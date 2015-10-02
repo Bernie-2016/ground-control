@@ -41,6 +41,33 @@
             {
               "name": "person",
               "description": null,
+              "args": [
+                {
+                  "name": "id",
+                  "description": "id",
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Person",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "persons",
+              "description": null,
               "args": [],
               "type": {
                 "kind": "LIST",
@@ -127,6 +154,18 @@
             {
               "name": "email",
               "description": "A person's e-mail address",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "name",
+              "description": "A person's name",
               "args": [],
               "type": {
                 "kind": "SCALAR",
