@@ -22,9 +22,10 @@ import {
 
 import {
   Person,
-  getPerson,
-  allPeople
-} from './database';
+  Field,
+  Note,
+  GroupCall
+} from './models';
 
 var {nodeInterface, nodeField} = nodeDefinitions(
   (globalId) => {
@@ -42,6 +43,25 @@ var {nodeInterface, nodeField} = nodeDefinitions(
   }
 );
 
+var inviteeType = new GraphQLObjectType({
+  name: 'GroupCallInvitee',
+  description: 'A single invitee to a group call',
+  fields: () => ({
+    personId: GraphQLString,
+    signedUp: GraphQLBoolean,
+    attended: GraphQLBoolean
+  })
+})
+
+var groupCallType = new GraphQLObjectType({
+  name: 'GroupCall',
+  description: 'A group call with a bunch of people',
+  fields: () => ({
+    id: globalIdField('GroupCall'),
+    invitees: new GraphQLList(inviteeType)
+  })
+})
+
 var personType = new GraphQLObjectType({
   name: 'Person',
   description: 'A person that has at some point signed up',
@@ -51,10 +71,6 @@ var personType = new GraphQLObjectType({
       type: GraphQLString,
       description: "A person's e-mail address",
     },
-    name: {
-      type: GraphQLString,
-      description: "A person's name"
-    }
   }),
   interfaces: [nodeInterface],
 });
