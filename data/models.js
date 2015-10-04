@@ -1,4 +1,4 @@
-var thinky = require('thinky')();
+import thinky from './thinky';
 var thinkyType = thinky.type;
 
 export var Person = thinky.createModel("person", {
@@ -9,7 +9,7 @@ export var Person = thinky.createModel("person", {
 export var Field = thinky.createModel("field", {
     id: thinkyType.string(),
     label: thinkyType.string(),
-    type: thinkyType.string().enum(['NUMBER', 'STRING', 'BOOLEAN']), // TODO: Change this to use the same enum from the graphql schema
+    type: thinkyType.string().enum(['NUMBER', 'STRING', 'BOOLEAN']),
     choices: []
 })
 
@@ -27,11 +27,19 @@ export var Note = thinky.createModel("note", {
     }
 })
 
+// An invitation gets sent to volunteers and they can pick one group call.
+export var GroupCallInvitation = thinky.createModel("group_call_invitation", {
+    id: thinkyType.string(),
+    topic: thinkyType.string(),
+    groupCalls: [GroupCall]
+})
+
 export var GroupCall = thinky.createModel("group_call", {
     id: thinkyType.string(),
-    invitees: [{
+    scheduledTime: thinkyType.date(),
+    maxSignups: thinkyType.number(),
+    signups: [{
         personId: thinkyType.string(),
-        signedUp: thinkyType.boolean(),
         attended: thinkyType.boolean()
     }]
 })
