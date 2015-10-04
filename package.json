@@ -1,8 +1,8 @@
 {
-  "name": "relay-starter-kit",
+  "name": "ground-control",
   "private": true,
   "description": "A quick way to get up and running with Relay",
-  "repository": "facebook/relay-starter-kit",
+  "repository": "saikat/ground-control",
   "version": "0.1.0",
   "scripts": {
     "start": "babel-node ./server.js",
