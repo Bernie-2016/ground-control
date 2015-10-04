@@ -1,3 +1,4 @@
+
 import {
     GraphQLBoolean,
     GraphQLList,
@@ -52,11 +53,11 @@ var inviteeType = new GraphQLObjectType({
     description: 'A single invitee to a group call',
     fields: () => ({
         person: {
-            type: personType,
+            type: new GraphQLNonNull(personType),
             resolve: (invitee) => { return Person.get(invitee.personId); }
         },
-        signedUp: { type: GraphQLBoolean },
-        attended: { type: GraphQLBoolean}
+        signedUp: { type: new GraphQLNonNull(GraphQLBoolean) },
+        attended: { type: new GraphQLNonNull(GraphQLBoolean) }
     })
 })
 
@@ -65,9 +66,9 @@ var groupCallType = new GraphQLObjectType({
     description: 'A group call with a bunch of people',
     fields: () => ({
         id: globalIdField('GroupCall'),
-        scheduledTime: { type: GraphQLString },
-        maxSignups: { type: GraphQLInt },
-        invitees: { type: new GraphQLList(inviteeType) }
+        scheduledTime: { type: new GraphQLNonNull(GraphQLString) },
+        maxSignups: { type: new GraphQLNonNull(GraphQLInt) },
+        invitees: { type: new GraphQLNonNull(new GraphQLList(inviteeType)) }
     })
 })
 
@@ -76,8 +77,8 @@ var groupCallInvitationType = new GraphQLObjectType({
     description: 'An invitation to a number of group calls.',
     fields: () => ({
         id: globalIdField('GroupCallInvitation'),
-        topic: { type: GraphQLString },
-        groupCalls: { type: new GraphQLList(groupCallType) }
+        topic: { type: new GraphQLNonNull(GraphQLString) },
+        groupCalls: { type: new GraphQLNonNull(new GraphQLList(groupCallType)) }
     })
 })
 
@@ -86,7 +87,7 @@ var personType = new GraphQLObjectType({
     description: 'A person that has at some point signed up',
     fields: () => ({
         id: globalIdField('Person'),
-        email: { type: GraphQLString },
+        email: { type: new GraphQLNonNull(GraphQLString) },
     }),
     interfaces: [nodeInterface],
 });
@@ -114,24 +115,28 @@ var queryType = new GraphQLObjectType({
 var groupCallInputType = new GraphQLInputObjectType({
     name: 'GroupCallInput',
     fields: {
-        scheduledTime: { type: GraphQLString },
-        maxSignups: { type: GraphQLInt }
+        scheduledTime: { type: new GraphQLNonNull(GraphQLString) },
+        maxSignups: { type: new GraphQLNonNull(GraphQLInt) }
     }
 })
 
 var CreateGroupCallInvitation = mutationWithClientMutationId({
     name: 'CreateGroupCallInvitation',
     inputFields: {
-        topic: { type: GraphQLString },
+        topic: { type: new GraphQLNonNull(GraphQLString) },
 //        groupCalls: { type: new GraphQLList(groupCallInputType) }
     },
     outputFields: {
-        groupCallInvitation: { type: groupCallInvitationType }
+        groupCallInvitation: {
+            type: groupCallInvitationType,
+            resolve: (payload) => payload
+        }
     },
     mutateAndGetPayload: ({topic}) => {
         var newGroupCallInvitation = new GroupCallInvitation({
             topic: topic
         });
+        return newGroupCallInvitation.save();
 /*        groupCalls.forEach((call) => {
             var newGroupCall = new GroupCall({
                 scheduledTime: call.scheduledTime,
@@ -143,7 +148,7 @@ var CreateGroupCallInvitation = mutationWithClientMutationId({
 
         });
         */
-        return newGroupCallInvitation
+//        return newGroupCallInvitation
     },
 });
 
