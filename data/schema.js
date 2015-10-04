@@ -1,8 +1,10 @@
 import {
     GraphQLBoolean,
     GraphQLList,
+    GraphQLInt,
     GraphQLNonNull,
     GraphQLObjectType,
+    GraphQLInputObjectType,
     GraphQLSchema,
     GraphQLString,
 } from 'graphql';
@@ -21,7 +23,8 @@ import {
     Person,
     Field,
     Note,
-    GroupCall
+    GroupCall,
+    GroupCallInvitation
 } from './models';
 
 var {nodeInterface, nodeField} = nodeDefinitions(
@@ -42,7 +45,7 @@ var {nodeInterface, nodeField} = nodeDefinitions(
         else
             return null;
     }
-);
+)
 
 var inviteeType = new GraphQLObjectType({
     name: 'GroupCallInvitee',
@@ -62,7 +65,19 @@ var groupCallType = new GraphQLObjectType({
     description: 'A group call with a bunch of people',
     fields: () => ({
         id: globalIdField('GroupCall'),
+        scheduledTime: { type: GraphQLString },
+        maxSignups: { type: GraphQLInt },
         invitees: { type: new GraphQLList(inviteeType) }
+    })
+})
+
+var groupCallInvitationType = new GraphQLObjectType({
+    name: 'GroupCallInvitation',
+    description: 'An invitation to a number of group calls.',
+    fields: () => ({
+        id: globalIdField('GroupCallInvitation'),
+        topic: { type: GraphQLString },
+        groupCalls: { type: new GraphQLList(groupCallType) }
     })
 })
 
@@ -75,9 +90,6 @@ var personType = new GraphQLObjectType({
     }),
     interfaces: [nodeInterface],
 });
-
-var {connectionType: personConnection} =
-  connectionDefinitions({name: 'Person', nodeType: personType});
 
 var queryType = new GraphQLObjectType({
     name: 'Query',
@@ -99,15 +111,51 @@ var queryType = new GraphQLObjectType({
 });
 
 
-//var mutationType = new GraphQLObjectType({
-//  name: 'Mutation',
-//  fields: () => ({
-        // Add your own mutations here
-//  })
-//});
+var groupCallInputType = new GraphQLInputObjectType({
+    name: 'GroupCallInput',
+    fields: {
+        scheduledTime: { type: GraphQLString },
+        maxSignups: { type: GraphQLInt }
+    }
+})
+
+var CreateGroupCallInvitation = mutationWithClientMutationId({
+    name: 'CreateGroupCallInvitation',
+    inputFields: {
+        topic: { type: GraphQLString },
+//        groupCalls: { type: new GraphQLList(groupCallInputType) }
+    },
+    outputFields: {
+        groupCallInvitation: { type: groupCallInvitationType }
+    },
+    mutateAndGetPayload: ({topic}) => {
+        var newGroupCallInvitation = new GroupCallInvitation({
+            topic: topic
+        });
+/*        groupCalls.forEach((call) => {
+            var newGroupCall = new GroupCall({
+                scheduledTime: call.scheduledTime,
+                maxSignups: call.maxSignups,
+                groupCallInvitation: newGroupCallInvitation,
+//                signups: []
+            })
+            newGroupCall.saveAll()
+
+        });
+        */
+        return newGroupCallInvitation
+    },
+});
+
+var mutationType = new GraphQLObjectType({
+    name: 'Mutation',
+    fields: () => ({
+        createGroupCallInvitation: CreateGroupCallInvitation
+    })
+});
 
 export var Schema = new GraphQLSchema({
     query: queryType,
     // Uncomment the following after adding some mutation fields:
-    // mutation: mutationType
+    mutation: mutationType
 });

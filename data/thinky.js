@@ -1,2 +1,3 @@
 // This is an app singleton
-export default var thinky = require('thinky')();
+var thinky = require('thinky')();
+export default thinky

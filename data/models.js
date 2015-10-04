@@ -27,19 +27,23 @@ export var Note = thinky.createModel("note", {
     }
 })
 
+Note.belongsTo(Field, "field", "fieldId", "id")
+
 // An invitation gets sent to volunteers and they can pick one group call.
 export var GroupCallInvitation = thinky.createModel("group_call_invitation", {
     id: thinkyType.string(),
     topic: thinkyType.string(),
-    groupCalls: [GroupCall]
 })
 
 export var GroupCall = thinky.createModel("group_call", {
     id: thinkyType.string(),
     scheduledTime: thinkyType.date(),
     maxSignups: thinkyType.number(),
+    groupCallInvitationId: thinkyType.string(),
     signups: [{
         personId: thinkyType.string(),
         attended: thinkyType.boolean()
     }]
 })
+
+GroupCall.belongsTo(GroupCallInvitation, "groupCallInvitation", "groupCallInvitationId", "id")
