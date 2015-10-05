@@ -2,5 +2,6 @@
 build/
 node_modules
 npm-debug.log
-data/schema.json
+schema.json
+schema.graphql
 rethinkdb_data
