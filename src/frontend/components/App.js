@@ -5,7 +5,7 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        <h1>Hello World</h1>
+        <h1>hi</h1>
       </div>
     );
   }
@@ -13,7 +13,7 @@ class App extends React.Component {
 
 export default Relay.createContainer(App, {
   fragments: {
-    group: () => Relay.QL`
+    groupCallInvitation: () => Relay.QL`
       fragment on GroupCallInvitation {
         topic
       }

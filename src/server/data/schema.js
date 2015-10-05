@@ -153,15 +153,18 @@ var queryType = new GraphQLObjectType({
             type: groupCallInvitationType,
             args: {
                 id: { type: new GraphQLNonNull(GraphQLString) }
+            },
+            resolve: (root, {id}) => {
+                return GroupCallInvitation.get(id);
             }
-        }
+        },
         groupCall: {
             type: groupCallType,
             args: {
                 id: { type: new GraphQLNonNull(GraphQLString) }
             },
             resolve: (root, {id}) => {
-                return GroupCallInvitation.get(id);
+                return GroupCall.get(id);
             }
         },
     }),

@@ -1,6 +1,6 @@
 .DS_Store
+build/
 node_modules
 npm-debug.log
-data/schema.graphql
 data/schema.json
 rethinkdb_data
