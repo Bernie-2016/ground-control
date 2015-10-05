@@ -78,7 +78,12 @@ var groupCallInvitationType = new GraphQLObjectType({
     fields: () => ({
         id: globalIdField('GroupCallInvitation'),
         topic: { type: new GraphQLNonNull(GraphQLString) },
-        groupCalls: { type: new GraphQLNonNull(new GraphQLList(groupCallType)) }
+        groupCalls: {
+            type: new GraphQLNonNull(new GraphQLList(groupCallType)),
+            resolve: (groupCallInvitation) => {
+                return groupCallInvitation.groupCalls || []
+            }
+        }
     })
 })
 
@@ -124,7 +129,7 @@ var CreateGroupCallInvitation = mutationWithClientMutationId({
     name: 'CreateGroupCallInvitation',
     inputFields: {
         topic: { type: new GraphQLNonNull(GraphQLString) },
-//        groupCalls: { type: new GraphQLList(groupCallInputType) }
+        groupCalls: { type: new GraphQLList(groupCallInputType) }
     },
     outputFields: {
         groupCallInvitation: {
@@ -132,23 +137,23 @@ var CreateGroupCallInvitation = mutationWithClientMutationId({
             resolve: (payload) => payload
         }
     },
-    mutateAndGetPayload: ({topic}) => {
+    mutateAndGetPayload: async ({topic, groupCalls}) => {
         var newGroupCallInvitation = new GroupCallInvitation({
             topic: topic
         });
-        return newGroupCallInvitation.save();
-/*        groupCalls.forEach((call) => {
+        newGroupCallInvitation.groupCalls = []
+
+        groupCalls.map(call => {
             var newGroupCall = new GroupCall({
                 scheduledTime: call.scheduledTime,
                 maxSignups: call.maxSignups,
-                groupCallInvitation: newGroupCallInvitation,
-//                signups: []
+                signups: []
             })
-            newGroupCall.saveAll()
+            newGroupCall.groupCallInvitation = newGroupCallInvitation;
+            newGroupCallInvitation.groupCalls.push(newGroupCall);
+        })
 
-        });
-        */
-//        return newGroupCallInvitation
+        return newGroupCallInvitation.saveAll()
     },
 });
 
