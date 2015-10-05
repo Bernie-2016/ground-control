@@ -97,25 +97,6 @@ var personType = new GraphQLObjectType({
     interfaces: [nodeInterface],
 });
 
-var queryType = new GraphQLObjectType({
-    name: 'Query',
-    fields: () => ({
-        node: nodeField,
-        groupCall: {
-            type: groupCallType,
-            args: {
-                id: {
-                    description: 'id',
-                    type: new GraphQLNonNull(GraphQLString)
-                }
-            },
-            resolve: (root, {id}) => {
-                return GroupCall.get(id);
-            }
-        },
-    }),
-});
-
 
 var groupCallInputType = new GraphQLInputObjectType({
     name: 'GroupCallInput',
@@ -162,6 +143,28 @@ var mutationType = new GraphQLObjectType({
     fields: () => ({
         createGroupCallInvitation: CreateGroupCallInvitation
     })
+});
+
+var queryType = new GraphQLObjectType({
+    name: 'Query',
+    fields: () => ({
+        node: nodeField,
+        groupCallInvitation: {
+            type: groupCallInvitationType,
+            args: {
+                id: { type: new GraphQLNonNull(GraphQLString) }
+            }
+        }
+        groupCall: {
+            type: groupCallType,
+            args: {
+                id: { type: new GraphQLNonNull(GraphQLString) }
+            },
+            resolve: (root, {id}) => {
+                return GroupCallInvitation.get(id);
+            }
+        },
+    }),
 });
 
 export var Schema = new GraphQLSchema({
