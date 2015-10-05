@@ -3,7 +3,7 @@ import webpack from 'webpack';
 import WebpackDevServer from 'webpack-dev-server';
 import nodemon from 'nodemon';
 import path from 'path';
-import { Schema } from './src/server/data/schema';
+import { Schema } from './src/backend/data/schema';
 import { introspectionQuery, printSchema } from 'graphql/utilities';
 import { graphql } from 'graphql';
 import fs from 'fs';
@@ -73,11 +73,11 @@ gulp.task('generate-schema', () => {
       if (result.errors)
         return console.error('[schema]: ERROR --', JSON.stringify(result.errors, null, 2));
       fs.writeFileSync(
-        path.join(__dirname, './src/server/data/schema.json'),
+        path.join(__dirname, './src/backend/data/schema.json'),
         JSON.stringify(result, null, 2)
       );
       fs.writeFileSync(
-        path.join(__dirname, './src/server/data/schema.graphql'),
+        path.join(__dirname, './src/backend/data/schema.graphql'),
         printSchema(Schema)
       );
       return compiler ? recompile() : null;
@@ -86,7 +86,7 @@ gulp.task('generate-schema', () => {
 
 // recompile the schema whenever .js files in data are updated
 gulp.task('watch-schema', () => {
-  gulp.watch(path.join(__dirname, './src/server/data', '**/*.js'), ['generate-schema']);
+  gulp.watch(path.join(__dirname, './src/backend/data', '**/*.js'), ['generate-schema']);
 });
 
 gulp.task('server', ['backend-watch', 'watch-schema'], () => {
