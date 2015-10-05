@@ -52,7 +52,7 @@ var frontendConfig = assign({}, defaultConfig, {
 });
 
 var serverConfig = assign({}, defaultConfig, {
-  entry: './src/server/index.js',
+  entry: './src/backend/server.js',
   output: {
     path: path.join(__dirname, 'build'),
     filename: 'server.js',

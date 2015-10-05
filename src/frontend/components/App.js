@@ -5,7 +5,7 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        <h1>hi</h1>
+        <h1>{this.props.groupCallInvitation.topic}</h1>
       </div>
     );
   }
