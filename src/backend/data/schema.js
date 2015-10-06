@@ -166,7 +166,7 @@ var queryType = new GraphQLObjectType({
             resolve: (root, {id}) => {
                 return GroupCall.get(id);
             }
-        },
+        }
     }),
 });
 

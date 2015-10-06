@@ -4,7 +4,7 @@ import graphQLHTTP from 'express-graphql';
 
 const app = express();
 app.use('/', graphQLHTTP((req) => {
-  console.log(req);
+  console.log(req.body);
   return {schema: Schema, pretty: true}
 }));
 app.listen(8000, (err) => {
