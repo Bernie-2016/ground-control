@@ -1,15 +1,33 @@
 import 'babel/polyfill';
-
-import App from './components/App';
-import AppHomeRoute from './routes/AppHomeRoute';
+import createHashHistory from 'history/lib/createHashHistory'
+import {IndexRoute, Route, Router} from 'react-router';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import ReactRouterRelay from 'react-router-relay';
 import Relay from 'react-relay';
+import CreateGroupCallInvitationForm from './components/CreateGroupCallInvitationForm'
 
+const GroupCallInvitationQueries = {
+  groupCallInvitation: () => Relay.QL`
+    query {
+      groupCallInvitation(id: $groupCallInvitationId)
+    }`,
+};
 ReactDOM.render(
-  <Relay.RootContainer
-    Component={App}
-    route={new AppHomeRoute({groupCallInvitationId: 'fda3567f-0d75-4c27-8777-8d28cd1402d1'})}
-  />,
+  <Router
+    createElement={ReactRouterRelay.createElement}
+    history={createHashHistory({queryKey: false})}
+  >
+    <Route
+      path="/" component={CreateGroupCallInvitationForm}
+      queries={GroupCallInvitationQueries}
+    >
+      <Route
+        path=":groupCallInvitationId"
+        component={CreateGroupCallInvitationForm}
+        queries={GroupCallInvitationQueries}
+      />
+    </Route>
+  </Router>,
   document.getElementById('root')
 );
