@@ -58,10 +58,13 @@ var Root = new GraphQLObjectType({
     groupCallInvitation: {
       type: GraphQLGroupCallInvitation,
       args: {
-        id: { type: new GraphQLNonNull(GraphQLString) }
+        id: { type: GraphQLString }
       },
       resolve: (root, {id}) => {
-        return GroupCallInvitation.get(id);
+        if (id)
+          return GroupCallInvitation.get(id);
+        else
+          return GroupCallInvitation.filter({});
       }
     },
     node: nodeField

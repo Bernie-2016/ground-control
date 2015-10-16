@@ -1,16 +1,17 @@
 import 'babel/polyfill';
 import createHashHistory from 'history/lib/createHashHistory'
-import {IndexRoute, Route, Router} from 'react-router';
+import {Redirect, Route, Router} from 'react-router';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactRouterRelay from 'react-router-relay';
 import Relay from 'react-relay';
-import CreateGroupCallInvitationForm from './components/CreateGroupCallInvitationForm'
+import {Dashboard} from './components/Dashboard'
+import {GroupCallInvitationListRelay} from './components/GroupCallInvitationList'
 
 const GroupCallInvitationQueries = {
   groupCallInvitation: () => Relay.QL`
     query {
-      groupCallInvitation(id: $groupCallInvitationId)
+      groupCallInvitation
     }`,
 };
 ReactDOM.render(
@@ -18,15 +19,14 @@ ReactDOM.render(
     createElement={ReactRouterRelay.createElement}
     history={createHashHistory({queryKey: false})}
   >
+    <Redirect from="/" to="/group-calls" />
     <Route
-      path="/" component={CreateGroupCallInvitationForm}
-      queries={GroupCallInvitationQueries}
+      path="/" component={Dashboard}
     >
       <Route
-        path=":groupCallInvitationId"
-        component={CreateGroupCallInvitationForm}
-        queries={GroupCallInvitationQueries}
-      />
+        path="group-calls"
+        component={GroupCallInvitationListRelay}
+        queries={GroupCallInvitationQueries} />
     </Route>
   </Router>,
   document.getElementById('root')
