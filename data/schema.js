@@ -34,13 +34,13 @@ var {nodeInterface, nodeField} = nodeDefinitions(
   },
   (obj) => {
     if (obj instanceof GroupCallInvitation)
-      return groupCallInvitationType;
+      return GraphQLGroupCallInvitation;
     else
       return null;
   }
 );
 
-var groupCallInvitationType = new GraphQLObjectType({
+var GraphQLGroupCallInvitation = new GraphQLObjectType({
   name: 'GroupCallInvitation',
   description: 'An invitation to a number of group calls.',
   fields: () => ({
@@ -52,11 +52,11 @@ var groupCallInvitationType = new GraphQLObjectType({
   interfaces: [nodeInterface]
 })
 
-var queryType = new GraphQLObjectType({
-  name: 'Query',
+var Root = new GraphQLObjectType({
+  name: 'Root',
   fields: () => ({
     groupCallInvitation: {
-      type: groupCallInvitationType,
+      type: GraphQLGroupCallInvitation,
       args: {
         id: { type: new GraphQLNonNull(GraphQLString) }
       },
@@ -69,5 +69,5 @@ var queryType = new GraphQLObjectType({
 });
 
 export var Schema = new GraphQLSchema({
-  query: queryType,
+  query: Root,
 });
