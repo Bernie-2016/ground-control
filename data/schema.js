@@ -33,6 +33,7 @@ var {nodeInterface, nodeField} = nodeDefinitions(
       return null;
   },
   (obj) => {
+    console.log('here')
     if (obj instanceof GroupCallInvitation)
       return GraphQLGroupCallInvitation;
     else
@@ -52,13 +53,29 @@ var GraphQLGroupCallInvitation = new GraphQLObjectType({
   interfaces: [nodeInterface]
 })
 
+var GraphQLViewer = new GraphQLObjectType({
+  name: 'Viewer',
+  fields: () => ({
+    id: globalIdField('Viewer'),
+    groupCallInvitationList: {
+      type: new GraphQLList(GraphQLGroupCallInvitation),
+      resolve: () => {
+        console.log("HERERERER")
+        return GroupCallInvitation.filter({})
+      }
+    }
+  }),
+  interfaces: [nodeInterface]
+})
+
 var Root = new GraphQLObjectType({
   name: 'Root',
   fields: () => ({
-    groupCallInvitationList: {
-      type: new GraphQLList(GraphQLGroupCallInvitation),
-      resolve: (root, {id}) => {
-        return GroupCallInvitation.filter({});
+    viewer: {
+      type: GraphQLViewer,
+      resolve: () => {
+        console.log("how about here?")
+        return {}
       }
     },
     node: nodeField

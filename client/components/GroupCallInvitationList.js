@@ -4,8 +4,11 @@ import Relay from 'react-relay';
 export class GroupCallInvitationList extends React.Component {
 
   renderGroupCallInvitations() {
-    console.log(this.props.groupCallInvitationList)
-    return this.props.groupCallInvitationList.topic
+    return this.props.viewer.groupCallInvitationList.map(invitation =>
+      <ul key={invitation.id}>
+        {invitation.topic}
+      </ul>
+    );
   }
 
   render() {
@@ -19,9 +22,12 @@ export class GroupCallInvitationList extends React.Component {
 
 export const GroupCallInvitationListRelay = Relay.createContainer(GroupCallInvitationList, {
   fragments: {
-    groupCallInvitationList: () => Relay.QL`
-      fragment on GroupCallInvitation {
-        topic
+    viewer: () => Relay.QL`
+      fragment on Viewer {
+        groupCallInvitationList {
+          id,
+          topic
+        }
       }
     `,
   },

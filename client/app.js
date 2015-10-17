@@ -8,25 +8,21 @@ import Relay from 'react-relay';
 import {Dashboard} from './components/Dashboard'
 import {GroupCallInvitationListRelay} from './components/GroupCallInvitationList'
 
-const GroupCallInvitationListQueries = {
-  groupCallInvitationList: () => Relay.QL`
-    query {
-      groupCallInvitationList
-    }`,
+const ViewerQueries = {
+  viewer: () => Relay.QL`query { viewer }`
 };
+
 ReactDOM.render(
   <Router
     createElement={ReactRouterRelay.createElement}
     history={createHashHistory({queryKey: false})}
   >
     <Redirect from="/" to="/group-calls" />
-    <Route
-      path="/" component={Dashboard}
-    >
+    <Route path="/" component={Dashboard}>
       <Route
         path="group-calls"
         component={GroupCallInvitationListRelay}
-        queries={GroupCallInvitationListQueries} />
+        queries={ViewerQueries} />
     </Route>
   </Router>,
   document.getElementById('root')
