@@ -1,5 +1,6 @@
 import React from 'react';
 import Relay from 'react-relay';
+import {GroupCallInvitationCreationForm} from './GroupCallInvitationCreationForm'
 
 export class GroupCallInvitationList extends React.Component {
 
@@ -24,7 +25,7 @@ export class GroupCallInvitationList extends React.Component {
     if (!this.state.isCreating)
       callCreationComponent = <button onClick={this.handleCreateCall}>New Call</button>;
     else
-      callCreationComponent = <div>hi</div>
+      callCreationComponent = <GroupCallInvitationCreationForm />
     return (
       <div>
         {this.renderGroupCallInvitations()}
