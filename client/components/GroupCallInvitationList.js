@@ -3,6 +3,14 @@ import Relay from 'react-relay';
 
 export class GroupCallInvitationList extends React.Component {
 
+  state = {
+    isCreating: false
+  }
+
+  handleCreateCall = (event) => {
+    this.setState({isCreating: true})
+  }
+
   renderGroupCallInvitations() {
     return this.props.viewer.groupCallInvitationList.map(invitation =>
       <ul key={invitation.id}>
@@ -12,9 +20,15 @@ export class GroupCallInvitationList extends React.Component {
   }
 
   render() {
+    var callCreationComponent;
+    if (!this.state.isCreating)
+      callCreationComponent = <button onClick={this.handleCreateCall}>New Call</button>;
+    else
+      callCreationComponent = <div>hi</div>
     return (
       <div>
         {this.renderGroupCallInvitations()}
+        {callCreationComponent}
       </div>
     );
   }
