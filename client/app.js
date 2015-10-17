@@ -8,10 +8,10 @@ import Relay from 'react-relay';
 import {Dashboard} from './components/Dashboard'
 import {GroupCallInvitationListRelay} from './components/GroupCallInvitationList'
 
-const GroupCallInvitationQueries = {
-  groupCallInvitation: () => Relay.QL`
+const GroupCallInvitationListQueries = {
+  groupCallInvitationList: () => Relay.QL`
     query {
-      groupCallInvitation
+      groupCallInvitationList
     }`,
 };
 ReactDOM.render(
@@ -26,7 +26,7 @@ ReactDOM.render(
       <Route
         path="group-calls"
         component={GroupCallInvitationListRelay}
-        queries={GroupCallInvitationQueries} />
+        queries={GroupCallInvitationListQueries} />
     </Route>
   </Router>,
   document.getElementById('root')

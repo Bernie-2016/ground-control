@@ -55,16 +55,10 @@ var GraphQLGroupCallInvitation = new GraphQLObjectType({
 var Root = new GraphQLObjectType({
   name: 'Root',
   fields: () => ({
-    groupCallInvitation: {
-      type: GraphQLGroupCallInvitation,
-      args: {
-        id: { type: GraphQLString }
-      },
+    groupCallInvitationList: {
+      type: new GraphQLList(GraphQLGroupCallInvitation),
       resolve: (root, {id}) => {
-        if (id)
-          return GroupCallInvitation.get(id);
-        else
-          return GroupCallInvitation.filter({});
+        return GroupCallInvitation.filter({});
       }
     },
     node: nodeField

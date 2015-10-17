@@ -2,10 +2,16 @@ import React from 'react';
 import Relay from 'react-relay';
 
 export class GroupCallInvitationList extends React.Component {
+
+  renderGroupCallInvitations() {
+    console.log(this.props.groupCallInvitationList)
+    return this.props.groupCallInvitationList.topic
+  }
+
   render() {
     return (
       <div>
-        Test
+        {this.renderGroupCallInvitations()}
       </div>
     );
   }
@@ -13,7 +19,7 @@ export class GroupCallInvitationList extends React.Component {
 
 export const GroupCallInvitationListRelay = Relay.createContainer(GroupCallInvitationList, {
   fragments: {
-    groupCallInvitation: () => Relay.QL`
+    groupCallInvitationList: () => Relay.QL`
       fragment on GroupCallInvitation {
         topic
       }
