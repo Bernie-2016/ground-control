@@ -1,7 +1,8 @@
 import React from 'react';
 import Relay from 'react-relay';
+import CreateGroupCallInvitationMutation from '../mutations/CreateGroupCallInvitationMutation';
 
-export class GroupCallInvitationCreationForm extends React.Component {
+class GroupCallInvitationCreationForm extends React.Component {
 
   state = {
     topic: "A call",
@@ -12,7 +13,9 @@ export class GroupCallInvitationCreationForm extends React.Component {
   }
 
   handleCreation = (event) => {
-    console.log(this.state.topic);
+    Relay.Store.update(
+      new CreateGroupCallInvitationMutation({topic: this.state.topic, viewer: this.props.viewer})
+    );
   }
 
   render() {
@@ -34,3 +37,13 @@ export class GroupCallInvitationCreationForm extends React.Component {
     )
   }
 }
+
+export default Relay.createContainer(GroupCallInvitationCreationForm, {
+  fragments: {
+    viewer: () => Relay.QL`
+      fragment on Viewer {
+        ${CreateGroupCallInvitationMutation.getFragment('viewer')},
+      }
+    `
+  },
+});

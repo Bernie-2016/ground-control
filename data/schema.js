@@ -40,6 +40,10 @@ var {nodeInterface, nodeField} = nodeDefinitions(
   }
 );
 
+function getViewer() {
+  return {id: '1'}
+}
+
 var GraphQLGroupCallInvitation = new GraphQLObjectType({
   name: 'GroupCallInvitation',
   description: 'An invitation to a number of group calls.',
@@ -82,15 +86,17 @@ var GraphQLCreateGroupCallInvitationMutation = mutationWithClientMutationId({
     topic: { type: new GraphQLNonNull(GraphQLString) }
   },
   outputFields: {
-    groupCallInvitation: {
-      type: GraphQLGroupCallInvitation,
+    viewer: {
+      type: GraphQLViewer,
       resolve: (payload) => {
-        console.log(payload)
+        console.log(payload);
+        return getViewer();
       }
     }
   },
-  mutateAndGetPayload: (input) => {
-
+  mutateAndGetPayload: async (input) => {
+    console.log(input);
+    var invitation = await GroupCallInvitation.save({topic: input.topic})
   }
 });
 
@@ -107,7 +113,7 @@ var RootQuery = new GraphQLObjectType({
     viewer: {
       type: GraphQLViewer,
       resolve: () => {
-        return {}
+        return getViewer();
       }
     },
     node: nodeField
@@ -116,5 +122,5 @@ var RootQuery = new GraphQLObjectType({
 
 export var Schema = new GraphQLSchema({
   query: RootQuery,
-//  mutation: RootMutation
+  mutation: RootMutation
 });

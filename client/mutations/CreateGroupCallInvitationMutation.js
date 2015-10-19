@@ -1,27 +1,43 @@
-class CreateGroupCallInvitationMutation extends Relay.Mutation {
+import Relay from 'react-relay';
+
+export default class CreateGroupCallInvitationMutation extends Relay.Mutation {
   static fragments = {
-    story: () => Relay.QL`
-      fragment on Story { id }
+    viewer: () => Relay.QL`
+      fragment on Viewer {
+        id
+      }
     `,
   };
+
   getMutation() {
     return Relay.QL`
       mutation{ createGroupCallInvitation }
     `;
   }
+
   getFatQuery() {
     return Relay.QL`
-      fragment on CreateCommentPayload {
-        story { comments },
+      fragment on CreateGroupCallInvitationPayload {
+        viewer {
+          id,
+          groupCallInvitationList
+        },
       }
     `;
   }
+
   getConfigs() {
     return [{
       type: 'FIELDS_CHANGE',
-      fieldIDs: { story: this.props.story.id },
+      fieldIDs: {
+        viewer: this.props.viewer.id
+      }
     }];
   }
 
   getVariables() {
-    return { text: this.props.text };
+    return {
+      topic: this.props.topic,
+    };
+  }
+}
