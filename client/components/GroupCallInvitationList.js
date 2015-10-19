@@ -13,7 +13,6 @@ export class GroupCallInvitationList extends React.Component {
   }
 
   renderGroupCallInvitations() {
-    console.log(this.props.viewer.groupCallInvitationList);
     return this.props.viewer.groupCallInvitationList.edges.map(invitation =>
       <ul key={invitation.node.id}>
         {invitation.node.topic}
