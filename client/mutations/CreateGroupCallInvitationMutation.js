@@ -22,7 +22,6 @@ class CreateGroupCallInvitationMutation extends Relay.Mutation {
       fieldIDs: { story: this.props.story.id },
     }];
   }
+
   getVariables() {
     return { text: this.props.text };
-  }
-}

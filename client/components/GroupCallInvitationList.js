@@ -13,9 +13,10 @@ export class GroupCallInvitationList extends React.Component {
   }
 
   renderGroupCallInvitations() {
-    return this.props.viewer.groupCallInvitationList.map(invitation =>
-      <ul key={invitation.id}>
-        {invitation.topic}
+    console.log(this.props.viewer.groupCallInvitationList);
+    return this.props.viewer.groupCallInvitationList.edges.map(invitation =>
+      <ul key={invitation.node.id}>
+        {invitation.node.topic}
       </ul>
     );
   }
@@ -39,9 +40,13 @@ export const GroupCallInvitationListRelay = Relay.createContainer(GroupCallInvit
   fragments: {
     viewer: () => Relay.QL`
       fragment on Viewer {
-        groupCallInvitationList {
-          id,
-          topic
+        groupCallInvitationList(first:10) {
+          edges {
+            node {
+              id,
+              topic
+            }
+          }
         }
       }
     `,

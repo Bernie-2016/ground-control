@@ -33,7 +33,6 @@ var {nodeInterface, nodeField} = nodeDefinitions(
       return null;
   },
   (obj) => {
-    console.log('here')
     if (obj instanceof GroupCallInvitation)
       return GraphQLGroupCallInvitation;
     else
@@ -53,28 +52,61 @@ var GraphQLGroupCallInvitation = new GraphQLObjectType({
   interfaces: [nodeInterface]
 })
 
+var {
+  connectionType: GraphQLGroupCallInvitationConnection,
+  edgeType: GraphQLGroupCallInvitationEdge
+ } = connectionDefinitions({
+  name: 'GroupCallInvitation',
+  nodeType: GraphQLGroupCallInvitation
+});
+
 var GraphQLViewer = new GraphQLObjectType({
   name: 'Viewer',
   fields: () => ({
     id: globalIdField('Viewer'),
     groupCallInvitationList: {
-      type: new GraphQLList(GraphQLGroupCallInvitation),
-      resolve: () => {
-        console.log("HERERERER")
-        return GroupCallInvitation.filter({})
+      type: GraphQLGroupCallInvitationConnection,
+      args: connectionArgs,
+      resolve: async (game, args) => {
+        var invitations = await GroupCallInvitation.filter({})
+        return connectionFromArray(invitations, args);
       }
     }
   }),
   interfaces: [nodeInterface]
 })
 
-var Root = new GraphQLObjectType({
-  name: 'Root',
+var GraphQLCreateGroupCallInvitationMutation = mutationWithClientMutationId({
+  name: 'CreateGroupCallInvitation',
+  inputFields: {
+    topic: { type: new GraphQLNonNull(GraphQLString) }
+  },
+  outputFields: {
+    groupCallInvitation: {
+      type: GraphQLGroupCallInvitation,
+      resolve: (payload) => {
+        console.log(payload)
+      }
+    }
+  },
+  mutateAndGetPayload: (input) => {
+
+  }
+});
+
+var RootMutation = new GraphQLObjectType({
+  name: 'RootMutation',
+  fields: () => ({
+    createGroupCallInvitation: GraphQLCreateGroupCallInvitationMutation
+  })
+});
+
+var RootQuery = new GraphQLObjectType({
+  name: 'RootQuery',
   fields: () => ({
     viewer: {
       type: GraphQLViewer,
       resolve: () => {
-        console.log("how about here?")
         return {}
       }
     },
@@ -83,5 +115,6 @@ var Root = new GraphQLObjectType({
 });
 
 export var Schema = new GraphQLSchema({
-  query: Root,
+  query: RootQuery,
+//  mutation: RootMutation
 });
