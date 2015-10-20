@@ -25,17 +25,23 @@ import {
   GroupCall
 } from './models';
 
+import Promise from 'bluebird';
+
 var {nodeInterface, nodeField} = nodeDefinitions(
   (globalId) => {
     var {type, id} = fromGlobalId(globalId);
     if (type === 'GroupCallInvitation')
       return GroupCallInvitation.get(id)
+    else if (type === 'GroupCall')
+      return GroupCall.get(id);
     else
       return null;
   },
   (obj) => {
     if (obj instanceof GroupCallInvitation)
       return GraphQLGroupCallInvitation;
+    else if (obj instanceof GroupCall)
+      return GraphQLGroupCall;
     else
       return null;
   }
@@ -51,8 +57,7 @@ function getViewer() {
   fields: () => ({
     id: globalIdField('GroupCall'),
     scheduledTime: { type: GraphQLString },
-    maxSignups: { type: GraphQLInt },
-    groupCallInvitation: { type: GraphQLGroupCallInvitation }
+    maxSignups: { type: GraphQLInt }
   })
 });
 
@@ -106,10 +111,19 @@ var GraphQLViewer = new GraphQLObjectType({
   interfaces: [nodeInterface]
 })
 
+var GraphQLGroupCallInput = new GraphQLInputObjectType({
+  name: 'GroupCallInput',
+  fields: {
+    scheduledTime: { type: new GraphQLNonNull(GraphQLString) },
+    maxSignups: { type: new GraphQLNonNull(GraphQLString) },
+  }
+})
+
 var GraphQLCreateGroupCallInvitationMutation = mutationWithClientMutationId({
   name: 'CreateGroupCallInvitation',
   inputFields: {
-    topic: { type: new GraphQLNonNull(GraphQLString) }
+    topic: { type: new GraphQLNonNull(GraphQLString) },
+    groupCallList: { type: new GraphQLNonNull(new GraphQLList(GraphQLGroupCallInput)) }
   },
   outputFields: {
     viewer: {
@@ -119,8 +133,19 @@ var GraphQLCreateGroupCallInvitationMutation = mutationWithClientMutationId({
       }
     }
   },
-  mutateAndGetPayload: async ({topic}) => {
+  mutateAndGetPayload: async ({topic, groupCallList}) => {
     var invitation = await GroupCallInvitation.save({topic: topic})
+    var promises = [];
+    groupCallList.forEach((groupCall) => {
+      promises.push(GroupCall.save({
+        scheduledTime: groupCall.scheduledTime,
+        maxSignups: groupCall.maxSignups,
+        signups: [],
+        groupCallInvitationId: invitation.id
+      }));
+    });
+
+    await Promise.all(promises)
     return {};
   }
 });

@@ -35,8 +35,8 @@ export var GroupCallInvitation = thinky.createModel("group_call_invitation", {
 
 export var GroupCall = thinky.createModel("group_call", {
   id: thinkyType.string().options({enforce_missing: false}),
-  scheduledTime: thinkyType.date(),
-  maxSignups: thinkyType.number(),
+  scheduledTime: thinkyType.string(),
+  maxSignups: thinkyType.string(),
   groupCallInvitationId: thinkyType.string(),
   signups: [{
     personId: thinkyType.string(),
