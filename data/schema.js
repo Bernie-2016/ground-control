@@ -72,6 +72,7 @@ var GraphQLViewer = new GraphQLObjectType({
       type: GraphQLGroupCallInvitationConnection,
       args: connectionArgs,
       resolve: async (game, args) => {
+        console.log('resolving');
         var invitations = await GroupCallInvitation.filter({})
         return connectionFromArray(invitations, args);
       }
@@ -88,15 +89,14 @@ var GraphQLCreateGroupCallInvitationMutation = mutationWithClientMutationId({
   outputFields: {
     viewer: {
       type: GraphQLViewer,
-      resolve: (payload) => {
-        console.log(payload);
+      resolve: () => {
         return getViewer();
       }
     }
   },
-  mutateAndGetPayload: async (input) => {
-    console.log(input);
-    var invitation = await GroupCallInvitation.save({topic: input.topic})
+  mutateAndGetPayload: async ({topic}) => {
+    var invitation = await GroupCallInvitation.save({topic: topic})
+    return {};
   }
 });
 
