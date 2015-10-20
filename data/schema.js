@@ -21,7 +21,8 @@ import {
 } from 'graphql-relay';
 
 import {
-  GroupCallInvitation
+  GroupCallInvitation,
+  GroupCall
 } from './models';
 
 var {nodeInterface, nodeField} = nodeDefinitions(
@@ -44,6 +45,24 @@ function getViewer() {
   return {id: '1'}
 }
 
+ var GraphQLGroupCall = new GraphQLObjectType({
+  name: "GroupCall",
+  description: 'A group call',
+  fields: () => ({
+    id: globalIdField('GroupCall'),
+    scheduledTime: { type: GraphQLString },
+    maxSignups: { type: GraphQLInt },
+    groupCallInvitation: { type: GraphQLGroupCallInvitation }
+  })
+});
+
+var {
+  connectionType: GraphLQGroupCallConnection,
+} = connectionDefinitions({
+  name: 'GroupCall',
+  nodeType: GraphQLGroupCall
+});
+
 var GraphQLGroupCallInvitation = new GraphQLObjectType({
   name: 'GroupCallInvitation',
   description: 'An invitation to a number of group calls.',
@@ -51,6 +70,14 @@ var GraphQLGroupCallInvitation = new GraphQLObjectType({
     id: globalIdField('GroupCallInvitation'),
     topic: {
       type: GraphQLString
+    },
+    groupCallList: {
+      type: GraphLQGroupCallConnection,
+      args: connectionArgs,
+      resolve: async (invitation, args) => {
+        var groupCalls = await GroupCall.filter({groupCallInvitationId : invitation.id})
+        return connectionFromArray(groupCalls, args);
+      }
     }
   }),
   interfaces: [nodeInterface]
@@ -58,8 +85,7 @@ var GraphQLGroupCallInvitation = new GraphQLObjectType({
 
 var {
   connectionType: GraphQLGroupCallInvitationConnection,
-  edgeType: GraphQLGroupCallInvitationEdge
- } = connectionDefinitions({
+} = connectionDefinitions({
   name: 'GroupCallInvitation',
   nodeType: GraphQLGroupCallInvitation
 });
@@ -71,8 +97,7 @@ var GraphQLViewer = new GraphQLObjectType({
     groupCallInvitationList: {
       type: GraphQLGroupCallInvitationConnection,
       args: connectionArgs,
-      resolve: async (game, args) => {
-        console.log('resolving');
+      resolve: async (viewer, args) => {
         var invitations = await GroupCallInvitation.filter({})
         return connectionFromArray(invitations, args);
       }

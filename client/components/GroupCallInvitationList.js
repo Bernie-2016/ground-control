@@ -44,7 +44,14 @@ export const GroupCallInvitationListRelay = Relay.createContainer(GroupCallInvit
           edges {
             node {
               id,
-              topic
+              topic,
+              groupCallList(first:10) {
+                edges {
+                  node {
+                    scheduledTime
+                  }
+                }
+              }
             }
           }
         }
