@@ -36,8 +36,14 @@ export default class CreateGroupCallInvitationMutation extends Relay.Mutation {
   }
 
   getVariables() {
+    var groupCalls = []
+    for (let i = 0; i < this.props.numCalls; i++) {
+      groupCalls.push({scheduledTime: "test", maxSignups: 15});
+    }
+
     return {
       topic: this.props.topic,
+      groupCallList: groupCalls
     };
   }
 }

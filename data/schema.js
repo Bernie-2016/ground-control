@@ -21,20 +21,27 @@ import {
 } from 'graphql-relay';
 
 import {
-  GroupCallInvitation
+  GroupCallInvitation,
+  GroupCall
 } from './models';
+
+import Promise from 'bluebird';
 
 var {nodeInterface, nodeField} = nodeDefinitions(
   (globalId) => {
     var {type, id} = fromGlobalId(globalId);
     if (type === 'GroupCallInvitation')
       return GroupCallInvitation.get(id)
+    else if (type === 'GroupCall')
+      return GroupCall.get(id);
     else
       return null;
   },
   (obj) => {
     if (obj instanceof GroupCallInvitation)
       return GraphQLGroupCallInvitation;
+    else if (obj instanceof GroupCall)
+      return GraphQLGroupCall;
     else
       return null;
   }
@@ -44,6 +51,23 @@ function getViewer() {
   return {id: '1'}
 }
 
+ var GraphQLGroupCall = new GraphQLObjectType({
+  name: "GroupCall",
+  description: 'A group call',
+  fields: () => ({
+    id: globalIdField('GroupCall'),
+    scheduledTime: { type: GraphQLString },
+    maxSignups: { type: GraphQLInt }
+  })
+});
+
+var {
+  connectionType: GraphLQGroupCallConnection,
+} = connectionDefinitions({
+  name: 'GroupCall',
+  nodeType: GraphQLGroupCall
+});
+
 var GraphQLGroupCallInvitation = new GraphQLObjectType({
   name: 'GroupCallInvitation',
   description: 'An invitation to a number of group calls.',
@@ -51,6 +75,14 @@ var GraphQLGroupCallInvitation = new GraphQLObjectType({
     id: globalIdField('GroupCallInvitation'),
     topic: {
       type: GraphQLString
+    },
+    groupCallList: {
+      type: GraphLQGroupCallConnection,
+      args: connectionArgs,
+      resolve: async (invitation, args) => {
+        var groupCalls = await GroupCall.filter({groupCallInvitationId : invitation.id})
+        return connectionFromArray(groupCalls, args);
+      }
     }
   }),
   interfaces: [nodeInterface]
@@ -58,8 +90,7 @@ var GraphQLGroupCallInvitation = new GraphQLObjectType({
 
 var {
   connectionType: GraphQLGroupCallInvitationConnection,
-  edgeType: GraphQLGroupCallInvitationEdge
- } = connectionDefinitions({
+} = connectionDefinitions({
   name: 'GroupCallInvitation',
   nodeType: GraphQLGroupCallInvitation
 });
@@ -71,7 +102,7 @@ var GraphQLViewer = new GraphQLObjectType({
     groupCallInvitationList: {
       type: GraphQLGroupCallInvitationConnection,
       args: connectionArgs,
-      resolve: async (game, args) => {
+      resolve: async (viewer, args) => {
         var invitations = await GroupCallInvitation.filter({})
         return connectionFromArray(invitations, args);
       }
@@ -80,23 +111,42 @@ var GraphQLViewer = new GraphQLObjectType({
   interfaces: [nodeInterface]
 })
 
+var GraphQLGroupCallInput = new GraphQLInputObjectType({
+  name: 'GroupCallInput',
+  fields: {
+    scheduledTime: { type: new GraphQLNonNull(GraphQLString) },
+    maxSignups: { type: new GraphQLNonNull(GraphQLString) },
+  }
+})
+
 var GraphQLCreateGroupCallInvitationMutation = mutationWithClientMutationId({
   name: 'CreateGroupCallInvitation',
   inputFields: {
-    topic: { type: new GraphQLNonNull(GraphQLString) }
+    topic: { type: new GraphQLNonNull(GraphQLString) },
+    groupCallList: { type: new GraphQLNonNull(new GraphQLList(GraphQLGroupCallInput)) }
   },
   outputFields: {
     viewer: {
       type: GraphQLViewer,
-      resolve: (payload) => {
-        console.log(payload);
+      resolve: () => {
         return getViewer();
       }
     }
   },
-  mutateAndGetPayload: async (input) => {
-    console.log(input);
-    var invitation = await GroupCallInvitation.save({topic: input.topic})
+  mutateAndGetPayload: async ({topic, groupCallList}) => {
+    var invitation = await GroupCallInvitation.save({topic: topic})
+    var promises = [];
+    groupCallList.forEach((groupCall) => {
+      promises.push(GroupCall.save({
+        scheduledTime: groupCall.scheduledTime,
+        maxSignups: groupCall.maxSignups,
+        signups: [],
+        groupCallInvitationId: invitation.id
+      }));
+    });
+
+    await Promise.all(promises)
+    return {};
   }
 });
 

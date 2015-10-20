@@ -13,7 +13,7 @@ class GroupCallInvitationCreationForm extends React.Component {
 
   handleCreation = (event) => {
     Relay.Store.update(
-      new CreateGroupCallInvitationMutation({topic: this.props.store.get('topic'), viewer: this.props.viewer})
+      new CreateGroupCallInvitationMutation({topic: this.props.store.get('topic'), numCalls: this.state.numCalls, viewer: this.props.viewer})
     );
   }
 

@@ -45,7 +45,14 @@ export default Relay.createContainer(GroupCallInvitationList, {
           edges {
             node {
               id,
-              topic
+              topic,
+              groupCallList(first:10) {
+                edges {
+                  node {
+                    scheduledTime
+                  }
+                }
+              }
             }
           }
         }
