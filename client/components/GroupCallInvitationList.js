@@ -3,28 +3,13 @@ import Relay from 'react-relay';
 import GroupCallInvitationCreationForm from './GroupCallInvitationCreationForm'
 
 class GroupCallInvitationList extends React.Component {
-  state = {
-    isCreating: false,
-  }
-
-  getState(stateName) {
-    if (typeof this.props.cursor.value === 'undefined' || typeof this.props.cursor.refine(stateName).value === 'undefined')
-      return this.state[stateName]
-    else
-      return this.props.cursor.refine(stateName).value
-  }
-
-  setState(stateObject) {
-    if (typeof this.props.cursor.value === 'undefined')
-      this.props.cursor.set(stateObject)
-    else
-      Object.keys(stateObject).forEach((key) => {
-        this.props.cursor.refine(key).set(stateObject[key]);
-      })
+  constructor(props) {
+    super(props);
+    console.log(this.store);
   }
 
   handleCreateCall = (event) => {
-    this.setState({isCreating : true});
+//    this.props.store.set({isCreating : true});
   }
 
   renderGroupCallInvitations() {
@@ -36,11 +21,12 @@ class GroupCallInvitationList extends React.Component {
   }
 
   render() {
+    console.log('rendering 1');
     var callCreationComponent;
-    if (!this.getState('isCreating'))
+    if (this.props.store.get('isCreating'))
       callCreationComponent = <button onClick={this.handleCreateCall}>New Call</button>;
     else
-      callCreationComponent = <GroupCallInvitationCreationForm viewer={this.props.viewer} cursor={this.props.cursor.refine('groupCallInvitationCreationForm')} />
+      callCreationComponent = <GroupCallInvitationCreationForm viewer={this.props.viewer} store={this.props.store.branch('groupCallInvitationCreationForm')} />
     return (
       <div>
         {this.renderGroupCallInvitations()}

@@ -11,27 +11,9 @@ class GroupCallInvitationCreationForm extends React.Component {
     maxSignups: 20
   }
 
-  getState(stateName) {
-    if (typeof this.props.cursor.value === 'undefined' || typeof this.props.cursor.refine(stateName).value === 'undefined')
-      return this.state[stateName]
-    else
-      return this.props.cursor.refine(stateName).value
-  }
-
-  setState(stateObject) {
-    if (typeof this.props.cursor.value === 'undefined') {
-      this.props.cursor.set(stateObject)
-    }
-    else {
-      Object.keys(stateObject).forEach((key) => {
-        this.props.cursor.refine(key).set(stateObject[key]);
-      })
-    }
-  }
-
   handleCreation = (event) => {
     Relay.Store.update(
-      new CreateGroupCallInvitationMutation({topic: this.getState('topic'), viewer: this.props.viewer})
+      new CreateGroupCallInvitationMutation({topic: this.props.store.get('topic'), viewer: this.props.viewer})
     );
   }
 
@@ -39,7 +21,7 @@ class GroupCallInvitationCreationForm extends React.Component {
     return (
       <form onSubmit={this.handleCreation}>
         <div>
-          <input type='text' placeholder='Topic' value={this.getState('topic')} onChange={e => this.setState({topic : e.target.value})}/>
+          <input type='text' placeholder='Topic' value={this.props.store.get('topic')} onChange={e => this.props.store.set({topic : e.target.value})}/>
         </div>
         <input type='text' placeholder='# of calls' value={this.state.numCalls} onChange={e => this.setState({numCalls : e.target.value})}/>
         calls from

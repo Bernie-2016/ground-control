@@ -1,14 +1,21 @@
 import React from 'react';
 import Relay from 'react-relay';
-import {Cursor} from 'react-cursor';
 import GroupCallInvitationList from './GroupCallInvitationList';
+import Store from '../store'
 
 class App extends React.Component {
-  state = {}
+  constructor(props) {
+    super(props);
+    this.state = {store: new Store({})};
+  }
+
+  componentDidMount() {
+    this.state.store.on('update', () => this.forceUpdate())
+  }
 
   render() {
-    var cursor = Cursor.build(this)
-    return <GroupCallInvitationList viewer={this.props.viewer} cursor={cursor.refine('groupCallInvitationList')} />
+    console.log('rendering');
+    return <GroupCallInvitationList viewer={this.props.viewer} store={this.state.store.branch('groupCallInvitationList')} />
   }
 }
 
