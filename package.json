@@ -27,6 +27,6 @@
     "react-router": "^1.0.0-rc3",
     "react-router-relay": "^0.7.0",
     "history": "^1.12.5",
-    "freezer-js": "^0.8.2"
+    "freezer-js": "0.8.2"
   }
 }

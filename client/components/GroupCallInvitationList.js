@@ -2,14 +2,9 @@ import React from 'react';
 import Relay from 'react-relay';
 import GroupCallInvitationCreationForm from './GroupCallInvitationCreationForm'
 
-export class GroupCallInvitationList extends React.Component {
-
-  state = {
-    isCreating: false
-  }
-
+class GroupCallInvitationList extends React.Component {
   handleCreateCall = (event) => {
-    this.setState({isCreating: true})
+    this.props.state.set({isCreating: true})
   }
 
   renderGroupCallInvitations() {
@@ -22,10 +17,10 @@ export class GroupCallInvitationList extends React.Component {
 
   render() {
     var callCreationComponent;
-    if (!this.state.isCreating)
+    if (!this.props.isCreating)
       callCreationComponent = <button onClick={this.handleCreateCall}>New Call</button>;
     else
-      callCreationComponent = <GroupCallInvitationCreationForm viewer={this.props.viewer} />
+      callCreationComponent = <GroupCallInvitationCreationForm viewer={this.props.viewer} state={this.props.state.groupCallInvitationCreationForm} />
     return (
       <div>
         {this.renderGroupCallInvitations()}
@@ -35,7 +30,7 @@ export class GroupCallInvitationList extends React.Component {
   }
 }
 
-export const GroupCallInvitationListRelay = Relay.createContainer(GroupCallInvitationList, {
+export default Relay.createContainer(GroupCallInvitationList, {
   fragments: {
     viewer: () => Relay.QL`
       fragment on Viewer {

@@ -5,8 +5,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactRouterRelay from 'react-router-relay';
 import Relay from 'react-relay';
-import {Dashboard} from './components/Dashboard'
-import {GroupCallInvitationListRelay} from './components/GroupCallInvitationList'
+import App from './components/App';
 
 const ViewerQueries = {
   viewer: () => Relay.QL`query { viewer }`
@@ -18,11 +17,7 @@ ReactDOM.render(
     history={createHashHistory({queryKey: false})}
   >
     <Redirect from="/" to="/group-calls" />
-    <Route path="/" component={Dashboard}>
-      <Route
-        path="group-calls"
-        component={GroupCallInvitationListRelay}
-        queries={ViewerQueries} />
+    <Route path="/group-calls" component={App} queries={ViewerQueries}>
     </Route>
   </Router>,
   document.getElementById('root')
