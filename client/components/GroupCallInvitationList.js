@@ -17,7 +17,7 @@ class GroupCallInvitationList extends React.Component {
 
   render() {
     var callCreationComponent;
-    if (!this.props.isCreating)
+    if (!this.props.state.isCreating)
       callCreationComponent = <button onClick={this.handleCreateCall}>New Call</button>;
     else
       callCreationComponent = <GroupCallInvitationCreationForm viewer={this.props.viewer} state={this.props.state.groupCallInvitationCreationForm} />
