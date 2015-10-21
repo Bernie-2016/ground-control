@@ -2,12 +2,12 @@ import thinky from './thinky';
 var thinkyType = thinky.type;
 
 export var Person = thinky.createModel("person", {
-  id: thinkyType.string(),
+  id: thinkyType.string().options({enforce_missing: false}),
   email: thinkyType.string()
 });
 
 export var Field = thinky.createModel("field", {
-  id: thinkyType.string(),
+  id: thinkyType.string().options({enforce_missing: false}),
   label: thinkyType.string(),
   type: thinkyType.string().enum(['NUMBER', 'STRING', 'BOOLEAN']),
   choices: []
