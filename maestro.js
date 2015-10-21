@@ -7,11 +7,12 @@ export default class Maestro {
     this.URL = URL;
   }
 
-  async createConferenceCall(name, maxReservations, startDate, duration, {contactEmail=null, greenroom=null, recording=null, backgroundMusic=null}={}) {
+  createConferenceCall(name, maxReservations, startDate, duration, {contactEmail=null, greenroom=null, recording=null, backgroundMusic=null}={}) {
 
     var postParams = {contactEmail, greenroom, recording, backgroundMusic}
 
-    Object.keys(postParams).forEach((key) => typeof postParams[key] === 'undefined' ? delete postParams[key] : true)
+    Object.keys(postParams).forEach((key) => typeof postParams[key] === 'undefined' ? delete postParams[key] : true);
+
     Object.assign(postParams, {
       customer: this.customerUID,
       key: this.secretToken,
@@ -29,6 +30,6 @@ export default class Maestro {
       json: true
     }
 
-    return await requestPromise(options);
+    return requestPromise(options);
   }
 }
