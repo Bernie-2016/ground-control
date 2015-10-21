@@ -1,21 +1,20 @@
 import React from 'react';
 import Relay from 'react-relay';
 import GroupCallInvitationList from './GroupCallInvitationList';
-import Store from '../store'
+import {Store} from '../store'
 
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {store: new Store({})};
+    this.state = new Store({});
   }
 
   componentDidMount() {
-    this.state.store.on('update', () => this.forceUpdate())
+    this.state.on('update', () => this.forceUpdate())
   }
 
   render() {
-    console.log('rendering');
-    return <GroupCallInvitationList viewer={this.props.viewer} store={this.state.store.branch('groupCallInvitationList')} />
+    return <GroupCallInvitationList viewer={this.props.viewer} state={this.state.refine('groupCallInvitationList')} />
   }
 }
 

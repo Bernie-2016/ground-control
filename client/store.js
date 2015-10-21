@@ -1,78 +1,85 @@
 import Freezer from 'freezer-js';
 
-export default class Store {
-  static GLOBAL_DATA;
-
-  constructor(initialData) {
-    if (initialData)
-      this.constructor.GLOBAL_DATA = new Freezer(initialData);
-    this.__setKeyPath([]);
-    this.defaults = {}
+// TODO: Switch to Cortex
+// TODO: set doesn't quite work
+export class Cursor {
+  constructor(store, keyPath) {
+    this.rootStore = store;
+    this.setKeyPath(keyPath);
   }
 
-  __globalData() {
-    return this.constructor.GLOBAL_DATA.get();
-  }
-
-  __setKeyPath(newKeyPath) {
+  setKeyPath(newKeyPath) {
     this.keyPath = newKeyPath;
-    this.data = this.__dataFromKeyPath(this.keyPath);
+    this.data = this.dataFromKeyPath(this.keyPath);
   }
 
-  __dataFromKeyPath(aKeyPath) {
-    var data = this.__globalData();
+  dataFromKeyPath(aKeyPath) {
+    var data = this.rootStore.get();
     if (aKeyPath.length === 0)
       return data;
 
     aKeyPath.forEach((keyName) => {
-      if (data.hasOwnProperty(keyName))
+      if (data && data.hasOwnProperty(keyName))
         data = data[keyName];
-      else
-        return undefined;
+      else {
+        data = undefined;
+        return;
+      }
     })
     return data;
   }
 
-  setDefaults(defaultValues) {
-    this.defaults = defaultValues;
-  }
-
   get(propName) {
+    console.log(this.data, this.keyPath);
+    if (typeof propName === 'undefined')
+      return this.data;
+
     if (this.data && this.data.hasOwnProperty(propName))
       return this.data[propName];
-    else if (this.defaults.hasOwnProperty(propName))
-      return this.defaults[propName];
     else
       return undefined;
   }
 
-  branch(name) {
-    var newStore = new Store()
-    var newKeyPath = this.keyPath.slice(0);
-    newKeyPath.push(name);
-    newStore.__setKeyPath(newKeyPath);
-    return newStore;
-  }
-
-  set(propObject) {
+  set(val) {
     // First create empty objects in this entire branch
-    if (typeof this.data === undefined) {
-      var pointer = this.__globalData();
+    if (typeof this.data === 'undefined') {
+      var pointer = this.rootStore.get();
       this.keyPath.forEach((key) => {
         if (pointer.hasOwnProperty(key))
           pointer = pointer[key];
-        else
-          pointer.set(key, {});
-      })
-      this.data = this.__dataFromKeyPath(this.keyPath);
+        else {
+          pointer = pointer.set(key, {});
+        }
+      });
+      this.data = this.dataFromKeyPath(this.keyPath);
     }
 
-    Object.keys(propObject).forEach((key) => {
-      this.data.set(key, propObject[key]);
-    })
+    if (typeof val === 'object') {
+      Object.keys(val).forEach((key) => {
+        this.data.set(key, val[key]);
+      })
+    }
+    else
+      this.data.set(val);
+  }
+
+  refine(names) {
+    if (typeof names === 'string')
+      names = [names];
+    return new Cursor(this.rootStore, this.keyPath.concat(names));
+  }
+}
+
+export class Store {
+  constructor(initialData) {
+    this.data = new Freezer(initialData);
+  }
+
+  refine(names) {
+    return new Cursor(this.data, []).refine(names);
   }
 
   on(eventName, func) {
-    this.constructor.GLOBAL_DATA.on(eventName, func);
+    this.data.on(eventName, func);
   }
 }
