@@ -1,9 +1,17 @@
 import React from 'react';
 import Relay from 'react-relay';
 import GroupCallInvitationCreationForm from './GroupCallInvitationCreationForm'
-import {Nav, NavItem} from "react-bootstrap";
+import {List, ListItem, Styles} from "material-ui";
 
 export class GroupCallInvitationList extends React.Component {
+
+  styles = {
+    list: {
+      width: 200,
+      minHeight: "800px",
+      border: "solid 1px " + Styles.Colors.grey300,
+    }
+  }
 
   state = {
     isCreating: false
@@ -15,30 +23,19 @@ export class GroupCallInvitationList extends React.Component {
 
   renderGroupCallInvitations() {
     return this.props.viewer.groupCallInvitationList.edges.map(invitation =>
-      <NavItem eventKey={invitation.node.id}>
-        {invitation.node.topic}
-      </NavItem>
+      <ListItem primaryText={invitation.node.topic} />
     );
   }
 
   render() {
-    var callCreationComponent;
-    if (!this.state.isCreating)
-      callCreationComponent = <button onClick={this.handleCreateCall}>New Call</button>;
-    else
-      callCreationComponent = <GroupCallInvitationCreationForm viewer={this.props.viewer} />
+    let menuItems = [
+      { route: 'get-started', text: 'Get Started' }
+    ];
     return (
-      <div class="row">
-        <div class="col-md-4">
-          <Nav bsStyle="pills" bsSize="xsmall" stacked>
-            {this.renderGroupCallInvitations()}
-          </Nav>
-        </div>
-        <div class="col-md-8">
-          {callCreationComponent}
-        </div>
-      </div>
-    );
+      <List style={this.styles.list} subheader="Upcoming calls">
+        {this.renderGroupCallInvitations()}
+      </List>
+    )
   }
 }
 

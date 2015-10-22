@@ -1,6 +1,6 @@
 import React from 'react';
 import Relay from 'react-relay';
-import {AppBar, Styles, FlatButton, Tabs, Tab} from 'material-ui';
+import {AppBar, Styles, FlatButton, Tabs, Tab, AppCanvas} from 'material-ui';
 import BernieLogo from './BernieLogo';
 
 export class Dashboard extends React.Component {
@@ -9,7 +9,6 @@ export class Dashboard extends React.Component {
       width: 96,
       height: 40
     },
-
     bar: {
       backgroundColor: "rgb(20, 127, 215)",
       minHeight: 56,
@@ -43,6 +42,7 @@ export class Dashboard extends React.Component {
           iconStyleRight={this.styles.tabsContainer}
         >
         </AppBar>
+        {this.props.children}
       </div>
     );
   }
