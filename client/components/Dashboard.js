@@ -1,23 +1,48 @@
 import React from 'react';
 import Relay from 'react-relay';
-import {Navbar, NavBrand, Nav, NavItem} from 'react-bootstrap';
+import {AppBar, Styles, FlatButton, Tabs, Tab} from 'material-ui';
+import BernieLogo from './BernieLogo';
 
 export class Dashboard extends React.Component {
+  styles = {
+    logo: {
+      width: 96,
+      height: 40
+    },
+
+    bar: {
+      backgroundColor: "rgb(20, 127, 215)",
+      minHeight: 56,
+      height: 56
+    },
+    tabs: {
+      backgroundColor: "rgb(20, 127, 215)"
+    },
+    tabsContainer: {
+      width: 200
+    }
+  }
+
   render() {
     return (
-      <div className="container-fluid">
-        <Navbar inverse toggleNavKey={0}>
-          <NavBrand>
-            <a href="/">
-              <img className="logo" src="https://berniesanders.com/wp-content/themes/berniesanders2016/images/icns/sanders-logo.svg#logo" />
-            </a>
-          </NavBrand>
-          <p className='navbar-text h3' left>Ground Control</p>
-          <Nav right>
-            <NavItem href="/#/group-calls">Group Calls</NavItem>
-          </Nav>
-        </Navbar>
-        {this.props.children}
+      <div>
+        <AppBar
+          style={this.styles.bar}
+          zDepth={1}
+          title="Ground Control"
+          iconElementLeft={
+            <BernieLogo color={Styles.Colors.white}
+              viewBox="0 0 480 200"
+              style={this.styles.logo}
+          />}
+          iconElementRight={
+            <Tabs>
+              <Tab label="Group Calls" style={this.styles.tabs} />
+            </Tabs>
+          }
+          iconStyleRight={this.styles.tabsContainer}
+        >
+        </AppBar>
       </div>
     );
   }
