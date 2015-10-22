@@ -31,8 +31,7 @@ export class GroupCallInvitationList extends React.Component {
       <div class="row">
         <div class="col-md-4">
           <Nav bsStyle="pills" bsSize="xsmall" stacked>
-            <NavItem>Test 1</NavItem>
-            <NavItem>Test 2</NavItem>
+            {this.renderGroupCallInvitations()}
           </Nav>
         </div>
         <div class="col-md-8">
