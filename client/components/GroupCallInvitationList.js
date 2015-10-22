@@ -15,7 +15,7 @@ export class GroupCallInvitationList extends React.Component {
 
   renderGroupCallInvitations() {
     return this.props.viewer.groupCallInvitationList.edges.map(invitation =>
-      <NavItem>
+      <NavItem eventKey={invitation.node.id}>
         {invitation.node.topic}
       </NavItem>
     );
