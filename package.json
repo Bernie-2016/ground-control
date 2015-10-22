@@ -29,6 +29,6 @@
     "history": "^1.12.5",
     "bluebird": "^2.10.2",
     "request-promise": "^1.0.1",
-    "material-ui": "^0.13.0"
+    "react-bootstrap": "^0.27.2"
   }
 }

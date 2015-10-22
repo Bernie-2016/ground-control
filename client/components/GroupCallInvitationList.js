@@ -1,6 +1,7 @@
 import React from 'react';
 import Relay from 'react-relay';
 import GroupCallInvitationCreationForm from './GroupCallInvitationCreationForm'
+import {Nav, NavItem} from "react-bootstrap";
 
 export class GroupCallInvitationList extends React.Component {
 
@@ -14,9 +15,9 @@ export class GroupCallInvitationList extends React.Component {
 
   renderGroupCallInvitations() {
     return this.props.viewer.groupCallInvitationList.edges.map(invitation =>
-      <ul key={invitation.node.id}>
+      <NavItem>
         {invitation.node.topic}
-      </ul>
+      </NavItem>
     );
   }
 
@@ -27,9 +28,16 @@ export class GroupCallInvitationList extends React.Component {
     else
       callCreationComponent = <GroupCallInvitationCreationForm viewer={this.props.viewer} />
     return (
-      <div>
-        {this.renderGroupCallInvitations()}
-        {callCreationComponent}
+      <div class="row">
+        <div class="col-md-4">
+          <Nav bsStyle="pills" bsSize="xsmall" stacked>
+            <NavItem>Test 1</NavItem>
+            <NavItem>Test 2</NavItem>
+          </Nav>
+        </div>
+        <div class="col-md-8">
+          {callCreationComponent}
+        </div>
       </div>
     );
   }
