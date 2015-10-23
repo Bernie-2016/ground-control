@@ -2,7 +2,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { Schema } from '../data/schema';
+import { Schema } from './schema';
 import { graphql }  from 'graphql';
 import { introspectionQuery, printSchema } from 'graphql/utilities';
 
@@ -16,13 +16,13 @@ async function writeSchema() {
       );
     } else {
       fs.writeFileSync(
-        path.join(__dirname, '../data/schema.json'),
+        path.join(__dirname, './schema.json'),
         JSON.stringify(result, null, 2)
       );
     }
   }();
   fs.writeFileSync(
-    path.join(__dirname, '../data/schema.graphql'),
+    path.join(__dirname, './schema.graphql'),
     printSchema(Schema)
   );
 
