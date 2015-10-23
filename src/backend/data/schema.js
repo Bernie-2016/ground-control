@@ -25,6 +25,7 @@ import {
   GroupCall
 } from './models';
 
+import Maestro from '../maestro';
 import Promise from 'bluebird';
 
 var {nodeInterface, nodeField} = nodeDefinitions(
@@ -136,6 +137,7 @@ var GraphQLCreateGroupCallInvitationMutation = mutationWithClientMutationId({
   mutateAndGetPayload: async ({topic, groupCallList}) => {
     var invitation = await GroupCallInvitation.save({topic: topic})
     var promises = [];
+    var maestro = new Maestro('PWC0PU44ZPOHAI9L', '60aedf735b2b6f7cf83f34c8b560ac9b', 'http://myaccount.maestroconference.com/_access');
     groupCallList.forEach((groupCall) => {
       promises.push(GroupCall.save({
         scheduledTime: groupCall.scheduledTime,
@@ -143,9 +145,10 @@ var GraphQLCreateGroupCallInvitationMutation = mutationWithClientMutationId({
         signups: [],
         groupCallInvitationId: invitation.id
       }));
+      promises.push(maestro.createConferenceCall(topic, groupCall.maxSignups, "2015.10.23 05:30:00", 60))
     });
 
-    await Promise.all(promises)
+    await Promise.all(promises);
     return {};
   }
 });
