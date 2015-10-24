@@ -3,7 +3,7 @@ import Relay from 'react-relay';
 import {AppBar, Styles, FlatButton, Tabs, Tab, AppCanvas} from 'material-ui';
 import BernieLogo from './BernieLogo';
 
-export class Dashboard extends React.Component {
+export default class Dashboard extends React.Component {
   styles = {
     logo: {
       width: 96,

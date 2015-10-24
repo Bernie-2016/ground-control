@@ -38,7 +38,7 @@ export class GroupCallInvitationList extends React.Component {
   }
 }
 
-export const GroupCallInvitationListRelay = Relay.createContainer(GroupCallInvitationList, {
+export default Relay.createContainer(GroupCallInvitationList, {
   fragments: {
     viewer: () => Relay.QL`
       fragment on Viewer {
