@@ -102,7 +102,9 @@ var GraphQLViewer = new GraphQLObjectType({
     id: globalIdField('Viewer'),
     groupCallInvitationList: {
       type: GraphQLGroupCallInvitationConnection,
-      args: connectionArgs,
+      args: {
+        ...connectionArgs,
+      },
       resolve: async (viewer, args) => {
         var invitations = await GroupCallInvitation.filter({})
         return connectionFromArray(invitations, args);

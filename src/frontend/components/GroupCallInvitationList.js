@@ -1,64 +1,38 @@
 import React from 'react';
 import Relay from 'react-relay';
-import GroupCallInvitationCreationForm from './GroupCallInvitationCreationForm'
 import {List, ListItem, Styles} from "material-ui";
 
 export class GroupCallInvitationList extends React.Component {
-  styles = {
-    list: {
-      width: 200,
-      minHeight: "800px",
-      border: "solid 1px " + Styles.Colors.grey300,
-    }
-  }
-
-  state = {
-    isCreating: false
-  }
-
-  handleCreateCall = (event) => {
-    this.setState({isCreating: true})
-  }
-
   renderGroupCallInvitations() {
     return this.props.viewer.groupCallInvitationList.edges.map(invitation =>
-      <ListItem primaryText={invitation.node.topic} />
+      <ListItem key={invitation.node.id} primaryText={invitation.node.topic} />
     );
   }
 
   render() {
-    let menuItems = [
-      { route: 'get-started', text: 'Get Started' }
-    ];
+    console.log(this.props.filter);
+    let subheader = this.props.filter === "upcoming" ? "Upcoming calls" : "Past calls";
     return (
-      <List style={this.styles.list} subheader="Upcoming calls">
+      <List subheader={subheader}>
         {this.renderGroupCallInvitations()}
       </List>
-    )
+    );
   }
 }
 
 export default Relay.createContainer(GroupCallInvitationList, {
   fragments: {
     viewer: () => Relay.QL`
-      fragment on Viewer {
-        ${GroupCallInvitationCreationForm.getFragment('viewer')},
-        groupCallInvitationList(first:10) {
+    fragment on Viewer {
+        groupCallInvitationList(first:50) {
           edges {
             node {
               id,
               topic,
-              groupCallList(first:10) {
-                edges {
-                  node {
-                    scheduledTime
-                  }
-                }
-              }
             }
           }
         }
       }
-    `,
-  },
+    `
+  }
 });
