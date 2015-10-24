@@ -8,6 +8,7 @@ import {
   GraphQLInputObjectType,
   GraphQLSchema,
   GraphQLString,
+  GraphQLEnumType
 } from 'graphql';
 
 import {
@@ -27,6 +28,7 @@ import {
 
 import Maestro from '../maestro';
 import Promise from 'bluebird';
+import thinky from './thinky';
 
 var {nodeInterface, nodeField} = nodeDefinitions(
   (globalId) => {
@@ -96,6 +98,13 @@ var {
   nodeType: GraphQLGroupCallInvitation
 });
 
+var GraphQLGroupCallInvitationOrderOption = new GraphQLEnumType({
+  name: 'GroupCallInvitationOrderOption',
+  values: {
+    DATE: { value: "date" },
+  }
+});
+
 var GraphQLViewer = new GraphQLObjectType({
   name: 'Viewer',
   fields: () => ({
@@ -103,11 +112,31 @@ var GraphQLViewer = new GraphQLObjectType({
     groupCallInvitationList: {
       type: GraphQLGroupCallInvitationConnection,
       args: {
+        orderBy: {
+          type: GraphQLGroupCallInvitationOrderOption,
+          defaultValue: GraphQLGroupCallInvitationOrderOption.DATE
+        },
         ...connectionArgs,
       },
-      resolve: async (viewer, args) => {
-        var invitations = await GroupCallInvitation.filter({})
-        return connectionFromArray(invitations, args);
+      resolve: async (viewer, {orderBy, first}) => {
+        let r = thinky.r;
+        var orderParam = orderBy === GraphQLGroupCallInvitationOrderOption.DATE ? 'scheduledTime' : 'scheduledTime';
+        var invitations = await r.table(
+          GroupCall.getTableName())
+          .group('groupCallInvitationId')
+          .min('scheduledTime')
+          .ungroup()('reduction')
+          .orderBy(orderParam)
+          .merge((groupCall) => {
+            return {
+              invitation: r.table(GroupCallInvitation.getTableName()).get(groupCall('groupCallInvitationId'))
+            }
+          })
+          ('invitation')
+          .limit(first)
+
+        console.log(invitations);
+        return connectionFromArray(invitations, {first});
       }
     }
   }),
