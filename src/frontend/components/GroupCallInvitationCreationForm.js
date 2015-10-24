@@ -3,7 +3,6 @@ import Relay from 'react-relay';
 import CreateGroupCallInvitationMutation from '../mutations/CreateGroupCallInvitationMutation';
 
 class GroupCallInvitationCreationForm extends React.Component {
-
   state = {
     topic: "A call",
     numCalls: 15,
@@ -14,7 +13,7 @@ class GroupCallInvitationCreationForm extends React.Component {
 
   handleCreation = (event) => {
     Relay.Store.update(
-      new CreateGroupCallInvitationMutation({topic: this.state.topic, numCalls: this.state.numCalls, viewer: this.props.viewer})
+      new CreateGroupCallInvitationMutation({topic: this.props.store.get('topic'), numCalls: this.state.numCalls, viewer: this.props.viewer})
     );
   }
 
@@ -22,7 +21,7 @@ class GroupCallInvitationCreationForm extends React.Component {
     return (
       <form onSubmit={this.handleCreation}>
         <div>
-          <input type='text' placeholder='Topic' value={this.state.topic} onChange={e => this.setState({topic : e.target.value})}/>
+          <input type='text' placeholder='Topic' value={this.props.store.get('topic')} onChange={e => this.props.store.set({topic : e.target.value})}/>
         </div>
         <input type='text' placeholder='# of calls' value={this.state.numCalls} onChange={e => this.setState({numCalls : e.target.value})}/>
         calls from

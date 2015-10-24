@@ -1,6 +1,6 @@
 .DS_Store
 node_modules
 npm-debug.log
-backend/data/schema.graphql
-backend/data/schema.json
+src/backend/data/schema.graphql
+src/backend/data/schema.json
 rethinkdb_data
