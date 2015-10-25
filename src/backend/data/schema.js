@@ -120,17 +120,22 @@ var GraphQLViewer = new GraphQLObjectType({
           queryFilter = (row) => row('scheduledTime').le(new Date());
 
         var invitations = await r.table(GroupCall.getTableName())
-          .filter(queryFilter)
           .group('groupCallInvitationId')
-          .min('scheduledTime')
+          .max('scheduledTime')
           .ungroup()
           ('reduction')
-          .orderBy('scheduledTime')
+          .filter(queryFilter)
           .merge((groupCall) => {
             return {
+              minScheduledTime: r.table(GroupCall.getTableName())
+                .filter({'groupCallInvitationId' : groupCall('groupCallInvitationId')})
+                .orderBy('scheduledTime')
+                .limit(1)
+                (0)('scheduledTime'),
               invitation: r.table(GroupCallInvitation.getTableName()).get(groupCall('groupCallInvitationId'))
             }
           })
+          .orderBy('minScheduledTime')
           ('invitation')
           .limit(first)
 
