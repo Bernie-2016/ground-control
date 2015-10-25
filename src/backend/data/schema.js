@@ -70,7 +70,9 @@ var {
   name: 'GroupCall',
   nodeType: GraphQLGroupCall,
   connectionFields: {
-    total: { type: GraphQLInt }
+    total: { type: GraphQLInt },
+    firstCallDate: { type: GraphQLInt },
+    lastCallDate: { type: GraphQLInt }
   }
 });
 
@@ -86,9 +88,17 @@ var GraphQLGroupCallInvitation = new GraphQLObjectType({
       type: GraphLQGroupCallConnection,
       args: connectionArgs,
       resolve: async (invitation, {first}) => {
-        var groupCalls = await GroupCall.filter({groupCallInvitationId : invitation.id})
-        var groupCallCount = await groupCalls.length;
-        return Object.assign(connectionFromArray(groupCalls, {first}), {total: groupCallCount});
+        var groupCalls = await GroupCall.filter({groupCallInvitationId : invitation.id}).orderBy('scheduledTime')
+        var groupCallCount = groupCalls.length;
+        var firstCallDate = groupCalls[0].scheduledTime;
+        var lastCallDate = groupCalls[groupCallCount-1].scheduledTime
+        return Object.assign(
+          connectionFromArray(groupCalls, {first}),
+          {
+            total: groupCallCount,
+            firstCallDate: firstCallDate,
+            lastCallDate: lastCallDate
+          });
       }
     }
   }),

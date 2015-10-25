@@ -4,8 +4,16 @@ import {List, ListItem, Styles} from "material-ui";
 
 export class GroupCallInvitationList extends React.Component {
   renderGroupCallInvitations() {
-    return this.props.viewer.groupCallInvitationList.edges.map(invitation =>
-      <ListItem key={invitation.node.id} primaryText={invitation.node.topic} secondaryText={invitation.node.groupCallList.total} />
+    return this.props.viewer.groupCallInvitationList.edges.map(invitation => {
+        let node = invitation.node;
+        let secondaryText = node.groupCallList.total + " calls from " + new Date(node.groupCallList.firstCallDate) + " to " + new Date(node.groupCallList.lastCallDate)
+        return (
+          <ListItem
+            key={node.id}
+            primaryText={node.topic}
+            secondaryText={secondaryText} />
+        )
+    }
     );
   }
 
@@ -34,7 +42,9 @@ export default Relay.createContainer(GroupCallInvitationList, {
               id,
               topic,
               groupCallList {
-                total
+                total,
+                firstCallDate,
+                lastCallDate
               }
             }
           }
