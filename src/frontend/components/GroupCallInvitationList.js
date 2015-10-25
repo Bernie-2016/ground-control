@@ -2,6 +2,12 @@ import React from 'react';
 import Relay from 'react-relay';
 import {List, ListItem, Styles} from "material-ui";
 
+export const filterTypes = {
+  UPCOMING: 'upcoming',
+  PAST: 'past',
+  ALL: 'all'
+}
+
 export class GroupCallInvitationList extends React.Component {
   renderGroupCallInvitations() {
     return this.props.viewer.groupCallInvitationList.edges.map(invitation =>
@@ -24,7 +30,7 @@ export default Relay.createContainer(GroupCallInvitationList, {
   fragments: {
     viewer: () => Relay.QL`
     fragment on Viewer {
-        groupCallInvitationList(first:50) {
+        groupCallInvitationList(first:50, filter:"upcoming") {
           edges {
             node {
               id,

@@ -1,6 +1,7 @@
 import React from 'react';
 import Relay from 'react-relay';
 import GroupCallInvitationList from './GroupCallInvitationList';
+import {filterTypes} from './GroupCallInvitationList';
 import {Paper, Styles} from "material-ui";
 
 export class GroupCallSection extends React.Component {
@@ -15,8 +16,8 @@ export class GroupCallSection extends React.Component {
   render() {
     return (
       <Paper zDepth={0} style={this.styles.sideBar}>
-        <GroupCallInvitationList viewer={this.props.viewer} filter="upcoming" />
-        <GroupCallInvitationList viewer={this.props.viewer} filter="past" />
+        <GroupCallInvitationList viewer={this.props.viewer} filter=filterTypes.UPCOMING />
+        <GroupCallInvitationList viewer={this.props.viewer} filter=filterTypes.PAST />
       </Paper>
     )
   }

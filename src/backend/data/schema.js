@@ -98,10 +98,12 @@ var {
   nodeType: GraphQLGroupCallInvitation
 });
 
-var GraphQLGroupCallInvitationOrderOption = new GraphQLEnumType({
-  name: 'GroupCallInvitationOrderOption',
+var GraphQLChronoFilter = new GraphQLEnumType({
+  name: 'GroupCallInvitation',
   values: {
-    DATE: { value: "date" },
+    UPCOMING: { value: "upcoming" },
+    PAST: { value: "past" },
+    ALL: { value: "all" }
   }
 });
 
@@ -112,21 +114,30 @@ var GraphQLViewer = new GraphQLObjectType({
     groupCallInvitationList: {
       type: GraphQLGroupCallInvitationConnection,
       args: {
-        orderBy: {
-          type: GraphQLGroupCallInvitationOrderOption,
-          defaultValue: GraphQLGroupCallInvitationOrderOption.DATE
+        filter: {
+          type: GraphQLBoolean,
+          defaultValue: GraphQLChronoFilter.ALL
         },
         ...connectionArgs,
       },
-      resolve: async (viewer, {orderBy, first}) => {
+      resolve: async (viewer, {first, filter}) => {
         let r = thinky.r;
-        var orderParam = orderBy === GraphQLGroupCallInvitationOrderOption.DATE ? 'scheduledTime' : 'scheduledTime';
-        var invitations = await r.table(
-          GroupCall.getTableName())
+        let queryFilter = {};
+        switch (filter) {
+          case GraphQLChronoFilter.UPCOMING:
+            queryFilter = (row) => row('scheduledTime').gt(new Date());
+            break;
+          case GraphQLChronoFilter.PAST:
+            queryFilter = (row) => row('scheduledTime').lte(new Date());
+            break;
+        }
+        var invitations = await r.table(GroupCall.getTableName())
+          .filter(queryFilter)
           .group('groupCallInvitationId')
           .min('scheduledTime')
-          .ungroup()('reduction')
-          .orderBy(orderParam)
+          .ungroup()
+          ('reduction')
+          .orderBy('scheduledTime')
           .merge((groupCall) => {
             return {
               invitation: r.table(GroupCallInvitation.getTableName()).get(groupCall('groupCallInvitationId'))
@@ -135,7 +146,6 @@ var GraphQLViewer = new GraphQLObjectType({
           ('invitation')
           .limit(first)
 
-        console.log(invitations);
         return connectionFromArray(invitations, {first});
       }
     }
