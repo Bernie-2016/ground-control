@@ -6,18 +6,33 @@ import {Paper, Styles} from "material-ui";
 
 export class GroupCallSection extends React.Component {
   styles = {
+    container: {
+      position: "relative"
+    },
+
     sideBar: {
+      display: "inline-block",
       width: 200,
       minHeight: "800px",
       border: "solid 1px " + Styles.Colors.grey300,
+    },
+
+    content: {
+      display: "inline-block",
+      verticalAlign: 'top'
     }
   }
 
   render() {
     return (
-      <Paper zDepth={0} style={this.styles.sideBar}>
-        <GroupCallInvitationList viewer={this.props.viewer}  withUpcomingGroupCalls={true} />
-        <GroupCallInvitationList viewer={this.props.viewer}  withUpcomingGroupCalls={false} />
+      <Paper style={this.styles.container}>
+        <Paper zDepth={0} style={this.styles.sideBar}>
+          <GroupCallInvitationList viewer={this.props.viewer}  withUpcomingGroupCalls={true} />
+          <GroupCallInvitationList viewer={this.props.viewer}  withUpcomingGroupCalls={false} />
+        </Paper>
+        <Paper zDepth={0} style={this.styles.content}>
+          "Hi"
+        </Paper>
       </Paper>
     )
   }
