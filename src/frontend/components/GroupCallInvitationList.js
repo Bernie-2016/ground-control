@@ -1,16 +1,18 @@
 import React from 'react';
 import Relay from 'react-relay';
 import {List, ListItem, Styles} from "material-ui";
+import moment from "moment";
 
 export class GroupCallInvitationList extends React.Component {
   renderGroupCallInvitations() {
     return this.props.viewer.groupCallInvitationList.edges.map(invitation => {
         let node = invitation.node;
-        let secondaryText = node.groupCallList.total + " calls from " + new Date(node.groupCallList.firstCallDate) + " to " + new Date(node.groupCallList.lastCallDate)
+        let primaryText = node.topic + ": " + node.groupCallList.total + " calls"
+        let secondaryText = moment(node.groupCallList.firstCallDate).format("M/D H:mm") + " - " + moment(node.groupCallList.lastCallDate).format("M/D H:mm")
         return (
           <ListItem
             key={node.id}
-            primaryText={node.topic}
+            primaryText={primaryText}
             secondaryText={secondaryText} />
         )
     }
