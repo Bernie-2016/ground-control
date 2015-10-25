@@ -16,8 +16,8 @@ export class GroupCallSection extends React.Component {
   render() {
     return (
       <Paper zDepth={0} style={this.styles.sideBar}>
-        <GroupCallInvitationList viewer={this.props.viewer} filter=filterTypes.UPCOMING />
-        <GroupCallInvitationList viewer={this.props.viewer} filter=filterTypes.PAST />
+        <GroupCallInvitationList viewer={this.props.viewer}  withUpcomingGroupCalls={true} />
+        <GroupCallInvitationList viewer={this.props.viewer}  withUpcomingGroupCalls={false} />
       </Paper>
     )
   }
@@ -27,7 +27,8 @@ export default Relay.createContainer(GroupCallSection, {
   fragments: {
     viewer: () => Relay.QL`
       fragment on Viewer {
-        ${GroupCallInvitationList.getFragment('viewer')}
+        ${GroupCallInvitationList.getFragment('viewer', {withUpcomingGroupCalls: true})},
+        ${GroupCallInvitationList.getFragment('viewer', {withUpcomingGroupCalls: false})}
       }
     `,
   },

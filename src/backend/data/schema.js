@@ -98,15 +98,6 @@ var {
   nodeType: GraphQLGroupCallInvitation
 });
 
-var GraphQLChronoFilter = new GraphQLEnumType({
-  name: 'GroupCallInvitation',
-  values: {
-    UPCOMING: { value: "upcoming" },
-    PAST: { value: "past" },
-    ALL: { value: "all" }
-  }
-});
-
 var GraphQLViewer = new GraphQLObjectType({
   name: 'Viewer',
   fields: () => ({
@@ -114,23 +105,20 @@ var GraphQLViewer = new GraphQLObjectType({
     groupCallInvitationList: {
       type: GraphQLGroupCallInvitationConnection,
       args: {
-        filter: {
+        withUpcomingGroupCalls: {
           type: GraphQLBoolean,
-          defaultValue: GraphQLChronoFilter.ALL
+          defaultValue: null
         },
         ...connectionArgs,
       },
-      resolve: async (viewer, {first, filter}) => {
+      resolve: async (viewer, {first, withUpcomingGroupCalls}) => {
         let r = thinky.r;
         let queryFilter = {};
-        switch (filter) {
-          case GraphQLChronoFilter.UPCOMING:
-            queryFilter = (row) => row('scheduledTime').gt(new Date());
-            break;
-          case GraphQLChronoFilter.PAST:
-            queryFilter = (row) => row('scheduledTime').lte(new Date());
-            break;
-        }
+        if (withUpcomingGroupCalls)
+          queryFilter = (row) => row('scheduledTime').gt(new Date());
+        else if (withUpcomingGroupCalls == false)
+          queryFilter = (row) => row('scheduledTime').le(new Date());
+
         var invitations = await r.table(GroupCall.getTableName())
           .filter(queryFilter)
           .group('groupCallInvitationId')
