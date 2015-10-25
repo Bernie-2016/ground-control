@@ -5,7 +5,7 @@ import {List, ListItem, Styles} from "material-ui";
 export class GroupCallInvitationList extends React.Component {
   renderGroupCallInvitations() {
     return this.props.viewer.groupCallInvitationList.edges.map(invitation =>
-      <ListItem key={invitation.node.id} primaryText={invitation.node.topic} />
+      <ListItem key={invitation.node.id} primaryText={invitation.node.topic} secondaryText={invitation.node.groupCallList.total} />
     );
   }
 
@@ -33,6 +33,9 @@ export default Relay.createContainer(GroupCallInvitationList, {
             node {
               id,
               topic,
+              groupCallList {
+                total
+              }
             }
           }
         }
