@@ -31,11 +31,18 @@ export class GroupCallSection extends React.Component {
     return (
       <Paper style={this.styles.container}>
         <Paper zDepth={0} style={this.styles.sideBar}>
-          <GroupCallInvitationList viewer={this.props.viewer} withUpcomingGroupCalls={true} onSelect={(id) => this.selectInvitation(id)} />
-          <GroupCallInvitationList viewer={this.props.viewer} withUpcomingGroupCalls={false} onSelect={(id) => this.selectInvitation(id)} />
+          <GroupCallInvitationList
+            groupCallInvitationList={this.props.viewer.upcomingInvitationList}
+            subheader="Upcoming calls"
+            onSelect={(id) => this.selectInvitation(id)} />
+          <GroupCallInvitationList
+            groupCallInvitationList={this.props.viewer.pastInvitationList}
+            subheader="Past calls"
+            onSelect={(id) => this.selectInvitation(id)} />
         </Paper>
         <Paper zDepth={0} style={this.styles.content}>
-          <GroupCallInvitation viewer={this.props.viewer} id={this.props.relay.variables.invitationId} />
+          <GroupCallInvitation
+            groupCallInvitation={this.props.viewer.groupCallInvitation} />
         </Paper>
       </Paper>
     )
@@ -50,9 +57,15 @@ export default Relay.createContainer(GroupCallSection, {
   fragments: {
     viewer: (variables) => Relay.QL`
       fragment on Viewer {
-        ${GroupCallInvitationList.getFragment('viewer', {withUpcomingGroupCalls: true})}
-        ${GroupCallInvitationList.getFragment('viewer', {withUpcomingGroupCalls: false})}
-        ${GroupCallInvitation.getFragment('viewer', {id: variables.invitationId})}
+        upcomingInvitationList:groupCallInvitationList(first:50, withUpcomingGroupCalls:true) {
+          ${GroupCallInvitationList.getFragment('groupCallInvitationList')}
+        }
+        pastInvitationList:groupCallInvitationList(first:50, withUpcomingGroupCalls:false) {
+            ${GroupCallInvitationList.getFragment('groupCallInvitationList')}
+        }
+        groupCallInvitation(id:$invitationId) {
+          ${GroupCallInvitation.getFragment('groupCallInvitation')}
+        }
       }
     `,
   },

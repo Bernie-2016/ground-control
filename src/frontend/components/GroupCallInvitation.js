@@ -21,9 +21,8 @@ export class GroupCallInvitation extends React.Component {
   }
 
   renderGroupCalls() {
-    return this.props.viewer.groupCallInvitation.groupCallList.edges.map(callList => {
+    return this.props.groupCallInvitation.groupCallList.edges.map(callList => {
         let node = callList.node;
-        console.log(node.id)      ;
         let primaryText = moment(node.scheduledTime).format("dddd, MMMM Do YYYY, h:mm:ss a")
         return (
           <ListItem
@@ -37,7 +36,7 @@ export class GroupCallInvitation extends React.Component {
     return (
       <Paper style={this.styles.container} zDepth={0}>
         <div style={this.styles.title}>
-          {this.props.viewer.groupCallInvitation.topic}
+          {this.props.groupCallInvitation.topic}
         </div>
         <Paper>
           <List style={this.styles.callList}>
@@ -50,22 +49,17 @@ export class GroupCallInvitation extends React.Component {
 }
 
 export default Relay.createContainer(GroupCallInvitation, {
-  initialVariables: {
-    id: null,
-  },
-
   fragments: {
-    viewer: () => Relay.QL`
-      fragment on Viewer {
-        groupCallInvitation(id:$id) {
-          id
-          topic
-          groupCallList(first:50) {
-            edges {
-              node {
-                scheduledTime
-                maxSignups
-              }
+    groupCallInvitation: () => Relay.QL`
+      fragment on GroupCallInvitation {
+        id
+        topic
+        groupCallList(first:50) {
+          edges {
+            node {
+              id
+              scheduledTime
+              maxSignups
             }
           }
         }

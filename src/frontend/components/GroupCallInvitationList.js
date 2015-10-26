@@ -5,7 +5,7 @@ import moment from "moment";
 
 export class GroupCallInvitationList extends React.Component {
   renderGroupCallInvitations() {
-    return this.props.viewer.groupCallInvitationList.edges.map(invitation => {
+    return this.props.groupCallInvitationList.edges.map(invitation => {
         let node = invitation.node;
         let primaryText = node.topic + ": " + node.groupCallList.total + " calls"
         let secondaryText = moment(node.groupCallList.firstCallDate).format("M/D H:mm") + " - " + moment(node.groupCallList.lastCallDate).format("M/D H:mm")
@@ -21,9 +21,8 @@ export class GroupCallInvitationList extends React.Component {
   }
 
   render() {
-    let subheader = this.props.withUpcomingGroupCalls === false ? "Past calls" : "Upcoming calls";
     return (
-      <List subheader={subheader}>
+      <List subheader={this.props.subheader}>
         {this.renderGroupCallInvitations()}
       </List>
     );
@@ -31,24 +30,17 @@ export class GroupCallInvitationList extends React.Component {
 }
 
 export default Relay.createContainer(GroupCallInvitationList, {
-  initialVariables: {
-    first: 50,
-    withUpcomingGroupCalls: null
-  },
-
   fragments: {
-    viewer: () => Relay.QL`
-      fragment on Viewer {
-        groupCallInvitationList(first:50, withUpcomingGroupCalls:$withUpcomingGroupCalls) {
-          edges {
-            node {
-              id
-              topic
-              groupCallList {
-                total
-                firstCallDate
-                lastCallDate
-              }
+    groupCallInvitationList: () => Relay.QL`
+      fragment on GroupCallInvitationConnection {
+        edges {
+          node {
+            id
+            topic
+            groupCallList {
+              total
+              firstCallDate
+              lastCallDate
             }
           }
         }
