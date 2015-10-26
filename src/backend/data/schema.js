@@ -155,6 +155,16 @@ var GraphQLViewer = new GraphQLObjectType({
 
         return connectionFromArray(invitations, {first});
       }
+    },
+    groupCallInvitation: {
+      type: GraphQLGroupCallInvitation,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLString) }
+      },
+      resolve: (viewer, {id}) => {
+        console.log(id);
+        return GroupCallInvitation.get(id);
+      }
     }
   }),
   interfaces: [nodeInterface]

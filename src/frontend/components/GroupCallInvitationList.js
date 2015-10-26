@@ -37,7 +37,7 @@ export default Relay.createContainer(GroupCallInvitationList, {
 
   fragments: {
     viewer: () => Relay.QL`
-    fragment on Viewer {
+      fragment on Viewer {
         groupCallInvitationList(first:50, withUpcomingGroupCalls:$withUpcomingGroupCalls) {
           edges {
             node {

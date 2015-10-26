@@ -1,7 +1,7 @@
 import React from 'react';
 import Relay from 'react-relay';
 import GroupCallInvitationList from './GroupCallInvitationList';
-import {filterTypes} from './GroupCallInvitationList';
+import GroupCallInvitation from './GroupCallInvitation';
 import {Paper, Styles} from "material-ui";
 
 export class GroupCallSection extends React.Component {
@@ -27,11 +27,11 @@ export class GroupCallSection extends React.Component {
     return (
       <Paper style={this.styles.container}>
         <Paper zDepth={0} style={this.styles.sideBar}>
-          <GroupCallInvitationList viewer={this.props.viewer}  withUpcomingGroupCalls={true} />
-          <GroupCallInvitationList viewer={this.props.viewer}  withUpcomingGroupCalls={false} />
+          <GroupCallInvitationList viewer={this.props.viewer} withUpcomingGroupCalls={true} />
+          <GroupCallInvitationList viewer={this.props.viewer} withUpcomingGroupCalls={false} />
         </Paper>
         <Paper zDepth={0} style={this.styles.content}>
-          "Hi"
+          <GroupCallInvitation viewer={this.props.viewer} id={"5909b32c-b9a4-41e7-ac04-9e7d05e0f8b4"} />
         </Paper>
       </Paper>
     )
@@ -44,6 +44,7 @@ export default Relay.createContainer(GroupCallSection, {
       fragment on Viewer {
         ${GroupCallInvitationList.getFragment('viewer', {withUpcomingGroupCalls: true})},
         ${GroupCallInvitationList.getFragment('viewer', {withUpcomingGroupCalls: false})}
+        ${GroupCallInvitation.getFragment('viewer', {id: "5909b32c-b9a4-41e7-ac04-9e7d05e0f8b4"})}
       }
     `,
   },
