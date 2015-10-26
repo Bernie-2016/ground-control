@@ -41,6 +41,7 @@ export class GroupCallSection extends React.Component {
     else
       contentView = <GroupCallInvitationCreationForm
         viewer={this.props.viewer} />
+
     return (
       <Paper style={this.styles.container}>
         <Paper zDepth={0} style={this.styles.sideBar}>
@@ -67,7 +68,18 @@ export class GroupCallSection extends React.Component {
 
 export default Relay.createContainer(GroupCallSection, {
   initialVariables: {
-    invitationId: "R3JvdXBDYWxsSW52aXRhdGlvbjplMGY3YzRjMy0wM2YxLTRhMzQtYmRjMC1kNGVkNTBhNDQxMWE="
+    invitationId: "",
+  },
+
+  prepareVariables: (prev) =>
+  {
+    var fetchInvitation = true;
+    if (prev.invitationId === "")
+      fetchInvitation = false;
+    return {
+      invitationId: prev.invitationId,
+      fetchInvitation: fetchInvitation
+    }
   },
 
   fragments: {
@@ -79,7 +91,7 @@ export default Relay.createContainer(GroupCallSection, {
         pastInvitationList:groupCallInvitationList(first:50, withUpcomingGroupCalls:false) {
             ${GroupCallInvitationList.getFragment('groupCallInvitationList')}
         }
-        groupCallInvitation(id:$invitationId) {
+        groupCallInvitation(id:$invitationId) @include(if: $fetchInvitation) {
           ${GroupCallInvitation.getFragment('groupCallInvitation')}
         }
         ${GroupCallInvitationCreationForm.getFragment('viewer')}
