@@ -30,17 +30,23 @@ export class GroupCallSection extends React.Component {
   }
 
   selectInvitation(invitationId) {
+    this.setState({isCreating: false})
     this.props.relay.setVariables({invitationId});
   }
 
+  selectCallCreation() {
+    this.setState({isCreating: true})
+    this.props.relay.setVariables({invitationId: null});
+  }
+
   render() {
-    var contentView;
+    var contentView = <div></div>;
     if (this.state.isCreating)
-      contentView = <GroupCallInvitation
-        groupCallInvitation={this.props.viewer.groupCallInvitation} />
-    else
       contentView = <GroupCallInvitationCreationForm
         viewer={this.props.viewer} />
+    else if (this.props.relay.variables.invitationId)
+      contentView = <GroupCallInvitation
+        groupCallInvitation={this.props.viewer.groupCallInvitation} />
 
     return (
       <Paper style={this.styles.container}>
@@ -48,7 +54,7 @@ export class GroupCallSection extends React.Component {
           <RaisedButton label="Create Call"
             fullWidth={true}
             primary={true}
-            onClick={() => this.setState({isCreating: true})} />
+            onClick={() => this.selectCallCreation()} />
           <GroupCallInvitationList
             groupCallInvitationList={this.props.viewer.upcomingInvitationList}
             subheader="Upcoming calls"
@@ -68,18 +74,21 @@ export class GroupCallSection extends React.Component {
 
 export default Relay.createContainer(GroupCallSection, {
   initialVariables: {
-    invitationId: "",
+    invitationId: null
   },
 
   prepareVariables: (prev) =>
   {
-    var fetchInvitation = true;
-    if (prev.invitationId === "")
-      fetchInvitation = false;
-    return {
-      invitationId: prev.invitationId,
-      fetchInvitation: fetchInvitation
-    }
+    if (prev.invitationId)
+      return {
+        invitationId: prev.invitationId,
+        fetchInvitation: true
+      }
+    else
+      return {
+        invitationId: "",
+        fetchInvitation: false
+      }
   },
 
   fragments: {
