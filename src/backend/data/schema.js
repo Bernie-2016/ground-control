@@ -38,6 +38,8 @@ var {nodeInterface, nodeField} = nodeDefinitions(
       return GroupCallInvitation.get(id)
     else if (type === 'GroupCall')
       return GroupCall.get(id);
+    else if (type === 'Viewer')
+      return getViewer();
     else
       return null;
   },
@@ -47,7 +49,7 @@ var {nodeInterface, nodeField} = nodeDefinitions(
     else if (obj instanceof GroupCall)
       return GraphQLGroupCall;
     else
-      return null;
+      return GraphQLViewer;
   }
 );
 
