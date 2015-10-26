@@ -5,20 +5,10 @@ import Baobab from 'baobab';
 import Dashboard from './Dashboard';
 
 class App extends React.Component {
-  state = {
-    tree: new Baobab({})
-  }
-
-  componentDidMount() {
-    this.state.tree.on('update', (eventData) => {
-      this.forceUpdate();
-    })
-  }
-
   render() {
     return (
       <Dashboard>
-        <GroupCallSection viewer={this.props.viewer} state={this.state.tree.select('groupCallSection')} />
+        <GroupCallSection viewer={this.props.viewer} />
       </Dashboard>
     )
   }
