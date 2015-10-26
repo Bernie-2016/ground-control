@@ -1,14 +1,16 @@
 import React from 'react';
 import Relay from 'react-relay';
 import CreateGroupCallInvitationMutation from '../mutations/CreateGroupCallInvitationMutation';
+import {TextField, DatePicker, Paper} from 'material-ui';
+import moment from "moment";
 
 class GroupCallInvitationCreationForm extends React.Component {
   state = {
-    topic: "A call",
-    numCalls: 15,
-    fromDate: "A date",
-    toDate: "Another date",
-    maxSignups: 20
+    topic: null,
+    numCalls: null,
+    fromDate: null,
+    toDate: null,
+    maxSignups: null
   }
 
   handleCreation = (event) => {
@@ -17,22 +19,38 @@ class GroupCallInvitationCreationForm extends React.Component {
     );
   }
 
+  textField(label, stateKey) {
+    return (
+      <TextField
+        hintText={label}
+        value={this.state[stateKey]}
+        onChange={(e) => {
+          let newState = {}
+          newState[stateKey] = e.target.value;
+          this.setState(newState)
+        }} />
+    )
+  }
+
   render() {
     return (
-      <form onSubmit={this.handleCreation}>
-        <div>
-          <input type='text' placeholder='Topic' value={this.state.topic} onChange={e => this.setState({topic : e.target.value})}/>
-        </div>
-        <input type='text' placeholder='# of calls' value={this.state.numCalls} onChange={e => this.setState({numCalls : e.target.value})}/>
-        calls from
-        <input type='text' placeholder='From date' value={this.state.fromDate} onChange={e => this.setState({fromDate : e.target.value})}/>
-        to
-        <input type='text' placeholder='To date' value={this.state.toDate} onChange={e => this.setState({toDate : e.target.value})}/>
-        with
-        <input type='text' placeholder='Max signups' value={this.state.maxSignups} onChange={e => this.setState({maxSignups : e.target.value})}/>
-        people/call
-        <input type='submit' value='Done' />
-      </form>
+      <Paper zDepth={0}>
+        <form onSubmit={this.handleCreation}>
+          {this.textField('Topic', 'topic')}<br />
+          {this.textField('# of calls', 'numCalls')}<br />
+          <DatePicker
+            hintText="From date"
+            mode="landscape"
+            value={this.state.fromDate}
+            autoOk={true} />
+          <DatePicker
+            hintText="To date"
+            mode="landscape"
+            value={this.state.toDate}
+            autoOk={true} />
+          {this.textField('Max signups', 'maxSignups')}<br />
+        </form>
+      </Paper>
     )
   }
 }

@@ -54,7 +54,7 @@ export class GroupCallSection extends React.Component {
           <RaisedButton label="Create Call"
             fullWidth={true}
             primary={true}
-            onClick={() => this.selectCallCreation()} />
+            onTouchTap={() => this.selectCallCreation()} />
           <GroupCallInvitationList
             groupCallInvitationList={this.props.viewer.upcomingInvitationList}
             subheader="Upcoming calls"

@@ -14,7 +14,7 @@ export class GroupCallInvitationList extends React.Component {
             key={node.id}
             primaryText={primaryText}
             secondaryText={secondaryText}
-            onClick={(e) => this.props.onSelect(node.id)}/>
+            onTouchTap={(e) => this.props.onSelect(node.id)}/>
         )
     }
     );
