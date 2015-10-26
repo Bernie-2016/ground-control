@@ -2,9 +2,11 @@ import React from 'react';
 import Relay from 'react-relay';
 import GroupCallInvitationList from './GroupCallInvitationList';
 import GroupCallInvitation from './GroupCallInvitation';
+import GroupCallInvitationCreationForm from "./GroupCallInvitationCreationForm";
 import {Paper, Styles, RaisedButton} from "material-ui";
 
 export class GroupCallSection extends React.Component {
+
   styles = {
     container: {
       position: "relative"
@@ -23,15 +25,29 @@ export class GroupCallSection extends React.Component {
     },
   }
 
+  state = {
+    isCreating: false
+  }
+
   selectInvitation(invitationId) {
     this.props.relay.setVariables({invitationId});
   }
 
   render() {
+    var contentView;
+    if (this.state.isCreating)
+      contentView = <GroupCallInvitation
+        groupCallInvitation={this.props.viewer.groupCallInvitation} />
+    else
+      contentView = <GroupCallInvitationCreationForm
+        viewer={this.props.viewer} />
     return (
       <Paper style={this.styles.container}>
         <Paper zDepth={0} style={this.styles.sideBar}>
-          <RaisedButton label="Create Call" fullWidth={true} primary={true} />
+          <RaisedButton label="Create Call"
+            fullWidth={true}
+            primary={true}
+            onClick={() => this.setState({isCreating: true})} />
           <GroupCallInvitationList
             groupCallInvitationList={this.props.viewer.upcomingInvitationList}
             subheader="Upcoming calls"
@@ -42,8 +58,7 @@ export class GroupCallSection extends React.Component {
             onSelect={(id) => this.selectInvitation(id)} />
         </Paper>
         <Paper zDepth={0} style={this.styles.content}>
-          <GroupCallInvitation
-            groupCallInvitation={this.props.viewer.groupCallInvitation} />
+          {contentView}
         </Paper>
       </Paper>
     )
@@ -56,7 +71,7 @@ export default Relay.createContainer(GroupCallSection, {
   },
 
   fragments: {
-    viewer: (variables) => Relay.QL`
+    viewer: () => Relay.QL`
       fragment on Viewer {
         upcomingInvitationList:groupCallInvitationList(first:50, withUpcomingGroupCalls:true) {
           ${GroupCallInvitationList.getFragment('groupCallInvitationList')}
@@ -67,6 +82,7 @@ export default Relay.createContainer(GroupCallSection, {
         groupCallInvitation(id:$invitationId) {
           ${GroupCallInvitation.getFragment('groupCallInvitation')}
         }
+        ${GroupCallInvitationCreationForm.getFragment('viewer')}
       }
     `,
   },

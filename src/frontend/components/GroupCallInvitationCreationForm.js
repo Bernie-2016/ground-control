@@ -21,7 +21,7 @@ class GroupCallInvitationCreationForm extends React.Component {
     return (
       <form onSubmit={this.handleCreation}>
         <div>
-          <input type='text' placeholder='Topic' value={this.props.store.get('topic')} onChange={e => this.props.store.set({topic : e.target.value})}/>
+          <input type='text' placeholder='Topic' value={this.state.topic} onChange={e => this.setState({topic : e.target.value})}/>
         </div>
         <input type='text' placeholder='# of calls' value={this.state.numCalls} onChange={e => this.setState({numCalls : e.target.value})}/>
         calls from
