@@ -30,7 +30,7 @@ export var Note = thinky.createModel("note", {
 // An invitation gets sent to volunteers and they can pick one group call.
 export var GroupCallInvitation = thinky.createModel("group_call_invitation", {
   id: thinkyType.string().options({enforce_missing: false}),
-  topic: thinkyType.string(),
+  topic: thinkyType.string()
 })
 
 export var GroupCall = thinky.createModel("group_call", {

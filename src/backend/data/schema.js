@@ -166,14 +166,8 @@ var GraphQLViewer = new GraphQLObjectType({
         id: { type: new GraphQLNonNull(GraphQLString) }
       },
       resolve: async (viewer, {id}) => {
-        try {
         let localID = fromGlobalId(id).id;
-        console.log(localID);
         var invite = await GroupCallInvitation.get(localID);
-        console.log(invite)
-        }catch(ex) {
-          console.log(ex);
-        }
         return invite;
       }
     }
