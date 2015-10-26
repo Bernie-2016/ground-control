@@ -62,9 +62,10 @@ function getViewer() {
   description: 'A group call',
   fields: () => ({
     id: globalIdField('GroupCall'),
-    scheduledTime: { type: GraphQLString },
+    scheduledTime: { type: GraphQLInt },
     maxSignups: { type: GraphQLInt }
-  })
+  }),
+  interfaces: [nodeInterface]
 });
 
 var {
