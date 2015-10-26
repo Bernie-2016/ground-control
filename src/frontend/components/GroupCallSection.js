@@ -23,8 +23,7 @@ export class GroupCallSection extends React.Component {
     }
   }
 
-  groupCallInvitationSelected(invitationId) {
-    console.log(invitationId);
+  selectInvitation(invitationId) {
     this.props.relay.setVariables({invitationId});
   }
 
@@ -32,8 +31,8 @@ export class GroupCallSection extends React.Component {
     return (
       <Paper style={this.styles.container}>
         <Paper zDepth={0} style={this.styles.sideBar}>
-          <GroupCallInvitationList viewer={this.props.viewer} withUpcomingGroupCalls={true} onSelect={(id) => this.groupCallInvitationSelected(id)} />
-          <GroupCallInvitationList viewer={this.props.viewer} withUpcomingGroupCalls={false} onSelect={(id) => this.groupCallInvitationSelected(id)} />
+          <GroupCallInvitationList viewer={this.props.viewer} withUpcomingGroupCalls={true} onSelect={(id) => this.selectInvitation(id)} />
+          <GroupCallInvitationList viewer={this.props.viewer} withUpcomingGroupCalls={false} onSelect={(id) => this.selectInvitation(id)} />
         </Paper>
         <Paper zDepth={0} style={this.styles.content}>
           <GroupCallInvitation viewer={this.props.viewer} id={this.props.relay.variables.invitationId} />
