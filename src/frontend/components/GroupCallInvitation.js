@@ -14,9 +14,6 @@ export class GroupCallInvitation extends React.Component {
     title: {
       fontWeight: "bold",
       fontSize: 30
-    },
-    callList: {
-      width: 800
     }
   }
 
@@ -38,8 +35,8 @@ export class GroupCallInvitation extends React.Component {
         <div style={this.styles.title}>
           {this.props.groupCallInvitation.topic}
         </div>
-        <Paper>
-          <List style={this.styles.callList}>
+        <Paper zDepth={0}>
+          <List>
             {this.renderGroupCalls()}
           </List>
         </Paper>

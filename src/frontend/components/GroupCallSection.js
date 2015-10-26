@@ -2,7 +2,7 @@ import React from 'react';
 import Relay from 'react-relay';
 import GroupCallInvitationList from './GroupCallInvitationList';
 import GroupCallInvitation from './GroupCallInvitation';
-import {Paper, Styles} from "material-ui";
+import {Paper, Styles, RaisedButton} from "material-ui";
 
 export class GroupCallSection extends React.Component {
   styles = {
@@ -20,7 +20,7 @@ export class GroupCallSection extends React.Component {
     content: {
       display: "inline-block",
       verticalAlign: 'top'
-    }
+    },
   }
 
   selectInvitation(invitationId) {
@@ -31,6 +31,7 @@ export class GroupCallSection extends React.Component {
     return (
       <Paper style={this.styles.container}>
         <Paper zDepth={0} style={this.styles.sideBar}>
+          <RaisedButton label="Create Call" fullWidth={true} primary={true} />
           <GroupCallInvitationList
             groupCallInvitationList={this.props.viewer.upcomingInvitationList}
             subheader="Upcoming calls"
