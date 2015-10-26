@@ -39,12 +39,16 @@ export class GroupCallSection extends React.Component {
 }
 
 export default Relay.createContainer(GroupCallSection, {
+  initialVariables: {
+    invitationId: "5909b32c-b9a4-41e7-ac04-9e7d05e0f8b4"
+  },
+
   fragments: {
-    viewer: () => Relay.QL`
+    viewer: (variables) => Relay.QL`
       fragment on Viewer {
-        ${GroupCallInvitationList.getFragment('viewer', {withUpcomingGroupCalls: true})},
+        ${GroupCallInvitationList.getFragment('viewer', {withUpcomingGroupCalls: true})}
         ${GroupCallInvitationList.getFragment('viewer', {withUpcomingGroupCalls: false})}
-        ${GroupCallInvitation.getFragment('viewer', {id: "5909b32c-b9a4-41e7-ac04-9e7d05e0f8b4"})}
+        ${GroupCallInvitation.getFragment('viewer', {id: variables.invitationId})}
       }
     `,
   },

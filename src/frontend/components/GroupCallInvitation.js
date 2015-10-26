@@ -3,7 +3,6 @@ import Relay from 'react-relay';
 
 export class GroupCallInvitation extends React.Component {
   render() {
-    console.log(this.props)
     return (
       <div>
         {this.props.viewer.groupCallInvitation.topic}
@@ -16,6 +15,7 @@ export default Relay.createContainer(GroupCallInvitation, {
   initialVariables: {
     id: null,
   },
+
   fragments: {
     viewer: () => Relay.QL`
       fragment on Viewer {

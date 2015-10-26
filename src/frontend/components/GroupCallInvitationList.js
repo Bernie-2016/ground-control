@@ -41,11 +41,11 @@ export default Relay.createContainer(GroupCallInvitationList, {
         groupCallInvitationList(first:50, withUpcomingGroupCalls:$withUpcomingGroupCalls) {
           edges {
             node {
-              id,
-              topic,
+              id
+              topic
               groupCallList {
-                total,
-                firstCallDate,
+                total
+                firstCallDate
                 lastCallDate
               }
             }
