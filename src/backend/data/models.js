@@ -40,7 +40,8 @@ export var GroupCall = thinky.createModel("group_call", {
   groupCallInvitationId: thinkyType.string(),
   signups: [{
     personId: thinkyType.string(),
-    attended: thinkyType.boolean()
+    attended: thinkyType.boolean(),
+    role: thinkyType.string().enum(['HOST', 'NOTETAKER', 'PARTICIPANT'])
   }]
 })
 
