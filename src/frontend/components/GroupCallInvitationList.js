@@ -13,7 +13,8 @@ export class GroupCallInvitationList extends React.Component {
           <ListItem
             key={node.id}
             primaryText={primaryText}
-            secondaryText={secondaryText} />
+            secondaryText={secondaryText}
+            onClick={(e) => this.props.onSelect(node.id)}/>
         )
     }
     );

@@ -23,15 +23,20 @@ export class GroupCallSection extends React.Component {
     }
   }
 
+  groupCallInvitationSelected(invitationId) {
+    console.log(invitationId);
+    this.props.relay.setVariables({invitationId});
+  }
+
   render() {
     return (
       <Paper style={this.styles.container}>
         <Paper zDepth={0} style={this.styles.sideBar}>
-          <GroupCallInvitationList viewer={this.props.viewer} withUpcomingGroupCalls={true} />
-          <GroupCallInvitationList viewer={this.props.viewer} withUpcomingGroupCalls={false} />
+          <GroupCallInvitationList viewer={this.props.viewer} withUpcomingGroupCalls={true} onSelect={(id) => this.groupCallInvitationSelected(id)} />
+          <GroupCallInvitationList viewer={this.props.viewer} withUpcomingGroupCalls={false} onSelect={(id) => this.groupCallInvitationSelected(id)} />
         </Paper>
         <Paper zDepth={0} style={this.styles.content}>
-          <GroupCallInvitation viewer={this.props.viewer} id={"5909b32c-b9a4-41e7-ac04-9e7d05e0f8b4"} />
+          <GroupCallInvitation viewer={this.props.viewer} id={this.props.relay.variables.invitationId} />
         </Paper>
       </Paper>
     )
@@ -40,7 +45,7 @@ export class GroupCallSection extends React.Component {
 
 export default Relay.createContainer(GroupCallSection, {
   initialVariables: {
-    invitationId: "5909b32c-b9a4-41e7-ac04-9e7d05e0f8b4"
+    invitationId: "R3JvdXBDYWxsSW52aXRhdGlvbjplMGY3YzRjMy0wM2YxLTRhMzQtYmRjMC1kNGVkNTBhNDQxMWE="
   },
 
   fragments: {
