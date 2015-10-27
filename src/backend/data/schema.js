@@ -23,7 +23,6 @@ import {
 } from 'graphql-relay';
 
 import {
-  GroupCallInvitation,
   GroupCall
 } from './models';
 
@@ -34,9 +33,7 @@ import thinky from './thinky';
 var {nodeInterface, nodeField} = nodeDefinitions(
   (globalId) => {
     var {type, id} = fromGlobalId(globalId);
-    if (type === 'GroupCallInvitation')
-      return GroupCallInvitation.get(id)
-    else if (type === 'GroupCall')
+    if (type === 'GroupCall')
       return GroupCall.get(id);
     else if (type === 'Viewer')
       return getViewer();
@@ -44,9 +41,7 @@ var {nodeInterface, nodeField} = nodeDefinitions(
       return null;
   },
   (obj) => {
-    if (obj instanceof GroupCallInvitation)
-      return GraphQLGroupCallInvitation;
-    else if (obj instanceof GroupCall)
+    if (obj instanceof GroupCall)
       return GraphQLGroupCall;
     else
       return GraphQLViewer;
@@ -69,106 +64,51 @@ function getViewer() {
 });
 
 var {
-  connectionType: GraphLQGroupCallConnection,
+  connectionType: GraphQLGroupCallConnection,
 } = connectionDefinitions({
   name: 'GroupCall',
-  nodeType: GraphQLGroupCall,
-  connectionFields: {
-    total: { type: GraphQLInt },
-    firstCallDate: { type: GraphQLInt },
-    lastCallDate: { type: GraphQLInt }
-  }
+  nodeType: GraphQLGroupCall
 });
 
-var GraphQLGroupCallInvitation = new GraphQLObjectType({
-  name: 'GroupCallInvitation',
-  description: 'An invitation to a number of group calls.',
-  fields: () => ({
-    id: globalIdField('GroupCallInvitation'),
-    topic: {
-      type: GraphQLString
-    },
-    groupCallList: {
-      type: GraphLQGroupCallConnection,
-      args: connectionArgs,
-      resolve: async (invitation, {first}) => {
-        var groupCalls = await GroupCall.filter({groupCallInvitationId : invitation.id}).orderBy('scheduledTime')
-        var groupCallCount = groupCalls.length;
-        var firstCallDate = groupCalls[0].scheduledTime;
-        var lastCallDate = groupCalls[groupCallCount-1].scheduledTime
-        return Object.assign(
-          connectionFromArray(groupCalls, {first}),
-          {
-            total: groupCallCount,
-            firstCallDate: firstCallDate,
-            lastCallDate: lastCallDate
-          });
-      }
-    }
-  }),
-  interfaces: [nodeInterface]
-})
-
-var {
-  connectionType: GraphQLGroupCallInvitationConnection,
-} = connectionDefinitions({
-  name: 'GroupCallInvitation',
-  nodeType: GraphQLGroupCallInvitation
-});
 
 var GraphQLViewer = new GraphQLObjectType({
   name: 'Viewer',
   fields: () => ({
     id: globalIdField('Viewer'),
-    groupCallInvitationList: {
-      type: GraphQLGroupCallInvitationConnection,
+    groupCallList: {
+      type: GraphQLGroupCallConnection,
       args: {
-        withUpcomingGroupCalls: {
+       upcoming: {
           type: GraphQLBoolean,
           defaultValue: null
         },
         ...connectionArgs,
       },
-      resolve: async (viewer, {first, withUpcomingGroupCalls}) => {
+      resolve: async (viewer, {first, upcoming}) => {
         let r = thinky.r;
         let queryFilter = {};
-        if (withUpcomingGroupCalls)
+        if (upcoming)
           queryFilter = (row) => row('scheduledTime').gt(new Date());
-        else if (withUpcomingGroupCalls == false)
+        else if (upcoming == false)
           queryFilter = (row) => row('scheduledTime').le(new Date());
 
-        var invitations = await r.table(GroupCall.getTableName())
-          .group('groupCallInvitationId')
-          .max('scheduledTime')
-          .ungroup()
-          ('reduction')
+        var calls = await r.table(GroupCall.getTableName())
+          .orderBy('scheduledTime')
           .filter(queryFilter)
-          .merge((groupCall) => {
-            return {
-              minScheduledTime: r.table(GroupCall.getTableName())
-                .filter({'groupCallInvitationId' : groupCall('groupCallInvitationId')})
-                .orderBy('scheduledTime')
-                .limit(1)
-                (0)('scheduledTime'),
-              invitation: r.table(GroupCallInvitation.getTableName()).get(groupCall('groupCallInvitationId'))
-            }
-          })
-          .orderBy('minScheduledTime')
-          ('invitation')
           .limit(first)
 
-        return connectionFromArray(invitations, {first});
+        return connectionFromArray(calls, {first});
       }
     },
-    groupCallInvitation: {
-      type: GraphQLGroupCallInvitation,
+    groupCall: {
+      type: GraphQLGroupCall,
       args: {
         id: { type: new GraphQLNonNull(GraphQLString) }
       },
       resolve: async (viewer, {id}) => {
         let localID = fromGlobalId(id).id;
-        var invite = await GroupCallInvitation.get(localID);
-        return invite;
+        var call = await GroupCall.get(localID);
+        return call;
       }
     }
   }),
@@ -238,5 +178,5 @@ var RootQuery = new GraphQLObjectType({
 
 export var Schema = new GraphQLSchema({
   query: RootQuery,
-  mutation: RootMutation
+//  mutation: RootMutation
 });
