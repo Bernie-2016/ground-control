@@ -17,7 +17,7 @@ export default class BatchCreateGroupCallMutation extends Relay.Mutation {
 
   getFatQuery() {
     return Relay.QL`
-      fragment on BatchCreateGroupCallsPayload {
+      fragment on BatchCreateGroupCallPayload {
         viewer {
           id,
           groupCallList
