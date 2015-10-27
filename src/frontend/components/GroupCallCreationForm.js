@@ -1,17 +1,18 @@
 import React from 'react';
 import Relay from 'react-relay';
-import {TextField, DatePicker, Paper} from 'material-ui';
+import {TextField, DatePicker, Paper, List, ListItem, ListDivider} from 'material-ui';
 import moment from "moment";
 import BatchCreateGroupCallMutation from "../mutations/BatchCreateGroupCallMutation";
 import GroupCallCalendar from "./GroupCallCalendar";
 
 class GroupCallCreationForm extends React.Component {
   state = {
-    name: null,
-    numCalls: null,
-    fromDate: null,
-    toDate: null,
-    maxSignups: null
+    name: "A new call",
+    numCalls: 10,
+    fromDate: moment(),
+    toDate: moment().add(7, "d"),
+    maxSignups: 30,
+    duration: moment.duration(1, "hour")
   }
 
   handleCreation = (event) => {
@@ -30,6 +31,14 @@ class GroupCallCreationForm extends React.Component {
     title: {
       fontWeight: "bold",
       fontSize: 30
+    },
+    callList: {
+      float: "right",
+      marginLeft: 20,
+      minWidth: 400
+    },
+    controlForm: {
+      float: "left"
     }
   }
 
@@ -37,6 +46,7 @@ class GroupCallCreationForm extends React.Component {
     return (
       <TextField
         hintText={label}
+        floatingLabelText={label}
         value={this.state[stateKey]}
         onChange={(e) => {
           let newState = {}
@@ -46,29 +56,44 @@ class GroupCallCreationForm extends React.Component {
     )
   }
 
+  renderCallDetails() {
+    let numDays = this.state.toDate.diff(this.state.fromDate, 'days');
+    let numCallsPerDay = Math.floor(this.state.numCalls / this.state.numDays);
+    let iterationArray = new Array(this.state.numCalls).fill(0);
+    let elements = [];
+    for (let index = 0; index < this.state.numCalls; index++) {
+      elements.push(
+        <ListItem primaryText={this.state.name} secondaryText={this.state.fromDate.format("MM/DD @ h:mm a")} />
+      )
+      elements.push(<ListDivider />)
+    }
+    return elements;
+  }
+
   render() {
     return (
       <Paper zDepth={0} style={this.styles.container}>
-        <div style={this.styles.title}>Create calls</div>
-        <Paper style={this.styles.container}>
-          <form onSubmit={this.handleCreation}>
-            {this.textField('Name', 'name')}<br />
-            {this.textField('# of calls', 'numCalls')}<br />
-            <DatePicker
-              hintText="From date"
-              mode="landscape"
-              value={this.state.fromDate}
-              autoOk={true} />
-            <DatePicker
-              hintText="To date"
-              mode="landscape"
-              value={this.state.toDate}
-              autoOk={true} />
-            {this.textField('Max signups', 'maxSignups')}<br />
-          </form>
+        <Paper zDepth={0} style={this.styles.controlForm}>
+          {this.textField('Name', 'name')} <br />
+          {this.textField('# of calls', 'numCalls')}
+          <DatePicker
+            floatingLabelText="From date"
+            hintText="From date"
+            mode="landscape"
+            value={this.state.fromDate.toDate()}
+            autoOk={true} />
+          <DatePicker
+            floatingLabelText="To date"
+            hintText="To date"
+            mode="landscape"
+            value={this.state.toDate.toDate()}
+            autoOk={true} />
+          {this.textField('Max signups', 'maxSignups')}
         </Paper>
-        <Paper>
-          <GroupCallCalendar />
+        <Paper style={this.styles.callList}>
+          <List>
+            {this.renderCallDetails()}
+          </List>
         </Paper>
       </Paper>
     )
