@@ -1,10 +1,10 @@
 import React from 'react';
 import Relay from 'react-relay';
-import CreateGroupCallInvitationMutation from '../mutations/CreateGroupCallInvitationMutation';
 import {TextField, DatePicker, Paper} from 'material-ui';
 import moment from "moment";
+import BatchCreateGroupCallMutation from "../mutations/BatchCreateGroupCallMutation";
 
-class GroupCallInvitationCreationForm extends React.Component {
+class GroupCallCreationForm extends React.Component {
   state = {
     topic: null,
     numCalls: null,
@@ -15,7 +15,7 @@ class GroupCallInvitationCreationForm extends React.Component {
 
   handleCreation = (event) => {
     Relay.Store.update(
-      new CreateGroupCallInvitationMutation({topic: this.props.store.get('topic'), numCalls: this.state.numCalls, viewer: this.props.viewer})
+      new BatchCreateGroupCallMutation({topic: this.props.store.get('topic'), numCalls: this.state.numCalls, viewer: this.props.viewer})
     );
   }
 
@@ -55,11 +55,11 @@ class GroupCallInvitationCreationForm extends React.Component {
   }
 }
 
-export default Relay.createContainer(GroupCallInvitationCreationForm, {
+export default Relay.createContainer(GroupCallCreationForm, {
   fragments: {
     viewer: () => Relay.QL`
       fragment on Viewer {
-        ${CreateGroupCallInvitationMutation.getFragment('viewer')},
+        ${BatchCreateGroupCallMutation.getFragment('viewer')},
       }
     `
   },

@@ -119,15 +119,15 @@ var GraphQLViewer = new GraphQLObjectType({
 var GraphQLGroupCallInput = new GraphQLInputObjectType({
   name: 'GroupCallInput',
   fields: {
+    name: { type: new GraphQLNonNull(GraphQLString) },
     scheduledTime: { type: new GraphQLNonNull(GraphQLString) },
     maxSignups: { type: new GraphQLNonNull(GraphQLString) },
   }
 })
 
-var GraphQLCreateGroupCallInvitationMutation = mutationWithClientMutationId({
-  name: 'CreateGroupCallInvitation',
+var GraphQLBatchCreateGroupCallMutation = mutationWithClientMutationId({
+  name: 'BatchCreateGroupCall',
   inputFields: {
-    topic: { type: new GraphQLNonNull(GraphQLString) },
     groupCallList: { type: new GraphQLNonNull(new GraphQLList(GraphQLGroupCallInput)) }
   },
   outputFields: {
@@ -160,7 +160,7 @@ var GraphQLCreateGroupCallInvitationMutation = mutationWithClientMutationId({
 var RootMutation = new GraphQLObjectType({
   name: 'RootMutation',
   fields: () => ({
-    createGroupCallInvitation: GraphQLCreateGroupCallInvitationMutation
+    batchCreateGroupCall: GraphQLBatchCreateGroupCallMutation
   })
 });
 
@@ -179,5 +179,5 @@ var RootQuery = new GraphQLObjectType({
 
 export var Schema = new GraphQLSchema({
   query: RootQuery,
-//  mutation: RootMutation
+  mutation: RootMutation
 });

@@ -2,7 +2,7 @@ import React from 'react';
 import Relay from 'react-relay';
 import GroupCallList from './GroupCallList';
 import GroupCall from './GroupCall';
-import GroupCallInvitationCreationForm from "./GroupCallInvitationCreationForm";
+import GroupCallCreationForm from './GroupCallCreationForm';
 import {Paper, Styles, RaisedButton} from "material-ui";
 
 export class GroupCallSection extends React.Component {
@@ -43,7 +43,7 @@ export class GroupCallSection extends React.Component {
     var contentView = <div></div>;
     console.log(this.state.isCreating)
     if (this.state.isCreating)
-      contentView = <div></div>;//<GroupCallInvitationCreationForm viewer={this.props.viewer} />
+      contentView = <GroupCallCreationForm viewer={this.props.viewer} />
     else if (this.props.relay.variables.callId)
       contentView = <GroupCall
         groupCall={this.props.viewer.groupCall} />
@@ -103,6 +103,7 @@ export default Relay.createContainer(GroupCallSection, {
         groupCall(id:$callId) @include(if: $fetchCall) {
           ${GroupCall.getFragment('groupCall')}
         }
+        ${GroupCallCreationForm.getFragment('viewer')}
       }
     `,
   },

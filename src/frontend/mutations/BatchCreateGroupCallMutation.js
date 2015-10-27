@@ -1,6 +1,6 @@
 import Relay from 'react-relay';
 
-export default class CreateGroupCallInvitationMutation extends Relay.Mutation {
+export default class BatchCreateGroupCallMutation extends Relay.Mutation {
   static fragments = {
     viewer: () => Relay.QL`
       fragment on Viewer {
@@ -11,16 +11,16 @@ export default class CreateGroupCallInvitationMutation extends Relay.Mutation {
 
   getMutation() {
     return Relay.QL`
-      mutation{ createGroupCallInvitation }
+      mutation{ batchCreateGroupCall }
     `;
   }
 
   getFatQuery() {
     return Relay.QL`
-      fragment on CreateGroupCallInvitationPayload {
+      fragment on BatchCreateGroupCallsPayload {
         viewer {
           id,
-          groupCallInvitationList
+          groupCallList
         },
       }
     `;
@@ -38,11 +38,10 @@ export default class CreateGroupCallInvitationMutation extends Relay.Mutation {
   getVariables() {
     var groupCalls = []
     for (let i = 0; i < this.props.numCalls; i++) {
-      groupCalls.push({scheduledTime: "test", maxSignups: 15});
+      groupCalls.push({name: "test", scheduledTime: "test", maxSignups: 15});
     }
 
     return {
-      topic: this.props.topic,
       groupCallList: groupCalls
     };
   }
