@@ -31,6 +31,8 @@
     "radium": "^0.14.3",
     "material-ui": "^0.13.0",
     "moment": "^2.10.6",
-    "react-tap-event-plugin": "^0.2.1"
+    "react-tap-event-plugin": "^0.2.1",
+    "fullcalendar": "^2.4.0",
+    "jquery": "^2.1.4"
   }
 }

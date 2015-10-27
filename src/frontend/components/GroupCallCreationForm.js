@@ -2,12 +2,8 @@ import React from 'react';
 import Relay from 'react-relay';
 import {TextField, DatePicker, Paper} from 'material-ui';
 import moment from "moment";
-import BigCalendar from 'react-big-calendar';
 import BatchCreateGroupCallMutation from "../mutations/BatchCreateGroupCallMutation";
-
-BigCalendar.setLocalizer(
-  BigCalendar.momentLocalizer(moment)
-);
+import GroupCallCalendar from "./GroupCallCalendar";
 
 class GroupCallCreationForm extends React.Component {
   state = {
@@ -70,6 +66,9 @@ class GroupCallCreationForm extends React.Component {
               autoOk={true} />
             {this.textField('Max signups', 'maxSignups')}<br />
           </form>
+        </Paper>
+        <Paper>
+          <GroupCallCalendar />
         </Paper>
       </Paper>
     )
