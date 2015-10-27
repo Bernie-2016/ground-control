@@ -1,7 +1,7 @@
 import React from 'react';
 import Relay from 'react-relay';
 import GroupCallList from './GroupCallList';
-//import GroupCall from './GroupCall';
+import GroupCall from './GroupCall';
 import GroupCallInvitationCreationForm from "./GroupCallInvitationCreationForm";
 import {Paper, Styles, RaisedButton} from "material-ui";
 
@@ -41,18 +41,17 @@ export class GroupCallSection extends React.Component {
 
   render() {
     var contentView = <div></div>;
-/*    if (this.state.isCreating)
-      contentView = <GroupCallInvitationCreationForm
-        viewer={this.props.viewer} />
-    else if (this.props.relay.variables.invitationId)
-      contentView = <GroupCallInvitation
-        groupCallInvitation={this.props.viewer.groupCallInvitation} />
-        */
+    console.log(this.state.isCreating)
+    if (this.state.isCreating)
+      contentView = <div></div>;//<GroupCallInvitationCreationForm viewer={this.props.viewer} />
+    else if (this.props.relay.variables.callId)
+      contentView = <GroupCall
+        groupCall={this.props.viewer.groupCall} />
 
     return (
       <Paper style={this.styles.container}>
         <Paper zDepth={0} style={this.styles.sideBar}>
-          <RaisedButton label="Create Call"
+          <RaisedButton label="Create Calls"
             fullWidth={true}
             primary={true}
             onTouchTap={() => this.selectCallCreation()} />
@@ -99,9 +98,11 @@ export default Relay.createContainer(GroupCallSection, {
           ${GroupCallList.getFragment('groupCallList')}
         }
         pastCallList:groupCallList(first:50, upcoming:false) {
-            ${GroupCallList.getFragment('groupCallList')}
+          ${GroupCallList.getFragment('groupCallList')}
         }
-
+        groupCall(id:$callId) @include(if: $fetchCall) {
+          ${GroupCall.getFragment('groupCall')}
+        }
       }
     `,
   },
