@@ -1,7 +1,7 @@
 import React from 'react';
 import Relay from 'react-relay';
-import GroupCallInvitationList from './GroupCallInvitationList';
-import GroupCallInvitation from './GroupCallInvitation';
+import GroupCallList from './GroupCallList';
+//import GroupCall from './GroupCall';
 import GroupCallInvitationCreationForm from "./GroupCallInvitationCreationForm";
 import {Paper, Styles, RaisedButton} from "material-ui";
 
@@ -29,24 +29,25 @@ export class GroupCallSection extends React.Component {
     isCreating: false
   }
 
-  selectInvitation(invitationId) {
+  selectCall(callId) {
     this.setState({isCreating: false})
-    this.props.relay.setVariables({invitationId});
+    this.props.relay.setVariables({callId});
   }
 
   selectCallCreation() {
     this.setState({isCreating: true})
-    this.props.relay.setVariables({invitationId: null});
+    this.props.relay.setVariables({callId: null});
   }
 
   render() {
     var contentView = <div></div>;
-    if (this.state.isCreating)
+/*    if (this.state.isCreating)
       contentView = <GroupCallInvitationCreationForm
         viewer={this.props.viewer} />
     else if (this.props.relay.variables.invitationId)
       contentView = <GroupCallInvitation
         groupCallInvitation={this.props.viewer.groupCallInvitation} />
+        */
 
     return (
       <Paper style={this.styles.container}>
@@ -55,14 +56,14 @@ export class GroupCallSection extends React.Component {
             fullWidth={true}
             primary={true}
             onTouchTap={() => this.selectCallCreation()} />
-          <GroupCallInvitationList
-            groupCallInvitationList={this.props.viewer.upcomingInvitationList}
+          <GroupCallList
+            groupCallList={this.props.viewer.upcomingCallList}
             subheader="Upcoming calls"
-            onSelect={(id) => this.selectInvitation(id)} />
-          <GroupCallInvitationList
-            groupCallInvitationList={this.props.viewer.pastInvitationList}
+            onSelect={(id) => this.selectCall(id)} />
+          <GroupCallList
+            groupCallList={this.props.viewer.pastCallList}
             subheader="Past calls"
-            onSelect={(id) => this.selectInvitation(id)} />
+            onSelect={(id) => this.selectCall(id)} />
         </Paper>
         <Paper zDepth={0} style={this.styles.content}>
           {contentView}
@@ -74,36 +75,33 @@ export class GroupCallSection extends React.Component {
 
 export default Relay.createContainer(GroupCallSection, {
   initialVariables: {
-    invitationId: null
+    callId: null
   },
 
   prepareVariables: (prev) =>
   {
-    if (prev.invitationId)
+    if (prev.callId)
       return {
-        invitationId: prev.invitationId,
-        fetchInvitation: true
+        callId: prev.callId,
+        fetchCall: true
       }
     else
       return {
-        invitationId: "",
-        fetchInvitation: false
+        callId: "",
+        fetchCall: false
       }
   },
 
   fragments: {
     viewer: () => Relay.QL`
       fragment on Viewer {
-        upcomingInvitationList:groupCallInvitationList(first:50, withUpcomingGroupCalls:true) {
-          ${GroupCallInvitationList.getFragment('groupCallInvitationList')}
+        upcomingCallList:groupCallList(first:50, upcoming:true) {
+          ${GroupCallList.getFragment('groupCallList')}
         }
-        pastInvitationList:groupCallInvitationList(first:50, withUpcomingGroupCalls:false) {
-            ${GroupCallInvitationList.getFragment('groupCallInvitationList')}
+        pastCallList:groupCallList(first:50, upcoming:false) {
+            ${GroupCallList.getFragment('groupCallList')}
         }
-        groupCallInvitation(id:$invitationId) @include(if: $fetchInvitation) {
-          ${GroupCallInvitation.getFragment('groupCallInvitation')}
-        }
-        ${GroupCallInvitationCreationForm.getFragment('viewer')}
+
       }
     `,
   },
