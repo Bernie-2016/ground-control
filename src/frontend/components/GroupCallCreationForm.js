@@ -146,14 +146,14 @@ class GroupCallCreationForm extends React.Component {
           mode="landscape"
           value={this.state.fromDate.toDate()}
           autoOk={true}
-          onChange={(nil, date) => this.setStateFromInput(fromDate, moment(date))} />
+          onChange={(nil, date) => this.setStateFromInput("fromDate", moment(date))} />
         <DatePicker
           floatingLabelText="To date"
           hintText="To date"
           mode="landscape"
           value={this.state.toDate.toDate()}
           autoOk={true}
-          onChange={(nil, date) => this.setStateFromInput(toDate, moment(date))} />
+          onChange={(nil, date) => this.setStateFromInput("toDate", moment(date))} />
         <TimePicker
           defaultTime={this.state.defaultTime.toDate()}
           floatingLabelText="Default time"
