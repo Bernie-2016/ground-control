@@ -15,7 +15,8 @@ class GroupCallCreationForm extends React.Component {
       toDate: moment().add(7, "d"),
       maxSignups: 30,
       duration: moment.duration(1, "hour"),
-      defaultTime: moment().hour(19).minute(0).second(0)
+      defaultTime: moment().hour(19).minute(0).second(0),
+      selectedIndex: null
     };
 
     let callState = this.generateCalls(defaultState);
@@ -59,19 +60,29 @@ class GroupCallCreationForm extends React.Component {
       paddingLeft: 15,
       paddingTop: 15,
       paddingRight: 15,
-      paddingBottom: 15
+      paddingBottom: 15,
+      position: "relative",
+      minHeight: 800
     },
     title: {
       fontWeight: "bold",
       fontSize: 30
     },
     callList: {
-      float: "right",
+      position: "absolute",
+      top: 15,
+      left: 295,
       marginLeft: 20,
       minWidth: 400
     },
-    controlForm: {
-      float: "left"
+    callForm: {
+      position: "fixed",
+      top: 80,
+      width: 280,
+      paddingLeft: 15,
+      paddingTop: 15,
+      paddingRight: 15,
+      paddingBottom: 15
     }
   }
 
@@ -94,48 +105,72 @@ class GroupCallCreationForm extends React.Component {
     )
   }
 
+  modifyCall(callIndex) {
+    this.setState({selectedIndex: callIndex});
+  }
+
   renderCallDetails() {
     let elements = [];
     for (let index = 0; index < this.state.calls.length; index++) {
       elements.push(
-        <ListItem primaryText={this.state.calls[index].name} secondaryText={this.state.calls[index].scheduledTime.format("MM/DD @ h:mm a")} />
+        <ListItem
+          primaryText={this.state.calls[index].name}
+          secondaryText={this.state.calls[index].scheduledTime.format("MM/DD @ h:mm a")}
+          key={index}
+          onTouchTap={(e) => this.modifyCall(index)} />
       )
       elements.push(<ListDivider />)
     }
     return elements;
   }
 
+  generateCallsForm() {
+    return (
+      <div>
+        {this.textField('Name', 'name')} <br />
+        {this.textField('# of calls', 'numCalls')}
+        <DatePicker
+          floatingLabelText="From date"
+          hintText="From date"
+          mode="landscape"
+          value={this.state.fromDate.toDate()}
+          autoOk={true}
+          onChange={(nil, date) => this.setStateFromInput(fromDate, moment(date))} />
+        <DatePicker
+          floatingLabelText="To date"
+          hintText="To date"
+          mode="landscape"
+          value={this.state.toDate.toDate()}
+          autoOk={true}
+          onChange={(nil, date) => this.setStateFromInput(toDate, moment(date))} />
+        <TimePicker
+          defaultTime={this.state.defaultTime.toDate()}
+          floatingLabelText="Default time"
+          hintText="Default time"
+          onChange={(nil, time) => this.setStateFromInput(defaultTime, moment(time))} />
+        {this.textField('Max signups', 'maxSignups')}
+      </div>
+    )
+  }
+
   render() {
+    let inputZDepth=1
+    let callForm = null;
+    if (this.state.selectedIndex !== null) {
+      inputZDepth = 0;
+    }
+    else {
+      inputZDepth = 1;
+      callForm = this.generateCallsForm()
+    }
+
     return (
       <Paper zDepth={0} style={this.styles.container}>
-        <Paper zDepth={0} style={this.styles.controlForm}>
-          {this.textField('Name', 'name')} <br />
-          {this.textField('# of calls', 'numCalls')}
-          <DatePicker
-            floatingLabelText="From date"
-            hintText="From date"
-            mode="landscape"
-            value={this.state.fromDate.toDate()}
-            autoOk={true}
-            onChange={(nil, date) => this.setStateFromInput(fromDate, moment(date))} />
-          <DatePicker
-            floatingLabelText="To date"
-            hintText="To date"
-            mode="landscape"
-            value={this.state.toDate.toDate()}
-            autoOk={true}
-            onChange={(nil, date) => this.setStateFromInput(toDate, moment(date))} />
-          <TimePicker
-            defaultTime={this.state.defaultTime.toDate()}
-            floatingLabelText="Default time"
-            hintText="Default time"
-            onChange={(nil, time) => this.setStateFromInput(defaultTime, moment(time))} />
-          {this.textField('Max signups', 'maxSignups')}
+        <Paper zDepth={inputZDepth} style={this.styles.callForm}>
+          {callForm}
         </Paper>
-        <Paper style={this.styles.callList}>
-          <List>
-            {this.renderCallDetails()}
-          </List>
+        <Paper zDepth={0} style={this.styles.callList}>
+          {this.renderCallDetails()}
         </Paper>
       </Paper>
     )
