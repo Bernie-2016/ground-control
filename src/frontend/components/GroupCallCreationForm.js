@@ -1,9 +1,8 @@
 import React from 'react';
 import Relay from 'react-relay';
-import {TextField, SvgIcon, DatePicker, Paper, List, FloatingActionButton, Styles, ListItem, ListDivider, TimePicker} from 'material-ui';
+import {TextField, SvgIcon, DatePicker, Paper, List, FloatingActionButton, Styles, ListItem, ListDivider, TimePicker, RaisedButton} from 'material-ui';
 import moment from "moment";
 import BatchCreateGroupCallMutation from "../mutations/BatchCreateGroupCallMutation";
-import GroupCallCalendar from "./GroupCallCalendar";
 
 class GroupCallCreationForm extends React.Component {
   constructor(props) {
@@ -31,11 +30,13 @@ class GroupCallCreationForm extends React.Component {
   }
 
   generateCalls(callInfo) {
+    let names = callInfo.name.split(';');
     let numDays = callInfo.toDate.diff(callInfo.fromDate, 'days');
     let calls = [];
     for (let index = 0; index < callInfo.numCalls; index++) {
+      let name = index < names.length ? names[index] : names[names.length-1]
       let call = {
-        name: callInfo.name,
+        name: name.trim(),
         scheduledTime: moment({
           year: callInfo.fromDate.year(),
           month: callInfo.fromDate.month(),
@@ -74,7 +75,8 @@ class GroupCallCreationForm extends React.Component {
       left: 295,
       marginLeft: 20,
       minWidth: 400,
-      zIndex: 0
+      zIndex: 0,
+      border: "solid 1px " + Styles.Colors.grey300,
     },
     callForm: {
       position: "fixed",
@@ -138,6 +140,10 @@ class GroupCallCreationForm extends React.Component {
   generateCallsForm() {
     return (
       <div>
+        <RaisedButton label="Create!"
+          fullWidth={true}
+          primary={true}
+          onTouchTap={() => true} />
         {this.textField('Name', 'name')} <br />
         {this.textField('# of calls', 'numCalls')}
         <DatePicker
