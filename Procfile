@@ -1,1 +1,1 @@
-web: npm run update-schema && npm start
+web: python ./tunnel.py && npm run update-schema && npm start
