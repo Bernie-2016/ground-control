@@ -31,24 +31,26 @@ class GroupCallCreationForm extends React.Component {
 
   generateCalls(callInfo) {
     let numDays = callInfo.toDate.diff(callInfo.fromDate, 'days');
-    let numCallsPerDay = Math.floor(callInfo.numCalls / callInfo.numDays);
     let calls = [];
     for (let index = 0; index < callInfo.numCalls; index++) {
-      calls.push({
+      let call = {
         name: callInfo.name,
-        time: moment({
+        scheduledTime: moment({
           year: callInfo.fromDate.year(),
           month: callInfo.fromDate.month(),
-          day: callInfo.fromDate.day(),
+          day: callInfo.fromDate.date(),
           hour: callInfo.defaultTime.hour(),
           minute: callInfo.defaultTime.minute(),
           second: callInfo.defaultTime.second()
         }),
         maxSignups: callInfo.maxSignups,
         duration: callInfo.duration
-      })
+      };
+      let dayOffset = index % numDays;
+      call.scheduledTime.add(dayOffset, "d");
+      calls.push(call);
     }
-    calls.sort((a, b) => b.time.diff(a))
+    calls.sort((a, b) => a.scheduledTime.diff(b.scheduledTime))
     return calls;
   }
 
@@ -96,7 +98,7 @@ class GroupCallCreationForm extends React.Component {
     let elements = [];
     for (let index = 0; index < this.state.calls.length; index++) {
       elements.push(
-        <ListItem primaryText={this.state.calls[index].name} secondaryText={this.state.calls[index].time.format("MM/DD @ h:mm a")} />
+        <ListItem primaryText={this.state.calls[index].name} secondaryText={this.state.calls[index].scheduledTime.format("MM/DD @ h:mm a")} />
       )
       elements.push(<ListDivider />)
     }
