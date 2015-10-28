@@ -1,7 +1,6 @@
 import React from 'react';
 import Relay from 'react-relay';
 import GroupCallSection from './GroupCallSection';
-import Baobab from 'baobab';
 import Dashboard from './Dashboard';
 
 class App extends React.Component {
