@@ -164,7 +164,7 @@ class GroupCallCreationForm extends React.Component {
           defaultTime={this.state.defaultTime.toDate()}
           floatingLabelText="Default time"
           hintText="Default time"
-          onChange={(nil, time) => this.setStateFromInput(defaultTime, moment(time))} />
+          onChange={(nil, time) => this.setStateFromInput("defaultTime", moment(time))} />
         {this.textField('Max signups', 'maxSignups')}
       </div>
     )
