@@ -146,7 +146,7 @@ var GraphQLBatchCreateGroupCallMutation = mutationWithClientMutationId({
     var maestro = new Maestro('PWC0PU44ZPOHAI9L', '60aedf735b2b6f7cf83f34c8b560ac9b', 'http://myaccount.maestroconference.com/_access');
     for (let index = 0; index < groupCallList.length; index++) {
       let groupCall = groupCallList[index];
-      let response = await maestro.createConferenceCall(groupCall.name, groupCall.maxSignups, moment(groupCall.scheduledTime).format("YYYY.MM.DD HH:MM:SS"), groupCall.duration)
+      let response = await maestro.createConferenceCall(groupCall.name, groupCall.maxSignups, moment(groupCall.scheduledTime).utc().format("YYYY.MM.DD HH:MM:SS"), groupCall.duration)
 
       promises.push(GroupCall.save({
         name: groupCall.name,
