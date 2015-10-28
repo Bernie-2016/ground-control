@@ -41,7 +41,7 @@ export class GroupCallSection extends React.Component {
 
   render() {
     var contentView = <div></div>;
-    console.log(this.state.isCreating)
+
     if (this.state.isCreating)
       contentView = <GroupCallCreationForm viewer={this.props.viewer} />
     else if (this.props.relay.variables.callId)
