@@ -6,20 +6,50 @@ import BatchCreateGroupCallMutation from "../mutations/BatchCreateGroupCallMutat
 import GroupCallCalendar from "./GroupCallCalendar";
 
 class GroupCallCreationForm extends React.Component {
-  state = {
-    name: "A new call",
-    numCalls: 10,
-    fromDate: moment(),
-    toDate: moment().add(7, "d"),
-    maxSignups: 30,
-    duration: moment.duration(1, "hour"),
-    defaultTime: moment().hour(7).minute(0).second(0)
+  constructor(props) {
+    super(props);
+    let defaultState = {
+      name: "Call name",
+      numCalls: 10,
+      fromDate: moment(),
+      toDate: moment().add(7, "d"),
+      maxSignups: 30,
+      duration: moment.duration(1, "hour"),
+      defaultTime: moment().hour(19).minute(0).second(0)
+    };
+
+    let callState = this.generateCalls(defaultState);
+    defaultState['calls'] = callState;
+    this.state = defaultState
   }
 
   handleCreation = (event) => {
     Relay.Store.update(
       new BatchCreateGroupCallMutation({name: this.props.store.get('name'), numCalls: this.state.numCalls, viewer: this.props.viewer})
     );
+  }
+
+  generateCalls(callInfo) {
+    let numDays = callInfo.toDate.diff(callInfo.fromDate, 'days');
+    let numCallsPerDay = Math.floor(callInfo.numCalls / callInfo.numDays);
+    let calls = [];
+    for (let index = 0; index < callInfo.numCalls; index++) {
+      calls.push({
+        name: callInfo.name,
+        time: moment({
+          year: callInfo.fromDate.year(),
+          month: callInfo.fromDate.month(),
+          day: callInfo.fromDate.day(),
+          hour: callInfo.defaultTime.hour(),
+          minute: callInfo.defaultTime.minute(),
+          second: callInfo.defaultTime.second()
+        }),
+        maxSignups: callInfo.maxSignups,
+        duration: callInfo.duration
+      })
+    }
+    calls.sort((a, b) => b.time.diff(a))
+    return calls;
   }
 
   styles = {
@@ -43,6 +73,13 @@ class GroupCallCreationForm extends React.Component {
     }
   }
 
+  setStateFromInput(key, value) {
+    let newState = this.state;
+    newState[key] = value;
+    newState['calls'] = this.generateCalls(newState)
+    this.setState(newState);
+  }
+
   textField(label, stateKey) {
     return (
       <TextField
@@ -50,21 +87,16 @@ class GroupCallCreationForm extends React.Component {
         floatingLabelText={label}
         value={this.state[stateKey]}
         onChange={(e) => {
-          let newState = {}
-          newState[stateKey] = e.target.value;
-          this.setState(newState)
+          this.setStateFromInput(stateKey, e.target.value)
         }} />
     )
   }
 
   renderCallDetails() {
-    let numDays = this.state.toDate.diff(this.state.fromDate, 'days');
-    let numCallsPerDay = Math.floor(this.state.numCalls / this.state.numDays);
-    let iterationArray = new Array(this.state.numCalls).fill(0);
     let elements = [];
-    for (let index = 0; index < this.state.numCalls; index++) {
+    for (let index = 0; index < this.state.calls.length; index++) {
       elements.push(
-        <ListItem primaryText={this.state.name} secondaryText={this.state.fromDate.format("MM/DD @ h:mm a")} />
+        <ListItem primaryText={this.state.calls[index].name} secondaryText={this.state.calls[index].time.format("MM/DD @ h:mm a")} />
       )
       elements.push(<ListDivider />)
     }
@@ -83,19 +115,19 @@ class GroupCallCreationForm extends React.Component {
             mode="landscape"
             value={this.state.fromDate.toDate()}
             autoOk={true}
-            onChange={(nil, date) => this.setState({fromDate: moment(date)})} />
+            onChange={(nil, date) => this.setStateFromInput(fromDate, moment(date))} />
           <DatePicker
             floatingLabelText="To date"
             hintText="To date"
             mode="landscape"
             value={this.state.toDate.toDate()}
             autoOk={true}
-            onChange={(nil, date) => this.setState({toDate: moment(date)})} />
+            onChange={(nil, date) => this.setStateFromInput(toDate, moment(date))} />
           <TimePicker
             defaultTime={this.state.defaultTime.toDate()}
             floatingLabelText="Default time"
             hintText="Default time"
-            onChange={(nil, time) => this.setState({defaultTime: moment(time)})} />
+            onChange={(nil, time) => this.setStateFromInput(defaultTime, moment(time))} />
           {this.textField('Max signups', 'maxSignups')}
         </Paper>
         <Paper style={this.styles.callList}>
