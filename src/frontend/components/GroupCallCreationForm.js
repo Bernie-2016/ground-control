@@ -1,6 +1,6 @@
 import React from 'react';
 import Relay from 'react-relay';
-import {TextField, DatePicker, Paper, List, ListItem, ListDivider} from 'material-ui';
+import {TextField, DatePicker, Paper, List, ListItem, ListDivider, TimePicker} from 'material-ui';
 import moment from "moment";
 import BatchCreateGroupCallMutation from "../mutations/BatchCreateGroupCallMutation";
 import GroupCallCalendar from "./GroupCallCalendar";
@@ -12,7 +12,8 @@ class GroupCallCreationForm extends React.Component {
     fromDate: moment(),
     toDate: moment().add(7, "d"),
     maxSignups: 30,
-    duration: moment.duration(1, "hour")
+    duration: moment.duration(1, "hour"),
+    defaultTime: moment().hour(7).minute(0).second(0)
   }
 
   handleCreation = (event) => {
@@ -81,13 +82,20 @@ class GroupCallCreationForm extends React.Component {
             hintText="From date"
             mode="landscape"
             value={this.state.fromDate.toDate()}
-            autoOk={true} />
+            autoOk={true}
+            onChange={(nil, date) => this.setState({fromDate: moment(date)})} />
           <DatePicker
             floatingLabelText="To date"
             hintText="To date"
             mode="landscape"
             value={this.state.toDate.toDate()}
-            autoOk={true} />
+            autoOk={true}
+            onChange={(nil, date) => this.setState({toDate: moment(date)})} />
+          <TimePicker
+            defaultTime={this.state.defaultTime.toDate()}
+            floatingLabelText="Default time"
+            hintText="Default time"
+            onChange={(nil, time) => this.setState({defaultTime: moment(time)})} />
           {this.textField('Max signups', 'maxSignups')}
         </Paper>
         <Paper style={this.styles.callList}>
