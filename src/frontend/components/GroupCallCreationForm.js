@@ -8,8 +8,8 @@ class GroupCallCreationForm extends React.Component {
   constructor(props) {
     super(props);
     let defaultState = {
-      name: "Call name",
-      numCalls: 10,
+      name: "A new conference",
+      numCalls: 1,
       fromDate: moment(),
       toDate: moment().add(7, "d"),
       maxSignups: 30,
