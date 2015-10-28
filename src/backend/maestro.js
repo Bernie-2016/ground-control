@@ -20,7 +20,8 @@ export default class Maestro {
       reservationCount: 1,
       estimatedCallers1: maxReservations,
       startDate1: startDate,
-      duration1: duration
+      duration1: duration,
+      type: 'json'
     });
 
     var options = {

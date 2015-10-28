@@ -36,13 +36,17 @@ export default class BatchCreateGroupCallMutation extends Relay.Mutation {
   }
 
   getVariables() {
-    var groupCalls = []
-    for (let i = 0; i < this.props.numCalls; i++) {
-      groupCalls.push({name: "test", scheduledTime: "test", maxSignups: 15});
-    }
-
+    let inputCalls = []
+    this.props.calls.forEach((call) => {
+      inputCalls.push({
+        name: call.name,
+        scheduledTime: call.scheduledTime.toDate().getTime(),
+        maxSignups: call.maxSignups,
+        duration: 60
+      })
+    });
     return {
-      groupCallList: groupCalls
+      groupCallList: inputCalls
     };
   }
 }

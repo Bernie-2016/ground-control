@@ -47,6 +47,8 @@ export var GroupCall = thinky.createModel("group_call", {
   name: thinkyType.string(),
   scheduledTime: thinkyType.date(),
   maxSignups: thinkyType.number(),
+  duration: thinkyType.number(),
+  maestroConferenceUID: thinkyType.string(),
   signups: [{
     personId: thinkyType.string(),
     attended: thinkyType.boolean(),

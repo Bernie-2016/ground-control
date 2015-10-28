@@ -23,9 +23,9 @@ class GroupCallCreationForm extends React.Component {
     this.state = defaultState
   }
 
-  handleCreation = (event) => {
+  onCreate = (event) => {
     Relay.Store.update(
-      new BatchCreateGroupCallMutation({name: this.props.store.get('name'), numCalls: this.state.numCalls, viewer: this.props.viewer})
+      new BatchCreateGroupCallMutation({calls:this.state.calls, viewer: this.props.viewer})
     );
   }
 
@@ -143,7 +143,7 @@ class GroupCallCreationForm extends React.Component {
         <RaisedButton label="Create!"
           fullWidth={true}
           primary={true}
-          onTouchTap={() => true} />
+          onTouchTap={(event) => this.onCreate(event)} />
         {this.textField('Name', 'name')} <br />
         {this.textField('# of calls', 'numCalls')}
         <DatePicker
