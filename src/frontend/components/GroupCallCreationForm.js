@@ -73,7 +73,8 @@ class GroupCallCreationForm extends React.Component {
       top: 15,
       left: 295,
       marginLeft: 20,
-      minWidth: 400
+      minWidth: 400,
+      zIndex: 0
     },
     callForm: {
       position: "fixed",
@@ -84,6 +85,7 @@ class GroupCallCreationForm extends React.Component {
       paddingRight: 15,
       paddingBottom: 15,
       border: "solid 1px " + Styles.Colors.grey300,
+      zIndex: 10
     }
   }
 
@@ -163,6 +165,7 @@ class GroupCallCreationForm extends React.Component {
   }
 
   generateIndividualCallForm(callIndex) {
+    let call = this.state.calls[callIndex];
     return (
       <div>
         <FloatingActionButton mini={true} style={{float:"right"}} onTouchTap={() => this.setSelectedCall(null)}>
@@ -171,11 +174,57 @@ class GroupCallCreationForm extends React.Component {
         <TextField
           hintText="Name"
           floatingLabelText="Name"
-          value={this.state.calls[callIndex].name}
+          value={call.name}
           onChange={(e) => {
             let calls = this.state.calls
             calls[callIndex]['name'] = e.target.value
+            this.setState({calls: calls})}} /> <br />
+        <TextField
+          hintText="Max signups"
+          floatingLabelText="Max signups"
+          value={call.maxSignups}
+          onChange={(e) => {
+            let calls = this.state.calls
+            calls[callIndex]['maxSignups'] = e.target.value
             this.setState({calls: calls})}} />
+        <DatePicker
+          floatingLabelText="Scheduled date"
+          hintText="Scheduled date"
+          mode="landscape"
+          value={moment(call.scheduledTime).startOf('day').toDate()}
+          autoOk={true}
+          onChange={(nil, date) => {
+            let calls = this.state.calls;
+            let newMoment = moment(date);
+            calls[callIndex]['scheduledTime'] = moment({
+              year: newMoment.year(),
+              month: newMoment.month(),
+              day: newMoment.date(),
+              hour: call.scheduledTime.hour(),
+              minute: call.scheduledTime.minute(),
+              second: call.scheduledTime.second()
+            })
+            calls.sort((a, b) => a.scheduledTime.diff(b.scheduledTime))
+            this.setState({calls: calls})
+          }} />
+          <TimePicker
+            floatingLabelText="Scheduled time"
+            hintText="Scheduled time"
+            defaultTime={moment(call.scheduledTime).toDate()}
+            onChange={(nil, time) => {
+              let calls = this.state.calls;
+              let newMoment = moment(time);
+              calls[callIndex]['scheduledTime'] = moment({
+                year: call.scheduledTime.year(),
+                month: call.scheduledTime.month(),
+                day: call.scheduledTime.date(),
+                hour: newMoment.hour(),
+                minute: newMoment.minute(),
+                second: newMoment.second()
+              })
+            calls.sort((a, b) => a.scheduledTime.diff(b.scheduledTime))
+            this.setState({calls: calls})
+          }} />
       </div>
     )
   }
