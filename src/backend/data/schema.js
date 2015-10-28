@@ -26,11 +26,10 @@ import {
   GroupCall
 } from './models';
 
-import moment from 'moment';
+import moment from 'moment-timezone';
 import Promise from 'bluebird';
 import Maestro from '../maestro';
 import thinky from './thinky';
-
 
 var {nodeInterface, nodeField} = nodeDefinitions(
   (globalId) => {
@@ -146,7 +145,7 @@ var GraphQLBatchCreateGroupCallMutation = mutationWithClientMutationId({
     var maestro = new Maestro('PWC0PU44ZPOHAI9L', '60aedf735b2b6f7cf83f34c8b560ac9b', 'http://myaccount.maestroconference.com/_access');
     for (let index = 0; index < groupCallList.length; index++) {
       let groupCall = groupCallList[index];
-      let response = await maestro.createConferenceCall(groupCall.name, groupCall.maxSignups, moment(groupCall.scheduledTime).utc().format("YYYY.MM.DD HH:MM:SS"), groupCall.duration)
+      let response = await maestro.createConferenceCall(groupCall.name, groupCall.maxSignups, moment(groupCall.scheduledTime).tz("America/Los_Angeles").format("YYYY.MM.DD HH:mm:ss"), groupCall.duration)
 
       promises.push(GroupCall.save({
         name: groupCall.name,

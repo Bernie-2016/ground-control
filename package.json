@@ -33,6 +33,7 @@
     "moment": "^2.10.6",
     "react-tap-event-plugin": "^0.2.1",
     "fullcalendar": "^2.4.0",
-    "jquery": "^2.1.4"
+    "jquery": "^2.1.4",
+    "moment-timezone": "^0.4.1"
   }
 }
