@@ -1,6 +1,6 @@
 import React from 'react';
 import Relay from 'react-relay';
-import {TextField, DatePicker, Paper, List, ListItem, ListDivider, TimePicker} from 'material-ui';
+import {TextField, SvgIcon, DatePicker, Paper, List, FloatingActionButton, Styles, ListItem, ListDivider, TimePicker} from 'material-ui';
 import moment from "moment";
 import BatchCreateGroupCallMutation from "../mutations/BatchCreateGroupCallMutation";
 import GroupCallCalendar from "./GroupCallCalendar";
@@ -82,7 +82,8 @@ class GroupCallCreationForm extends React.Component {
       paddingLeft: 15,
       paddingTop: 15,
       paddingRight: 15,
-      paddingBottom: 15
+      paddingBottom: 15,
+      border: "solid 1px " + Styles.Colors.grey300,
     }
   }
 
@@ -105,7 +106,7 @@ class GroupCallCreationForm extends React.Component {
     )
   }
 
-  modifyCall(callIndex) {
+  setSelectedCall(callIndex) {
     this.setState({selectedIndex: callIndex});
   }
 
@@ -117,11 +118,19 @@ class GroupCallCreationForm extends React.Component {
           primaryText={this.state.calls[index].name}
           secondaryText={this.state.calls[index].scheduledTime.format("MM/DD @ h:mm a")}
           key={index}
-          onTouchTap={(e) => this.modifyCall(index)} />
+          onTouchTap={(e) => this.setSelectedCall(index)} />
       )
       elements.push(<ListDivider />)
     }
     return elements;
+  }
+
+  closeButton() {
+    return (
+      <SvgIcon {...this.props}>
+        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+      </SvgIcon>
+    );
   }
 
   generateCallsForm() {
@@ -153,14 +162,33 @@ class GroupCallCreationForm extends React.Component {
     )
   }
 
+  generateIndividualCallForm(callIndex) {
+    return (
+      <div>
+        <FloatingActionButton mini={true} style={{float:"right"}} onTouchTap={() => this.setSelectedCall(null)}>
+          {this.closeButton()}
+        </FloatingActionButton>
+        <TextField
+          hintText="Name"
+          floatingLabelText="Name"
+          value={this.state.calls[callIndex].name}
+          onChange={(e) => {
+            let calls = this.state.calls
+            calls[callIndex]['name'] = e.target.value
+            this.setState({calls: calls})}} />
+      </div>
+    )
+  }
+
   render() {
     let inputZDepth=1
     let callForm = null;
     if (this.state.selectedIndex !== null) {
-      inputZDepth = 0;
+      inputZDepth = 1;
+      callForm = this.generateIndividualCallForm(this.state.selectedIndex)
     }
     else {
-      inputZDepth = 1;
+      inputZDepth = 0;
       callForm = this.generateCallsForm()
     }
 
