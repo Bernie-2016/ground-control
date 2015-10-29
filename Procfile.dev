@@ -1,0 +1,2 @@
+web: npm install && npm run update-schema && npm start
+db: rethinkdb
