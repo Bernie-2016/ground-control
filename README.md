@@ -37,3 +37,16 @@ On top of that, we are creating a [GraphQL](http://graphql.org/) API.  GraphQL i
 
 If you are feeling stuck/aren't familiar with any of this and want some help, please don't bang your head against a wall!  Talk to me (saikat@berniesanders.com, @saikat in the BernieBuilders Slack).
 
+## Some more conceptual info to help you get started
+
+At the core of Ground Control, there are a few basic models to work with that can be combined in powerful ways.
+
+There are People, who are represented with very limited top-level data - just an e-mail address for now (possibly also a password in the future).
+
+There are Fields, which are descriptions of typed data.  E.g. there could be a field called "volunteers_registered" of type Number.
+
+There are Notes, which are key: value pairs of Field: value on Persons.
+
+There are Surveys, which represent any interaction with a person.  Surveys are modeled as having attached data and a template (which is simply a React component) to display the survey.  Then, on the backend, we define a variety of SurveyProcessors which, given a Survey, can run a bunch of tasks on the input (e.g. attach Notes on people based on Fields defined in the survey, sign the person up for a group call, etc.).
+
+Not all of this exists yet.  BUT IT WILL!
