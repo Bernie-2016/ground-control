@@ -44,13 +44,20 @@ var {nodeInterface, nodeField} = nodeDefinitions(
   (obj) => {
     if (obj instanceof GroupCall)
       return GraphQLGroupCall;
-    else
+    else if (obj instanceof Viewer)
       return GraphQLViewer;
+    else
+      return null;
   }
 );
 
+// This is a dummy object because Relay can't handle having connections on the root query fields.
+class Viewer extends Object {}
+var viewer = new Viewer();
+viewer.id = '1';
+
 function getViewer() {
-  return {id: '1'}
+  return viewer;
 }
 
  var GraphQLGroupCall = new GraphQLObjectType({
