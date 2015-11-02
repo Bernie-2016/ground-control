@@ -8,16 +8,6 @@ Install the [Heroku toolbelt](https://toolbelt.heroku.com/), [RethinkDB](http://
 
 Ground Control should be running at `http://localhost:3000`.  The [RethinkDB database admin](https://www.rethinkdb.com/docs/administration-tools/) will be running at `http://localhost:8080`.
 
-## Deploying
-
-Once you have permission to deploy, add the Heroku remote:
-
-`git remote add heroku git@heroku.com:bernie-ground-control.git`
-
-Then you can deploy with
-
-`git push heroku master`
-
 ## What is this?
 
 Right now, Ground Control is a tool for scheduling conference calls on the MaestroConference system.  In the near future, it will also generate spreadsheets for notetakers on these calls to take notes and send back into Ground Control.  But in general, you can think of Ground Control as, ultimately, our central tool for managing our volunteer organizing efforts.  It will have two major goals:
