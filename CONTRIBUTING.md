@@ -6,13 +6,13 @@ It may seem a bit overwhelming at first and unclear how to get started, so there
 
 ## Where is everyone hanging out?
 
-We're on [Discord](https://discord.gg/0bmwNXGVZ2RZBGKJ)!  Why [Discord](https://discord.gg/0bmwNXGVZ2RZBGKJ) you ask?  For many of the same reasons that Reactiflux [moved](https://github.com/reactiflux/volunteers/issues/25#issuecomment-147538522) [there](https://facebook.github.io/react/blog/2015/10/19/reactiflux-is-moving-to-discord.html), the main ones being that it's super simple to invite people to and has free infinite chat history.  [Here's an invite](https://discord.gg/0bmwNXGVZ2RZBGKJ).
+We're on [the BernieBuilders Slack](https://organize.berniesanders.com/chat/) in the [#tech-team](https://berniebuilders.slack.com/messages/tech-team/) channel!  [Join us](http://organize.berniesanders.com/chat/)!
 
 ## What should I work on?
 
 To get a sense of which projects are most active, you can take a look at https://github.com/Bernie-2016/ -- the projects will be listed in order of most to least recent activity.
 
-The current priorities for the campaign will be set as the topic in #general in Discord.  These are things we often need to get done very soon, so help is always appreciated!
+The current priorities for the campaign will be set as pinned messages in #tech-team in Slack.  These are things we often need to get done very soon, so help is always appreciated!
 
 If the top priorities seem too complicated and difficult to get into (they probably often will be for newcomers), feel free to instead trawl through some of our projects and try to find Issues marked with the ‘newbie-friendly’ tag.  Pick a newbie-friendly task (even better if it is a newbie-friendly task with a high-priority tag as well) and give it a shot!
 
