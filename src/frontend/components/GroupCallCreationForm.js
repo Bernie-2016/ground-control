@@ -65,10 +65,6 @@ class GroupCallCreationForm extends React.Component {
       position: "relative",
       minHeight: 800
     },
-    title: {
-      fontWeight: "bold",
-      fontSize: 30
-    },
     callList: {
       position: "absolute",
       top: 15,

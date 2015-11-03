@@ -2,6 +2,7 @@ import React from 'react';
 import Relay from 'react-relay';
 import {AppBar, Styles, FlatButton, Tabs, Tab, AppCanvas} from 'material-ui';
 import BernieLogo from './BernieLogo';
+import {BernieColors} from './bernie-styles'
 
 export default class Dashboard extends React.Component {
   styles = {
@@ -10,12 +11,12 @@ export default class Dashboard extends React.Component {
       height: 40
     },
     bar: {
-      backgroundColor: "rgb(20, 127, 215)",
+      backgroundColor: BernieColors.blue,
       minHeight: 56,
       height: 56
     },
     tabs: {
-      backgroundColor: "rgb(20, 127, 215)"
+      backgroundColor: BernieColors.blue
     },
     tabsContainer: {
       width: 200
