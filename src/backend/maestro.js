@@ -1,10 +1,11 @@
 import requestPromise from 'request-promise';
 
 export default class Maestro {
-  constructor(customerUID, secretToken, URL) {
+  constructor(customerUID, secretToken, URL, fakeCall) {
     this.customerUID = customerUID;
     this.secretToken = secretToken;
     this.URL = URL;
+    this.fakeCall = fakeCall;
   }
 
   createConferenceCall(name, maxReservations, startDate, duration, {contactEmail=null, greenroom=null, recording=null, backgroundMusic=null}={}) {
@@ -29,6 +30,11 @@ export default class Maestro {
       method: 'POST',
       form: postParams,
       json: true
+    }
+
+    if (this.fakeCall) {
+      console.log('Would have made request: ' + options)
+      return true;
     }
 
     return requestPromise(options);

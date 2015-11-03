@@ -147,9 +147,10 @@ var GraphQLBatchCreateGroupCallMutation = mutationWithClientMutationId({
       }
     }
   },
-  mutateAndGetPayload: async ({topic, groupCallList}) => {
+  mutateAndGetPayload:async ({topic, groupCallList}) => {
     var promises = [];
-    var maestro = new Maestro('PWC0PU44ZPOHAI9L', '60aedf735b2b6f7cf83f34c8b560ac9b', 'http://myaccount.maestroconference.com/_access');
+    var maestro = new Maestro(process.env.MAESTRO_UID, process.env.MAESTRO_TOKEN, process.env.MAESTRO_URL, !process.env.DEBUG);
+
     for (let index = 0; index < groupCallList.length; index++) {
       let groupCall = groupCallList[index];
       let response = await maestro.createConferenceCall(groupCall.name, groupCall.maxSignups, moment(groupCall.scheduledTime).tz("America/Los_Angeles").format("YYYY.MM.DD HH:mm:ss"), groupCall.duration)
@@ -164,8 +165,8 @@ var GraphQLBatchCreateGroupCallMutation = mutationWithClientMutationId({
       }));
     };
 
+//    throw new Error("This is a test")
     await Promise.all(promises);
-
     return {};
   }
 });

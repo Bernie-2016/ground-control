@@ -6,7 +6,7 @@ import WebpackDevServer from 'webpack-dev-server';
 import {Schema} from './data/schema';
 
 const APP_PORT = process.env.PORT;
-const GRAPHQL_PORT = 8000;
+const GRAPHQL_PORT = 8090;
 
 // Expose a GraphQL endpoint
 var graphQLServer = express();

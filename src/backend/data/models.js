@@ -9,8 +9,9 @@ export var Person = thinky.createModel("person", {
 export var Field = thinky.createModel("field", {
   id: thinkyType.string().options({enforce_missing: false}),
   label: thinkyType.string(),
-  type: thinkyType.string().enum(['NUMBER', 'STRING', 'BOOLEAN']),
-  choices: []
+  type: thinkyType.string().enum(['NUMBER', 'STRING', 'BOOLEAN', 'DATETIME']),
+  choices: [],
+  maxLength: thinkyType.number()
 })
 
 export var Note = thinky.createModel("note", {

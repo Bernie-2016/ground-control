@@ -1,8 +1,9 @@
 import React from 'react';
 import Relay from 'react-relay';
-import {TextField, SvgIcon, DatePicker, Paper, List, FloatingActionButton, Styles, ListItem, ListDivider, TimePicker, RaisedButton} from 'material-ui';
+import {TextField, SvgIcon, DatePicker, Paper, List, FloatingActionButton, Styles, ListItem, ListDivider, TimePicker, RaisedButton, Snackbar} from 'material-ui';
 import moment from "moment";
 import BatchCreateGroupCallMutation from "../mutations/BatchCreateGroupCallMutation";
+import {BernieColors} from './bernie-styles'
 
 class GroupCallCreationForm extends React.Component {
   constructor(props) {
@@ -15,7 +16,9 @@ class GroupCallCreationForm extends React.Component {
       maxSignups: 30,
       duration: moment.duration(1, "hour"),
       defaultTime: moment().hour(19).minute(0).second(0),
-      selectedIndex: null
+      selectedIndex: null,
+      globalErrorMessage: null,
+      globalStatusMessage: null
     };
 
     let callState = this.generateCalls(defaultState);
@@ -28,8 +31,26 @@ class GroupCallCreationForm extends React.Component {
   }
 
   onCreate = (event) => {
+    this.setState({
+      globalErrorMessage: null,
+      globalStatusMessage: null
+    });
+
+    let onFailure = (transaction) => {
+      var error = transaction.getError() || new Error('Mutation failed.');
+      this.setState({globalErrorMessage : "Something went wrong trying to make the calls."})
+    };
+
+    let onSuccess = (transaction) => {
+      this.setState({globalStatusMessage : "Calls created successfully!"})
+    }
+
     Relay.Store.update(
-      new BatchCreateGroupCallMutation({calls:this.state.calls, viewer: this.props.viewer})
+      new BatchCreateGroupCallMutation({
+        calls:this.state.calls,
+        viewer: this.props.viewer,
+      }),
+      {onFailure}
     );
   }
 
@@ -87,7 +108,7 @@ class GroupCallCreationForm extends React.Component {
       paddingRight: 15,
       paddingBottom: 15,
       border: "solid 1px " + Styles.Colors.grey300,
-      zIndex: 10
+      zIndex: 1
     }
   }
 
@@ -247,8 +268,27 @@ class GroupCallCreationForm extends React.Component {
       callForm = this.generateCallsForm()
     }
 
+    let errorSnack = <div></div>
+    let messageSnack = <div></div>
+    if (this.state.globalErrorMessage)
+      errorSnack = <Snackbar
+        message={this.state.globalErrorMessage}
+        autoHideDuration={10000}
+        openOnMount={true}
+        style={{'backgroundColor' : BernieColors.red}}
+        action={null} />
+    else if (this.state.globalStatusMessage)
+      messageSnack = <Snackbar
+        message={this.state.globalStatusMessage}
+        autoHideDuration={10000}
+        openOnMount={true}
+        style={{'backgroundColor' : BernieColors.blue}}
+        action={null} />
+
     return (
       <Paper zDepth={0} style={this.styles.container}>
+        {errorSnack}
+        {messageSnack}
         <Paper zDepth={inputZDepth} style={this.styles.callForm}>
           {callForm}
         </Paper>
