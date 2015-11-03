@@ -16,7 +16,7 @@ class GroupCallCreationForm extends React.Component {
       maxSignups: 30,
       duration: moment.duration(1, "hour"),
       defaultTime: moment().hour(19).minute(0).second(0),
-      selectedIndex: null,
+      selectedCall: null,
       globalErrorMessage: null,
       globalStatusMessage: null
     };
@@ -28,57 +28,6 @@ class GroupCallCreationForm extends React.Component {
 
   static propTypes = {
     viewer: React.PropTypes.object
-  }
-
-  onCreate = (event) => {
-    this.setState({
-      globalErrorMessage: null,
-      globalStatusMessage: null
-    });
-
-    let onFailure = (transaction) => {
-      var error = transaction.getError() || new Error('Mutation failed.');
-      this.setState({globalErrorMessage : "Something went wrong trying to make the calls."})
-    };
-
-    let onSuccess = (transaction) => {
-      this.setState({globalStatusMessage : "Calls created successfully!"})
-    }
-
-    Relay.Store.update(
-      new BatchCreateGroupCallMutation({
-        calls:this.state.calls,
-        viewer: this.props.viewer,
-      }),
-      {onFailure}
-    );
-  }
-
-  generateCalls(callInfo) {
-    let names = callInfo.name.split(';');
-    let numDays = callInfo.toDate.diff(callInfo.fromDate, 'days');
-    let calls = [];
-    for (let index = 0; index < callInfo.numCalls; index++) {
-      let name = index < names.length ? names[index] : names[names.length-1]
-      let call = {
-        name: name.trim(),
-        scheduledTime: moment({
-          year: callInfo.fromDate.year(),
-          month: callInfo.fromDate.month(),
-          day: callInfo.fromDate.date(),
-          hour: callInfo.defaultTime.hour(),
-          minute: callInfo.defaultTime.minute(),
-          second: callInfo.defaultTime.second()
-        }),
-        maxSignups: callInfo.maxSignups,
-        duration: callInfo.duration
-      };
-      let dayOffset = index % numDays;
-      call.scheduledTime.add(dayOffset, "d");
-      calls.push(call);
-    }
-    calls.sort((a, b) => a.scheduledTime.diff(b.scheduledTime))
-    return calls;
   }
 
   styles = {
@@ -112,6 +61,58 @@ class GroupCallCreationForm extends React.Component {
     }
   }
 
+  onCreate = (event) => {
+    this.setState({
+      globalErrorMessage: null,
+      globalStatusMessage: null
+    });
+
+    let onFailure = (transaction) => {
+      var error = transaction.getError() || new Error('Mutation failed.');
+      this.setState({globalErrorMessage : "Something went wrong trying to make the calls."})
+    };
+
+    let onSuccess = (transaction) => {
+      this.setState({globalStatusMessage : "Calls created successfully!"})
+    }
+
+    Relay.Store.update(
+      new BatchCreateGroupCallMutation({
+        calls:this.state.calls,
+        viewer: this.props.viewer,
+      }),
+      {onFailure}
+    );
+  }
+
+  generateCalls(callInfo) {
+    let names = callInfo.name.split(';');
+    let numDays = callInfo.toDate.diff(callInfo.fromDate, 'days');
+    let calls = [];
+    for (let index = 0; index < callInfo.numCalls; index++) {
+      let name = index < names.length ? names[index] : names[names.length-1]
+      let call = {
+        id: Math.random().toString(36).substring(7),
+        name: name.trim(),
+        scheduledTime: moment({
+          year: callInfo.fromDate.year(),
+          month: callInfo.fromDate.month(),
+          day: callInfo.fromDate.date(),
+          hour: callInfo.defaultTime.hour(),
+          minute: callInfo.defaultTime.minute(),
+          second: callInfo.defaultTime.second()
+        }),
+        maxSignups: callInfo.maxSignups,
+        duration: callInfo.duration
+      };
+      let dayOffset = index % numDays;
+      call.scheduledTime.add(dayOffset, "d");
+      calls.push(call);
+    }
+    calls.sort((a, b) => a.scheduledTime.diff(b.scheduledTime))
+    return calls;
+  }
+
   setStateFromInput(key, value) {
     let newState = this.state;
     newState[key] = value;
@@ -131,19 +132,19 @@ class GroupCallCreationForm extends React.Component {
     )
   }
 
-  setSelectedCall(callIndex) {
-    this.setState({selectedIndex: callIndex});
+  setSelectedCall(callId) {
+    this.setState({selectedCall: callId});
   }
 
-  renderCallDetails() {
+  generatedCallsList() {
     let elements = [];
     for (let index = 0; index < this.state.calls.length; index++) {
       elements.push(
         <ListItem
           primaryText={this.state.calls[index].name}
           secondaryText={this.state.calls[index].scheduledTime.format("MM/DD @ h:mm a")}
-          key={index}
-          onTouchTap={(e) => this.setSelectedCall(index)} />
+          key={this.state.calls[index].id}
+          onTouchTap={(e) => this.setSelectedCall(this.state.calls[index].id)} />
       )
       elements.push(<ListDivider />)
     }
@@ -158,7 +159,7 @@ class GroupCallCreationForm extends React.Component {
     );
   }
 
-  generateCallsForm() {
+  callGeneratorForm() {
     return (
       <div>
         <RaisedButton label="Create!"
@@ -191,8 +192,10 @@ class GroupCallCreationForm extends React.Component {
     )
   }
 
-  generateIndividualCallForm(callIndex) {
-    let call = this.state.calls[callIndex];
+  callForm(callId) {
+    let calls = this.state.calls;
+    let call = calls.filter((element) => element.id === callId)[0]
+
     return (
       <div>
         <FloatingActionButton mini={true} style={{float:"right"}} onTouchTap={() => this.setSelectedCall(null)}>
@@ -203,16 +206,14 @@ class GroupCallCreationForm extends React.Component {
           floatingLabelText="Name"
           value={call.name}
           onChange={(e) => {
-            let calls = this.state.calls
-            calls[callIndex]['name'] = e.target.value
+            call['name'] = e.target.value
             this.setState({calls: calls})}} /> <br />
         <TextField
           hintText="Max signups"
           floatingLabelText="Max signups"
           value={call.maxSignups}
           onChange={(e) => {
-            let calls = this.state.calls
-            calls[callIndex]['maxSignups'] = e.target.value
+            call['maxSignups'] = e.target.value
             this.setState({calls: calls})}} />
         <DatePicker
           floatingLabelText="Scheduled date"
@@ -220,10 +221,9 @@ class GroupCallCreationForm extends React.Component {
           mode="landscape"
           value={moment(call.scheduledTime).startOf('day').toDate()}
           autoOk={true}
-          onChange={(nil, date) => {
-            let calls = this.state.calls;
+          onChange={(nil, date) => {            ;
             let newMoment = moment(date);
-            calls[callIndex]['scheduledTime'] = moment({
+            call['scheduledTime'] = moment({
               year: newMoment.year(),
               month: newMoment.month(),
               day: newMoment.date(),
@@ -238,10 +238,9 @@ class GroupCallCreationForm extends React.Component {
             floatingLabelText="Scheduled time"
             hintText="Scheduled time"
             defaultTime={moment(call.scheduledTime).toDate()}
-            onChange={(nil, time) => {
-              let calls = this.state.calls;
+            onChange={(nil, time) => {              ;
               let newMoment = moment(time);
-              calls[callIndex]['scheduledTime'] = moment({
+              call['scheduledTime'] = moment({
                 year: call.scheduledTime.year(),
                 month: call.scheduledTime.month(),
                 day: call.scheduledTime.date(),
@@ -259,13 +258,13 @@ class GroupCallCreationForm extends React.Component {
   render() {
     let inputZDepth=1
     let callForm = null;
-    if (this.state.selectedIndex !== null) {
+    if (this.state.selectedCall !== null) {
       inputZDepth = 1;
-      callForm = this.generateIndividualCallForm(this.state.selectedIndex)
+      callForm = this.callForm(this.state.selectedCall)
     }
     else {
       inputZDepth = 0;
-      callForm = this.generateCallsForm()
+      callForm = this.callGeneratorForm()
     }
 
     let errorSnack = <div></div>
@@ -293,7 +292,7 @@ class GroupCallCreationForm extends React.Component {
           {callForm}
         </Paper>
         <Paper zDepth={0} style={this.styles.callList}>
-          {this.renderCallDetails()}
+          {this.generatedCallsList()}
         </Paper>
       </Paper>
     )
