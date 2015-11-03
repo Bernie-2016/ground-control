@@ -1,3 +1,4 @@
+// Use material-ui themes instead
 export const BernieColors = {
   blue: 'rgb(20, 127, 215)',
   red: 'rgb(245, 91, 91)',
