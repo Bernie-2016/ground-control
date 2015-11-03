@@ -7,19 +7,13 @@ export const BernieColors = {
   gray: 'rgb(54, 67, 80)'
 }
 
-/*
 export const BernieStyles = {
-  base: {
+  bodyText: {
     color: BernieColors.gray
   },
 
-  button: {
-    base: {
-      backgroundColor: BernieColors.red,
-    },
-    hover: {
-      backgroundColor: BernieColors.darkRed
-    }
+  container: {
+    padding: "15 15 15 15"
   },
 
   title: {
@@ -28,4 +22,3 @@ export const BernieStyles = {
     fontWeight: 500
   },
 }
-*/

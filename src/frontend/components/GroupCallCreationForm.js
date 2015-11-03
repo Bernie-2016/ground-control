@@ -3,8 +3,10 @@ import Relay from 'react-relay';
 import {TextField, SvgIcon, DatePicker, Paper, List, FloatingActionButton, Styles, ListItem, ListDivider, TimePicker, RaisedButton, Snackbar} from 'material-ui';
 import moment from "moment";
 import BatchCreateGroupCallMutation from "../mutations/BatchCreateGroupCallMutation";
-import {BernieColors} from './bernie-styles'
+import {BernieColors, BernieStyles} from './bernie-styles'
+import Radium from 'radium'
 
+@Radium
 class GroupCallCreationForm extends React.Component {
   constructor(props) {
     super(props);
@@ -33,8 +35,8 @@ class GroupCallCreationForm extends React.Component {
   styles = {
     container: {
       paddingLeft: 15,
-      paddingTop: 15,
       paddingRight: 15,
+      paddingTop: 15,
       paddingBottom: 15,
       position: "relative",
       minHeight: 800
@@ -49,8 +51,6 @@ class GroupCallCreationForm extends React.Component {
       border: "solid 1px " + Styles.Colors.grey300,
     },
     callForm: {
-      position: "fixed",
-      top: 80,
       width: 280,
       paddingLeft: 15,
       paddingTop: 15,
@@ -162,10 +162,6 @@ class GroupCallCreationForm extends React.Component {
   callGeneratorForm() {
     return (
       <div>
-        <RaisedButton label="Create!"
-          fullWidth={true}
-          primary={true}
-          onTouchTap={(event) => this.onCreate(event)} />
         {this.textField('Name', 'name')} <br />
         {this.textField('# of calls', 'numCalls')}
         <DatePicker
@@ -188,6 +184,10 @@ class GroupCallCreationForm extends React.Component {
           hintText="Default time"
           onChange={(nil, time) => this.setStateFromInput("defaultTime", moment(time))} />
         {this.textField('Max signups', 'maxSignups')}
+        <RaisedButton label="Create!"
+          fullWidth={true}
+          primary={true}
+          onTouchTap={(event) => this.onCreate(event)} />
       </div>
     )
   }
@@ -286,13 +286,24 @@ class GroupCallCreationForm extends React.Component {
 
     return (
       <Paper zDepth={0} style={this.styles.container}>
-        {errorSnack}
-        {messageSnack}
-        <Paper zDepth={inputZDepth} style={this.styles.callForm}>
-          {callForm}
-        </Paper>
-        <Paper zDepth={0} style={this.styles.callList}>
-          {this.generatedCallsList()}
+        <div style={BernieStyles.title}>Make group calls</div>
+        <div style={[BernieStyles.bodyText, BernieStyles.container]}>
+          Use this form to quickly create multiple Maestro calls.  Just do the following:
+          <ol>
+            <li>Use the form on the left to type in default data across all the calls. This will generate a list of calls on the right.</li>
+            <li>Edit individual calls generated on the right by clicking them.</li>
+            <li>Once all the calls on the right look good, click 'Create!' to create them in Maestro!</li>
+          </ol>
+        </div>
+        <Paper zDepth={0} style={this.styles.container}>
+          {errorSnack}
+          {messageSnack}
+          <Paper zDepth={inputZDepth} style={this.styles.callForm}>
+            {callForm}
+          </Paper>
+          <Paper zDepth={0} style={this.styles.callList}>
+            {this.generatedCallsList()}
+          </Paper>
         </Paper>
       </Paper>
     )
