@@ -17,6 +17,10 @@ export class GroupCall extends React.Component {
     }
   }
 
+  static propTypes = {
+    groupCall: React.PropTypes.object
+  }
+
   render() {
     return (
       <Paper style={this.styles.container} zDepth={0}>

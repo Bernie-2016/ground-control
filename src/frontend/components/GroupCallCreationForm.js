@@ -23,6 +23,10 @@ class GroupCallCreationForm extends React.Component {
     this.state = defaultState
   }
 
+  static propTypes = {
+    viewer: React.PropTypes.object
+  }
+
   onCreate = (event) => {
     Relay.Store.update(
       new BatchCreateGroupCallMutation({calls:this.state.calls, viewer: this.props.viewer})

@@ -4,6 +4,11 @@ import {List, ListItem, Styles} from "material-ui";
 import moment from "moment";
 
 export class GroupCallList extends React.Component {
+  static propTypes = {
+    subheader: React.PropTypes.string,
+    onSelect: React.PropTypes.func,
+    groupCallList : React.PropTypes.object
+  }
   renderGroupCalls() {
     return this.props.groupCallList.edges.map(call => {
         let node = call.node;
@@ -16,7 +21,7 @@ export class GroupCallList extends React.Component {
             secondaryText={secondaryText}
             onTouchTap={(e) => this.props.onSelect(node.id)}/>
         )
-    }
+      }
     );
   }
 
