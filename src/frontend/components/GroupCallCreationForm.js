@@ -69,6 +69,7 @@ class GroupCallCreationForm extends React.Component {
 
     let onFailure = (transaction) => {
       var error = transaction.getError() || new Error('Mutation failed.');
+      console.log(error);
       this.setState({globalErrorMessage : "Something went wrong trying to make the calls."})
     };
 
@@ -287,7 +288,7 @@ class GroupCallCreationForm extends React.Component {
     return (
       <Paper zDepth={0} style={this.styles.container}>
         <div style={BernieStyles.title}>Make group calls</div>
-        <div style={[BernieStyles.bodyText, BernieStyles.container]}>
+        <div style={[BernieStyles.bodyText, {'paddingTop' : 15}]}>
           Use this form to quickly create multiple Maestro calls.  Just do the following:
           <ol>
             <li>Use the form on the left to type in default data across all the calls. This will generate a list of calls on the right.</li>

@@ -33,10 +33,9 @@ export default class Maestro {
     }
 
     if (this.fakeCall) {
-      console.log('Would have made request: ' + options)
+      console.log('Would have made request: ' + JSON.stringify(options))
       return true;
     }
-
     return requestPromise(options);
   }
 }
