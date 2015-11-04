@@ -3,7 +3,6 @@ var thinkyType = thinky.type;
 
 export var Person = thinky.createModel("person", {
   id: thinkyType.string().options({enforce_missing: false}),
-  email: thinkyType.string()
 });
 
 export var Field = thinky.createModel("field", {
@@ -11,17 +10,16 @@ export var Field = thinky.createModel("field", {
   label: thinkyType.string(),
   type: thinkyType.string().enum(['NUMBER', 'STRING', 'BOOLEAN', 'DATETIME']),
   choices: [],
-  maxLength: thinkyType.number()
+  maxLength: thinkyType.number(),
+  validationFunc: thinkyType.string()
 })
 
 export var Note = thinky.createModel("note", {
   id: thinkyType.string().options({enforce_missing: false}),
-  about: {
-    table: thinkyType.string(),
-    id: thinkyType.string()
-  },
+  personId: thinkyType.string(),
   fieldId: thinkyType.string(),
   value: thinkyType.any(),
+  entryTime: thinkyType.date(),
   source: {
     table: thinkyType.string(),
     id: thinkyType.string()
@@ -34,13 +32,7 @@ export var Survey = thinky.createModel("survey", {
     table: thinkyType.string(),
     id: thinkyType.string()
   }],
-  link: thinkyType.string()
-})
-
-export var SurveyQuestion = thinky.createModel("survey_question", {
-  id: thinkyType.string().options({enforce_missing: false}),
-  label: thinkyType.string(),
-  fieldId: thinkyType.string()
+  slug: thinkyType.string()
 })
 
 export var GroupCall = thinky.createModel("group_call", {

@@ -5,7 +5,7 @@ import GroupCall from './GroupCall';
 import GroupCallCreationForm from './GroupCallCreationForm';
 import {Paper, Styles, RaisedButton} from "material-ui";
 
-export class GroupCallSection extends React.Component {
+export class GroupCallAdmin extends React.Component {
 
   styles = {
     container: {
@@ -72,7 +72,7 @@ export class GroupCallSection extends React.Component {
   }
 }
 
-export default Relay.createContainer(GroupCallSection, {
+export default Relay.createContainer(GroupCallAdmin, {
   initialVariables: {
     callId: null
   },
