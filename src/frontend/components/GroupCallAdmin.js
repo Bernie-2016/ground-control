@@ -4,6 +4,7 @@ import GroupCallList from './GroupCallList';
 import GroupCall from './GroupCall';
 import GroupCallCreationForm from './GroupCallCreationForm';
 import {Paper, Styles, RaisedButton} from "material-ui";
+import Helpers from './helpers';
 
 export class GroupCallAdmin extends React.Component {
 
@@ -30,6 +31,7 @@ export class GroupCallAdmin extends React.Component {
   }
 
   selectCall(callId) {
+    Helpers.navigateTo(this, callId)
     this.setState({isCreating: false})
     this.props.relay.setVariables({callId});
   }
