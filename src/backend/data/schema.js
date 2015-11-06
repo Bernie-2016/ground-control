@@ -23,7 +23,12 @@ import {
 } from 'graphql-relay';
 
 import {
-  GroupCall
+  Person,
+  Group,
+  CallAssignment,
+  Call,
+  Survey,
+  GroupCall,
 } from './models';
 
 import moment from 'moment-timezone';
@@ -34,33 +39,89 @@ import thinky from './thinky';
 var {nodeInterface, nodeField} = nodeDefinitions(
   (globalId) => {
     var {type, id} = fromGlobalId(globalId);
+    if (type === 'Person')
+      return Person.get(id);
+    if (type === 'Group')
+      return Group.get(id);
+    if (type === 'CallAssignment')
+      return CallAssignment.get(id);
+    if (type === 'Call')
+      return Call.get(id);
+    if (type === 'Survey')
+      return Survey.get(id);
     if (type === 'GroupCall')
       return GroupCall.get(id);
-    else if (type === 'Viewer')
-      return getViewer();
-    else
-      return null;
+    return null;
   },
   (obj) => {
+    if (obj instanceof Person)
+      return GraphQLPerson;
+    if (obj instanceof Group)
+      return GraphQLGroup;
+    if (obj instanceof CallAssignment)
+      return GraphQLCallAssignment;
+    if (obj instanceof Call)
+      return GraphQLCall;
+    if (obj instanceof Survey)
+      return GraphQLSurvey;
     if (obj instanceof GroupCall)
       return GraphQLGroupCall;
-    else if (obj instanceof Viewer)
-      return GraphQLViewer;
-    else
-      return null;
+    return null;
   }
 );
 
-// This is a dummy object because Relay can't handle having connections on the root query fields.
-class Viewer extends Object {}
-var viewer = new Viewer();
-viewer.id = '1';
+const GraphQLPerson = new GraphQLObjectType({
+  name: "Person",
+  description: "A person.",
+  fields: () => ({
+    id: globalIdField('Person'),
+  }),
+  interfaces: [nodeInterface]
+})
 
-function getViewer() {
-  return viewer;
-}
+var {
+  connectionType: GraphQLPersonConnection,
+} = connectionDefinitions({
+  name: 'Person',
+  nodeType: GraphQLPerson
+});
 
- var GraphQLGroupCall = new GraphQLObjectType({
+const GraphQLGroup = new GraphQLObjectType({
+  name: "Group",
+  description: "A list of people as determined by some criteria",
+  personList: { type: GraphQLPersonConnection }
+});
+
+const GraphQLCallAssignment = new GraphQLObjectType({
+  name: "CallAssignment",
+  description: 'A mass calling assignment',
+  fields: () => ({
+    id: globalIdField('CallAssignment'),
+    name: { type: GraphQLString },
+    callerGroup: { type: GraphQLGroup },
+    targetGroup: { type: GraphQLGroup },
+    survey: { type: GraphQLSurvey }
+  })
+});
+
+const GraphQLSurvey = new GraphQLObjectType({
+  name: "Survey",
+  description: "A survey to be filled out by a person",
+  fields: () => ({
+    id: globalIdField('Survey'),
+    slug: { type: GraphQLString },
+    bsdData: {
+      type: GraphQLString,
+      resolve: (survey) => {
+        if (survey.bsdLink)
+          console.log("here");
+        return null;
+      }
+    }
+  })
+})
+
+var GraphQLGroupCall = new GraphQLObjectType({
   name: "GroupCall",
   description: 'A group call',
   fields: () => ({
@@ -78,7 +139,6 @@ var {
   name: 'GroupCall',
   nodeType: GraphQLGroupCall
 });
-
 
 var GraphQLViewer = new GraphQLObjectType({
   name: 'Viewer',
