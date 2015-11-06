@@ -13,13 +13,13 @@ const DataSource = {
 
 export const Person = thinky.createModel("person", {
   id: thinkyType.string().options({enforce_missing: false}),
-  bsdLink: BSDLink
+  bsdLink: BsdLink
 });
 
 export const Group = thinky.createModel("person_group" {
   id: thinkyType.string().options({enforce_missing: false}),
   personIdList: [thinkyType.string()],
-  bsdLink: BSDLink
+  bsdLink: BsdLink
 })
 
 export const CallAssignment = think.createModel("call_assignment", {
@@ -40,9 +40,8 @@ export const Call = think.createModel("call", {
 
 export const Survey = thinky.createModel("survey", {
   id: thinkyType.string().options({enforce_missing: false}),
-  data: [DataSource],
   slug: thinkyType.string(),
-  bsdLink: BSDLink
+  bsdLink: BsdLink
 })
 
 export const GroupCall = thinky.createModel("group_call", {
@@ -67,7 +66,7 @@ export const Field = thinky.createModel("field", {
   choices: [],
   maxLength: thinkyType.number(),
   validationFunc: thinkyType.string(),
-  bsdLink: BSDLink
+  bsdLink: BsdLink
 })
 
 export const Note = thinky.createModel("note", {
