@@ -140,10 +140,10 @@ const GraphQLSurvey = new GraphQLObjectType({
   fields: () => ({
     id: globalIdField('Survey'),
     slug: { type: GraphQLString },
-    bsdData: {
+    BSDData: {
       type: GraphQLString,
       resolve: (survey) => {
-        if (survey.bsdLink)
+        if (survey.BSDLink)
           console.log("here");
         return null;
       }
