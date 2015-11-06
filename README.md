@@ -10,10 +10,11 @@ Ground Control should be running at `http://localhost:3000`.  The [RethinkDB dat
 
 ## What is this?
 
-The purpose of Ground Control is three-fold:
+The purposes of Ground Control are:
     1. Be the central routing point/API for applications to integrate with our the CRMs the campaign uses (BSD and VAN)
     2. Be a repository for data that does not fit neatly into BSD and VAN and give people outside of our system access to this data as well
-    3. An effort to build out more organizing tools on top of what we already have (which leads to the data in #2). Currently this means a phonebanking tool and a tool for scheduling conference calls with volunteers.
+    3. Be the central portal for volunteers who want to get involved with the campaign and an admin interface to manage volunteers.
+    4. An effort to build out more organizing tools on top of what we already have (which leads to the data in #2). Currently this means a phonebanking tool and a tool for scheduling conference calls with volunteers.
 
 ## What are these "CRMs the campaign uses?"
 
