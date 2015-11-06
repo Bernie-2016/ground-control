@@ -13,21 +13,20 @@ const DataSource = {
 
 export const Person = thinky.createModel("person", {
   id: thinkyType.string().options({enforce_missing: false}),
-  bsdLink: BSDLink,
-  auth0Token: thinkyType.string()
+  bsdLink: BSDLink
 });
 
-export const Group = thinky.createModel("person_list" {
+export const Group = thinky.createModel("person_group" {
   id: thinkyType.string().options({enforce_missing: false}),
-  people: [thinkyType.string()],
-  dynamic: thinkyType.boolean(),
+  personIdList: [thinkyType.string()],
   bsdLink: BSDLink
 })
 
 export const CallAssignment = think.createModel("call_assignment", {
   id: thinkyType.string().options({enforce_missing: false}),
-  callerListId: thinkyType.string(),
-  targetListId : thinkyType.string(),
+  name: thinkyType.string(),
+  callerGroupId: thinkyType.string(),
+  targetGroupId : thinkyType.string(),
   surveyId: thinkyType.string(),
 })
 
@@ -37,25 +36,6 @@ export const Call = think.createModel("call", {
   callerId: thinkyType.string(),
   intervieweeId: thinkyType.string(),
   callAssignedAt: thinkyType.date()
-})
-
-export const Field = thinky.createModel("field", {
-  id: thinkyType.string().options({enforce_missing: false}),
-  label: thinkyType.string(),
-  type: thinkyType.string().enum(['NUMBER', 'STRING', 'BOOLEAN', 'DATETIME']),
-  choices: [],
-  maxLength: thinkyType.number(),
-  validationFunc: thinkyType.string(),
-  bsdLink: BSDLink
-})
-
-export const Note = thinky.createModel("note", {
-  id: thinkyType.string().options({enforce_missing: false}),
-  personId: thinkyType.string(),
-  fieldId: thinkyType.string(),
-  value: thinkyType.any(),
-  entryTime: thinkyType.date(),
-  source: DataSource
 })
 
 export const Survey = thinky.createModel("survey", {
@@ -77,4 +57,24 @@ export const GroupCall = thinky.createModel("group_call", {
     attended: thinkyType.boolean(),
     role: thinkyType.string().enum(['HOST', 'NOTETAKER', 'PARTICIPANT'])
   }]
+})
+
+// Unused models for now
+export const Field = thinky.createModel("field", {
+  id: thinkyType.string().options({enforce_missing: false}),
+  label: thinkyType.string(),
+  type: thinkyType.string().enum(['NUMBER', 'STRING', 'BOOLEAN', 'DATETIME']),
+  choices: [],
+  maxLength: thinkyType.number(),
+  validationFunc: thinkyType.string(),
+  bsdLink: BSDLink
+})
+
+export const Note = thinky.createModel("note", {
+  id: thinkyType.string().options({enforce_missing: false}),
+  personId: thinkyType.string(),
+  fieldId: thinkyType.string(),
+  value: thinkyType.any(),
+  entryTime: thinkyType.date(),
+  source: DataSource
 })
