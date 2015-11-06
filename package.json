@@ -18,7 +18,6 @@
     "graphql": "^0.4.9",
     "graphql-relay": "^0.3.2",
     "webpack": "^1.10.5",
-    "webpack-dev-server": "^1.10.1",
     "thinky": "^2.1.9",
     "react": "^0.14.0",
     "react-dom": "^0.14.0",
@@ -35,5 +34,9 @@
     "fullcalendar": "^2.4.0",
     "jquery": "^2.1.4",
     "moment-timezone": "^0.4.1"
+  },
+  "devDependencies": {
+    "webpack-dev-server": "^1.10.1",
+    "graphiql": "^0.4.0"
   }
 }
