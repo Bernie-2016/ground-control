@@ -15,8 +15,8 @@
     "babel-relay-plugin": "^0.3.0",
     "express": "^4.13.1",
     "express-graphql": "^0.3.0",
-    "graphql": "^0.4.9",
-    "graphql-relay": "^0.3.2",
+    "graphql": "^0.4.2",
+    "graphql-relay": "^0.3.5",
     "webpack": "^1.10.5",
     "thinky": "^2.1.9",
     "react": "^0.14.0",
@@ -33,10 +33,10 @@
     "react-tap-event-plugin": "^0.2.1",
     "fullcalendar": "^2.4.0",
     "jquery": "^2.1.4",
-    "moment-timezone": "^0.4.1"
+    "moment-timezone": "^0.4.1",
+    "bsd-api-auth": "^1.0.0"
   },
   "devDependencies": {
-    "webpack-dev-server": "^1.10.1",
-    "graphiql": "^0.4.0"
+    "webpack-dev-server": "^1.10.1"
   }
 }
