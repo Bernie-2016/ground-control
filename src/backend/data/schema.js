@@ -36,9 +36,16 @@ import Promise from 'bluebird';
 import Maestro from '../maestro';
 import thinky from './thinky';
 
-var {nodeInterface, nodeField} = nodeDefinitions(
+class Viewer {
+  constructor(identifier) {
+    this.id = identifier
+  }
+}
+const SharedViewer = new Viewer(1);
+
+let {nodeInterface, nodeField} = nodeDefinitions(
   (globalId) => {
-    var {type, id} = fromGlobalId(globalId);
+    let {type, id} = fromGlobalId(globalId);
     if (type === 'Person')
       return Person.get(id);
     if (type === 'Group')
@@ -51,6 +58,8 @@ var {nodeInterface, nodeField} = nodeDefinitions(
       return Survey.get(id);
     if (type === 'GroupCall')
       return GroupCall.get(id);
+    if (type === 'Viewer')
+      return SharedViewer;
     return null;
   },
   (obj) => {
@@ -66,6 +75,8 @@ var {nodeInterface, nodeField} = nodeDefinitions(
       return GraphQLSurvey;
     if (obj instanceof GroupCall)
       return GraphQLGroupCall;
+    if (obj instanceof Viewer)
+      return GraphQLViewer;
     return null;
   }
 );
@@ -79,7 +90,7 @@ const GraphQLPerson = new GraphQLObjectType({
   interfaces: [nodeInterface]
 })
 
-var {
+let {
   connectionType: GraphQLPersonConnection,
 } = connectionDefinitions({
   name: 'Person',
@@ -89,7 +100,9 @@ var {
 const GraphQLGroup = new GraphQLObjectType({
   name: "Group",
   description: "A list of people as determined by some criteria",
-  personList: { type: GraphQLPersonConnection }
+  fields: () => ({
+    personList: { type: GraphQLPersonConnection }
+  })
 });
 
 const GraphQLCallAssignment = new GraphQLObjectType({
@@ -101,7 +114,15 @@ const GraphQLCallAssignment = new GraphQLObjectType({
     callerGroup: { type: GraphQLGroup },
     targetGroup: { type: GraphQLGroup },
     survey: { type: GraphQLSurvey }
-  })
+  }),
+  interfaces: [nodeInterface]
+});
+
+var {
+  connectionType: GraphQLCallAssignmentConnection,
+} = connectionDefinitions({
+  name: 'CallAssignment',
+  nodeType: GraphQLCallAssignment
 });
 
 const GraphQLSurvey = new GraphQLObjectType({
@@ -118,10 +139,11 @@ const GraphQLSurvey = new GraphQLObjectType({
         return null;
       }
     }
-  })
+  }),
+  interfaces: [nodeInterface]
 })
 
-var GraphQLGroupCall = new GraphQLObjectType({
+const GraphQLGroupCall = new GraphQLObjectType({
   name: "GroupCall",
   description: 'A group call',
   fields: () => ({
@@ -133,14 +155,14 @@ var GraphQLGroupCall = new GraphQLObjectType({
   interfaces: [nodeInterface]
 });
 
-var {
+let {
   connectionType: GraphQLGroupCallConnection,
 } = connectionDefinitions({
   name: 'GroupCall',
   nodeType: GraphQLGroupCall
 });
 
-var GraphQLViewer = new GraphQLObjectType({
+const GraphQLViewer = new GraphQLObjectType({
   name: 'Viewer',
   fields: () => ({
     id: globalIdField('Viewer'),
@@ -161,7 +183,7 @@ var GraphQLViewer = new GraphQLObjectType({
         else if (upcoming == false)
           queryFilter = (row) => row('scheduledTime').le(new Date());
 
-        var calls = await r.table(GroupCall.getTableName())
+        let calls = await r.table(GroupCall.getTableName())
           .orderBy('scheduledTime')
           .filter(queryFilter)
           .limit(first)
@@ -176,15 +198,23 @@ var GraphQLViewer = new GraphQLObjectType({
       },
       resolve: async (viewer, {id}) => {
         let localID = fromGlobalId(id).id;
-        var call = await GroupCall.get(localID);
+        let call = await GroupCall.get(localID);
         return call;
+      }
+    },
+    callAssignmentList: {
+      type: GraphQLCallAssignmentConnection,
+      resolve: async (assignment, {first}) => {
+        console.log("haere");
+        let assignments = CallAssignment.fetch({})
+        return connectionFromArray(assignments, {first});
       }
     }
   }),
   interfaces: [nodeInterface]
 })
 
-var GraphQLGroupCallInput = new GraphQLInputObjectType({
+const GraphQLGroupCallInput = new GraphQLInputObjectType({
   name: 'GroupCallInput',
   fields: {
     name: { type: new GraphQLNonNull(GraphQLString) },
@@ -194,7 +224,7 @@ var GraphQLGroupCallInput = new GraphQLInputObjectType({
   }
 })
 
-var GraphQLBatchCreateGroupCallMutation = mutationWithClientMutationId({
+const GraphQLBatchCreateGroupCallMutation = mutationWithClientMutationId({
   name: 'BatchCreateGroupCall',
   inputFields: {
     groupCallList: { type: new GraphQLNonNull(new GraphQLList(GraphQLGroupCallInput)) }
@@ -203,13 +233,13 @@ var GraphQLBatchCreateGroupCallMutation = mutationWithClientMutationId({
     viewer: {
       type: GraphQLViewer,
       resolve: () => {
-        return getViewer();
+        return SharedViewer;
       }
     }
   },
   mutateAndGetPayload:async ({topic, groupCallList}) => {
-    var promises = [];
-    var maestro = new Maestro(process.env.MAESTRO_UID, process.env.MAESTRO_TOKEN, process.env.MAESTRO_URL, process.env.DEBUG);
+    let promises = [];
+    let maestro = new Maestro(process.env.MAESTRO_UID, process.env.MAESTRO_TOKEN, process.env.MAESTRO_URL, process.env.DEBUG);
 
     for (let index = 0; index < groupCallList.length; index++) {
       let groupCall = groupCallList[index];
@@ -230,27 +260,25 @@ var GraphQLBatchCreateGroupCallMutation = mutationWithClientMutationId({
   }
 });
 
-var RootMutation = new GraphQLObjectType({
+let RootMutation = new GraphQLObjectType({
   name: 'RootMutation',
   fields: () => ({
     batchCreateGroupCall: GraphQLBatchCreateGroupCallMutation
   })
 });
 
-var RootQuery = new GraphQLObjectType({
+let RootQuery = new GraphQLObjectType({
   name: 'RootQuery',
   fields: () => ({
     viewer: {
       type: GraphQLViewer,
-      resolve: () => {
-        return getViewer();
-      }
+      resolve: () => SharedViewer
     },
     node: nodeField
   }),
 });
 
-export var Schema = new GraphQLSchema({
+export let Schema = new GraphQLSchema({
   query: RootQuery,
   mutation: RootMutation
 });

@@ -1,7 +1,7 @@
 {
   "name": "ground-control",
   "private": true,
-  "description": "A tool to organize the political revolution",
+  "description": "Every political revolution needs a launch pad.",
   "repository": "Bernie-2016/ground-control",
   "version": "0.1.0",
   "scripts": {
@@ -19,7 +19,7 @@
     "graphql-relay": "^0.3.5",
     "webpack": "^1.10.5",
     "thinky": "^2.1.9",
-    "react": "^0.14.0",
+    "react": "^0.14.2",
     "react-dom": "^0.14.0",
     "react-relay": "^0.4.0",
     "react-router": "^1.0.0-rc3",
