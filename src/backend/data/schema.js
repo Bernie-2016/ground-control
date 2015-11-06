@@ -111,9 +111,18 @@ const GraphQLCallAssignment = new GraphQLObjectType({
   fields: () => ({
     id: globalIdField('CallAssignment'),
     name: { type: GraphQLString },
-    callerGroup: { type: GraphQLGroup },
-    targetGroup: { type: GraphQLGroup },
-    survey: { type: GraphQLSurvey }
+    callerGroup: {
+      type: GraphQLGroup,
+      resolve: (assignment) => Group.get(assignment.callerGroupId)
+    },
+    targetGroup: {
+      type: GraphQLGroup,
+      resolve: (assignment) => Group.get(assignment.targetGroupId)
+    },
+    survey: {
+      type: GraphQLSurvey,
+      resolve: (assignment) => Survey.get(assignment.surveyId)
+    }
   }),
   interfaces: [nodeInterface]
 });
@@ -205,10 +214,8 @@ const GraphQLViewer = new GraphQLObjectType({
     callAssignmentList: {
       type: GraphQLCallAssignmentConnection,
       resolve: async (assignment, {first}) => {
-        console.log("haere");
         let assignments = await CallAssignment.filter({})
-        console.log(assignments)
-        return connectionFromArray(assignments, {first});
+          return connectionFromArray(assignments, {first});
       }
     }
   }),
