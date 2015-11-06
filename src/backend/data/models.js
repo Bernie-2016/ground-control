@@ -28,8 +28,8 @@ export const CallAssignment = thinky.createModel("call_assignment", {
   callerGroupId: thinkyType.string(),
   targetGroupId : thinkyType.string(),
   surveyId: thinkyType.string(),
-  startDate: thinkyType.date(),
-  endDate: thinkyType.date()
+//  startDate: thinkyType.date(),
+//  endDate: thinkyType.date()
 })
 
 export const Call = thinky.createModel("call", {

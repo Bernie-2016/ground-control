@@ -206,7 +206,8 @@ const GraphQLViewer = new GraphQLObjectType({
       type: GraphQLCallAssignmentConnection,
       resolve: async (assignment, {first}) => {
         console.log("haere");
-        let assignments = CallAssignment.fetch({})
+        let assignments = await CallAssignment.filter({})
+        console.log(assignments)
         return connectionFromArray(assignments, {first});
       }
     }
