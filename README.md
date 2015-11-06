@@ -10,14 +10,19 @@ Ground Control should be running at `http://localhost:3000`.  The [RethinkDB dat
 
 ## What is this?
 
-Right now, Ground Control is a tool for scheduling conference calls on the MaestroConference system.  In the near future, it will also generate spreadsheets for notetakers on these calls to take notes and send back into Ground Control.  But in general, you can think of Ground Control as, ultimately, our central tool for managing our volunteer organizing efforts.  It will have two major goals:
+The purpose of Ground Control is three-fold:
+    1. Be the central routing point/API for applications to integrate with our the CRMs the campaign uses (BSD and VAN)
+    2. Be a repository for data that does not fit neatly into BSD and VAN and give people outside of our system access to this data as well
+    3. An effort to build out more organizing tools on top of what we already have (which leads to the data in #2). Currently this means a phonebanking tool and a tool for scheduling conference calls with volunteers.
 
-1. Expose a variety of ways to communicate with/survey our volunteers (conference calls, one-on-one calls, e-mail, etc.) and collect all this data in a very flexible model.
-2. Expose an API for others to build apps on top of using this data
+## What are these "CRMs the campaign uses?"
 
-In other words, think of Ground Control as a central repository of information that can be written to in a multitude of different ways.
+BSD is Blue State Digital and VAN is Voter Activation Network.  BSD is basically a CRM including a mailer, way to create surveys, and way to look at signup data.  VAN is a giant database of voter information that is used for canvassing/voter outreach efforts.  Here is a rough diagram of how it fits together. Rectangles are things that exist, circles are things we are building: [https://gomockingbird.com/projects/0govthz/sXMAyD](https://gomockingbird.com/projects/0govthz/sXMAyD).
 
-There are multiple tools that the campaign is already using for various parts of organizing people who want to get Bernie elected, and this diagram tries to roughly sketch out how they fit together and what the architecture we are going for.  Rectangles are things that exist, circles are things we are building: [https://gomockingbird.com/projects/0govthz/sXMAyD](https://gomockingbird.com/projects/0govthz/sXMAyD).
+VAN and BSD have their own APIs, and currently Ground Control makes use of the BSD API heavily for its syncing purposes.
+
+    * [BSD API](https://www.bluestatedigital.com/page/api/doc)
+    * [VAN API](http://developers.ngpvan.com/van-api)
 
 ## What stack is this project using?
 
@@ -27,16 +32,6 @@ On top of that, we are creating a [GraphQL](http://graphql.org/) API.  GraphQL i
 
 If you are feeling stuck/aren't familiar with any of this and want some help, please don't bang your head against a wall!  Talk to me (saikat@berniesanders.com, @saikat in the BernieBuilders Slack).
 
-## Some more conceptual info to help you get started
+## More info?
 
-At the core of Ground Control, there are a few basic models to work with that can be combined in powerful ways.
-
-There are People, who are represented with very limited top-level data - just an e-mail address for now (possibly also a password in the future).
-
-There are Fields, which are descriptions of typed data.  E.g. there could be a field called "volunteers_registered" of type Number.
-
-There are Notes, which are key: value pairs of Field: value on Persons.
-
-There are Surveys, which represent any interaction with a person.  Surveys are modeled as having attached data and a template (which is simply a React component) to display the survey.  Then, on the backend, we define a variety of SurveyProcessors which, given a Survey, can run a bunch of tasks on the input (e.g. attach Notes on people based on Fields defined in the survey, sign the person up for a group call, etc.).
-
-Not all of this exists yet.  BUT IT WILL!
+See the [specs](SPECS.md).
