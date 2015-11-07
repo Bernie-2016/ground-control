@@ -35,6 +35,7 @@ import moment from 'moment-timezone';
 import Promise from 'bluebird';
 import Maestro from '../maestro';
 import thinky from './thinky';
+import BSD from '../bsd';
 
 class Viewer {
   constructor(identifier) {
@@ -143,8 +144,11 @@ const GraphQLSurvey = new GraphQLObjectType({
     BSDData: {
       type: GraphQLString,
       resolve: (survey) => {
-        if (survey.BSDLink)
-          console.log("here");
+        if (survey.BSDLink) {
+          console.log("HERE?")
+          let bsd = new BSD('bernietest.cp.bsd.net', 'ground-control', '0cd514daf066ddc438930f86388a42a5e5eb667d');
+          return bsd.getForm(survey.BSDLink.id);
+        }
         return null;
       }
     }
@@ -206,8 +210,8 @@ const GraphQLViewer = new GraphQLObjectType({
         id: { type: new GraphQLNonNull(GraphQLString) }
       },
       resolve: async (viewer, {id}) => {
-        let localID = fromGlobalId(id).id;
-        let call = await GroupCall.get(localID);
+        let localId = fromGlobalId(id).id;
+        let call = await GroupCall.get(localId);
         return call;
       }
     },
