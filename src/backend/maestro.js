@@ -1,10 +1,10 @@
 import requestPromise from 'request-promise';
 
 export default class Maestro {
-  constructor(customerUID, secretToken, URL, fakeCall) {
+  constructor(customerUID, secretToken, host, fakeCall) {
     this.customerUID = customerUID;
     this.secretToken = secretToken;
-    this.URL = URL;
+    this.host = host;
     this.fakeCall = fakeCall;
   }
 
@@ -26,7 +26,7 @@ export default class Maestro {
     });
 
     var options = {
-      uri: this.URL + '/createConferenceReserved',
+      uri: this.host + '/createConferenceReserved',
       method: 'POST',
       form: postParams,
       json: true
