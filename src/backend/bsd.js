@@ -2,6 +2,8 @@ import requestPromise from 'request-promise';
 import url from 'url';
 import crypto from 'crypto';
 import querystring from 'querystring';
+import {parseString} from 'xml2js';
+import Promise from 'bluebird';
 
 export default class BSD {
   constructor(host, id, secret) {
@@ -54,8 +56,10 @@ export default class BSD {
     return url.format(finalURL);
   };
 
-  getForm(formId) {
-    return this.request('signup/get_form', {signup_form_id: formId}, 'GET');
+  async getForm(formId) {
+    let response = await this.request('signup/get_form', {signup_form_id: formId}, 'GET');
+    let parseStringPromise = Promise.promisify(parseString)
+    return parseStringPromise(response)
   }
 
   async request(callPath, params, method) {

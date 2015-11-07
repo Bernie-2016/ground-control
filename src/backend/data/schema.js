@@ -143,11 +143,10 @@ const GraphQLSurvey = new GraphQLObjectType({
     slug: { type: GraphQLString },
     BSDData: {
       type: GraphQLString,
-      resolve: (survey) => {
+      resolve: async (survey) => {
         if (survey.BSDLink) {
-          console.log("HERE?")
           let bsd = new BSD('bernietest.cp.bsd.net', 'ground-control', '0cd514daf066ddc438930f86388a42a5e5eb667d');
-          return bsd.getForm(survey.BSDLink.id);
+          return JSON.stringify(await bsd.getForm(survey.BSDLink.id));
         }
         return null;
       }
