@@ -1,19 +1,9 @@
-import express from 'express';
-import graphQLHTTP from 'express-graphql';
+import WebpackDevServer from 'webpack-dev-server';
 import path from 'path';
 import webpack from 'webpack';
-import WebpackDevServer from 'webpack-dev-server';
-import {Schema} from './data/schema';
+import express from 'express';
 
-const APP_PORT = process.env.PORT;
-const GRAPHQL_PORT = 8090;
-
-// Expose a GraphQL endpoint
-var graphQLServer = express();
-graphQLServer.use('/', graphQLHTTP({schema: Schema, graphiql: true}));
-graphQLServer.listen(GRAPHQL_PORT, () => console.log(
-  `GraphQL Server is now running on http://localhost:${GRAPHQL_PORT}`
-));
+const APP_PORT = process.env.APP_PORT
 
 // Serve the Relay app
 var compiler = webpack({
@@ -33,7 +23,7 @@ var compiler = webpack({
 
 var app = new WebpackDevServer(compiler, {
   contentBase: '/static/',
-  proxy: {'/graphql': `http://localhost:${GRAPHQL_PORT}`},
+  proxy: {'/graphql': `http://localhost:${process.env.GRAPHQL_PORT}`},
   publicPath: '/static/',
   stats: {colors: true}
 });

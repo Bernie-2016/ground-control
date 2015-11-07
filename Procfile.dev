@@ -1,2 +1,3 @@
-web: npm install && npm run update-schema && npm start
+graphql: npm run start-graphql
+web: npm run start-app
 db: rethinkdb

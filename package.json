@@ -5,7 +5,8 @@
   "repository": "Bernie-2016/ground-control",
   "version": "0.1.0",
   "scripts": {
-    "start": "cd ./src/backend && babel-node ./server.js",
+    "start-graphql": "cd ./src/backend && forever --watch --watchDirectory ./ ./graphql-dev-server.js",
+    "start-app": "cd ./src/backend && babel-node ./app-server.js",
     "update-schema": "babel-node ./src/backend/data/updateSchema.js"
   },
   "dependencies": {
@@ -34,7 +35,8 @@
     "fullcalendar": "^2.4.0",
     "jquery": "^2.1.4",
     "moment-timezone": "^0.4.1",
-    "bsd-api-auth": "^1.0.0"
+    "bsd-api-auth": "^1.0.0",
+    "forever": "^0.15.1"
   },
   "devDependencies": {
     "webpack-dev-server": "^1.10.1"
