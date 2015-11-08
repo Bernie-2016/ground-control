@@ -1,7 +1,7 @@
 import React from 'react';
 import Relay from 'react-relay';
 import {Paper, List, ListItem} from 'material-ui';
-import moment from "moment";
+import moment from 'moment';
 
 export class GroupCall extends React.Component {
   styles = {
@@ -12,7 +12,7 @@ export class GroupCall extends React.Component {
       marginBottom: 15
     },
     title: {
-      fontWeight: "bold",
+      fontWeight: 'bold',
       fontSize: 30
     }
   }
@@ -28,7 +28,7 @@ export class GroupCall extends React.Component {
           {this.props.groupCall.name}
         </div>
         <Paper zDepth={0}>
-          <div>{moment(this.props.groupCall.scheduledTime).format("dddd, MMMM Do YYYY, h:mm:ss a")}
+          <div>{moment(this.props.groupCall.scheduledTime).format('dddd, MMMM Do YYYY, h:mm:ss a')}
           </div>
         </Paper>
       </Paper>

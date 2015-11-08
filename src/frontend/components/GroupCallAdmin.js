@@ -3,25 +3,25 @@ import Relay from 'react-relay';
 import GroupCallList from './GroupCallList';
 import GroupCall from './GroupCall';
 import GroupCallCreationForm from './GroupCallCreationForm';
-import {Paper, Styles, RaisedButton} from "material-ui";
+import {Paper, Styles, RaisedButton} from 'material-ui';
 import Helpers from './helpers';
 
 export class GroupCallAdmin extends React.Component {
 
   styles = {
     container: {
-      position: "relative"
+      position: 'relative'
     },
 
     sideBar: {
-      display: "inline-block",
+      display: 'inline-block',
       width: 200,
-      minHeight: "800px",
-      border: "solid 1px " + Styles.Colors.grey300,
+      minHeight: '800px',
+      border: 'solid 1px ' + Styles.Colors.grey300,
     },
 
     content: {
-      display: "inline-block",
+      display: 'inline-block',
       verticalAlign: 'top'
     },
   }
@@ -88,7 +88,7 @@ export default Relay.createContainer(GroupCallAdmin, {
       }
     else
       return {
-        callId: "",
+        callId: '',
         fetchCall: false
       }
   },
