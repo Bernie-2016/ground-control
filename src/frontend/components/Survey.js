@@ -4,7 +4,7 @@ import Relay from 'react-relay';
 class Survey extends React.Component {
   render() {
     return (
-      <div>{this.props.viewer.survey.BSDData.fullURL}</div>
+      <iframe src={this.props.viewer.survey.BSDData.fullURL} />
     )
   }
 }
