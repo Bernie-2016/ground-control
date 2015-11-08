@@ -21,7 +21,7 @@ class Survey extends React.Component {
       return;
 
     if (typeof event.data === 'number') {
-      this.setState({iframeHeight: {height: event.data + 'px'}})
+      this.setState({iframeHeight: {height: event.data }})
     }
   }
 
@@ -34,7 +34,7 @@ class Survey extends React.Component {
   }
 
   state = {
-    iframeHeight : {height: '200px'}
+    iframeHeight : {height: 0}
   }
 
   iframeHost() {
