@@ -1,4 +1,3 @@
-
 import {
   GraphQLBoolean,
   GraphQLList,
@@ -129,7 +128,7 @@ const GraphQLCallAssignment = new GraphQLObjectType({
   interfaces: [nodeInterface]
 });
 
-var {
+let {
   connectionType: GraphQLCallAssignmentConnection,
 } = connectionDefinitions({
   name: 'CallAssignment',
@@ -159,7 +158,7 @@ const GraphQLSurvey = new GraphQLObjectType({
           let surveyData = await bsd.getForm(survey.BSDLink.id);
           return {
             id: survey.BSDLink.id,
-            fullURL: url.resolve('http://' + process.env.BSD_HOST, '/page/s/' + surveyData.api.signup_form.signup_form_slug)
+            fullURL: url.resolve('https://' + process.env.BSD_HOST, '/page/s/' + surveyData.api.signup_form.signup_form_slug)
           }
         }
         return null;
