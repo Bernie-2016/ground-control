@@ -2,9 +2,24 @@ import React from 'react';
 import Relay from 'react-relay';
 
 class Survey extends React.Component {
+  styles = {
+    frame: {
+      display: 'block',
+      border: 'none',
+      width: '100%',
+      height: '100%',
+    },
+    container: {
+      width: '100%',
+      height: '800px',
+    }
+  }
+
   render() {
     return (
-      <iframe src={this.props.viewer.survey.BSDData.fullURL} />
+      <div style={this.styles.container}>
+        <iframe scrolling="no" src={this.props.viewer.survey.BSDData.fullURL} style={this.styles.frame} />
+      </div>
     )
   }
 }

@@ -11,18 +11,18 @@ const DataSource = {
   id: thinkyType.string()
 }
 
-export const Person = thinky.createModel("person", {
+export const Person = thinky.createModel('person', {
   id: thinkyType.string().options({enforce_missing: false}),
   BSDLink: BSDLinkType
 });
 
-export const Group = thinky.createModel("group", {
+export const Group = thinky.createModel('group', {
   id: thinkyType.string().options({enforce_missing: false}),
   personIdList: [thinkyType.string()],
   BSDLink: BSDLinkType
 })
 
-export const CallAssignment = thinky.createModel("call_assignment", {
+export const CallAssignment = thinky.createModel('call_assignment', {
   id: thinkyType.string().options({enforce_missing: false}),
   name: thinkyType.string(),
   callerGroupId: thinkyType.string(),
@@ -32,7 +32,7 @@ export const CallAssignment = thinky.createModel("call_assignment", {
 //  endDate: thinkyType.date()
 })
 
-export const Call = thinky.createModel("call", {
+export const Call = thinky.createModel('call', {
   id: thinkyType.string().options({enforce_missing: false}),
   callAssignmentId: thinkyType.string(),
   callerId: thinkyType.string(),
@@ -40,13 +40,13 @@ export const Call = thinky.createModel("call", {
   callAssignedAt: thinkyType.date()
 })
 
-export const Survey = thinky.createModel("survey", {
+export const Survey = thinky.createModel('survey', {
   id: thinkyType.string().options({enforce_missing: false}),
   slug: thinkyType.string(),
   BSDLink: BSDLinkType
 })
 
-export const GroupCall = thinky.createModel("group_call", {
+export const GroupCall = thinky.createModel('group_call', {
   id: thinkyType.string().options({enforce_missing: false}),
   name: thinkyType.string(),
   scheduledTime: thinkyType.date(),
@@ -61,7 +61,7 @@ export const GroupCall = thinky.createModel("group_call", {
 })
 
 // Unused models for now
-export const Field = thinky.createModel("field", {
+export const Field = thinky.createModel('field', {
   id: thinkyType.string().options({enforce_missing: false}),
   label: thinkyType.string(),
   type: thinkyType.string().enum(['NUMBER', 'STRING', 'BOOLEAN', 'DATETIME']),
@@ -71,7 +71,7 @@ export const Field = thinky.createModel("field", {
   BSDLink: BSDLinkType
 })
 
-export const Note = thinky.createModel("note", {
+export const Note = thinky.createModel('note', {
   id: thinkyType.string().options({enforce_missing: false}),
   personId: thinkyType.string(),
   fieldId: thinkyType.string(),
