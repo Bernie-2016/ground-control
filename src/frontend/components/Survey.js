@@ -1,6 +1,8 @@
 import React from 'react';
 import Relay from 'react-relay';
+import Radium from 'radium';
 
+@Radium
 class Survey extends React.Component {
   styles = {
     frame: {
@@ -11,14 +13,42 @@ class Survey extends React.Component {
     },
     container: {
       width: '100%',
-      height: '800px',
     }
+  }
+
+  handleMessageEvent = (event) => {
+    if (event.origin !== this.iframeHost())
+      return;
+
+    if (typeof event.data === 'number') {
+      this.setState({iframeHeight: {height: event.data + 'px'}})
+    }
+  }
+
+  componentDidMount() {
+    window.addEventListener('message', this.handleMessageEvent)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('message', this.handleMessageEvent);
+  }
+
+  state = {
+    iframeHeight : {height: '200px'}
+  }
+
+  iframeHost() {
+    return this.props.viewer.survey.BSDData.fullURL.split('/').slice(0, 3).join('/');
+  }
+
+  iframeLoaded = (event) => {
+    event.target.contentWindow.postMessage('getHeight', this.iframeHost())
   }
 
   render() {
     return (
-      <div style={this.styles.container}>
-        <iframe scrolling="no" src={this.props.viewer.survey.BSDData.fullURL} style={this.styles.frame} />
+      <div style={[this.styles.container, this.state.iframeHeight]}>
+        <iframe scrolling='no' src={this.props.viewer.survey.BSDData.fullURL} style={this.styles.frame} onLoad={this.iframeLoaded} />
       </div>
     )
   }
