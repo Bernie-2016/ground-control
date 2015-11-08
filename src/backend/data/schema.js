@@ -36,6 +36,7 @@ import Promise from 'bluebird';
 import Maestro from '../maestro';
 import thinky from './thinky';
 import BSD from '../bsd';
+import url from 'url';
 
 class Viewer {
   constructor(identifier) {
@@ -83,8 +84,8 @@ let {nodeInterface, nodeField} = nodeDefinitions(
 );
 
 const GraphQLPerson = new GraphQLObjectType({
-  name: "Person",
-  description: "A person.",
+  name: 'Person',
+  description: 'A person.',
   fields: () => ({
     id: globalIdField('Person'),
   }),
@@ -99,15 +100,15 @@ let {
 });
 
 const GraphQLGroup = new GraphQLObjectType({
-  name: "Group",
-  description: "A list of people as determined by some criteria",
+  name: 'Group',
+  description: 'A list of people as determined by some criteria',
   fields: () => ({
     personList: { type: GraphQLPersonConnection }
   })
 });
 
 const GraphQLCallAssignment = new GraphQLObjectType({
-  name: "CallAssignment",
+  name: 'CallAssignment',
   description: 'A mass calling assignment',
   fields: () => ({
     id: globalIdField('CallAssignment'),
@@ -135,18 +136,31 @@ var {
   nodeType: GraphQLCallAssignment
 });
 
+const GraphQLBSDSurvey = new GraphQLObjectType({
+  name: 'BSDSurvey',
+  description: 'Underlying survey object in BSD',
+  fields: () => ({
+    id: { type: GraphQLString },
+    fullURL: { type: GraphQLString }
+  })
+})
+
 const GraphQLSurvey = new GraphQLObjectType({
-  name: "Survey",
-  description: "A survey to be filled out by a person",
+  name: 'Survey',
+  description: 'A survey to be filled out by a person',
   fields: () => ({
     id: globalIdField('Survey'),
     slug: { type: GraphQLString },
     BSDData: {
-      type: GraphQLString,
+      type: GraphQLBSDSurvey,
       resolve: async (survey) => {
         if (survey.BSDLink) {
           let bsd = new BSD('bernietest.cp.bsd.net', 'ground-control', '0cd514daf066ddc438930f86388a42a5e5eb667d');
-          return JSON.stringify(await bsd.getForm(survey.BSDLink.id));
+          let surveyData = await bsd.getForm(survey.BSDLink.id);
+          return {
+            id: survey.BSDLink.id,
+            fullURL: url.resolve('http://bernietest.cp.bsd.net', '/page/s/' + surveyData.api.signup_form.signup_form_slug)
+          }
         }
         return null;
       }
@@ -156,7 +170,7 @@ const GraphQLSurvey = new GraphQLObjectType({
 })
 
 const GraphQLGroupCall = new GraphQLObjectType({
-  name: "GroupCall",
+  name: 'GroupCall',
   description: 'A group call',
   fields: () => ({
     id: globalIdField('GroupCall'),
@@ -172,6 +186,52 @@ let {
 } = connectionDefinitions({
   name: 'GroupCall',
   nodeType: GraphQLGroupCall
+});
+
+const GraphQLGroupCallInput = new GraphQLInputObjectType({
+  name: 'GroupCallInput',
+  fields: {
+    name: { type: new GraphQLNonNull(GraphQLString) },
+    scheduledTime: { type: new GraphQLNonNull(GraphQLInt) },
+    maxSignups: { type: new GraphQLNonNull(GraphQLInt) },
+    duration: { type: new GraphQLNonNull(GraphQLInt) }
+  }
+})
+
+const GraphQLBatchCreateGroupCallMutation = mutationWithClientMutationId({
+  name: 'BatchCreateGroupCall',
+  inputFields: () => ({
+    groupCallList: { type: new GraphQLNonNull(new GraphQLList(GraphQLGroupCallInput)) }
+  }),
+  outputFields: () => ({
+    viewer: {
+      type: GraphQLViewer,
+      resolve: () => {
+        return SharedViewer;
+      }
+    }
+  }),
+  mutateAndGetPayload:async ({topic, groupCallList}) => {
+    let promises = [];
+    let maestro = new Maestro(process.env.MAESTRO_UID, process.env.MAESTRO_TOKEN, process.env.MAESTRO_URL, process.env.DEBUG);
+
+    for (let index = 0; index < groupCallList.length; index++) {
+      let groupCall = groupCallList[index];
+      let response = await maestro.createConferenceCall(groupCall.name, groupCall.maxSignups, moment(groupCall.scheduledTime).tz('America/Los_Angeles').format('YYYY.MM.DD HH:mm:ss'), groupCall.duration)
+
+      promises.push(GroupCall.save({
+        name: groupCall.name,
+        scheduledTime: groupCall.scheduledTime,
+        maxSignups: groupCall.maxSignups,
+        duration: groupCall.duration,
+        maestroConferenceUID: response.value.UID,
+        signups: []
+      }));
+    };
+
+    await Promise.all(promises);
+    return {};
+  }
 });
 
 const GraphQLViewer = new GraphQLObjectType({
@@ -208,10 +268,9 @@ const GraphQLViewer = new GraphQLObjectType({
       args: {
         id: { type: new GraphQLNonNull(GraphQLString) }
       },
-      resolve: async (viewer, {id}) => {
+      resolve: (viewer, {id}) => {
         let localId = fromGlobalId(id).id;
-        let call = await GroupCall.get(localId);
-        return call;
+        return GroupCall.get(localId);
       }
     },
     callAssignmentList: {
@@ -220,56 +279,17 @@ const GraphQLViewer = new GraphQLObjectType({
         let assignments = await CallAssignment.filter({})
           return connectionFromArray(assignments, {first});
       }
-    }
+    },
+    survey: {
+      type: GraphQLSurvey,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLString) }
+      },
+      resolve: (viewer, {id}) => Survey.get(id),
+    },
   }),
   interfaces: [nodeInterface]
 })
-
-const GraphQLGroupCallInput = new GraphQLInputObjectType({
-  name: 'GroupCallInput',
-  fields: {
-    name: { type: new GraphQLNonNull(GraphQLString) },
-    scheduledTime: { type: new GraphQLNonNull(GraphQLInt) },
-    maxSignups: { type: new GraphQLNonNull(GraphQLInt) },
-    duration: { type: new GraphQLNonNull(GraphQLInt) }
-  }
-})
-
-const GraphQLBatchCreateGroupCallMutation = mutationWithClientMutationId({
-  name: 'BatchCreateGroupCall',
-  inputFields: {
-    groupCallList: { type: new GraphQLNonNull(new GraphQLList(GraphQLGroupCallInput)) }
-  },
-  outputFields: {
-    viewer: {
-      type: GraphQLViewer,
-      resolve: () => {
-        return SharedViewer;
-      }
-    }
-  },
-  mutateAndGetPayload:async ({topic, groupCallList}) => {
-    let promises = [];
-    let maestro = new Maestro(process.env.MAESTRO_UID, process.env.MAESTRO_TOKEN, process.env.MAESTRO_URL, process.env.DEBUG);
-
-    for (let index = 0; index < groupCallList.length; index++) {
-      let groupCall = groupCallList[index];
-      let response = await maestro.createConferenceCall(groupCall.name, groupCall.maxSignups, moment(groupCall.scheduledTime).tz("America/Los_Angeles").format("YYYY.MM.DD HH:mm:ss"), groupCall.duration)
-
-      promises.push(GroupCall.save({
-        name: groupCall.name,
-        scheduledTime: groupCall.scheduledTime,
-        maxSignups: groupCall.maxSignups,
-        duration: groupCall.duration,
-        maestroConferenceUID: response.value.UID,
-        signups: []
-      }));
-    };
-
-    await Promise.all(promises);
-    return {};
-  }
-});
 
 let RootMutation = new GraphQLObjectType({
   name: 'RootMutation',

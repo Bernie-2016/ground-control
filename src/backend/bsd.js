@@ -2,7 +2,7 @@ import requestPromise from 'request-promise';
 import url from 'url';
 import crypto from 'crypto';
 import querystring from 'querystring';
-import {parseString} from 'xml2js';
+import XMLParser from 'xml2json';
 import Promise from 'bluebird';
 
 export default class BSD {
@@ -31,7 +31,7 @@ export default class BSD {
 
     let unencodedQueryString = sortedParams.map((element) => {
       let key = Object.keys(element)[0]
-      return key + "=" + element[key]
+      return key + '=' + element[key]
     }).join('&');
 
     let signingString = [
@@ -41,9 +41,9 @@ export default class BSD {
       unencodedQueryString
     ].join('\n');
 
-    let encryptedMessage = crypto.createHmac("sha1", this.apiSecret);
+    let encryptedMessage = crypto.createHmac('sha1', this.apiSecret);
     encryptedMessage.update(signingString);
-    let apiMac = encryptedMessage.digest("hex");
+    let apiMac = encryptedMessage.digest('hex');
     sortedParams.push({api_mac : apiMac});
     let encodedQueryString = sortedParams.map((element) => {
       return querystring.stringify(element)
@@ -58,8 +58,7 @@ export default class BSD {
 
   async getForm(formId) {
     let response = await this.request('signup/get_form', {signup_form_id: formId}, 'GET');
-    let parseStringPromise = Promise.promisify(parseString)
-    return parseStringPromise(response)
+    return JSON.parse(XMLParser.toJson(response));
   }
 
   async request(callPath, params, method) {

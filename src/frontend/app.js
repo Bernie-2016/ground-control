@@ -5,9 +5,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactRouterRelay from 'react-router-relay';
 import Relay from 'react-relay';
-import injectTapEventPlugin from "react-tap-event-plugin";
+import injectTapEventPlugin from 'react-tap-event-plugin';
 import AdminDashboard from './components/AdminDashboard';
-import GroupCallAdmin from './components/GroupCallAdmin'
+import GroupCallAdmin from './components/GroupCallAdmin';
+import Survey from './components/Survey';
 
 injectTapEventPlugin();
 
@@ -29,6 +30,11 @@ ReactDOM.render(
         component={GroupCallAdmin}
         queries={ViewerQueries} />
     </Route>
+    <Route
+      path="/survey/:id"
+      component={Survey}
+      queries={ViewerQueries} />
+
   </Router>,
   document.getElementById('root')
 );
