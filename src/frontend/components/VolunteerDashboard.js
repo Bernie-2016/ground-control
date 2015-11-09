@@ -33,7 +33,9 @@ export default class VolunteerDashboard extends React.Component {
           zDepth={0}
           title=""
           iconElementLeft={
-            <BernieLogo color={BernieColors.blue}
+            <BernieLogo
+              color={BernieColors.blue}
+              bottomSwooshColor={BernieColors.red}
               viewBox="0 0 480 200"
               style={this.styles.logo}
           />}
