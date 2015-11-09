@@ -7,18 +7,19 @@ import BernieLogo from './BernieLogo';
 export default class VolunteerDashboard extends React.Component {
   styles = {
     logo: {
-      width: 150,
-      height: 63
+      width: 96,
+      height: 40
     },
     bar: {
       position: 'relative',
-      backgroundColor: BernieColors.white,
+      marginLeft: 0,
+      backgroundColor: BernieColors.lightGray,
       minHeight: 56,
-      height: 63
+      height: 56
     },
     tabs: {
       color: BernieColors.gray,
-      backgroundColor: Styles.Colors.white
+      backgroundColor: BernieColors.lightGray
     },
     tabsContainer: {
       verticalAlign: 'middle',

@@ -30,7 +30,9 @@ export default class AdminDashboard extends React.Component {
           zDepth={1}
           title="Ground Control"
           iconElementLeft={
-            <BernieLogo color={Styles.Colors.white}
+            <BernieLogo
+              color={Styles.Colors.white}
+              bottomSwooshColor={BernieColors.lightGray}
               viewBox="0 0 480 200"
               style={this.styles.logo}
           />}

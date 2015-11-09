@@ -5,7 +5,8 @@ export const BernieColors = {
   red: 'rgb(245, 91, 91)',
   darkRed: 'rgb(237, 60, 57)',
   green: 'rgb(74, 204, 102)',
-  gray: 'rgb(54, 67, 80)'
+  gray: 'rgb(54, 67, 80)',
+  lightGray: 'rgb(239, 243, 247)',
 }
 
 export const BernieStyles = {
