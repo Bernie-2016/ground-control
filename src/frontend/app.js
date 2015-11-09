@@ -28,7 +28,13 @@ ReactDOM.render(
       <Route
         path="group-calls"
         component={GroupCallAdmin}
-        queries={ViewerQueries} />
+        queries={ViewerQueries}>
+      </Route>
+      <Route
+        path="group-calls/:callId"
+        component={GroupCallAdmin}
+        queries={ViewerQueries}>
+      </Route>
     </Route>
     <Route
       path="/"

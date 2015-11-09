@@ -284,7 +284,10 @@ const GraphQLViewer = new GraphQLObjectType({
       args: {
         id: { type: new GraphQLNonNull(GraphQLString) }
       },
-      resolve: (viewer, {id}) => Survey.get(id),
+      resolve: (viewer, {id}) => {
+        let localId = fromGlobalId(id).id
+        return Survey.get(localId)
+      }
     },
   }),
   interfaces: [nodeInterface]

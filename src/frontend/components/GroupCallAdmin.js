@@ -4,8 +4,6 @@ import GroupCallList from './GroupCallList';
 import GroupCall from './GroupCall';
 import GroupCallCreationForm from './GroupCallCreationForm';
 import {Paper, Styles, RaisedButton} from 'material-ui';
-import Helpers from './helpers';
-
 export class GroupCallAdmin extends React.Component {
 
   styles = {
@@ -26,25 +24,20 @@ export class GroupCallAdmin extends React.Component {
     },
   }
 
-  state = {
-    isCreating: false
-  }
+  basePath = '/admin/group-calls';
 
   selectCall(callId) {
-    Helpers.navigateTo(this, callId)
-    this.setState({isCreating: false})
-    this.props.relay.setVariables({callId});
+    this.props.history.pushState(null, this.basePath + '/' + callId)
   }
 
   selectCallCreation() {
-    this.setState({isCreating: true})
-    this.props.relay.setVariables({callId: null});
+    this.props.history.pushState(null, this.basePath + '/create')
   }
 
   render() {
-    var contentView = <div></div>;
+    let contentView = <div></div>;
 
-    if (this.state.isCreating)
+    if (this.props.relay.variables.callId === 'create')
       contentView = <GroupCallCreationForm viewer={this.props.viewer} />
     else if (this.props.relay.variables.callId)
       contentView = <GroupCall
@@ -81,14 +74,14 @@ export default Relay.createContainer(GroupCallAdmin, {
 
   prepareVariables: (prev) =>
   {
-    if (prev.callId)
+    if (prev.callId && prev.callId !== 'create')
       return {
-        callId: prev.callId,
+        id: prev.callId,
         fetchCall: true
       }
     else
       return {
-        callId: '',
+        id: '',
         fetchCall: false
       }
   },
@@ -102,7 +95,7 @@ export default Relay.createContainer(GroupCallAdmin, {
         pastCallList:groupCallList(first:50, upcoming:false) {
           ${GroupCallList.getFragment('groupCallList')}
         }
-        groupCall(id:$callId) @include(if: $fetchCall) {
+        groupCall(id:$id) @include(if: $fetchCall) {
           ${GroupCall.getFragment('groupCall')}
         }
         ${GroupCallCreationForm.getFragment('viewer')}
