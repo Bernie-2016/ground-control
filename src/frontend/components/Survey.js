@@ -1,7 +1,6 @@
 import React from 'react';
 import Relay from 'react-relay';
 import Radium from 'radium';
-import BernieLogo from './BernieLogo'
 import {BernieColors} from './bernie-styles';
 import {RaisedButton} from 'material-ui';
 
@@ -90,10 +89,6 @@ class Survey extends React.Component {
 
     return (
       <div style={this.styles.container}>
-        <BernieLogo
-          viewBox="0 0 480 200"
-          style={this.styles.logo}
-        />
         {frame}
       </div>
     )

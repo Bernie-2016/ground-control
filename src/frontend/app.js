@@ -9,6 +9,7 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 import AdminDashboard from './components/AdminDashboard';
 import GroupCallAdmin from './components/GroupCallAdmin';
 import Survey from './components/Survey';
+import VolunteerDashboard from './components/VolunteerDashboard';
 
 injectTapEventPlugin();
 
@@ -20,7 +21,6 @@ ReactDOM.render(
   <Router
     createElement={ReactRouterRelay.createElement}
     history={createHashHistory({queryKey: false})} >
-    <Redirect from="/" to="/admin" />
     <Route
       path="/admin"
       component={AdminDashboard} >
@@ -31,10 +31,13 @@ ReactDOM.render(
         queries={ViewerQueries} />
     </Route>
     <Route
-      path="/surveys/:id"
-      component={Survey}
-      queries={ViewerQueries} />
-
+      path="/"
+      component={VolunteerDashboard} >
+      <Route
+        path="surveys/:id"
+        component={Survey}
+        queries={ViewerQueries} />
+    </Route>
   </Router>,
   document.getElementById('root')
 );
