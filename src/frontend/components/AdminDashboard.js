@@ -12,17 +12,7 @@ class AdminDashboard extends React.Component {
   sections = {
     'group-calls' : {
       label: 'Group Calls',
-      component: () => {
-        return (
-          <GroupCallAdmin
-            navigateTo={(path) => {
-              this.navigateTo('group-calls/' + path)
-            }}
-            path={this.subPath()}
-            viewer={this.props.viewer}
-          />
-        )
-      }
+      component: GroupCallAdmin
     },
     'call-assignments' : {
       label: 'Call Assignments',
@@ -43,11 +33,25 @@ class AdminDashboard extends React.Component {
     return parts.slice(1, parts.length).join('/')
   }
 
+  currentSelection() {
+    return this.path().split('/')[0]
+  }
+
   renderSelectedComponent() {
     let pathParts = this.path().split('/')
     let section = pathParts[0]
-    if (section && this.sections[section])
-      return this.sections[section].component();
+    if (section && this.sections[section]) {
+      return React.createElement(
+        this.sections[section].component,
+        {
+          navigateTo: (path) => {
+            this.navigateTo(section + '/' + path)
+          },
+          path: this.subPath(),
+          viewer: this.props.viewer
+        }
+      )
+    }
     else
       return <div>'Not found'</div>
   }
@@ -59,15 +63,16 @@ class AdminDashboard extends React.Component {
         label: this.sections[slug].label,
         onClick: () => {
           this.navigateTo(slug);
-        }
+        },
+        isSelected: slug === this.currentSelection()
       })
     })
     return (
       <div>
         <TopBar
           color={BernieColors.blue}
-          tabColor={Styles.Colors.white}
-          selectedTabColor={BernieColors.lightBlue}
+          tabColor={BernieColors.lightBlue}
+          selectedTabColor={Styles.Colors.white}
           zDepth={1}
           title="Ground Control"
           titleColor={BernieColors.red}

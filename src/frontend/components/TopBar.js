@@ -14,6 +14,7 @@ export default class TopBar extends React.Component {
     tabs: React.PropTypes.arrayOf(React.PropTypes.shape({
       label: React.PropTypes.string,
       onClick: React.PropTypes.func,
+      isSelected: React.PropTypes.boolean
     })),
     color: React.PropTypes.string,
     tabColor: React.PropTypes.string,
@@ -38,10 +39,14 @@ export default class TopBar extends React.Component {
   render() {
     let tabs = []
     this.props.tabs.forEach((tab) => {
-      tabs.push(<Tab label={tab.label} style={{
-        ...this.styles.tab,
-        color: this.props.tabColor
-      }} />)
+      tabs.push(<Tab
+        label={tab.label}
+        style={{
+          ...this.styles.tab,
+          color: tab.isSelected ? this.props.selectedTabColor : this.props.tabColor
+        }}
+        onClick={tab.onClick}
+      />)
     })
     return (
       <AppBar
