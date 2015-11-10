@@ -16,6 +16,7 @@ export default class AdminDashboard extends React.Component {
       height: 56
     },
     tabs: {
+      color: BernieColors.gray,
       backgroundColor: BernieColors.blue
     },
     tabsContainer: {
@@ -38,6 +39,7 @@ export default class AdminDashboard extends React.Component {
           />}
           iconElementRight={
             <Tabs>
+              <Tab label="Call Assignments" style={this.styles.tabs} />
               <Tab label="Group Calls" style={this.styles.tabs} />
             </Tabs>
           }
