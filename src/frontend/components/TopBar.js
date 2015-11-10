@@ -28,7 +28,8 @@ export default class TopBar extends React.Component {
       height: 40
     },
     bar: {
-      height: 56
+      height: 56,
+      minHeight: 56
     },
     tab: {
       ...BernieText.secondaryTitle,
@@ -43,7 +44,8 @@ export default class TopBar extends React.Component {
         label={tab.label}
         style={{
           ...this.styles.tab,
-          color: tab.isSelected ? this.props.selectedTabColor : this.props.tabColor
+          color: tab.isSelected ? this.props.selectedTabColor : this.props.tabColor,
+          backgroundColor: this.props.color
         }}
         onClick={tab.onClick}
       />)
@@ -51,6 +53,10 @@ export default class TopBar extends React.Component {
     return (
       <AppBar
         {...this.props}
+        style={{
+          ...this.styles.bar,
+          backgroundColor: this.props.color
+        }}
         iconElementLeft={
           <BernieLogo
             color={this.props.logoColors.primary}

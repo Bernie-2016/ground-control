@@ -73,7 +73,7 @@ class AdminDashboard extends React.Component {
           color={BernieColors.blue}
           tabColor={BernieColors.lightBlue}
           selectedTabColor={Styles.Colors.white}
-          zDepth={1}
+          zDepth={0}
           title="Ground Control"
           titleColor={BernieColors.red}
           logoColors={{

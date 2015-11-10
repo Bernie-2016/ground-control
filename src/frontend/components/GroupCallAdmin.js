@@ -24,6 +24,10 @@ export class GroupCallAdmin extends React.Component {
     },
   }
 
+  static propTypes = {
+    navigateTo: React.PropTypes.func
+  }
+
   componentWillReceiveProps(props) {
     let callId = props.path ? props.path.split('/')[0] : null
     this.props.relay.setVariables({callId: callId})
