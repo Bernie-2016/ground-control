@@ -7,11 +7,11 @@ export const BernieColors = {
   darkRed: 'rgb(237, 60, 57)',
   green: 'rgb(74, 204, 102)',
   darkGray: 'rgb(54, 67, 80)',
+  gray: 'rgb(153, 155, 158)',
   lightGray: 'rgb(239, 243, 247)',
 }
 
-// These should only include display styles, not anything layout related such as padding, block display, margin, etc.
-export const BernieTextStyles = {
+export const BernieText = {
   default: {
     color: BernieColors.darkGray,
     fontFamily: 'freight-sans-pro',
@@ -25,7 +25,8 @@ export const BernieTextStyles = {
     fontFamily: 'jubilat',
     fontSize: '2.6em',
     fontWeight: 'normal',
-    lineHeight: 1
+    lineHeight: 1,
+    marginBottom: '0.5em'
   },
 
   secondaryTitle: {
@@ -36,6 +37,7 @@ export const BernieTextStyles = {
     fontWeight: 500,
     lineHeight: '1.5',
     letterSpacing: '0.1em',
+    marginBottom: '0.25rem'
   },
 
   inputLabel: {

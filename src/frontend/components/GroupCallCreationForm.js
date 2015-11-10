@@ -3,7 +3,7 @@ import Relay from 'react-relay';
 import {TextField, SvgIcon, DatePicker, Paper, List, FloatingActionButton, Styles, ListItem, ListDivider, TimePicker, RaisedButton, Snackbar} from 'material-ui';
 import moment from 'moment';
 import BatchCreateGroupCallMutation from '../mutations/BatchCreateGroupCallMutation';
-import {BernieColors, BernieTextStyles} from './styles/bernie-css'
+import {BernieColors, BernieText} from './styles/bernie-css'
 import Radium from 'radium'
 
 @Radium
@@ -58,6 +58,10 @@ class GroupCallCreationForm extends React.Component {
       paddingBottom: 15,
       border: 'solid 1px ' + BernieColors.lightGray,
       zIndex: 1
+    },
+    directions: {
+      paddingTop : 15,
+      paddingLeft: 15
     }
   }
 
@@ -68,7 +72,7 @@ class GroupCallCreationForm extends React.Component {
     });
 
     let onFailure = (transaction) => {
-      var error = transaction.getError() || new Error('Mutation failed.');
+      let error = transaction.getError() || new Error('Mutation failed.');
       console.log(error);
       this.setState({globalErrorMessage : 'Something went wrong trying to make the calls.'})
     };
@@ -287,10 +291,10 @@ class GroupCallCreationForm extends React.Component {
 
     return (
       <Paper zDepth={0} style={this.styles.container}>
-        <div style={BernieTextStyles.title}>Make group calls</div>
-        <div style={{'paddingTop' : 15}}>
+        <div style={BernieText.title}>Make group calls</div>
+        <div>
           Use this form to quickly create multiple Maestro calls.  Just do the following:
-          <ol>
+          <ol style={this.styles.directions}>
             <li>Use the form on the left to type in default data across all the calls. This will generate a list of calls on the right.</li>
             <li>Edit individual calls generated on the right by clicking them.</li>
             <li>Once all the calls on the right look good, click 'Create!' to create them in Maestro!</li>

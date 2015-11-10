@@ -1,6 +1,6 @@
 import React from 'react';
 import Relay from 'react-relay';
-import {BernieTextStyles} from './styles/bernie-css';
+import {BernieText} from './styles/bernie-css';
 import {Paper, List, ListItem} from 'material-ui';
 import moment from 'moment';
 
@@ -21,7 +21,7 @@ export class GroupCall extends React.Component {
   render() {
     return (
       <Paper style={this.styles.container} zDepth={0}>
-        <div style={BernieTextStyles.title}>
+        <div style={BernieText.title}>
           {this.props.groupCall.name}
         </div>
         <Paper zDepth={0}>

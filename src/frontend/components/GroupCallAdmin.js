@@ -4,8 +4,8 @@ import GroupCallList from './GroupCallList';
 import GroupCall from './GroupCall';
 import GroupCallCreationForm from './GroupCallCreationForm';
 import {Paper, Styles, RaisedButton} from 'material-ui';
-export class GroupCallAdmin extends React.Component {
 
+export class GroupCallAdmin extends React.Component {
   styles = {
     container: {
       position: 'relative'
@@ -24,19 +24,25 @@ export class GroupCallAdmin extends React.Component {
     },
   }
 
-  basePath = '/admin/group-calls';
+  componentWillReceiveProps(props) {
+    let callId = props.path ? props.path.split('/')[0] : null
+    this.props.relay.setVariables({callId: callId})
+  }
+
+  componentWillMount() {
+    this.componentWillReceiveProps(this.props)
+  }
 
   selectCall(callId) {
-    this.props.history.pushState(null, this.basePath + '/' + callId)
+    this.props.navigateTo(callId)
   }
 
   selectCallCreation() {
-    this.props.history.pushState(null, this.basePath + '/create')
+    this.props.navigateTo('create')
   }
 
   render() {
     let contentView = <div></div>;
-
     if (this.props.relay.variables.callId === 'create')
       contentView = <GroupCallCreationForm viewer={this.props.viewer} />
     else if (this.props.relay.variables.callId)
@@ -69,19 +75,19 @@ export class GroupCallAdmin extends React.Component {
 
 export default Relay.createContainer(GroupCallAdmin, {
   initialVariables: {
-    callId: null
+    callId: null,
   },
 
   prepareVariables: (prev) =>
   {
     if (prev.callId && prev.callId !== 'create')
       return {
-        id: prev.callId,
+        callId: prev.callId,
         fetchCall: true
       }
     else
       return {
-        id: '',
+        callId: '',
         fetchCall: false
       }
   },
@@ -95,7 +101,7 @@ export default Relay.createContainer(GroupCallAdmin, {
         pastCallList:groupCallList(first:50, upcoming:false) {
           ${GroupCallList.getFragment('groupCallList')}
         }
-        groupCall(id:$id) @include(if: $fetchCall) {
+        groupCall(id:$callId) @include(if: $fetchCall) {
           ${GroupCall.getFragment('groupCall')}
         }
         ${GroupCallCreationForm.getFragment('viewer')}

@@ -7,7 +7,7 @@ import ReactRouterRelay from 'react-router-relay';
 import Relay from 'react-relay';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import AdminDashboard from './components/AdminDashboard';
-import GroupCallAdmin from './components/GroupCallAdmin';
+
 import Survey from './components/Survey';
 import VolunteerDashboard from './components/VolunteerDashboard';
 
@@ -22,20 +22,10 @@ ReactDOM.render(
     createElement={ReactRouterRelay.createElement}
     history={createHashHistory({queryKey: false})} >
     <Route
-      path="/admin"
-      component={AdminDashboard} >
-      <IndexRedirect to="group-calls" />
-      <Route
-        path="group-calls"
-        component={GroupCallAdmin}
-        queries={ViewerQueries}>
-      </Route>
-      <Route
-        path="group-calls/:callId"
-        component={GroupCallAdmin}
-        queries={ViewerQueries}>
-      </Route>
-    </Route>
+      path="/admin(/**)"
+      component={AdminDashboard}
+      queries={ViewerQueries}
+    />
     <Route
       path="/"
       component={VolunteerDashboard} >
