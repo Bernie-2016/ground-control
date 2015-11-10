@@ -1,18 +1,18 @@
 import {Styles, Utils} from 'material-ui';
-import {BernieColors, BernieTextStyles} from './bernie-css';
+import {BernieColors, BernieText} from './bernie-css';
 
-module.exports = {
+export const BernieTheme = {
   spacing: Styles.Spacing,
-  fontFamily: BernieTextStyles.default.fontFamily,
+  fontFamily: BernieText.default.fontFamily,
 
   palette: {
-    primary1Color: BernieColors.lightBlue,
-    primary2Color: BernieColors.blue,
+    primary1Color: BernieColors.blue,
+    primary2Color: BernieColors.red,
     primary3Color: Styles.Colors.grey400,
     accent1Color: BernieColors.red,
     accent2Color: BernieColors.lightGray,
     accent3Color: Styles.Colors.grey500,
-    textColor: BernieTextStyles.default,color,
+    textColor: BernieText.default.color,
     alternateTextColor: Styles.Colors.white,
     canvasColor: Styles.Colors.white,
     borderColor: BernieColors.lightGray,
