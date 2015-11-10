@@ -1,7 +1,7 @@
 import React from 'react';
 import Relay from 'react-relay';
-import {List, ListItem, Styles} from "material-ui";
-import moment from "moment";
+import {List, ListItem, Styles} from 'material-ui';
+import moment from 'moment';
 
 export class GroupCallList extends React.Component {
   static propTypes = {
@@ -13,7 +13,7 @@ export class GroupCallList extends React.Component {
     return this.props.groupCallList.edges.map(call => {
         let node = call.node;
         let primaryText = node.name
-        let secondaryText = moment(node.scheduledTime).format("MM/DD @ h:mm a")
+        let secondaryText = moment(node.scheduledTime).format('MM/DD @ h:mm a')
         return (
           <ListItem
             key={node.id}

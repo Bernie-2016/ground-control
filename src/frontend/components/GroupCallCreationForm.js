@@ -1,9 +1,9 @@
 import React from 'react';
 import Relay from 'react-relay';
 import {TextField, SvgIcon, DatePicker, Paper, List, FloatingActionButton, Styles, ListItem, ListDivider, TimePicker, RaisedButton, Snackbar} from 'material-ui';
-import moment from "moment";
-import BatchCreateGroupCallMutation from "../mutations/BatchCreateGroupCallMutation";
-import {BernieColors, BernieStyles} from './bernie-styles'
+import moment from 'moment';
+import BatchCreateGroupCallMutation from '../mutations/BatchCreateGroupCallMutation';
+import {BernieColors, BernieTextStyles} from './styles/bernie-css'
 import Radium from 'radium'
 
 @Radium
@@ -11,12 +11,12 @@ class GroupCallCreationForm extends React.Component {
   constructor(props) {
     super(props);
     let defaultState = {
-      name: "A new conference",
+      name: 'A new conference',
       numCalls: 1,
       fromDate: moment(),
-      toDate: moment().add(7, "d"),
+      toDate: moment().add(7, 'd'),
       maxSignups: 30,
-      duration: moment.duration(1, "hour"),
+      duration: moment.duration(1, 'hour'),
       defaultTime: moment().hour(19).minute(0).second(0),
       selectedCall: null,
       globalErrorMessage: null,
@@ -38,17 +38,17 @@ class GroupCallCreationForm extends React.Component {
       paddingRight: 15,
       paddingTop: 15,
       paddingBottom: 15,
-      position: "relative",
+      position: 'relative',
       minHeight: 800
     },
     callList: {
-      position: "absolute",
+      position: 'absolute',
       top: 15,
       left: 295,
       marginLeft: 20,
       minWidth: 400,
       zIndex: 0,
-      border: "solid 1px " + Styles.Colors.grey300,
+      border: 'solid 1px ' + BernieColors.lightGray,
     },
     callForm: {
       width: 280,
@@ -56,7 +56,7 @@ class GroupCallCreationForm extends React.Component {
       paddingTop: 15,
       paddingRight: 15,
       paddingBottom: 15,
-      border: "solid 1px " + Styles.Colors.grey300,
+      border: 'solid 1px ' + BernieColors.lightGray,
       zIndex: 1
     }
   }
@@ -70,11 +70,11 @@ class GroupCallCreationForm extends React.Component {
     let onFailure = (transaction) => {
       var error = transaction.getError() || new Error('Mutation failed.');
       console.log(error);
-      this.setState({globalErrorMessage : "Something went wrong trying to make the calls."})
+      this.setState({globalErrorMessage : 'Something went wrong trying to make the calls.'})
     };
 
     let onSuccess = (transaction) => {
-      this.setState({globalStatusMessage : "Calls created successfully!"})
+      this.setState({globalStatusMessage : 'Calls created successfully!'})
     }
 
     Relay.Store.update(
@@ -107,7 +107,7 @@ class GroupCallCreationForm extends React.Component {
         duration: callInfo.duration
       };
       let dayOffset = index % numDays;
-      call.scheduledTime.add(dayOffset, "d");
+      call.scheduledTime.add(dayOffset, 'd');
       calls.push(call);
     }
     calls.sort((a, b) => a.scheduledTime.diff(b.scheduledTime))
@@ -143,7 +143,7 @@ class GroupCallCreationForm extends React.Component {
       elements.push(
         <ListItem
           primaryText={this.state.calls[index].name}
-          secondaryText={this.state.calls[index].scheduledTime.format("MM/DD @ h:mm a")}
+          secondaryText={this.state.calls[index].scheduledTime.format('MM/DD @ h:mm a')}
           key={this.state.calls[index].id}
           onTouchTap={(e) => this.setSelectedCall(this.state.calls[index].id)} />
       )
@@ -155,7 +155,7 @@ class GroupCallCreationForm extends React.Component {
   closeButton() {
     return (
       <SvgIcon {...this.props}>
-        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+        <path d='M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z'/>
       </SvgIcon>
     );
   }
@@ -166,26 +166,26 @@ class GroupCallCreationForm extends React.Component {
         {this.textField('Name', 'name')} <br />
         {this.textField('# of calls', 'numCalls')}
         <DatePicker
-          floatingLabelText="From date"
-          hintText="From date"
-          mode="landscape"
+          floatingLabelText='From date'
+          hintText='From date'
+          mode='landscape'
           value={this.state.fromDate.toDate()}
           autoOk={true}
-          onChange={(nil, date) => this.setStateFromInput("fromDate", moment(date))} />
+          onChange={(nil, date) => this.setStateFromInput('fromDate', moment(date))} />
         <DatePicker
-          floatingLabelText="To date"
-          hintText="To date"
-          mode="landscape"
+          floatingLabelText='To date'
+          hintText='To date'
+          mode='landscape'
           value={this.state.toDate.toDate()}
           autoOk={true}
-          onChange={(nil, date) => this.setStateFromInput("toDate", moment(date))} />
+          onChange={(nil, date) => this.setStateFromInput('toDate', moment(date))} />
         <TimePicker
           defaultTime={this.state.defaultTime.toDate()}
-          floatingLabelText="Default time"
-          hintText="Default time"
-          onChange={(nil, time) => this.setStateFromInput("defaultTime", moment(time))} />
+          floatingLabelText='Default time'
+          hintText='Default time'
+          onChange={(nil, time) => this.setStateFromInput('defaultTime', moment(time))} />
         {this.textField('Max signups', 'maxSignups')}
-        <RaisedButton label="Create!"
+        <RaisedButton label='Create!'
           fullWidth={true}
           primary={true}
           onTouchTap={(event) => this.onCreate(event)} />
@@ -199,27 +199,27 @@ class GroupCallCreationForm extends React.Component {
 
     return (
       <div>
-        <FloatingActionButton mini={true} style={{float:"right"}} onTouchTap={() => this.setSelectedCall(null)}>
+        <FloatingActionButton mini={true} style={{float:'right'}} onTouchTap={() => this.setSelectedCall(null)}>
           {this.closeButton()}
         </FloatingActionButton>
         <TextField
-          hintText="Name"
-          floatingLabelText="Name"
+          hintText='Name'
+          floatingLabelText='Name'
           value={call.name}
           onChange={(e) => {
             call['name'] = e.target.value
             this.setState({calls: calls})}} /> <br />
         <TextField
-          hintText="Max signups"
-          floatingLabelText="Max signups"
+          hintText='Max signups'
+          floatingLabelText='Max signups'
           value={call.maxSignups}
           onChange={(e) => {
             call['maxSignups'] = e.target.value
             this.setState({calls: calls})}} />
         <DatePicker
-          floatingLabelText="Scheduled date"
-          hintText="Scheduled date"
-          mode="landscape"
+          floatingLabelText='Scheduled date'
+          hintText='Scheduled date'
+          mode='landscape'
           value={moment(call.scheduledTime).startOf('day').toDate()}
           autoOk={true}
           onChange={(nil, date) => {            ;
@@ -236,8 +236,8 @@ class GroupCallCreationForm extends React.Component {
             this.setState({calls: calls})
           }} />
           <TimePicker
-            floatingLabelText="Scheduled time"
-            hintText="Scheduled time"
+            floatingLabelText='Scheduled time'
+            hintText='Scheduled time'
             defaultTime={moment(call.scheduledTime).toDate()}
             onChange={(nil, time) => {              ;
               let newMoment = moment(time);
@@ -287,8 +287,8 @@ class GroupCallCreationForm extends React.Component {
 
     return (
       <Paper zDepth={0} style={this.styles.container}>
-        <div style={BernieStyles.title}>Make group calls</div>
-        <div style={[BernieStyles.bodyText, {'paddingTop' : 15}]}>
+        <div style={BernieTextStyles.title}>Make group calls</div>
+        <div style={{'paddingTop' : 15}}>
           Use this form to quickly create multiple Maestro calls.  Just do the following:
           <ol>
             <li>Use the form on the left to type in default data across all the calls. This will generate a list of calls on the right.</li>

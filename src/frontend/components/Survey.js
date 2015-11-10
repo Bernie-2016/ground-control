@@ -1,7 +1,6 @@
 import React from 'react';
 import Relay from 'react-relay';
 import Radium from 'radium';
-import {BernieColors} from './bernie-styles';
 import {RaisedButton} from 'material-ui';
 
 // This just handles rendering and interacting with a BSD survey in an iFrame
@@ -16,10 +15,6 @@ class Survey extends React.Component {
       border: 'none',
       width: '100%',
       height: 0,
-    },
-    logo: {
-      width: 96,
-      height: 40
     }
   }
 

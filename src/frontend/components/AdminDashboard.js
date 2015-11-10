@@ -1,6 +1,6 @@
 import React from 'react';
 import Relay from 'react-relay';
-import {BernieColors} from './bernie-styles';
+import {BernieColors} from './styles/bernie-css';
 import {AppBar, Styles, Tabs, Tab} from 'material-ui';
 import BernieLogo from './BernieLogo';
 
@@ -11,7 +11,6 @@ export default class AdminDashboard extends React.Component {
       height: 40
     },
     bar: {
-      backgroundColor: BernieColors.blue,
       minHeight: 56,
       height: 56
     },
@@ -27,7 +26,6 @@ export default class AdminDashboard extends React.Component {
     return (
       <div>
         <AppBar
-          style={this.styles.bar}
           zDepth={1}
           title="Ground Control"
           iconElementLeft={
@@ -39,11 +37,11 @@ export default class AdminDashboard extends React.Component {
           />}
           iconElementRight={
             <Tabs>
-              <Tab label="Call Assignments" style={this.styles.tabs} />
-              <Tab label="Group Calls" style={this.styles.tabs} />
+              <Tab label="Call Assignments"/>
+              <Tab label="Group Calls" />
             </Tabs>
           }
-          iconStyleRight={this.styles.tabsContainer} />
+        />
         {this.props.children}
       </div>
     )

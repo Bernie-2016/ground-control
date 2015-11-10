@@ -1,6 +1,6 @@
 import React from 'react';
 import Relay from 'react-relay';
-import {BernieColors} from './bernie-styles';
+import {BernieColors} from './styles/bernie-css';
 import {AppBar, Styles, Tabs, Tab} from 'material-ui';
 import BernieLogo from './BernieLogo';
 
@@ -11,8 +11,6 @@ export default class VolunteerDashboard extends React.Component {
       height: 40
     },
     bar: {
-      position: 'relative',
-      marginLeft: 0,
       backgroundColor: BernieColors.lightGray,
       minHeight: 56,
       height: 56
@@ -46,6 +44,7 @@ export default class VolunteerDashboard extends React.Component {
               <Tab label="Join Group Calls" style={this.styles.tabs} />
               <Tab label="Attend Events" style={this.styles.tabs} />
               <Tab label="Share with Friends" style={this.styles.tabs} />
+              <Tab label="Dashboard" style={this.styles.tabs} />
             </Tabs>
           }
           iconStyleRight={this.styles.tabsContainer} />
