@@ -3,27 +3,10 @@ import Relay from 'react-relay';
 import GroupCallList from './GroupCallList';
 import GroupCall from './GroupCall';
 import GroupCallCreationForm from './GroupCallCreationForm';
-import {Paper, Styles, RaisedButton} from 'material-ui';
+import {RaisedButton} from 'material-ui';
+import AdminSection from './AdminSection';
 
 export class GroupCallAdmin extends React.Component {
-  styles = {
-    container: {
-      position: 'relative'
-    },
-
-    sideBar: {
-      display: 'inline-block',
-      width: 200,
-      minHeight: '800px',
-      border: 'solid 1px ' + Styles.Colors.grey300,
-    },
-
-    content: {
-      display: 'inline-block',
-      verticalAlign: 'top'
-    },
-  }
-
   static propTypes = {
     navigateTo: React.PropTypes.func
   }
@@ -53,26 +36,30 @@ export class GroupCallAdmin extends React.Component {
       contentView = <GroupCall
         groupCall={this.props.viewer.groupCall} />
 
+    let sideBar = (
+      <div>
+        <RaisedButton label="Create Calls"
+          fullWidth={true}
+          primary={true}
+          onTouchTap={() => this.selectCallCreation()}
+        />
+        <GroupCallList
+          groupCallList={this.props.viewer.upcomingCallList}
+          subheader="Upcoming calls"
+          onSelect={(id) => this.selectCall(id)}
+        />
+        <GroupCallList
+          groupCallList={this.props.viewer.pastCallList}
+          subheader="Past calls"
+          onSelect={(id) => this.selectCall(id)}
+        />
+      </div>
+    )
     return (
-      <Paper style={this.styles.container}>
-        <Paper zDepth={0} style={this.styles.sideBar}>
-          <RaisedButton label="Create Calls"
-            fullWidth={true}
-            primary={true}
-            onTouchTap={() => this.selectCallCreation()} />
-          <GroupCallList
-            groupCallList={this.props.viewer.upcomingCallList}
-            subheader="Upcoming calls"
-            onSelect={(id) => this.selectCall(id)} />
-          <GroupCallList
-            groupCallList={this.props.viewer.pastCallList}
-            subheader="Past calls"
-            onSelect={(id) => this.selectCall(id)} />
-        </Paper>
-        <Paper zDepth={0} style={this.styles.content}>
-          {contentView}
-        </Paper>
-      </Paper>
+      <AdminSection
+        sideBar={sideBar}
+        content={contentView}
+      />
     )
   }
 }
