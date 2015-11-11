@@ -1,39 +1,36 @@
 import 'babel/polyfill';
 import createHashHistory from 'history/lib/createHashHistory'
-import {Redirect, Route, Router, IndexRedirect} from 'react-router';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import ReactRouterRelay from 'react-router-relay';
 import Relay from 'react-relay';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import AdminDashboard from './components/AdminDashboard';
-
 import Survey from './components/Survey';
 import VolunteerDashboard from './components/VolunteerDashboard';
+import {Router} from './components/TreeRouter'
 
 injectTapEventPlugin();
 
-const ViewerQueries = {
-  viewer: () => Relay.QL`query { viewer }`
-};
+class ViewerQueries extends Relay.Route {
+  static queries = {
+    viewer: () => Relay.QL`query { viewer }`,
+  };
+  static routeName = 'ViewerQueries';
+}
+
+let history = createHashHistory({queryKey: false});
+let routes = [
+  {
+    path: '/admin',
+    component: AdminDashboard,
+    queries: ViewerQueries
+  }
+]
 
 ReactDOM.render(
   <Router
-    createElement={ReactRouterRelay.createElement}
-    history={createHashHistory({queryKey: false})} >
-    <Route
-      path="/admin(/**)"
-      component={AdminDashboard}
-      queries={ViewerQueries}
-    />
-    <Route
-      path="/"
-      component={VolunteerDashboard} >
-      <Route
-        path="surveys/:id"
-        component={Survey}
-        queries={ViewerQueries} />
-    </Route>
-  </Router>,
+    history={history}
+    routes={routes}
+  />,
   document.getElementById('root')
 );

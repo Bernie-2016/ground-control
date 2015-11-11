@@ -6,7 +6,7 @@ import express from 'express';
 const APP_PORT = process.env.APP_PORT
 
 // Serve the Relay app
-var compiler = webpack({
+let compiler = webpack({
   entry: path.resolve(__dirname, '../frontend', 'app.js'),
   module: {
     loaders: [
@@ -21,7 +21,7 @@ var compiler = webpack({
   output: {filename: 'app.js', path: '/'}
 });
 
-var app = new WebpackDevServer(compiler, {
+let app = new WebpackDevServer(compiler, {
   contentBase: '/static/',
   proxy: {'/graphql': `http://localhost:${process.env.GRAPHQL_PORT}`},
   publicPath: '/static/',

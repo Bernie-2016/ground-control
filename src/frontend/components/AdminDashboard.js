@@ -7,8 +7,10 @@ import TopBar from './TopBar';
 import {BernieTheme} from './styles/bernie-theme';
 import {BernieColors} from './styles/bernie-css';
 import url from 'url';
+import {Route} from './TreeRouter';
 
 @Styles.ThemeDecorator(Styles.ThemeManager.getMuiTheme(BernieTheme))
+@Route(':section/:subpath')
 class AdminDashboard extends React.Component {
   sections = {
     'group-calls' : {
@@ -21,40 +23,20 @@ class AdminDashboard extends React.Component {
     }
   }
 
-  navigateTo(path) {
-    this.props.history.pushState(null, url.resolve('/admin/', path));
-  }
-
-  path() {
-    return this.props.routeParams.splat;
-  }
-
-  subPath() {
-    let parts = this.path().split('/')
-    return parts.slice(1, parts.length).join('/')
-  }
-
-  currentSelection() {
-    return this.path().split('/')[0]
-  }
-
   renderSelectedComponent() {
-    let pathParts = this.path().split('/')
-    let section = pathParts[0]
-    if (section && this.sections[section]) {
-      return React.createElement(
-        this.sections[section].component,
-        {
-          navigateTo: (path) => {
-            this.navigateTo(section + '/' + path)
-          },
-          path: this.subPath(),
-          viewer: this.props.viewer
-        }
+    if (this.props.section && this.sections[this.props.section]) {
+      let Section = this.sections[this.props.section].component;
+      return (
+        <Section
+          parentPath={this.props.path}
+          path={this.props.subpath}
+          viewer={this.props.viewer}
+          navigateTo={this.props.navigateTo}
+        />
       )
     }
     else
-      return <div>'Not found'</div>
+      return <div>Not found</div>
   }
 
   render() {
@@ -79,8 +61,8 @@ class AdminDashboard extends React.Component {
             swoosh: BernieColors.gray
           }}
           tabs={tabs}
-          selectedTabValue={this.currentSelection()}
-          tabChanged={(slug) => this.navigateTo(slug)}
+          selectedTabValue={this.props.section}
+          tabChanged={(slug) => this.props.navigateTo(slug)}
         />
         {this.renderSelectedComponent()}
       </div>
