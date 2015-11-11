@@ -5,6 +5,7 @@ import GroupCall from './GroupCall';
 import GroupCallCreationForm from './GroupCallCreationForm';
 import {RaisedButton} from 'material-ui';
 import AdminSection from './AdminSection';
+import AdminHelpers from './AdminHelpers';
 
 export class GroupCallAdmin extends React.Component {
 
@@ -13,49 +14,51 @@ export class GroupCallAdmin extends React.Component {
   }
 
   componentWillReceiveProps(props) {
-    let callId = props.path ? props.path.split('/')[0] : null
-    this.props.relay.setVariables({callId: callId})
+    let id = props.path ? props.path.split('/')[0] : null
+    this.props.relay.setVariables({id: id})
   }
 
   componentWillMount() {
     this.componentWillReceiveProps(this.props)
   }
 
-  selectCall(callId) {
-    this.props.navigateTo(callId)
+  selectItem(id) {
+    this.props.navigateTo(id)
   }
 
-  selectCallCreation() {
+  selectCreation() {
     this.props.navigateTo('create')
   }
 
   render() {
-    let contentView = <div></div>;
-    if (this.props.relay.variables.callId === 'create')
-      contentView = <GroupCallCreationForm viewer={this.props.viewer} />
-    else if (this.props.relay.variables.callId)
-      contentView = <GroupCall
-        groupCall={this.props.viewer.groupCall} />
+    let contentView = AdminHelpers.contentViewFromId(this.props.relay.variables.id,
+      <GroupCallCreationForm viewer={this.props.viewer} />,
+      <GroupCall groupCall={this.props.viewer.groupCall} />
+    )
+
+    console.log(<GroupCall groupCall={this.props.viewer.groupCall} />)
+    console.log(contentView)
 
     let sideBar = (
       <div>
         <RaisedButton label="Create Calls"
           fullWidth={true}
           primary={true}
-          onTouchTap={() => this.selectCallCreation()}
+          onTouchTap={() => this.selectCreation()}
         />
         <GroupCallList
           groupCallList={this.props.viewer.upcomingCallList}
           subheader="Upcoming calls"
-          onSelect={(id) => this.selectCall(id)}
+          onSelect={(id) => this.selectItem(id)}
         />
         <GroupCallList
           groupCallList={this.props.viewer.pastCallList}
           subheader="Past calls"
-          onSelect={(id) => this.selectCall(id)}
+          onSelect={(id) => this.selectItem(id)}
         />
       </div>
     )
+
     return (
       <AdminSection
         sideBar={sideBar}
@@ -66,23 +69,9 @@ export class GroupCallAdmin extends React.Component {
 }
 
 export default Relay.createContainer(GroupCallAdmin, {
-  initialVariables: {
-    callId: null,
-  },
+  initialVariables: { id: null },
 
-  prepareVariables: (prev) =>
-  {
-    if (prev.callId && prev.callId !== 'create')
-      return {
-        callId: prev.callId,
-        fetchCall: true
-      }
-    else
-      return {
-        callId: '',
-        fetchCall: false
-      }
-  },
+  prepareVariables: (prev) => AdminHelpers.variablesFromId(prev.id),
 
   fragments: {
     viewer: () => Relay.QL`
@@ -93,7 +82,7 @@ export default Relay.createContainer(GroupCallAdmin, {
         pastCallList:groupCallList(first:50, upcoming:false) {
           ${GroupCallList.getFragment('groupCallList')}
         }
-        groupCall(id:$callId) @include(if: $fetchCall) {
+        groupCall(id:$id) @include(if: $fetchItem) {
           ${GroupCall.getFragment('groupCall')}
         }
         ${GroupCallCreationForm.getFragment('viewer')}
