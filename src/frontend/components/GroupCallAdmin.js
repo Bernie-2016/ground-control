@@ -21,14 +21,6 @@ export class GroupCallAdmin extends React.Component {
     this.componentWillReceiveProps(this.props)
   }
 
-  selectItem(id) {
-    this.props.navigateTo(id)
-  }
-
-  selectCreation() {
-    this.props.navigateTo('create')
-  }
-
   render() {
     let contentView = AdminHelpers.contentViewFromId(this.props.relay.variables.id,
       <GroupCallCreationForm viewer={this.props.viewer} />,
@@ -45,12 +37,12 @@ export class GroupCallAdmin extends React.Component {
         <GroupCallList
           groupCallList={this.props.viewer.upcomingCallList}
           subheader="Upcoming calls"
-          onSelect={(id) => this.selectItem(id)}
+          onSelect={(id) => this.props.navigateTo(id)}
         />
         <GroupCallList
           groupCallList={this.props.viewer.pastCallList}
           subheader="Past calls"
-          onSelect={(id) => this.selectItem(id)}
+          onSelect={(id) => this.props.navigateTo('create')}
         />
       </div>
     )

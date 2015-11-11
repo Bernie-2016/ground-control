@@ -20,14 +20,6 @@ class CallAssignmentAdmin extends React.Component {
     this.componentWillReceiveProps(this.props)
   }
 
-  selectItem(id) {
-    this.props.navigateTo(id)
-  }
-
-  selectCreation() {
-    this.props.navigateTo('create')
-  }
-
   render() {
     let CallAssignmentCreationForm = (props) => {
       return <div>Create!</div>
@@ -41,12 +33,12 @@ class CallAssignmentAdmin extends React.Component {
         <RaisedButton label="Create Assignment"
           fullWidth={true}
           primary={true}
-          onTouchTap={() => this.selectCreation()}
+          onTouchTap={() => this.props.navigateTo('create')}
         />
         <CallAssignmentList
           callAssignmentList={this.props.viewer.callAssignmentList}
           subheader="Active Assignments"
-          onSelect={(id) => this.selectItem(id)}
+          onSelect={(id) => this.props.navigateTo(id)}
         />
       </div>
     )
