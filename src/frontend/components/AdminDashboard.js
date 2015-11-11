@@ -2,6 +2,7 @@ import React from 'react';
 import Relay from 'react-relay';
 import {Styles} from 'material-ui';
 import GroupCallAdmin from './GroupCallAdmin';
+import CallAssignmentAdmin from './CallAssignmentAdmin';
 import TopBar from './TopBar';
 import {BernieTheme} from './styles/bernie-theme';
 import {BernieColors} from './styles/bernie-css';
@@ -16,7 +17,7 @@ class AdminDashboard extends React.Component {
     },
     'call-assignments' : {
       label: 'Call Assignments',
-      component: GroupCallAdmin
+      component: CallAssignmentAdmin
     }
   }
 
@@ -61,10 +62,7 @@ class AdminDashboard extends React.Component {
     Object.keys(this.sections).forEach((slug) => {
       tabs.push({
         label: this.sections[slug].label,
-        onClick: () => {
-          this.navigateTo(slug);
-        },
-        isSelected: slug === this.currentSelection()
+        value: slug
       })
     })
     return (
@@ -81,6 +79,8 @@ class AdminDashboard extends React.Component {
             swoosh: BernieColors.gray
           }}
           tabs={tabs}
+          selectedTab={this.currentSelection()}
+          navigateTo={(slug) => this.navigateTo(slug)}
         />
         {this.renderSelectedComponent()}
       </div>
@@ -93,6 +93,7 @@ export default Relay.createContainer(AdminDashboard, {
     viewer: () => Relay.QL`
       fragment on Viewer {
         ${GroupCallAdmin.getFragment('viewer')}
+        ${CallAssignmentAdmin.getFragment('viewer')}
       }
     `
   }

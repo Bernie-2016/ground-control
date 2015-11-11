@@ -19,7 +19,8 @@ export default class TopBar extends React.Component {
     color: React.PropTypes.string,
     tabColor: React.PropTypes.string,
     selectedTabColor: React.PropTypes.string,
-    titleColor: React.PropTypes.string
+    titleColor: React.PropTypes.string,
+    navigateTo: React.PropTypes.func
   }
 
   styles = {
@@ -39,17 +40,19 @@ export default class TopBar extends React.Component {
 
   render() {
     let tabs = []
+    let selectedValue = null;
     this.props.tabs.forEach((tab) => {
       tabs.push(<Tab
         label={tab.label}
         style={{
           ...this.styles.tab,
-          color: tab.isSelected ? this.props.selectedTabColor : this.props.tabColor,
+          color: tab.value === this.props.selectedTab ? this.props.selectedTabColor : this.props.tabColor,
           backgroundColor: this.props.color
         }}
-        onClick={tab.onClick}
+        value={tab.value}
       />)
     })
+
     return (
       <AppBar
         {...this.props}
@@ -65,7 +68,7 @@ export default class TopBar extends React.Component {
             style={this.styles.logo}
         />}
         iconElementRight={
-          <Tabs>
+          <Tabs valueLink={{value: this.props.selectedTab, requestChange: (value, event, tab) => this.props.navigateTo(value)}}>
             {tabs}
           </Tabs>
         }

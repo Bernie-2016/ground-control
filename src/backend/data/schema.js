@@ -274,9 +274,10 @@ const GraphQLViewer = new GraphQLObjectType({
     },
     callAssignmentList: {
       type: GraphQLCallAssignmentConnection,
+      args: connectionArgs,
       resolve: async (assignment, {first}) => {
         let assignments = await CallAssignment.filter({})
-          return connectionFromArray(assignments, {first});
+        return connectionFromArray(assignments, {first});
       }
     },
     survey: {

@@ -7,6 +7,7 @@ import {RaisedButton} from 'material-ui';
 import AdminSection from './AdminSection';
 
 export class GroupCallAdmin extends React.Component {
+
   static propTypes = {
     navigateTo: React.PropTypes.func
   }
