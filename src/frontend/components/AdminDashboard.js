@@ -79,8 +79,8 @@ class AdminDashboard extends React.Component {
             swoosh: BernieColors.gray
           }}
           tabs={tabs}
-          selectedTab={this.currentSelection()}
-          navigateTo={(slug) => this.navigateTo(slug)}
+          selectedTabValue={this.currentSelection()}
+          tabChanged={(slug) => this.navigateTo(slug)}
         />
         {this.renderSelectedComponent()}
       </div>

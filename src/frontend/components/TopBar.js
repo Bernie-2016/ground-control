@@ -40,13 +40,12 @@ export default class TopBar extends React.Component {
 
   render() {
     let tabs = []
-    let selectedValue = null;
     this.props.tabs.forEach((tab) => {
       tabs.push(<Tab
         label={tab.label}
         style={{
           ...this.styles.tab,
-          color: tab.value === this.props.selectedTab ? this.props.selectedTabColor : this.props.tabColor,
+          color: tab.value === this.props.selectedTabValue ? this.props.selectedTabColor : this.props.tabColor,
           backgroundColor: this.props.color
         }}
         value={tab.value}
@@ -68,7 +67,7 @@ export default class TopBar extends React.Component {
             style={this.styles.logo}
         />}
         iconElementRight={
-          <Tabs valueLink={{value: this.props.selectedTab, requestChange: (value, event, tab) => this.props.navigateTo(value)}}>
+          <Tabs valueLink={{value: this.props.selectedTabValue, requestChange: (value, event, tab) => this.props.tabChanged(value)}}>
             {tabs}
           </Tabs>
         }
