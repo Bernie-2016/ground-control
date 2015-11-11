@@ -16,7 +16,11 @@ export default class AdminSection extends React.Component {
 
     content: {
       display: 'inline-block',
-      verticalAlign: 'top'
+      verticalAlign: 'top',
+      marginLeft: 15,
+      marginTop: 15,
+      marginRight: 15,
+      marginBottom: 15
     }
   }
 

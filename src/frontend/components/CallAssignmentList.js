@@ -7,8 +7,8 @@ export class CallAssignmentList extends React.Component {
   static propTypes = {
     subheader: React.PropTypes.string,
     onSelect: React.PropTypes.func,
-    callAssignmentList : React.PropTypes.object
   }
+
   renderCallAssignments() {
     return this.props.callAssignmentList.edges.map(assignment => {
         let node = assignment.node;

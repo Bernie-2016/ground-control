@@ -2,7 +2,9 @@ import React from 'react';
 import Relay from 'react-relay';
 import CallAssignmentList from './CallAssignmentList';
 import AdminSection from './AdminSection';
+import AdminHelpers from './AdminHelpers';
 import {RaisedButton} from 'material-ui';
+import CallAssignment from './CallAssignment';
 
 class CallAssignmentAdmin extends React.Component {
   static propTypes = {
@@ -10,35 +12,41 @@ class CallAssignmentAdmin extends React.Component {
   }
 
   componentWillReceiveProps(props) {
-    let assignmentId = props.path ? props.path.split('/')[0] : null
-    this.props.relay.setVariables({assignmentId: assignmentId})
+    let id = props.path ? props.path.split('/')[0] : null
+    this.props.relay.setVariables({id: id})
   }
 
   componentWillMount() {
     this.componentWillReceiveProps(this.props)
   }
 
-  selectAssignment(assignmentId) {
-    this.props.navigateTo(assignmentId)
+  selectItem(id) {
+    this.props.navigateTo(id)
   }
 
-  selectAssignmentCreation() {
+  selectCreation() {
     this.props.navigateTo('create')
   }
 
   render() {
-    let contentView = <div></div>;
+    let CallAssignmentCreationForm = (props) => {
+      return <div>Create!</div>
+    }
+    let contentView = AdminHelpers.contentViewFromId(this.props.relay.variables.id,
+      <CallAssignmentCreationForm viewer={this.props.viewer} />,
+      <CallAssignment callAssignment={this.props.viewer.callAssignment} />
+    )
     let sideBar = (
       <div>
         <RaisedButton label="Create Assignment"
           fullWidth={true}
           primary={true}
-          onTouchTap={() => this.selectAssignmentCreation()}
+          onTouchTap={() => this.selectCreation()}
         />
         <CallAssignmentList
           callAssignmentList={this.props.viewer.callAssignmentList}
           subheader="Active Assignments"
-          onSelect={(id) => this.selectAssignment(id)}
+          onSelect={(id) => this.selectItem(id)}
         />
       </div>
     )
@@ -52,29 +60,18 @@ class CallAssignmentAdmin extends React.Component {
 }
 
 export default Relay.createContainer(CallAssignmentAdmin, {
-  initialVariables: {
-    assignmentId: null
-  },
+  initialVariables: { id: null },
 
-  prepareVariables: (prev) =>
-  {
-    if (prev.assignmentId && prev.assignmentId !== 'create')
-      return {
-        assignmentId: prev.assignmentId,
-        fetchCall: true
-      }
-    else
-      return {
-        assignmentId: '',
-        fetchCall: false
-      }
-  },
+  prepareVariables: (prev) => AdminHelpers.variablesFromId(prev.id),
 
   fragments: {
     viewer: () => Relay.QL`
       fragment on Viewer {
         callAssignmentList(first:50) {
           ${CallAssignmentList.getFragment('callAssignmentList')}
+        }
+        callAssignment(id:$id) @include(if: $fetchItem) {
+          ${CallAssignment.getFragment('callAssignment')}
         }
       }
     `,

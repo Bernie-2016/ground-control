@@ -8,7 +8,6 @@ import AdminSection from './AdminSection';
 import AdminHelpers from './AdminHelpers';
 
 export class GroupCallAdmin extends React.Component {
-
   static propTypes = {
     navigateTo: React.PropTypes.func
   }
@@ -35,9 +34,6 @@ export class GroupCallAdmin extends React.Component {
       <GroupCallCreationForm viewer={this.props.viewer} />,
       <GroupCall groupCall={this.props.viewer.groupCall} />
     )
-
-    console.log(<GroupCall groupCall={this.props.viewer.groupCall} />)
-    console.log(contentView)
 
     let sideBar = (
       <div>

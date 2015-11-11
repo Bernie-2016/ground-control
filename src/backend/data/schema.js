@@ -280,6 +280,16 @@ const GraphQLViewer = new GraphQLObjectType({
         return connectionFromArray(assignments, {first});
       }
     },
+    callAssignment: {
+      type: GraphQLCallAssignment,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLString) }
+      },
+      resolve: (viewer, {id}) => {
+        let localId = fromGlobalId(id).id;
+        return CallAssignment.get(localId);
+      }
+    },
     survey: {
       type: GraphQLSurvey,
       args: {

@@ -1,17 +1,18 @@
 import React from 'react';
 import Relay from 'react-relay';
 import {BernieText} from './styles/bernie-css';
+import {Paper, List, ListItem} from 'material-ui';
 import moment from 'moment';
 
-export class GroupCall extends React.Component {
+export class CallAssignment extends React.Component {
   render() {
     return (
       <div>
         <div style={BernieText.title}>
-          {this.props.groupCall.name}
+          {this.props.callAssignment.name}
         </div>
         <div>
-          <div>{moment(this.props.groupCall.scheduledTime).format('dddd, MMMM Do YYYY, h:mm:ss a')}
+          <div>Test
           </div>
         </div>
       </div>
@@ -19,13 +20,12 @@ export class GroupCall extends React.Component {
   }
 }
 
-export default Relay.createContainer(GroupCall, {
+export default Relay.createContainer(CallAssignment, {
   fragments: {
-    groupCall: () => Relay.QL`
-      fragment on GroupCall {
+    callAssignment: () => Relay.QL`
+      fragment on CallAssignment {
         id
         name
-        scheduledTime
       }
     `
   }
