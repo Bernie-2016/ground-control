@@ -5,21 +5,10 @@ import AdminSection from './AdminSection';
 import AdminHelpers from './AdminHelpers';
 import {RaisedButton} from 'material-ui';
 import CallAssignment from './CallAssignment';
+import {connectPathToRelayVariable} from './decorators';
 
+@connectPathToRelayVariable('id')
 class CallAssignmentAdmin extends React.Component {
-  static propTypes = {
-    navigateTo: React.PropTypes.func
-  }
-
-  componentWillReceiveProps(props) {
-    let id = props.path ? props.path.split('/')[0] : null
-    this.props.relay.setVariables({id: id})
-  }
-
-  componentWillMount() {
-    this.componentWillReceiveProps(this.props)
-  }
-
   render() {
     let CallAssignmentCreationForm = (props) => {
       return <div>Create!</div>
