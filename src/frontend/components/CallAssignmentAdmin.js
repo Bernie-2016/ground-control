@@ -7,7 +7,7 @@ import {RaisedButton} from 'material-ui';
 import CallAssignment from './CallAssignment';
 import {connectPathToProps} from './decorators';
 
-@connectPathToProps('id')
+@connectPathToProps(':id')
 class CallAssignmentAdmin extends React.Component {
   render() {
     let CallAssignmentCreationForm = (props) => {

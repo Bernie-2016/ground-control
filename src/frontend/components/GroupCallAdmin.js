@@ -8,7 +8,7 @@ import AdminSection from './AdminSection';
 import AdminHelpers from './AdminHelpers';
 import {connectPathToProps} from './decorators';
 
-@connectPathToProps('id')
+@connectPathToProps(':id')
 export class GroupCallAdmin extends React.Component {
   render() {
     let contentView = AdminHelpers.contentViewFromId(this.props.relay.variables.id,

@@ -1,7 +1,7 @@
 import React from 'react';
 
-// Only supports one prop for now. This will assign the first part of the "path" prop to the props specified by propMap.
-export function connectPathToProps(propMap) {
+// This will match the path to a set of prop names and also set those props as relay variables
+export function connectPathToProps(matchString) {
   return function (DecoratedComponent) {
     return class extends React.Component {
       static propTypes = {
@@ -9,33 +9,47 @@ export function connectPathToProps(propMap) {
         path: React.PropTypes.string.isRequired
       }
 
-      pathParts() {
-        return this.props.path ? this.props.path.split('/') : []
+      propNameFromMatchPart(part) {
+        if (part && part[0] == ':')
+          return part.substring(1)
+        return null;
+      }
+
+      propsFromPath() {
+        let matchParts = matchString.split('/')
+        let propMap = {}
+        matchParts.forEach((part) => {
+          let propName = this.propNameFromMatchPart(part)
+          if (propName)
+            propMap[propName] = null;
+        })
+
+        let pathParts = this.props.path.split('/')
+        for (let index = 0; index < pathParts.length; index++) {
+          let match = this.propNameFromMatchPart(matchParts[index])
+          if (match)
+            propMap[match] = pathParts[index];
+        }
+        return propMap;
       }
 
       // This is a bit of a hack to also set the props as relay variables
       componentDidUpdate() {
         if (this.props.relay) {
-          let firstPathPart = this.pathParts()[0]
-          if (firstPathPart) {
-            let vars = {}
-            vars[propMap] = firstPathPart
-            this.props.relay.setVariables(vars)
-          }
+          this.props.relay.setVariables(this.propsFromPath())
         }
       }
 
       componentDidMount() {
-        this.componentDidUpdate(this.props)
+        this.componentDidUpdate()
       }
 
       render() {
-        let firstPathPart = this.pathParts()[0]
+        console.log(this.propsFromPath())
         let props = {
+          ...this.propsFromPath(),
           ...this.props
         }
-        if (firstPathPart)
-          props[propMap] = firstPathPart;
         return (
           <DecoratedComponent {...props} />
         );
