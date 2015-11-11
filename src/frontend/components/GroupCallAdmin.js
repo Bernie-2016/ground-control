@@ -11,7 +11,6 @@ import {connectPathToRelayVariable} from './decorators';
 @connectPathToRelayVariable('id')
 export class GroupCallAdmin extends React.Component {
   render() {
-    console.log('rendering');
     let contentView = AdminHelpers.contentViewFromId(this.props.relay.variables.id,
       <GroupCallCreationForm viewer={this.props.viewer} />,
       <GroupCall groupCall={this.props.viewer.groupCall} />
@@ -49,11 +48,8 @@ export class GroupCallAdmin extends React.Component {
 export default Relay.createContainer(GroupCallAdmin, {
   initialVariables: { id: null },
 
-  prepareVariables: (prev) =>
-  {
-    console.log(prev.id)
-    return AdminHelpers.variablesFromId(prev.id)
-  },
+  prepareVariables: (prev) => AdminHelpers.variablesFromId(prev.id),
+
 
   fragments: {
     viewer: () => Relay.QL`
