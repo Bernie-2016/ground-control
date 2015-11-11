@@ -5,9 +5,9 @@ import AdminSection from './AdminSection';
 import AdminHelpers from './AdminHelpers';
 import {RaisedButton} from 'material-ui';
 import CallAssignment from './CallAssignment';
-import {connectPathToProps} from './decorators';
+import {Route} from './decorators';
 
-@connectPathToProps(':id')
+@Route(':id')
 class CallAssignmentAdmin extends React.Component {
   render() {
     let CallAssignmentCreationForm = (props) => {

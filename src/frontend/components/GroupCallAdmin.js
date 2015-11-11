@@ -6,9 +6,9 @@ import GroupCallCreationForm from './GroupCallCreationForm';
 import {RaisedButton} from 'material-ui';
 import AdminSection from './AdminSection';
 import AdminHelpers from './AdminHelpers';
-import {connectPathToProps} from './decorators';
+import {Route} from './decorators';
 
-@connectPathToProps(':id')
+@Route(':id')
 export class GroupCallAdmin extends React.Component {
   render() {
     let contentView = AdminHelpers.contentViewFromId(this.props.relay.variables.id,

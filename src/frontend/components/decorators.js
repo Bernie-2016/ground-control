@@ -1,7 +1,7 @@
 import React from 'react';
 
 // This will match the path to a set of prop names and also set those props as relay variables
-export function connectPathToProps(matchString) {
+export function Route(matchString) {
   return function (DecoratedComponent) {
     return class extends React.Component {
       static propTypes = {
