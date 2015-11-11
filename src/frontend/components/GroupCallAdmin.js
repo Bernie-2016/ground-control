@@ -6,7 +6,7 @@ import GroupCallCreationForm from './GroupCallCreationForm';
 import {RaisedButton} from 'material-ui';
 import AdminSection from './AdminSection';
 import AdminHelpers from './AdminHelpers';
-import {Route} from './decorators';
+import {Route} from './ComponentRouter';
 
 @Route(':id')
 export class GroupCallAdmin extends React.Component {

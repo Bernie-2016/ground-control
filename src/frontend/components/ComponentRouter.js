@@ -1,12 +1,13 @@
 import React from 'react';
 
 // This will match the path to a set of prop names and also set those props as relay variables
-export function Route(matchString) {
+export default function Route(matchString) {
   return function (DecoratedComponent) {
     return class extends React.Component {
       static propTypes = {
-        navigateTo: React.PropTypes.func.isRequired,
-        path: React.PropTypes.string.isRequired
+        parentPath: React.PropTypes.string.isRequired,
+        path: React.PropTypes.string.isRequired,
+        navigateTo: React.PropTypes.func.isRequired
       }
 
       propNameFromMatchPart(part) {
@@ -45,10 +46,15 @@ export function Route(matchString) {
       }
 
       render() {
-        console.log(this.propsFromPath())
+        let navigateTo = (path) => {
+          let parentPath = this.props.parentPath;
+          let childPath = this.props.path;
+          this.props.navigateTo(parentPath.substring(0, parentPath.indexOf(childPath)) + path);
+          }
         let props = {
           ...this.propsFromPath(),
-          ...this.props
+          ...this.props,
+          navigateTo: navigateTo
         }
         return (
           <DecoratedComponent {...props} />

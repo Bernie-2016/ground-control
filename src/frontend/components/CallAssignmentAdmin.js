@@ -5,7 +5,7 @@ import AdminSection from './AdminSection';
 import AdminHelpers from './AdminHelpers';
 import {RaisedButton} from 'material-ui';
 import CallAssignment from './CallAssignment';
-import {Route} from './decorators';
+import {Route} from './ComponentRouter';
 
 @Route(':id')
 class CallAssignmentAdmin extends React.Component {
