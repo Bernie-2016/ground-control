@@ -3,7 +3,7 @@ import Relay from 'react-relay';
 import {Styles} from 'material-ui';
 import GroupCallAdmin from './GroupCallAdmin';
 import CallAssignmentAdmin from './CallAssignmentAdmin';
-import TopBar from './TopBar';
+import TopNav from './TopNav';
 import {BernieTheme} from './styles/bernie-theme';
 import {BernieColors} from './styles/bernie-css';
 
@@ -30,7 +30,7 @@ export default class VolunteerDashboard extends React.Component {
   render() {
     return (
       <div>
-        <TopBar
+        <TopNav
           zDepth={1}
           barColor={BernieColors.lightGray}
           tabColor={BernieColors.darkGray}

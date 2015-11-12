@@ -5,7 +5,7 @@ import {BernieTheme} from './styles/bernie-theme';
 import {AppBar, Styles, Tabs, Tab} from 'material-ui';
 
 @Styles.ThemeDecorator(Styles.ThemeManager.getMuiTheme(BernieTheme))
-export default class TopBar extends React.Component {
+export default class TopNav extends React.Component {
   static propTypes = {
     logoColors: React.PropTypes.shape({
       primary: React.PropTypes.string,
