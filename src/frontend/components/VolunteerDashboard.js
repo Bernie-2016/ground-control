@@ -43,7 +43,7 @@ export default class VolunteerDashboard extends React.Component {
           history={this.props.history}
           location={this.props.location}
         />
-
+        {this.props.children}
       </div>
     )
   }

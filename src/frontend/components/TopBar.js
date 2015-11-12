@@ -77,7 +77,7 @@ export default class TopBar extends React.Component {
           />}
           iconElementRight={
             <Tabs valueLink={{
-              value: selectedTab,
+              value: selectedTab ? selectedTab : 'none',
               requestChange: (value, event, tab) => {
                 this.props.history.pushState(null, value)
               }}}

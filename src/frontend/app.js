@@ -43,6 +43,7 @@ ReactDOM.render(
       <Route
         path="surveys(/:id)"
         component={SurveyViewer}
+        queries={ViewerQueries}
       />
     </Route>
   </Router>,
