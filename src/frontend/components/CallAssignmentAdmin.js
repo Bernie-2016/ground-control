@@ -5,12 +5,10 @@ import AdminSection from './AdminSection';
 import AdminHelpers from './AdminHelpers';
 import {RaisedButton} from 'material-ui';
 import CallAssignment from './CallAssignment';
+import CallAssignmentCreationForm from './CallAssignmentCreationForm';
 
 class CallAssignmentAdmin extends React.Component {
   render() {
-    let CallAssignmentCreationForm = (props) => {
-      return <div>Create!</div>
-    }
     let contentView = AdminHelpers.contentViewFromId(this.props.relay.variables.id,
       <CallAssignmentCreationForm viewer={this.props.viewer} />,
       <CallAssignment callAssignment={this.props.viewer.callAssignment} />
