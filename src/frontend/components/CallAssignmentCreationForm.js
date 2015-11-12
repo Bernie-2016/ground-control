@@ -1,18 +1,25 @@
 import React from 'react';
 import Relay from 'react-relay';
 import {BernieColors, BernieText} from './styles/bernie-css'
-import {TextField, SvgIcon, DatePicker, Paper, List, FloatingActionButton, Styles, ListItem, ListDivider, TimePicker, RaisedButton, Snackbar} from 'material-ui';
+import {Paper} from 'material-ui';
+import GCTextField from './forms/GCTextField';
 import Form from 'react-formal';
 import yup from 'yup';
+
+Form.addInputTypes({
+  string: GCTextField
+})
 
 export default class CallAssignmentCreationForm extends React.Component {
 
   styles = {
-    container: {
+    formContainer: {
+      width: 280,
       paddingLeft: 15,
       paddingRight: 15,
       paddingTop: 15,
       paddingBottom: 15,
+      marginTop: 15,
       border: 'solid 1px ' + BernieColors.lightGray
     }
   }
@@ -25,25 +32,33 @@ export default class CallAssignmentCreationForm extends React.Component {
 
   render() {
     return (
-      <Paper zDepth={1} style={this.styles.container}>
+      <div>
+      <div style={BernieText.title}>
+        Create Assignment
+      </div>
+      <div>
+        Create a new phonebanking assignment. Before you fill out this form, make sure you've set up the correct objects in BSD.
+      </div>
+      <Paper zDepth={0} style={this.styles.formContainer}>
         <Form
           schema={this.formSchema}
           defaultValue={this.formSchema.default()}
         >
           <Form.Field
             name='BSDSurvey'
-            placeholder='BSD Survey ID'
-          />
+            label='BSD Survey ID'
+          /><br />
           <Form.Field
             name='callerGroup'
-            placeholder='BSD Cons Group ID for callers'
-          />
+            label='Caller cons_group ID'
+          /><br />
           <Form.Field
             name='targetGroup'
-            placeholder='BSD Cons Group ID for target'
-          />
+            label='Target cons_group ID'
+          /><br />
         </Form>
       </Paper>
+      </div>
     )
   }
 }
