@@ -2,6 +2,7 @@ import React from 'react';
 import Relay from 'react-relay';
 import Radium from 'radium';
 import {RaisedButton} from 'material-ui';
+import {Route} from './TreeRouter';
 
 // This just handles rendering and interacting with a BSD survey in an iFrame
 @Radium
@@ -36,7 +37,7 @@ class Survey extends React.Component {
       return;
 
     if (event.data.message == 'documentLoaded') {
-      if (event.data.details.location === this.props.viewer.survey.BSDData.fullURL)
+      if (event.data.details.location === this.props.survey.BSDData.fullURL)
         this.sendFrameMessage({message: 'getHeight'});
       else {
         this.setState({isSubmitted: true});
@@ -65,11 +66,11 @@ class Survey extends React.Component {
   }
 
   frameHost() {
-    return this.hostFromURLString(this.props.viewer.survey.BSDData.fullURL);
+    return this.hostFromURLString(this.props.survey.BSDData.fullURL);
   }
 
   render() {
-    let source = this.props.viewer.survey.BSDData.fullURL;
+    let source = this.props.survey.BSDData.fullURL;
     let frame = <div></div>
     if (!this.state.isSubmitted)
       frame = (
@@ -91,20 +92,11 @@ class Survey extends React.Component {
 }
 
 export default Relay.createContainer(Survey, {
-  initialVariables: {
-    id: null
-  },
-  prepareVariables: (prev) =>
-  {
-    return {id: prev.id}
-  },
   fragments: {
-    viewer: () => Relay.QL`
-      fragment on Viewer {
-        survey(id:$id) {
-          BSDData {
-            fullURL
-          }
+    survey: () => Relay.QL`
+      fragment on Survey {
+        BSDData {
+          fullURL
         }
       }
     `

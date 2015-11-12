@@ -21,10 +21,10 @@ class ViewerQueries extends Relay.Route {
 let history = createHashHistory({queryKey: false});
 let routes = [
   {
-    path: '/admin',
+    path: '/admin/',
     component: AdminDashboard,
     queries: ViewerQueries
-  }
+  },
 ]
 
 ReactDOM.render(

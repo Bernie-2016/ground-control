@@ -3,8 +3,10 @@ import Relay from 'react-relay';
 import {BernieColors} from './styles/bernie-css';
 import {AppBar, Styles, Tabs, Tab} from 'material-ui';
 import BernieLogo from './BernieLogo';
+import {Route} from './TreeRouter';
 
-export default class VolunteerDashboard extends React.Component {
+@Route(':section/:subpath')
+class VolunteerDashboard extends React.Component {
   styles = {
     logo: {
       width: 96,
@@ -48,8 +50,19 @@ export default class VolunteerDashboard extends React.Component {
             </Tabs>
           }
           iconStyleRight={this.styles.tabsContainer} />
-        {this.props.children}
       </div>
     )
   }
 }
+
+export default Relay.createContainer(VolunteerDashboard, {
+  fragments: {
+    viewer: () => Relay.QL`
+      fragment on Viewer {
+        survey(id:$id) {
+          ${Survey.getFragment('survey')}
+        }
+      }
+    `
+  }
+});
