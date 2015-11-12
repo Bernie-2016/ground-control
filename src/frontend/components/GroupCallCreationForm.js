@@ -2,7 +2,7 @@ import React from 'react';
 import Relay from 'react-relay';
 import {TextField, SvgIcon, DatePicker, Paper, List, FloatingActionButton, Styles, ListItem, ListDivider, TimePicker, RaisedButton, Snackbar} from 'material-ui';
 import moment from 'moment';
-import BatchCreateGroupCallMutation from '../mutations/BatchCreateGroupCallMutation';
+import BatchCreateGroupCall from '../mutations/BatchCreateGroupCall';
 import {BernieColors, BernieText} from './styles/bernie-css'
 import Radium from 'radium'
 
@@ -82,7 +82,7 @@ class GroupCallCreationForm extends React.Component {
     }
 
     Relay.Store.update(
-      new BatchCreateGroupCallMutation({
+      new BatchCreateGroupCall({
         calls:this.state.calls,
         viewer: this.props.viewer,
       }),
@@ -319,7 +319,7 @@ export default Relay.createContainer(GroupCallCreationForm, {
   fragments: {
     viewer: () => Relay.QL`
       fragment on Viewer {
-        ${BatchCreateGroupCallMutation.getFragment('viewer')},
+        ${BatchCreateGroupCall.getFragment('viewer')},
       }
     `
   },

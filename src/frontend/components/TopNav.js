@@ -57,6 +57,7 @@ export default class TopNav extends React.Component {
           backgroundColor: this.props.barColor
         }}
         value={tab.value}
+        key={tab.value}
       />)
     })
 

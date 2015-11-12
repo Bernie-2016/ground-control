@@ -187,6 +187,36 @@ let {
   nodeType: GraphQLGroupCall
 });
 
+const GraphQLCreateCallAssignment = mutationWithClientMutationId({
+  name: 'CreateCallAssignment',
+  inputFields: () => ({
+    name: new GraphQLNonNull(GraphQLString),
+    callerGroup: new GraphQLNonNull(GraphQLString),
+    targetGroup: new GraphQLNonNull(GraphQLString),
+    BSDSurvey: new GraphQLNonNull(GraphQLString),
+    startDate: new GraphQLNonNull(GraphQLInt),
+    endDate: GraphQLInt
+  }),
+  outputFields: () => ({
+    viewer: {
+      type: GraphQLViewer,
+      resolve: () => {
+        return SharedViewer;
+      }
+    }
+  }),
+  mutateAndGetPayload:({name, callerGroup, targetGroup, BSDSurvey, startDate, endDate}) => {
+    return CallAssignment.save({
+      name: name,
+      callerGroupId: callerGroup,
+      targetGroupId: targetGroup,
+      surveyId: BSDSurvey,
+      startDate: startDate,
+      endDate: endDate
+    })
+  }
+});
+
 const GraphQLGroupCallInput = new GraphQLInputObjectType({
   name: 'GroupCallInput',
   fields: {
@@ -197,7 +227,7 @@ const GraphQLGroupCallInput = new GraphQLInputObjectType({
   }
 })
 
-const GraphQLBatchCreateGroupCallMutation = mutationWithClientMutationId({
+const GraphQLBatchCreateGroupCall = mutationWithClientMutationId({
   name: 'BatchCreateGroupCall',
   inputFields: () => ({
     groupCallList: { type: new GraphQLNonNull(new GraphQLList(GraphQLGroupCallInput)) }
@@ -210,7 +240,7 @@ const GraphQLBatchCreateGroupCallMutation = mutationWithClientMutationId({
       }
     }
   }),
-  mutateAndGetPayload:async ({topic, groupCallList}) => {
+  mutateAndGetPayload:async ({groupCallList}) => {
     let promises = [];
     let maestro = new Maestro(process.env.MAESTRO_UID, process.env.MAESTRO_TOKEN, process.env.MAESTRO_URL, process.env.DEBUG);
 
@@ -307,7 +337,7 @@ const GraphQLViewer = new GraphQLObjectType({
 let RootMutation = new GraphQLObjectType({
   name: 'RootMutation',
   fields: () => ({
-    batchCreateGroupCall: GraphQLBatchCreateGroupCallMutation
+    batchCreateGroupCall: GraphQLBatchCreateGroupCall
   })
 });
 

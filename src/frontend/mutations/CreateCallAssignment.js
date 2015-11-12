@@ -1,6 +1,6 @@
 import Relay from 'react-relay';
 
-export default class BatchCreateGroupCallMutation extends Relay.Mutation {
+export default class CreateCallAssignment extends Relay.Mutation {
   static fragments = {
     viewer: () => Relay.QL`
       fragment on Viewer {
@@ -11,16 +11,16 @@ export default class BatchCreateGroupCallMutation extends Relay.Mutation {
 
   getMutation() {
     return Relay.QL`
-      mutation{ batchCreateGroupCall }
+      mutation{ createCallAssignment }
     `;
   }
 
   getFatQuery() {
     return Relay.QL`
-      fragment on BatchCreateGroupCallPayload {
+      fragment on CreateCallAssignmentPayload {
         viewer {
           id,
-          groupCallList
+          callAssignmentList
         },
       }
     `;

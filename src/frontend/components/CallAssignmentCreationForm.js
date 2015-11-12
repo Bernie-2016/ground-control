@@ -27,7 +27,10 @@ export default class CallAssignmentCreationForm extends React.Component {
   formSchema = yup.object({
     BSDSurvey: yup.string().required(),
     callerGroup: yup.string().required(),
-    targetGroup: yup.string().required()
+    targetGroup: yup.string().required(),
+    name: yup.string().required(),
+//    startDate: yup.date().required(),
+//    endDate: yup.date()
   })
 
   render() {
@@ -44,6 +47,10 @@ export default class CallAssignmentCreationForm extends React.Component {
           schema={this.formSchema}
           defaultValue={this.formSchema.default()}
         >
+          <Form.Field
+            name='name'
+            label='Name'
+          /><br />
           <Form.Field
             name='BSDSurvey'
             label='BSD Survey ID'
