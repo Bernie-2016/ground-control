@@ -1,66 +1,50 @@
 import React from 'react';
 import Relay from 'react-relay';
+import {Styles} from 'material-ui';
+import GroupCallAdmin from './GroupCallAdmin';
+import CallAssignmentAdmin from './CallAssignmentAdmin';
+import TopBar from './TopBar';
+import {BernieTheme} from './styles/bernie-theme';
 import {BernieColors} from './styles/bernie-css';
-import {AppBar, Styles, Tabs, Tab} from 'material-ui';
-import BernieLogo from './BernieLogo';
 
-class VolunteerDashboard extends React.Component {
-  styles = {
-    logo: {
-      width: 96,
-      height: 40
+@Styles.ThemeDecorator(Styles.ThemeManager.getMuiTheme(BernieTheme))
+export default class VolunteerDashboard extends React.Component {
+  tabs = [{
+      value:'/call-assignments',
+      label: 'Make Calls',
     },
-    bar: {
-      backgroundColor: BernieColors.lightGray,
-      minHeight: 56,
-      height: 56
+    {
+      value: '/group-calls',
+      label: 'Join Group Calls'
     },
-    tabs: {
-      color: BernieColors.gray,
-      backgroundColor: BernieColors.lightGray
+    {
+      value: 'http://map.berniesanders.com',
+      label: 'Attend Events'
     },
-    tabsContainer: {
-      verticalAlign: 'middle',
-      width: 600
-    }
-  }
+    {
+      value: 'https://go.berniesanders.com/page/share/share-for-bernie?source=homepage_organize',
+      label: 'Share with Friends'
+    },
+  ]
+
   render() {
     return (
       <div>
-        <AppBar
-          style={this.styles.bar}
-          zDepth={0}
-          title=""
-          iconElementLeft={
-            <BernieLogo
-              color={BernieColors.blue}
-              bottomSwooshColor={BernieColors.red}
-              viewBox="0 0 480 200"
-              style={this.styles.logo}
-          />}
-          iconElementRight={
-            <Tabs>
-              <Tab label="Make Calls" style={this.styles.tabs} />
-              <Tab label="Join Group Calls" style={this.styles.tabs} />
-              <Tab label="Attend Events" style={this.styles.tabs} />
-              <Tab label="Share with Friends" style={this.styles.tabs} />
-              <Tab label="Dashboard" style={this.styles.tabs} />
-            </Tabs>
-          }
-          iconStyleRight={this.styles.tabsContainer} />
+        <TopBar
+          zDepth={1}
+          barColor={BernieColors.lightGray}
+          tabColor={BernieColors.darkGray}
+          selectedTabColor={BernieColors.gray}
+          logoColors={{
+            primary: BernieColors.blue,
+            swoosh: BernieColors.red
+          }}
+          tabs={this.tabs}
+          history={this.props.history}
+          location={this.props.location}
+        />
+
       </div>
     )
   }
 }
-
-export default Relay.createContainer(VolunteerDashboard, {
-  fragments: {
-    viewer: () => Relay.QL`
-      fragment on Viewer {
-        survey(id:$id) {
-          ${Survey.getFragment('survey')}
-        }
-      }
-    `
-  }
-});

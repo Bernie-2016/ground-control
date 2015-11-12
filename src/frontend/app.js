@@ -9,6 +9,7 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 import AdminDashboard from './components/AdminDashboard';
 import GroupCallAdmin from './components/GroupCallAdmin';
 import CallAssignmentAdmin from './components/CallAssignmentAdmin';
+import SurveyViewer from './components/SurveyViewer';
 import Survey from './components/Survey';
 import VolunteerDashboard from './components/VolunteerDashboard';
 
@@ -34,6 +35,14 @@ ReactDOM.render(
         path="call-assignments(/:id)"
         component={CallAssignmentAdmin}
         queries={ViewerQueries}
+      />
+    </Route>
+    <Route
+      path="/"
+      component={VolunteerDashboard}>
+      <Route
+        path="surveys(/:id)"
+        component={SurveyViewer}
       />
     </Route>
   </Router>,

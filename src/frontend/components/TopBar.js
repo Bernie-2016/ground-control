@@ -21,7 +21,7 @@ export default class TopBar extends React.Component {
     selectedTabColor: React.PropTypes.string,
     selectedTab: React.PropTypes.string,
     history: React.PropTypes.object,
-    onTabSelect: React.PropTypes.func
+    location: React.PropTypes.object
   }
 
   styles = {
@@ -41,13 +41,20 @@ export default class TopBar extends React.Component {
 
   render() {
     let tabs = []
+    let selectedTab = this.props.tabs.filter((tab) => {
+      return this.props.location.pathname.indexOf(tab.value) === 0
+    })[0]
+
+    if (selectedTab)
+      selectedTab = selectedTab.value
+
     this.props.tabs.forEach((tab) => {
       tabs.push(<Tab
         label={tab.label}
         style={{
           ...this.styles.tab,
-          color: tab.value === this.props.selectedTab ? this.props.selectedTabColor : this.props.tabColor,
-          backgroundColor: this.props.color
+          color: tab.value === selectedTab ? this.props.selectedTabColor : this.props.tabColor,
+          backgroundColor: this.props.barColor
         }}
         value={tab.value}
       />)
@@ -70,8 +77,10 @@ export default class TopBar extends React.Component {
           />}
           iconElementRight={
             <Tabs valueLink={{
-              value: this.props.selectedTab,
-              requestChange: (value, event, tab) => this.props.onTabSelect(value, event, tab)}}
+              value: selectedTab,
+              requestChange: (value, event, tab) => {
+                this.props.history.pushState(null, value)
+              }}}
             >
               {tabs}
             </Tabs>
