@@ -1,5 +1,5 @@
 import thinky from './thinky';
-var thinkyType = thinky.type;
+let thinkyType = thinky.type;
 
 const BSDLinkType = {
   type: thinkyType.string(),
