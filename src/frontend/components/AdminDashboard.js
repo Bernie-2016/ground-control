@@ -3,68 +3,52 @@ import Relay from 'react-relay';
 import {Styles} from 'material-ui';
 import GroupCallAdmin from './GroupCallAdmin';
 import CallAssignmentAdmin from './CallAssignmentAdmin';
-import Dashboard from './Dashboard';
+import TopBar from './TopBar';
 import {BernieTheme} from './styles/bernie-theme';
 import {BernieColors} from './styles/bernie-css';
 import url from 'url';
-import {Route} from './TreeRouter';
 
 @Styles.ThemeDecorator(Styles.ThemeManager.getMuiTheme(BernieTheme))
-@Route(':section/:subpath')
-class AdminDashboard extends React.Component {
-  componentFactory(componentClass) {
-    let Section = componentClass;
-    return (
-      <Section
-        parentPath={this.props.path}
-        path={this.props.subpath}
-        viewer={this.props.viewer}
-        navigateTo={this.props.navigateTo}
-      />
-    )
-  }
 
-  sections() {
-    return [{
-      link:'group-calls',
+export default class AdminDashboard extends React.Component {
+  tabs = [{
+      value:'/admin/group-calls',
       label: 'Group Calls',
-      component: this.componentFactory(GroupCallAdmin)
     },
     {
-      link: 'call-assignments',
+      value: '/admin/call-assignments',
       label: 'Call Assignments',
-      component: this.componentFactory(CallAssignmentAdmin)
-    }]
-  }
+    }
+  ]
 
   render() {
+    let selectedTab = this.tabs.filter((tab) => {
+      return this.props.location.pathname.indexOf(tab.value) === 0
+    })[0]
+
+    if (selectedTab)
+      selectedTab = selectedTab.value
+
     return (
       <div>
-        <Dashboard
-          barColor={BernieColors.blue}
-          tabColor={BernieColors.lightBlue}
-          selectedTabColor={Styles.Colors.white}
-          title="Ground Control"
-          logoColors={{
-            primary: Styles.Colors.white,
-            swoosh: BernieColors.gray
-          }}
-          sections={this.sections()}
-          selectedSection={this.props.section}
-          navigateTo={this.props.navigateTo}
-        />
+      <TopBar
+        barColor={BernieColors.blue}
+        tabColor={BernieColors.lightBlue}
+        selectedTabColor={Styles.Colors.white}
+        title="Ground Control"
+        logoColors={{
+          primary: Styles.Colors.white,
+          swoosh: BernieColors.gray
+        }}
+        tabs={this.tabs}
+        selectedTab={selectedTab}
+        history={this.props.history}
+        onTabSelect={(value, event, tab) => {
+          this.props.history.pushState(null, value);
+        }}
+      />
+      {this.props.children}
       </div>
     )
   }
 }
-
-export default Relay.createContainer(AdminDashboard, {
-  fragments: {
-    viewer: () => Relay.QL`
-      fragment on Viewer {
-        ${GroupCallAdmin.getFragment('viewer')}
-        ${CallAssignmentAdmin.getFragment('viewer')}
-      }
-    `
-  }
-});

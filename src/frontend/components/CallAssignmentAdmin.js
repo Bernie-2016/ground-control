@@ -5,9 +5,7 @@ import AdminSection from './AdminSection';
 import AdminHelpers from './AdminHelpers';
 import {RaisedButton} from 'material-ui';
 import CallAssignment from './CallAssignment';
-import {Route} from './TreeRouter';
 
-@Route(':id')
 class CallAssignmentAdmin extends React.Component {
   render() {
     let CallAssignmentCreationForm = (props) => {
@@ -22,12 +20,12 @@ class CallAssignmentAdmin extends React.Component {
         <RaisedButton label="Create Assignment"
           fullWidth={true}
           primary={true}
-          onTouchTap={() => this.props.navigateTo('create')}
+          onTouchTap={() => this.props.history.pushState(null, '/admin/call-assignments/create')}
         />
         <CallAssignmentList
           callAssignmentList={this.props.viewer.callAssignmentList}
           subheader="Active Assignments"
-          onSelect={(id) => this.props.navigateTo(id)}
+          onSelect={(id) => this.props.history.pushState(null, '/admin/call-assignments/' + id)}
         />
       </div>
     )

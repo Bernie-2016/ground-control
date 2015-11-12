@@ -13,14 +13,15 @@ export default class Dashboard extends React.Component {
     }),
     sections: React.PropTypes.arrayOf(React.PropTypes.shape({
       label: React.PropTypes.string,
-      link: React.PropTypes.string,
+      value: React.PropTypes.string,
       component: React.PropTypes.object
     })),
     barColor: React.PropTypes.string,
     tabColor: React.PropTypes.string,
     selectedTabColor: React.PropTypes.string,
-    selectedSection: React.PropTypes.string,
-    navigateTo: React.PropTypes.func
+    selectedTab: React.PropTypes.string,
+    history: React.PropTypes.object,
+    onTabSelect: React.PropTypes.func
   }
 
   styles = {
@@ -38,29 +39,17 @@ export default class Dashboard extends React.Component {
     }
   }
 
-  renderSelectedComponent() {
-    let component = <div>Not found</div>
-    if (this.props.selectedSection) {
-      this.props.sections.forEach((section) => {
-        if (section.link === this.props.selectedSection) {
-          component = section.component;
-        }
-      })
-    }
-    return component;
-  }
-
   render() {
     let tabs = []
-    this.props.sections.forEach((tab) => {
+    this.props.tabs.forEach((tab) => {
       tabs.push(<Tab
         label={tab.label}
         style={{
           ...this.styles.tab,
-          color: tab.link === this.props.selectedSection ? this.props.selectedTabColor : this.props.tabColor,
+          color: tab.value === this.props.selectedTab ? this.props.selectedTabColor : this.props.tabColor,
           backgroundColor: this.props.color
         }}
-        value={tab.link}
+        value={tab.value}
       />)
     })
 
@@ -81,13 +70,13 @@ export default class Dashboard extends React.Component {
           />}
           iconElementRight={
             <Tabs valueLink={{
-              value: this.props.selectedSection,
-              requestChange: (value, event, tab) => this.props.navigateTo(value)}}>
+              value: this.props.selectedTab,
+              requestChange: (value, event, tab) => this.props.onTabSelect(value, event, tab)}}
+            >
               {tabs}
             </Tabs>
           }
         />
-        {this.renderSelectedComponent()}
       </div>
     )
   }

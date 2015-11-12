@@ -3,9 +3,7 @@ import Relay from 'react-relay';
 import {BernieColors} from './styles/bernie-css';
 import {AppBar, Styles, Tabs, Tab} from 'material-ui';
 import BernieLogo from './BernieLogo';
-import {Route} from './TreeRouter';
 
-@Route(':section/:subpath')
 class VolunteerDashboard extends React.Component {
   styles = {
     logo: {

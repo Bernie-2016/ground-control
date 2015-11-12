@@ -11,16 +11,17 @@ export default class TopBar extends React.Component {
       primary: React.PropTypes.string,
       swoosh: React.PropTypes.string
     }),
-    tabs: React.PropTypes.arrayOf(React.PropTypes.shape({
+    sections: React.PropTypes.arrayOf(React.PropTypes.shape({
       label: React.PropTypes.string,
-      onClick: React.PropTypes.func,
-      isSelected: React.PropTypes.boolean
+      value: React.PropTypes.string,
+      component: React.PropTypes.object
     })),
-    color: React.PropTypes.string,
+    barColor: React.PropTypes.string,
     tabColor: React.PropTypes.string,
     selectedTabColor: React.PropTypes.string,
-    titleColor: React.PropTypes.string,
-    navigateTo: React.PropTypes.func
+    selectedTab: React.PropTypes.string,
+    history: React.PropTypes.object,
+    onTabSelect: React.PropTypes.func
   }
 
   styles = {
@@ -45,7 +46,7 @@ export default class TopBar extends React.Component {
         label={tab.label}
         style={{
           ...this.styles.tab,
-          color: tab.value === this.props.selectedTabValue ? this.props.selectedTabColor : this.props.tabColor,
+          color: tab.value === this.props.selectedTab ? this.props.selectedTabColor : this.props.tabColor,
           backgroundColor: this.props.color
         }}
         value={tab.value}
@@ -53,25 +54,30 @@ export default class TopBar extends React.Component {
     })
 
     return (
-      <AppBar
-        {...this.props}
-        style={{
-          ...this.styles.bar,
-          backgroundColor: this.props.color
-        }}
-        iconElementLeft={
-          <BernieLogo
-            color={this.props.logoColors.primary}
-            bottomSwooshColor={this.props.logoColors.swoosh}
-            viewBox="0 0 480 200"
-            style={this.styles.logo}
-        />}
-        iconElementRight={
-          <Tabs valueLink={{value: this.props.selectedTabValue, requestChange: (value, event, tab) => this.props.tabChanged(value)}}>
-            {tabs}
-          </Tabs>
-        }
-      />
+      <div>
+        <AppBar
+          {...this.props}
+          style={{
+            ...this.styles.bar,
+            backgroundColor: this.props.barColor
+          }}
+          iconElementLeft={
+            <BernieLogo
+              color={this.props.logoColors.primary}
+              bottomSwooshColor={this.props.logoColors.swoosh}
+              viewBox="0 0 480 200"
+              style={this.styles.logo}
+          />}
+          iconElementRight={
+            <Tabs valueLink={{
+              value: this.props.selectedTab,
+              requestChange: (value, event, tab) => this.props.onTabSelect(value, event, tab)}}
+            >
+              {tabs}
+            </Tabs>
+          }
+        />
+      </div>
     )
   }
 }

@@ -6,9 +6,7 @@ import GroupCallCreationForm from './GroupCallCreationForm';
 import {RaisedButton} from 'material-ui';
 import AdminSection from './AdminSection';
 import AdminHelpers from './AdminHelpers';
-import {Route} from './TreeRouter';
 
-@Route(':id')
 export class GroupCallAdmin extends React.Component {
   render() {
     let contentView = AdminHelpers.contentViewFromId(this.props.relay.variables.id,
@@ -21,17 +19,17 @@ export class GroupCallAdmin extends React.Component {
         <RaisedButton label="Create Calls"
           fullWidth={true}
           primary={true}
-          onTouchTap={() => this.props.navigateTo('create')}
+          onTouchTap={() => this.props.history.pushState(null, '/admin/group-calls/create')}
         />
         <GroupCallList
           groupCallList={this.props.viewer.upcomingCallList}
           subheader="Upcoming calls"
-          onSelect={(id) => this.props.navigateTo(id)}
+          onSelect={(id) => this.props.history.pushState(null, '/admin/group-calls/' + id)}
         />
         <GroupCallList
           groupCallList={this.props.viewer.pastCallList}
           subheader="Past calls"
-          onSelect={(id) => this.props.navigateTo(id)}
+          onSelect={(id) => this.props.history.pushState(null, '/admin/group-calls/' + id)}
         />
       </div>
     )
@@ -49,7 +47,6 @@ export default Relay.createContainer(GroupCallAdmin, {
   initialVariables: { id: null },
 
   prepareVariables: (prev) => AdminHelpers.variablesFromId(prev.id),
-
 
   fragments: {
     viewer: () => Relay.QL`

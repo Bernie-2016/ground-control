@@ -2,7 +2,6 @@ import React from 'react';
 import Relay from 'react-relay';
 import Radium from 'radium';
 import {RaisedButton} from 'material-ui';
-import {Route} from './TreeRouter';
 
 // This just handles rendering and interacting with a BSD survey in an iFrame
 @Radium
