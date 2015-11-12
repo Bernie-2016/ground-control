@@ -39,4 +39,4 @@ If you are feeling stuck/aren't familiar with any of this and want some help, pl
 
 ## More info?
 
-See the [specs](SPECS.md).
+See the [docs](docs).
