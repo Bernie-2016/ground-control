@@ -66,13 +66,14 @@ export const Note = thinky.createModel('note', {
   id: type.string().options({enforce_missing: false}),
   personId: type.string(),
   fieldId: type.string(),
-  value: type.any().validator((field) => {
-    // TODO
-    return true;
-  },
+  value: type.any(),
   entryTime: type.date(),
   source: {
     type: type.string().enum(['survey', 'group_call', 'BSD']),
     id: type.string()
+  }
+}, {
+  validator: (data) => {
+    return true;
   }
 })
