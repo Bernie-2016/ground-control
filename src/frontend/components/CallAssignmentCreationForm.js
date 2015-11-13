@@ -3,6 +3,7 @@ import Relay from 'react-relay';
 import {BernieColors, BernieText} from './styles/bernie-css'
 import {Paper} from 'material-ui';
 import GCTextField from './forms/GCTextField';
+import GCForm from './forms/GCForm';
 import Form from 'react-formal';
 import yup from 'yup';
 
@@ -33,9 +34,7 @@ export default class CallAssignmentCreationForm extends React.Component {
 //    endDate: yup.date()
   })
 
-  state = {
-    formErrors: null
-  }
+
 
   render() {
     return (
@@ -47,33 +46,28 @@ export default class CallAssignmentCreationForm extends React.Component {
         Create a new phonebanking assignment. Before you fill out this form, make sure you've set up the correct objects in BSD.
       </div>
       <Paper zDepth={0} style={this.styles.formContainer}>
-        <Form
-          schema={this.formSchema}
-          onError={errors => this.setState({formErrors: errors})}
-        >
+        <GCForm schema={this.formSchema} >
           <Form.Field
             name='name'
             label='Name'
-            errors={this.state.formErrors}
           />
           <br />
           <Form.Field
             name='BSDSurvey'
             label='Survey ID'
-            errors={this.state.formErrors}
           /><br />
+          <div>
           <Form.Field
             name='callerGroup'
             label='Caller Group (BSD cons_group ID)'
-            errors={this.state.formErrors}
           /><br />
+          </div>
           <Form.Field
             name='targetGroup'
             label='Target Group (BSD cons_group ID)'
-            errors={this.state.formErrors}
           /><br />
           <Form.Button type='submit'>Create!</Form.Button>
-        </Form>
+        </GCForm>
       </Paper>
       </div>
     )
