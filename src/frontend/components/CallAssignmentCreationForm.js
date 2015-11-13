@@ -2,14 +2,9 @@ import React from 'react';
 import Relay from 'react-relay';
 import {BernieColors, BernieText} from './styles/bernie-css'
 import {Paper} from 'material-ui';
-import GCTextField from './forms/GCTextField';
 import GCForm from './forms/GCForm';
 import Form from 'react-formal';
 import yup from 'yup';
-
-Form.addInputTypes({
-  string: GCTextField,
-})
 
 export default class CallAssignmentCreationForm extends React.Component {
 

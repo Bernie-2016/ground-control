@@ -12,8 +12,14 @@ import CallAssignmentAdmin from './components/CallAssignmentAdmin';
 import SurveyViewer from './components/SurveyViewer';
 import Survey from './components/Survey';
 import VolunteerDashboard from './components/VolunteerDashboard';
+import GCTextField from './components/forms/GCTextField';
+import Form from 'react-formal';
 
 injectTapEventPlugin();
+
+Form.addInputTypes({
+  string: GCTextField,
+})
 
 const ViewerQueries = {
   viewer: () => Relay.QL`query { viewer }`
