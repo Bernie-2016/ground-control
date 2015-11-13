@@ -82,6 +82,77 @@ let {nodeInterface, nodeField} = nodeDefinitions(
   }
 );
 
+const GraphQLViewer = new GraphQLObjectType({
+  name: 'Viewer',
+  fields: () => ({
+    id: globalIdField('Viewer'),
+    groupCallList: {
+      type: GraphQLGroupCallConnection,
+      args: {
+       upcoming: {
+          type: GraphQLBoolean,
+          defaultValue: null
+        },
+        ...connectionArgs,
+      },
+      resolve: async (viewer, {first, upcoming}) => {
+        let r = thinky.r;
+        let queryFilter = {};
+        if (upcoming)
+          queryFilter = (row) => row('scheduledTime').gt(new Date());
+        else if (upcoming == false)
+          queryFilter = (row) => row('scheduledTime').le(new Date());
+
+        let calls = await r.table(GroupCall.getTableName())
+          .orderBy('scheduledTime')
+          .filter(queryFilter)
+          .limit(first)
+
+        return connectionFromArray(calls, {first});
+      }
+    },
+    groupCall: {
+      type: GraphQLGroupCall,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLString) }
+      },
+      resolve: (viewer, {id}) => {
+        let localId = fromGlobalId(id).id;
+        return GroupCall.get(localId);
+      }
+    },
+    callAssignmentList: {
+      type: GraphQLCallAssignmentConnection,
+      args: connectionArgs,
+      resolve: async (assignment, {first}) => {
+        let assignments = await CallAssignment.filter({})
+        return connectionFromArray(assignments, {first});
+      }
+    },
+    callAssignment: {
+      type: GraphQLCallAssignment,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLString) }
+      },
+      resolve: (viewer, {id}) => {
+        let localId = fromGlobalId(id).id;
+        return CallAssignment.get(localId);
+      }
+    },
+    survey: {
+      type: GraphQLSurvey,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLString) }
+      },
+      resolve: (viewer, {id}) => {
+        let localId = fromGlobalId(id).id
+        return Survey.get(localId)
+      }
+    },
+  }),
+  interfaces: [nodeInterface]
+})
+
 const GraphQLPerson = new GraphQLObjectType({
   name: 'Person',
   description: 'A person.',
@@ -189,30 +260,31 @@ let {
 
 const GraphQLCreateCallAssignment = mutationWithClientMutationId({
   name: 'CreateCallAssignment',
-  inputFields: () => ({
-    name: new GraphQLNonNull(GraphQLString),
-    callerGroup: new GraphQLNonNull(GraphQLString),
-    targetGroup: new GraphQLNonNull(GraphQLString),
-    BSDSurvey: new GraphQLNonNull(GraphQLString),
-    startDate: new GraphQLNonNull(GraphQLInt),
-    endDate: GraphQLInt
-  }),
-  outputFields: () => ({
+  inputFields: {
+    name: { type: new GraphQLNonNull(GraphQLString) },
+    callerGroup: { type: new GraphQLNonNull(GraphQLString) },
+    targetGroup: { type: new GraphQLNonNull(GraphQLString) },
+    BSDSurvey: { type: new GraphQLNonNull(GraphQLString) },
+//    startDate: new GraphQLNonNull(GraphQLInt),
+//    endDate: GraphQLInt
+  },
+  outputFields: {
     viewer: {
       type: GraphQLViewer,
       resolve: () => {
         return SharedViewer;
       }
     }
-  }),
+  },
   mutateAndGetPayload:({name, callerGroup, targetGroup, BSDSurvey, startDate, endDate}) => {
+    console.log('here');
     return CallAssignment.save({
       name: name,
       callerGroupId: callerGroup,
       targetGroupId: targetGroup,
       surveyId: BSDSurvey,
-      startDate: startDate,
-      endDate: endDate
+//      startDate: startDate,
+//      endDate: endDate
     })
   }
 });
@@ -229,17 +301,15 @@ const GraphQLGroupCallInput = new GraphQLInputObjectType({
 
 const GraphQLBatchCreateGroupCall = mutationWithClientMutationId({
   name: 'BatchCreateGroupCall',
-  inputFields: () => ({
+  inputFields: {
     groupCallList: { type: new GraphQLNonNull(new GraphQLList(GraphQLGroupCallInput)) }
-  }),
-  outputFields: () => ({
+  },
+  outputFields: {
     viewer: {
       type: GraphQLViewer,
-      resolve: () => {
-        return SharedViewer;
-      }
+      resolve: () =>  SharedViewer
     }
-  }),
+  },
   mutateAndGetPayload:async ({groupCallList}) => {
     let promises = [];
     let maestro = new Maestro(process.env.MAESTRO_UID, process.env.MAESTRO_TOKEN, process.env.MAESTRO_URL, process.env.DEBUG);
@@ -259,85 +329,15 @@ const GraphQLBatchCreateGroupCall = mutationWithClientMutationId({
     };
 
     await Promise.all(promises);
-    return {};
+    return SharedViewer;
   }
 });
-
-const GraphQLViewer = new GraphQLObjectType({
-  name: 'Viewer',
-  fields: () => ({
-    id: globalIdField('Viewer'),
-    groupCallList: {
-      type: GraphQLGroupCallConnection,
-      args: {
-       upcoming: {
-          type: GraphQLBoolean,
-          defaultValue: null
-        },
-        ...connectionArgs,
-      },
-      resolve: async (viewer, {first, upcoming}) => {
-        let r = thinky.r;
-        let queryFilter = {};
-        if (upcoming)
-          queryFilter = (row) => row('scheduledTime').gt(new Date());
-        else if (upcoming == false)
-          queryFilter = (row) => row('scheduledTime').le(new Date());
-
-        let calls = await r.table(GroupCall.getTableName())
-          .orderBy('scheduledTime')
-          .filter(queryFilter)
-          .limit(first)
-
-        return connectionFromArray(calls, {first});
-      }
-    },
-    groupCall: {
-      type: GraphQLGroupCall,
-      args: {
-        id: { type: new GraphQLNonNull(GraphQLString) }
-      },
-      resolve: (viewer, {id}) => {
-        let localId = fromGlobalId(id).id;
-        return GroupCall.get(localId);
-      }
-    },
-    callAssignmentList: {
-      type: GraphQLCallAssignmentConnection,
-      args: connectionArgs,
-      resolve: async (assignment, {first}) => {
-        let assignments = await CallAssignment.filter({})
-        return connectionFromArray(assignments, {first});
-      }
-    },
-    callAssignment: {
-      type: GraphQLCallAssignment,
-      args: {
-        id: { type: new GraphQLNonNull(GraphQLString) }
-      },
-      resolve: (viewer, {id}) => {
-        let localId = fromGlobalId(id).id;
-        return CallAssignment.get(localId);
-      }
-    },
-    survey: {
-      type: GraphQLSurvey,
-      args: {
-        id: { type: new GraphQLNonNull(GraphQLString) }
-      },
-      resolve: (viewer, {id}) => {
-        let localId = fromGlobalId(id).id
-        return Survey.get(localId)
-      }
-    },
-  }),
-  interfaces: [nodeInterface]
-})
 
 let RootMutation = new GraphQLObjectType({
   name: 'RootMutation',
   fields: () => ({
-    batchCreateGroupCall: GraphQLBatchCreateGroupCall
+    batchCreateGroupCall: GraphQLBatchCreateGroupCall,
+    createCallAssignment: GraphQLCreateCallAssignment
   })
 });
 
