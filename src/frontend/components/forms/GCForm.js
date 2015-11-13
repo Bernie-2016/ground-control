@@ -1,5 +1,6 @@
 import React from 'react';
 import Form from 'react-formal';
+import GCSubmitButton from './GCSubmitButton';
 
 export default class GCForm extends React.Component {
   state = {
@@ -18,6 +19,11 @@ export default class GCForm extends React.Component {
           })
         }
         return child;
+      }
+      else if (child.type === Form.Button) {
+        return React.cloneElement(child, {
+          component: GCSubmitButton
+        })
       }
       else if (child.props && child.props.children)
         return this.renderChildren(child.props.children)

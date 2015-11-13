@@ -8,7 +8,7 @@ import Form from 'react-formal';
 import yup from 'yup';
 
 Form.addInputTypes({
-  string: GCTextField
+  string: GCTextField,
 })
 
 export default class CallAssignmentCreationForm extends React.Component {
@@ -66,7 +66,7 @@ export default class CallAssignmentCreationForm extends React.Component {
             name='targetGroup'
             label='Target Group (BSD cons_group ID)'
           /><br />
-          <Form.Button type='submit'>Create!</Form.Button>
+          <Form.Button type='submit' label='Create!' fullWidth={true} />
         </GCForm>
       </Paper>
       </div>
