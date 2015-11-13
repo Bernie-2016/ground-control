@@ -73,7 +73,6 @@ class GroupCallCreationForm extends React.Component {
 
     let onFailure = (transaction) => {
       let error = transaction.getError() || new Error('Mutation failed.');
-      console.log(error);
       this.setState({globalErrorMessage : 'Something went wrong trying to make the calls.'})
     };
 
@@ -86,7 +85,7 @@ class GroupCallCreationForm extends React.Component {
         calls:this.state.calls,
         viewer: this.props.viewer,
       }),
-      {onFailure}
+      {onFailure, onSuccess}
     );
   }
 
@@ -151,7 +150,7 @@ class GroupCallCreationForm extends React.Component {
           key={this.state.calls[index].id}
           onTouchTap={(e) => this.setSelectedCall(this.state.calls[index].id)} />
       )
-      elements.push(<ListDivider />)
+      elements.push(<ListDivider key={this.state.calls[index].id + '-divider'}/>)
     }
     return elements;
   }
@@ -281,13 +280,14 @@ class GroupCallCreationForm extends React.Component {
         openOnMount={true}
         style={{'backgroundColor' : BernieColors.red}}
         action={null} />
-    else if (this.state.globalStatusMessage)
+    else if (this.state.globalStatusMessage) {
       messageSnack = <Snackbar
         message={this.state.globalStatusMessage}
         autoHideDuration={10000}
         openOnMount={true}
         style={{'backgroundColor' : BernieColors.blue}}
         action={null} />
+    }
 
     return (
       <Paper zDepth={0} style={this.styles.container}>

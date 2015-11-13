@@ -50,6 +50,7 @@ export default Relay.createContainer(CallAssignmentAdmin, {
         callAssignment(id:$id) @include(if: $fetchItem) {
           ${CallAssignment.getFragment('callAssignment')}
         }
+        ${CallAssignmentCreationForm.getFragment('viewer')}
       }
     `,
   },

@@ -36,17 +36,11 @@ export default class CreateCallAssignment extends Relay.Mutation {
   }
 
   getVariables() {
-    let inputCalls = []
-    this.props.calls.forEach((call) => {
-      inputCalls.push({
-        name: call.name,
-        scheduledTime: call.scheduledTime.toDate().getTime(),
-        maxSignups: call.maxSignups,
-        duration: 60
-      })
-    });
     return {
-      groupCallList: inputCalls
-    };
+      name: this.props.name,
+      callerGroupId: this.props.callerGroupId,
+      targetGroupId: this.props.targetGroupId,
+      surveyId: this.props.surveyId
+    }
   }
 }

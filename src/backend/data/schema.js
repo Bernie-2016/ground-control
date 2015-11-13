@@ -262,9 +262,9 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
   name: 'CreateCallAssignment',
   inputFields: {
     name: { type: new GraphQLNonNull(GraphQLString) },
-    callerGroup: { type: new GraphQLNonNull(GraphQLString) },
-    targetGroup: { type: new GraphQLNonNull(GraphQLString) },
-    BSDSurvey: { type: new GraphQLNonNull(GraphQLString) },
+    callerGroupId: { type: new GraphQLNonNull(GraphQLString) },
+    targetGroupId: { type: new GraphQLNonNull(GraphQLString) },
+    surveyId: { type: new GraphQLNonNull(GraphQLString) },
 //    startDate: new GraphQLNonNull(GraphQLInt),
 //    endDate: GraphQLInt
   },
@@ -276,13 +276,12 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
       }
     }
   },
-  mutateAndGetPayload:({name, callerGroup, targetGroup, BSDSurvey, startDate, endDate}) => {
-    console.log('here');
+  mutateAndGetPayload:({name, callerGroupId, targetGroupId, surveyId, startDate, endDate}) => {
     return CallAssignment.save({
       name: name,
-      callerGroupId: callerGroup,
-      targetGroupId: targetGroup,
-      surveyId: BSDSurvey,
+      callerGroupId: callerGroupId,
+      targetGroupId: targetGroupId,
+      surveyId: surveyId,
 //      startDate: startDate,
 //      endDate: endDate
     })
