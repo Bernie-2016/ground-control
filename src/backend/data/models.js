@@ -1,4 +1,5 @@
 import thinky from './thinky';
+import validator from 'validator';
 let type = thinky.type;
 
 export const Person = thinky.createModel('person', {
@@ -65,7 +66,10 @@ export const Note = thinky.createModel('note', {
   id: type.string().options({enforce_missing: false}),
   personId: type.string(),
   fieldId: type.string(),
-  value: type.any(),
+  value: type.any().validator((field) => {
+    // TODO
+    return true;
+  },
   entryTime: type.date(),
   source: {
     type: type.string().enum(['survey', 'group_call', 'BSD']),
