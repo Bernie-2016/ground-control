@@ -33,6 +33,10 @@ export default class CallAssignmentCreationForm extends React.Component {
 //    endDate: yup.date()
   })
 
+  state = {
+    formErrors: null
+  }
+
   render() {
     return (
       <div>
@@ -45,24 +49,30 @@ export default class CallAssignmentCreationForm extends React.Component {
       <Paper zDepth={0} style={this.styles.formContainer}>
         <Form
           schema={this.formSchema}
-          defaultValue={this.formSchema.default()}
+          onError={errors => this.setState({formErrors: errors})}
         >
           <Form.Field
             name='name'
             label='Name'
-          /><br />
+            errors={this.state.formErrors}
+          />
+          <br />
           <Form.Field
             name='BSDSurvey'
             label='Survey ID'
+            errors={this.state.formErrors}
           /><br />
           <Form.Field
             name='callerGroup'
             label='Caller Group (BSD cons_group ID)'
+            errors={this.state.formErrors}
           /><br />
           <Form.Field
             name='targetGroup'
             label='Target Group (BSD cons_group ID)'
+            errors={this.state.formErrors}
           /><br />
+          <Form.Button type='submit'>Create!</Form.Button>
         </Form>
       </Paper>
       </div>
