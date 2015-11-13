@@ -51,12 +51,10 @@ export default class CallAssignmentCreationForm extends React.Component {
             name='BSDSurvey'
             label='Survey ID'
           /><br />
-          <div>
           <Form.Field
             name='callerGroup'
             label='Caller Group (BSD cons_group ID)'
           /><br />
-          </div>
           <Form.Field
             name='targetGroup'
             label='Target Group (BSD cons_group ID)'
