@@ -1,81 +1,74 @@
 import thinky from './thinky';
-let thinkyType = thinky.type;
-
-const BSDLinkType = {
-  type: thinkyType.string(),
-  id: thinkyType.string()
-}
-
-const DataSource = {
-  table: thinkyType.string(),
-  id: thinkyType.string()
-}
+let type = thinky.type;
 
 export const Person = thinky.createModel('person', {
-  id: thinkyType.string().options({enforce_missing: false}),
-  BSDLink: BSDLinkType
+  id: type.string().options({enforce_missing: false}),
+  BSDId: type.string().allowNull(true)
 });
 
 export const Group = thinky.createModel('group', {
-  id: thinkyType.string().options({enforce_missing: false}),
-  personIdList: [thinkyType.string()],
-  BSDLink: BSDLinkType
+  id: type.string().options({enforce_missing: false}),
+  personIdList: [type.string()],
 })
 
 export const CallAssignment = thinky.createModel('call_assignment', {
-  id: thinkyType.string().options({enforce_missing: false}),
-  name: thinkyType.string(),
-  callerGroupId: thinkyType.string(),
-  targetGroupId : thinkyType.string(),
-  surveyId: thinkyType.string(),
-//  startDate: thinkyType.date(),
-//  endDate: thinkyType.date().allowNull(true)
+  id: type.string().options({enforce_missing: false}),
+  name: type.string(),
+  callerGroupId: type.string(),
+  targetGroupId : type.string(),
+  surveyId: type.string(),
+//  startDate: type.date(),
+//  endDate: type.date().allowNull(true)
 })
 
 export const Call = thinky.createModel('call', {
-  id: thinkyType.string().options({enforce_missing: false}),
-  callAssignmentId: thinkyType.string(),
-  callerId: thinkyType.string(),
-  intervieweeId: thinkyType.string(),
-  callAssignedAt: thinkyType.date()
+  id: type.string().options({enforce_missing: false}),
+  callAssignmentId: type.string(),
+  callerId: type.string(),
+  intervieweeId: type.string(),
+  callAssignedAt: type.date()
 })
 
 export const Survey = thinky.createModel('survey', {
-  id: thinkyType.string().options({enforce_missing: false}),
-  slug: thinkyType.string(),
-  BSDLink: BSDLinkType
+  id: type.string().options({enforce_missing: false}),
+  slug: type.string(),
+  BSDId: type.string().allowNull(true)
 })
 
 export const GroupCall = thinky.createModel('group_call', {
-  id: thinkyType.string().options({enforce_missing: false}),
-  name: thinkyType.string(),
-  scheduledTime: thinkyType.date(),
-  maxSignups: thinkyType.number(),
-  duration: thinkyType.number(),
-  maestroConferenceUID: thinkyType.string(),
+  id: type.string().options({enforce_missing: false}),
+  name: type.string(),
+  scheduledTime: type.date(),
+  maxSignups: type.number(),
+  duration: type.number(),
+  maestroConferenceUID: type.string(),
   signups: [{
-    personId: thinkyType.string(),
-    attended: thinkyType.boolean(),
-    role: thinkyType.string().enum(['HOST', 'NOTETAKER', 'PARTICIPANT'])
+    personId: type.string(),
+    attended: type.boolean(),
+    role: type.string().enum(['HOST', 'NOTETAKER', 'PARTICIPANT'])
   }]
 })
 
-// Unused models for now
 export const Field = thinky.createModel('field', {
-  id: thinkyType.string().options({enforce_missing: false}),
-  label: thinkyType.string(),
-  type: thinkyType.string().enum(['NUMBER', 'STRING', 'BOOLEAN', 'DATETIME']),
-  choices: [],
-  maxLength: thinkyType.number(),
-  validationFunc: thinkyType.string(),
-  BSDLink: BSDLinkType
+  id: type.string().options({enforce_missing: false}),
+  label: type.string(),
+  type: type.string().enum(['Number', 'String', 'Boolean', 'Date', 'Point']),
+  validators: {
+    function: type.string().enum([
+      'enum', 'min', 'max', 'email', 'regex', 'lowercase', 'uppercase', 'integer'
+    ]),
+    args: []
+  }
 })
 
 export const Note = thinky.createModel('note', {
-  id: thinkyType.string().options({enforce_missing: false}),
-  personId: thinkyType.string(),
-  fieldId: thinkyType.string(),
-  value: thinkyType.any(),
-  entryTime: thinkyType.date(),
-  source: DataSource
+  id: type.string().options({enforce_missing: false}),
+  personId: type.string(),
+  fieldId: type.string(),
+  value: type.any(),
+  entryTime: type.date(),
+  source: {
+    type: type.string().enum(['survey', 'group_call', 'BSD']),
+    id: type.string()
+  }
 })

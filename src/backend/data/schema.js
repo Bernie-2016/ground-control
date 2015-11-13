@@ -153,11 +153,11 @@ const GraphQLSurvey = new GraphQLObjectType({
     BSDData: {
       type: GraphQLBSDSurvey,
       resolve: async (survey) => {
-        if (survey.BSDLink) {
+        if (survey.BSDId) {
           let bsd = new BSD(process.env.BSD_HOST, process.env.BSD_API_ID, process.env.BSD_API_SECRET);
-          let surveyData = await bsd.getForm(survey.BSDLink.id);
+          let surveyData = await bsd.getForm(survey.BSDId);
           return {
-            id: survey.BSDLink.id,
+            id: survey.BSDId,
             fullURL: url.resolve('https://' + process.env.BSD_HOST, '/page/s/' + surveyData.api.signup_form.signup_form_slug)
           }
         }

@@ -1,7 +1,5 @@
 Ground Control exposes a GraphQL-based API that you can explore in src/backend/data/schema.js.
 
-These are the main conceptual models in Ground Control and what they represent.  Additionally, many of these models have a "BSDLink" field.  This represents the id of the corresponding object in BSD when the object was created by BSD.
-
 # Person
 
 This is a person.  Very minimal data exists at a top level of a person because, as it turns out, everything can change and we want to keep track of these changes (not an absolute truth, but until we find it too hard to do so).
