@@ -66,23 +66,41 @@ export default class BSD {
     return JSON.parse(XMLParser.toJson(response));
   }
 
-  async request(callPath, params, method) {
+  async getConsIdsForGroup(groupId) {
+    let response = await this.request('/cons_group/get_cons_ids_for_group', {cons_group_id: groupId})
+    return {
+      consIds: response.trim().split('\n')
+    }
+  }
+
+  async getDeferredResult(deferredId) {
+    return new Promise((resolve, reject) => {
+      setTimeout(async () => {
+        let response = await this.makeRawRequest('/get_deferred_results', {deferred_id: deferredId}, 'GET');
+        if (response.statusCode === 202)
+          resolve(this.getDeferredResult(deferredId))
+        else
+          resolve(response.body)
+      }, 1000)
+    })
+  }
+
+  async makeRawRequest(callPath, params, method) {
     let finalURL = this.generateBSDURL(callPath, {params});
     let options = {
       uri: finalURL,
       method: method,
+      resolveWithFullResponse: true,
       json: true
     }
-    let deferredResponse = await requestPromise(options)
-    if (deferredResponse.statusCode === 202) {
-      let deferredId = deferredResponse.body;
-      return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          resolve(this.request('get_deferred_results', {deferred_id: deferredResponse.body}))
-          }, 5000)
-      })
-    }
+    return requestPromise(options)
+  }
+
+  async request(callPath, params, method) {
+    let response = await this.makeRawRequest(callPath, params, method);
+    if (response.statusCode === 202)
+      return this.getDeferredResult(response.body);
     else
-      return deferredResponse;
+      return response.body;
   }
 }

@@ -289,12 +289,13 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
   mutateAndGetPayload:async ({name, callerGroupId, targetGroupId, surveyId, startDate, endDate}) => {
 
     try {
-      let survey = await BSDClient.getForm(surveyId);
-      console.log(survey);
-//      let callerConsGroup = BSDClient.getConsIdsForGroup(callerGroupId);
+//      let survey = await BSDClient.getForm(surveyId);
+      let callerConsGroup = await BSDClient.getConsIdsForGroup(callerGroupId);
+      console.log(callerConsGroup);
 //      let targetConsGroup = await BSDClient.getConstituentGroup(targetGroupId);
 
     } catch(err) {
+      console.log(err)
       if (err.response.statusCode === 409)
         throw new GraphQLError({
           status: 400,
