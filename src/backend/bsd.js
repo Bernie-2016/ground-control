@@ -66,11 +66,6 @@ export default class BSD {
     return JSON.parse(XMLParser.toJson(response));
   }
 
-  async getConsIdsForGroup(groupId) {
-    let response = await this.request('cons_group/get_cons_ids_for_group', {cons_group_id: groupId});
-    return response
-  }
-
   async request(callPath, params, method) {
     let finalURL = this.generateBSDURL(callPath, {params});
     let options = {
@@ -78,6 +73,16 @@ export default class BSD {
       method: method,
       json: true
     }
-    return requestPromise(options);
+    let deferredResponse = await requestPromise(options)
+    if (deferredResponse.statusCode === 202) {
+      let deferredId = deferredResponse.body;
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve(this.request('get_deferred_results', {deferred_id: deferredResponse.body}))
+          }, 5000)
+      })
+    }
+    else
+      return deferredResponse;
   }
 }

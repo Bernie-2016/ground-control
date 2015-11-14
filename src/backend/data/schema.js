@@ -288,12 +288,13 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
   },
   mutateAndGetPayload:async ({name, callerGroupId, targetGroupId, surveyId, startDate, endDate}) => {
 
-//    try {
-//      let surveyPromise = BSDClient.getForm(surveyId);
-      let callerConsGroup = await BSDClient.getConsIdsForGroup(callerGroupId);
+    try {
+      let survey = await BSDClient.getForm(surveyId);
+      console.log(survey);
+//      let callerConsGroup = BSDClient.getConsIdsForGroup(callerGroupId);
 //      let targetConsGroup = await BSDClient.getConstituentGroup(targetGroupId);
 
-/*    } catch(err) {
+    } catch(err) {
       if (err.response.statusCode === 409)
         throw new GraphQLError({
           status: 400,
@@ -304,7 +305,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
           status: 500,
           message: 'Error communicating with BSD.'});
     }
-    */
+
     return CallAssignment.save({
       name: name,
       callerGroupId: callerGroupId,
