@@ -66,6 +66,22 @@ export default class BSD {
     return JSON.parse(XMLParser.toJson(response));
   }
 
+  async getConstituents(filter) {
+    let filterStrings = []
+    Object.keys(filter).forEach((key) => {
+      let val = ''
+      if (typeof filter[key].join === 'function') {
+        val = '(' + filter[key].join(',') + ')';
+      }
+      else
+        val = filter[key];
+      filterStrings.push(key + '=' + val)
+    })
+    let filterString = filterStrings.join(',');
+    let response = await this.request('cons/get_constituents', {filter: filterString}, 'GET');
+    return response;
+  }
+
   async getConsIdsForGroup(groupId) {
     let response = await this.request('/cons_group/get_cons_ids_for_group', {cons_group_id: groupId})
     return {

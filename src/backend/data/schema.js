@@ -289,22 +289,19 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
   mutateAndGetPayload:async ({name, callerGroupId, targetGroupId, surveyId, startDate, endDate}) => {
 
     try {
-//      let survey = await BSDClient.getForm(surveyId);
-      let callerConsGroup = await BSDClient.getConsIdsForGroup(callerGroupId);
-      console.log(callerConsGroup);
-//      let targetConsGroup = await BSDClient.getConstituentGroup(targetGroupId);
-
+      let surveyPromise = BSDClient.getForm(surveyId);
+      let callersPromise = BSDClient.getConstituents({cons_group: callerGroupId});
+      let targetsPromise = BSDClient.getConstituents({cons_group: targetGroupId});
+      let [survey, callers, targets] = await Promise.all([surveyPromise, callersPromise, targetsPromise]);
     } catch(err) {
-      console.log(err)
-      if (err.response.statusCode === 409)
+      if (err && err.response && err.response.statusCode === 409) {
         throw new GraphQLError({
           status: 400,
-          message: 'Survey with the given ID was not found in BSD.'
+          message: 'One of BSD IDs provided was not found in BSD.'
         });
+      }
       else
-        throw new GraphQLError({
-          status: 500,
-          message: 'Error communicating with BSD.'});
+        throw err;
     }
 
     return CallAssignment.save({
