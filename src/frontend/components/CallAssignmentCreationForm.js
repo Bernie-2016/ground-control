@@ -21,6 +21,10 @@ export default class CallAssignmentCreationForm extends React.Component {
     }
   }
 
+  state = {
+    global
+  }
+
   formSchema = yup.object({
     surveyId: yup.string().required(),
     callerGroupId: yup.string().required(),
@@ -42,11 +46,22 @@ export default class CallAssignmentCreationForm extends React.Component {
       <Paper zDepth={0} style={this.styles.formContainer}>
         <GCForm
           schema={this.formSchema}
+          globalError={this.state.globalErrorMessage}
+          globalStatus={this.state.globalStatusMessage}
           onSubmit={(formValue) => {
+            this.setState({
+              globalErrorMessage: null,
+              globalStatusMessage: null
+            })
             let onFailure = (transaction) => {
               let error = transaction.getError() || new Error('Mutation failed.');
-              console.log(error);
+              this.setState({globalErrorMessage: 'Something went wrong trying to create this call assignment.'})
             };
+
+            let onSuccess = (transaction) => {
+              this.setState({globalStatusMessage: 'Call assignment created successfully!'})
+            };
+
             Relay.Store.update(
               new CreateCallAssignment({
                 viewer: this.props.viewer,

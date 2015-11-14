@@ -5,7 +5,7 @@ import GroupCall from './GroupCall';
 import GroupCallCreationForm from './GroupCallCreationForm';
 import {RaisedButton} from 'material-ui';
 import AdminSection from './AdminSection';
-import AdminHelpers from './AdminHelpers';
+import AdminHelpers from './helpers/admin-helpers';
 
 export class GroupCallAdmin extends React.Component {
   render() {

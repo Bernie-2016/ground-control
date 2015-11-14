@@ -2,7 +2,7 @@ import React from 'react';
 import Relay from 'react-relay';
 import CallAssignmentList from './CallAssignmentList';
 import AdminSection from './AdminSection';
-import AdminHelpers from './AdminHelpers';
+import AdminHelpers from './helpers/admin-helpers';
 import {RaisedButton} from 'material-ui';
 import CallAssignment from './CallAssignment';
 import CallAssignmentCreationForm from './CallAssignmentCreationForm';
