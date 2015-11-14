@@ -56,9 +56,19 @@ export default class BSD {
     return url.format(finalURL);
   };
 
+  async getConstituentGroup(groupId) {
+    let response = await this.request('cons_group/get_constituent_group', {cons_group_id: groupId}, 'GET');
+    return JSON.parse(XMLParser.toJson(response));
+  }
+
   async getForm(formId) {
     let response = await this.request('signup/get_form', {signup_form_id: formId}, 'GET');
     return JSON.parse(XMLParser.toJson(response));
+  }
+
+  async getConsIdsForGroup(groupId) {
+    let response = await this.request('cons_group/get_cons_ids_for_group', {cons_group_id: groupId});
+    return response
   }
 
   async request(callPath, params, method) {
