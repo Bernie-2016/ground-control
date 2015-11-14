@@ -66,7 +66,7 @@ export default class CallAssignmentCreationForm extends React.Component {
               new CreateCallAssignment({
                 viewer: this.props.viewer,
                 ...formValue
-              }), {onFailure}
+              }), {onFailure, onSuccess}
             );
           }}
         >

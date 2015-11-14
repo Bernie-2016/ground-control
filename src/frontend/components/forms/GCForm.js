@@ -47,7 +47,7 @@ export default class GCForm extends React.Component {
     }
     else if (this.props.globalStatus) {
       globalSnack = <Snackbar
-        message={this.state.globalStatus}
+        message={this.props.globalStatus}
         autoHideDuration={10000}
         openOnMount={true}
         style={{'backgroundColor' : BernieColors.blue}}
@@ -58,7 +58,6 @@ export default class GCForm extends React.Component {
         {globalSnack}
         <Form
           onError={(errors) => {
-            console.log('ERRORS');
             this.setState({formErrors: errors})
           }}
           {...this.props} >
