@@ -54,8 +54,16 @@ export default class CallAssignmentCreationForm extends React.Component {
               globalStatusMessage: null
             })
             let onFailure = (transaction) => {
-              let error = transaction.getError() || new Error('Mutation failed.');
-              this.setState({globalErrorMessage: 'Something went wrong trying to create this call assignment.'})
+              let defaultMessage = 'Something went wrong.'
+              let error = transaction.getError();
+              let errorMessage = error ? error.source.errors[0].message : defaultMessage;
+              try {
+                errorMessage = JSON.parse(errorMessage)
+                errorMessage = errorMessage.message;
+              } catch(ex) {
+                errorMessage = defaultMessage;
+              }
+              this.setState({globalErrorMessage: errorMessage})
             };
 
             let onSuccess = (transaction) => {

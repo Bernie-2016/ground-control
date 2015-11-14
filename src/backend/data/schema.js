@@ -37,12 +37,23 @@ import thinky from './thinky';
 import BSD from '../bsd';
 import url from 'url';
 
+class GraphQLError extends Error {
+  constructor(errorObject) {
+    let message = JSON.stringify(errorObject)
+    super(message)
+    this.name = 'MyError',
+    this.message = message,
+    Error.captureStackTrace(this, this.constructor.name)
+  }
+}
+
 class Viewer {
   constructor(identifier) {
     this.id = identifier
   }
 }
 const SharedViewer = new Viewer(1);
+const BSDClient = new BSD(process.env.BSD_HOST, process.env.BSD_API_ID, process.env.BSD_API_SECRET);
 
 let {nodeInterface, nodeField} = nodeDefinitions(
   (globalId) => {
@@ -225,8 +236,7 @@ const GraphQLSurvey = new GraphQLObjectType({
       type: GraphQLBSDSurvey,
       resolve: async (survey) => {
         if (survey.BSDId) {
-          let bsd = new BSD(process.env.BSD_HOST, process.env.BSD_API_ID, process.env.BSD_API_SECRET);
-          let surveyData = await bsd.getForm(survey.BSDId);
+          let surveyData = await BSDClient.getForm(survey.BSDId);
           return {
             id: survey.BSDId,
             fullURL: url.resolve('https://' + process.env.BSD_HOST, '/page/s/' + surveyData.api.signup_form.signup_form_slug)
@@ -276,7 +286,22 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
       }
     }
   },
-  mutateAndGetPayload:({name, callerGroupId, targetGroupId, surveyId, startDate, endDate}) => {
+  mutateAndGetPayload:async ({name, callerGroupId, targetGroupId, surveyId, startDate, endDate}) => {
+
+    try {
+      let survey = await BSDClient.getForm(surveyId);
+    } catch(err) {
+      if (err.response.statusCode === 409)
+        throw new GraphQLError({
+          status: 400,
+          message: 'Survey with the given ID was not found in BSD.'
+        });
+      else
+        throw new GraphQLError({
+          status: 500,
+          message: 'Error communicating with BSD.'});
+    }
+
     return CallAssignment.save({
       name: name,
       callerGroupId: callerGroupId,
