@@ -1,5 +1,4 @@
 import 'babel/polyfill';
-import createHashHistory from 'history/lib/createHashHistory'
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Relay from 'react-relay';
@@ -14,6 +13,7 @@ import Survey from './components/Survey';
 import VolunteerDashboard from './components/VolunteerDashboard';
 import GCTextField from './components/forms/GCTextField';
 import Form from 'react-formal';
+import {createHistory} from 'history';
 
 injectTapEventPlugin();
 
@@ -25,10 +25,12 @@ const ViewerQueries = {
   viewer: () => Relay.QL`query { viewer }`
 };
 
+let history = createHistory()
+
 ReactDOM.render(
   <Router
-    createElement={ReactRouterRelay.createElement}
-    history={createHashHistory({queryKey: false})} >
+    history={history}
+    createElement={ReactRouterRelay.createElement}>
     <Route
       path="/admin"
       component={AdminDashboard}>
