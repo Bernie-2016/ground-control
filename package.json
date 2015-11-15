@@ -41,7 +41,7 @@
     "react-formal": "^0.14.2",
     "yup": "^0.11.0",
     "validator": "^4.2.1",
-    "http-proxy": "latest"
+    "http-proxy-middleware": "latest"
   },
   "devDependencies": {
     "foreman": "latest",
