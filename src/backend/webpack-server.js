@@ -21,8 +21,8 @@ let compiler = webpack({
 });
 
 let app = new WebpackDevServer(compiler, {
-  contentBase: '/',
-  publicPath: '/',
+  contentBase: '/public/',
+  publicPath: '/public/',
   stats: {colors: true}
 });
 
