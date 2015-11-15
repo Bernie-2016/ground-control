@@ -2,9 +2,13 @@
 
 ## Getting started
 
-Install the [Heroku toolbelt](https://toolbelt.heroku.com/), [RethinkDB](http://rethinkdb.com/docs/install/), and [Node.js](https://nodejs.org/en/download/). Then run:
+Install [RethinkDB](http://rethinkdb.com/docs/install/) and [Node.js](https://nodejs.org/en/download/). Then run the following once to install all the packages
 
-`./start`
+`npm install`
+
+Then to start Ground Control, you will run this every time:
+
+`npm start`
 
 Ground Control should be running at `http://localhost:3000`.  The [RethinkDB database admin](https://www.rethinkdb.com/docs/administration-tools/) will be running at `http://localhost:8080`.
 

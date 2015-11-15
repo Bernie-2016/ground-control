@@ -5,8 +5,9 @@
   "repository": "Bernie-2016/ground-control",
   "version": "0.1.0",
   "scripts": {
-    "start": "nodemon -e js -w ./src/backend --exec babel-node -- ./src/backend/server.js",
-    "start-webpack": "babel-node ./src/backend/webpack-server.js",
+    "start": "nf start",
+    "start-graphql": "nodemon -e js -w ./src/backend --exec babel-node -- ./src/backend/server.js",
+    "start-webpack": "cd ./src/backend && babel-node ./webpack-server.js",
     "lint": "eslint src"
   },
   "dependencies": {
@@ -43,6 +44,7 @@
     "http-proxy": "latest"
   },
   "devDependencies": {
+    "foreman": "latest",
     "nodemon": "latest",
     "eslint": "latest",
     "eslint-plugin-react": "latest",
