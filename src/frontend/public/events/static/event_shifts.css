@@ -1,0 +1,28 @@
+.event_shifts_list {
+  list-style: none;   
+  text-indent: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.event_shifts_list li,
+#page_content ul.event_shifts_list li {
+  list-style-type:  none;
+  list-style:       none;
+  margin: 0;
+  padding: 3px 0px;
+}
+
+.event_shifts_list li select {
+    font-family:Helvetica,Arial,sans-serif;
+    font-size:  13px;  
+    display: inline; 
+    padding: 0px;
+    background-image: none;
+    background-repeat: none;
+    color: black;
+}
+
+.event_shifts_list li span.shiftnum {
+    padding-right: 15px;    
+}

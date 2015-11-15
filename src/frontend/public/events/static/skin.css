@@ -1,0 +1,225 @@
+/* this is the skin/skin.css file in EE */
+
+ /**
+ * Layout tested successfully on:* Win/IE 5.01,5.5,6.0
+ * Win/Firefox 1.5.0.4
+ * Mac/Firefox
+ * Mac/Safari
+ *
+ * Layout test unsuccessfully on:* Mac/IE 5.2
+ */
+
+/**
+ * To-do:* Remove unneccessary whitespace from background images on dashboard
+ */
+
+/*----------------------------------------------------------------------------
+=GENERAL STYLES
+ ---------------------------------------------------------------------------*/
+#SKIN p,
+#SKIN h3,
+#SKIN h4,
+#SKIN h5,
+#SKIN .table_container { padding: 0 10px; }
+#SKIN td, #SKIN th { padding-top: 2px; padding-bottom: 2px; vertical-align: top; }
+
+#SKIN p, #SKIN table, #SKIN .table_container { margin-bottom: 18px; }
+#SKIN table { /*width: 100%;*/ }
+#SKIN .table_container table { margin-bottom: 0; }
+
+#SKIN fieldset { position: relative; margin: 0; padding: 5px 10px; border: 0; }
+#SKIN button { font-size: 12px; /*padding: 2px 5px;*/ }
+
+#SKIN .form_button_group { margin-bottom: 18px; }
+#SKIN .form_button_group fieldset { padding: 0; }
+#SKIN .form_button_group input { margin-right: 5px; }
+
+#SKIN .widget_actions { height: 24px; line-height: 24px; }
+
+#SKIN .standard_form .form_field { clear: both; float: none; margin: 0 0 5px 0; overflow: hidden; width: 600px; }
+
+#SKIN .standard_form .form_label { float: left; margin: 0 10px 0 0; width: 120px; }
+
+#SKIN .standard_form .form_input { float: left; padding: 0 0 0 10px; width: 460px; }
+#SKIN .standard_form .form_input p { padding-left: 0; }
+
+#SKIN .standard_form .form_label { /*vertical-align: top;*/ }
+
+hr {
+	background: #ddd;
+	border: 0;
+	clear: both;
+	color: #ddd;
+	height: 1px;
+	margin: 0 0 18px 0;
+}
+
+
+/*----------------------------------------------------------------------------
+ TYPOGRAPHY
+ ---------------------------------------------------------------------------*/
+#SKIN #profiledetail { padding: 10px; }
+#SKIN #profiledetail p { padding: 0; }
+.controlblock { margin-bottom: 18px; }
+
+#SKIN h1 { font-size: 24px; font-weight: bold; line-height: 30px; margin-bottom: 6px; }
+
+#SKIN h2,
+#sectionheader,
+#SKIN .widget_header,
+#SKIN .widget_title { font-size: 18px; font-weight: bold; line-height: 24px; margin-bottom: 6px; }
+
+#SKIN h3 { font-size: 14px; font-weight: bold; line-height: 20px; margin-bottom: 6px; }
+#SKIN h4 { font-size: 12px; font-weight: bold; line-height: 18px; }
+#SKIN h5 { font-size: 12px; font-weight: bold; line-height: 18px; }
+
+#sectionheader,
+.sectionheader,
+#SKIN .header { border-bottom: 1px solid #ddd; padding-bottom: 3px; }
+
+#SKIN .sectionheader h3 { margin-bottom: 0; }
+
+#SKIN .widget_action_menu { font-size: 12px; }
+
+#SKIN p,
+#SKIN li,
+#SKIN td,
+#SKIN th,
+#SKIN label,
+#SKIN div,
+#SKIN a {  }
+
+#SKIN .main h3, #SKIN .main p, #SKIN .main .table_container, #SKIN .main th { padding-left: 0; }
+
+#SKIN .submit { /*margin: 18px 0;*/ }
+
+#SKIN em { font-weight: bold; font-style: normal; }
+
+#SKIN #account_actions a { font-weight: bold; }
+
+#SKIN .widget_actions select { font-size: 12px; }
+
+#SKIN #account_actions .delimiter { color: #ddd; margin: auto 3px; }
+
+/*
+ * list entities: for example group and profile listings
+ */
+#SKIN .entity_list_header h3,
+#SKIN .entity_list_header a { padding-bottom: 0; /*font-size: 12px;*/ }
+
+#SKIN .entity_list_title { margin-top: 10px ; margin-left: 10px; }
+
+#SKIN .entity_list_subheading { margin-left: 10px; }
+
+#SKIN .form_label { font-weight: bold; }
+
+#SKIN .form_value { }
+
+.required,
+#SKIN .form_required,
+#SKIN .form_error { color: #f80116; }
+
+#SKIN .group_access_public { color: green; }
+
+#SKIN .group_access_private { color: red; }
+
+#SKIN td.group_prev_link { text-align: left; }
+
+#SKIN td.group_next_link { text-align: right; }
+
+#SKIN .odd { background: #f2f7f7; }
+
+#SKIN .even { background: none; }
+
+
+/*----------------------------------------------------------------------------
+ =LAYOUT STYLES
+ ---------------------------------------------------------------------------*/
+#SKIN .container { position: relative; }
+
+#SKIN .main { padding: 20px 10px; }
+#SKIN .main fieldset { padding: 0; }
+
+#SKIN .basic { padding: 0; margin: 0; }
+
+
+/*=CONTROL SET
+ ---------------------------------------------------------------------------*/
+#SKIN #control_set { float: left; clear: both; width: 100%; /* IE 5/5.5 get this value and ignore next line */
+/* w\idth: 920px;*/ /* real width (plus 10 padding on left and right) */
+ padding: 10px 0; position: relative; margin: 0; /* modify right margin value to add/substract spacing between columns */ }
+#SKIN .basic #control_set { float: none; overflow: hidden; width: auto;  }
+#SKIN #control_set h1 { display: inline; float: left; margin-right: 10px; margin-left: 10px; }
+
+/* IE = 7 */
+*: first-child+html #SKIN #control_set { margin: 0; }
+
+/* IE <= 6 */
+* html #SKIN #control_set { margin: 0 0 10px 0; }
+
+#SKIN .header {  }
+
+
+/*=COLUMNS
+ ---------------------------------------------------------------------------*/
+/* left column */
+#SKIN #widget_group_1 { clear: left; display: inline; float: left; /*margin: 0 20px 0 0;*/ width: 49%; /*padding: 0 10px;*/ }
+
+/* IE <= 6 */
+* html #SKIN #widget_group_1 { margin: 0 1px 0 0; }
+
+/* right column */
+#SKIN #widget_group_2 { display: inline; float: right; width: 49%;  }
+
+/* IE <= 6 */
+/** html #SKIN #widget_group_2 { float: left; }*/
+
+.widget_container { margin-bottom: 20px; padding-bottom: 5px; }
+
+/* right column
+ IE only
+ Explorer 6 Duplicate Characters Bug
+ (reference http://positioniseverything.net/explorer/dup-characters.html) */
+* html #SKIN #widget_group_2 { margin-right:-3px; }
+
+#SKIN #account_actions { display: inline; font-size: 12px; float: right; margin: 10px 10px 0; /*padding: 7px 0;*/ vertical-align: center; /*position: absolute; top: 10px; right: 10px;*/ }
+
+#SKIN .widget_group { padding: 0; margin: 0; overflow: hidden; /* prevent blowing out of the column layout */ }
+
+#SKIN #widget_group_1 .group_last { zoom: 1; /* IE7 needs this */ }
+
+/* IE <= 6 */
+* html #SKIN .group_last { height: 1%; }
+
+#SKIN #widget_group_2 .group_last { /*padding-bottom: 34px;*/ /* height of background image */
+ zoom: 1; /* IE7 needs this */ }
+
+/*=WIDGET STYLES
+ ---------------------------------------------------------------------------*/
+#SKIN .widget_header { background: #eee; border-bottom: 1px solid #ddd; margin-bottom: 6px; padding: 5px 10px; position: relative; }
+#SKIN .widget_header h2 { margin-bottom: 0; }
+
+#SKIN .widget_title { /*padding: 5px 10px; margin: 0;*/ float: left; vertical-align: middle; }
+
+#SKIN .widget_actions { vertical-align: middle; float: right; }
+
+/*#SKIN .widget_action_submit { border: 0; height: 15px; width: 20px; overflow: hidden; background: url(../../skins/default/images/action-5.gif) no-repeat left top; font-size: 1px; line-height: 24px; color:#004499; text-indent:-3000px; }*/
+#SKIN .widget_action_submit { margin: 0px 5px auto 5px; m\argin: auto 5px auto 5px; }
+.widget_action_submit { padding: 0; }
+button[type=submit].widget_action_submit { padding: 2px 5px; }
+
+/* IE <= 6 */
+* html #SKIN .widget_action_menu { margin: auto 3px auto 0; padding: 0; }
+
+#SKIN .widget_subheader { background: #F2F7F7; border-bottom: 1px solid #ddd; margin-bottom: 6px; padding: 5px 10px; }
+#SKIN .widget_subheader p { margin-bottom: 0; padding: 0; }
+
+
+
+/*
+ =3rd party app styling
+ ---------------------------------------------------------------------------*/
+
+/* YUI tooltip */
+#SKIN .tt { width: 200px; }
+#SKIN .tt .empty_tt { font-style: italic; }

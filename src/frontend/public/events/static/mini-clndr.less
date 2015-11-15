@@ -1,0 +1,234 @@
+// @light-gray:  #dedede;
+@black-text: #212121;
+@trans-white: rgba(255, 255, 255, 0.5);
+@time: 0.5s;
+@time-quick: 0.25s;
+@cal-width: 100%;
+@day-width: 14%;
+
+.noselect
+{
+  -webkit-user-select: none; /* Chrome/Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+ */
+}
+
+.vertical-padding(@size: 5px)
+{
+  padding-top: @size;
+  padding-bottom: @size;
+}
+
+#mini-clndr
+{
+  font-family: Asap, Helvetica, Arial;
+  margin: 0 auto;
+  width: @cal-width;
+  border: 3px solid white;
+  border-radius: 3px;
+/*  -moz-box-shadow: 4px 4px 0 darken(@dark-gray, 5%);
+  -webkit-box-shadow: 4px 4px 0 darken(@dark-gray, 5%);
+  box-shadow: 4px 4px 0 darken(@dark-gray, 5%);*/
+}
+
+#mini-clndr .clndr
+{
+  overflow: hidden;
+  /*border-bottom: 7px solid @dark-highlight;*/
+
+  .controls
+  {
+    background-color: @dark-highlight;
+    color: white;
+
+    .clndr-previous-button, .clndr-next-button, .clndr-today-button
+    {
+      width: 15%;
+      .vertical-padding;
+      display: inline-block;
+      text-align: center;
+      cursor: pointer;
+      .noselect;
+      .transition(background-color @time);
+      &:hover
+      {
+        background-color: darken(@dark-highlight, 10%);
+      }
+    }
+
+    .clndr-today-button {
+      width: 70%;
+    }
+
+    .month
+    {
+      width: 70%;
+      .vertical-padding;
+      display: inline-block;
+      text-align: center;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+  }
+
+  .days-container
+  {
+    position: relative;
+    width: @cal-width;
+    height: 213px;
+    .clearfix;
+
+    .days
+    {
+      position: absolute;
+      left: 0;
+      width: @cal-width;
+      height: 217px;
+      .transition(left @time);
+      background-color: @light-gray;
+
+      .day, .empty
+      {
+        width: @day-width;
+
+        display: inline-block;
+        .vertical-padding(8px);
+
+        font-size: 12px;
+        // font-weight: 700;
+        text-align: center;
+        color: @black-text;
+
+        border-right: 1px solid @trans-white;
+        border-bottom: 1px solid @trans-white;
+
+        &.event
+        {
+          background-color: darken(@light-gray, 10%);
+          .transition(background-color @time);
+          cursor: pointer;
+          &:hover
+          {
+            background-color: darken(@light-gray, 20%);
+          }
+        }
+
+        &.adjacent-month
+        {
+          color: rgba(0, 0, 0, 0.3);
+        }
+      }
+
+      .empty
+      {
+        height: 31px;
+        vertical-align: bottom;
+      }
+
+      .headers
+      {
+        background-color: @lighter-highlight;
+        .vertical-padding;
+
+        .day-header
+        {
+          width: @day-width;
+          display: inline-block;
+          text-align: center;
+          color: white;
+        }
+      }
+
+      .calendar-dow-0, .calendar-dow-6, .day-header:first-of-type, .day-header:last-of-type {
+        width: 15%;
+      }
+    }
+
+    .events
+    {
+      position: absolute;
+      left: @cal-width;
+      width: @cal-width;
+      height: 217px;
+      .transition(left @time);
+      background-color: @light-gray;
+
+      .headers
+      {
+        position: relative;
+      }
+
+      .event-header
+      {
+        width: 100%;
+        background-color: @lighter-highlight;
+        .vertical-padding;
+        text-align: center;
+        color: white;
+      }
+
+      .x-button
+      {
+        position: absolute;
+        font-size: 80%;
+        top: 7px;
+        left: 20px;
+        cursor: pointer;
+        .transition(color @time-quick);
+        &:hover
+        {
+          color: white;
+        }
+      }
+
+      .events-list
+      {
+        overflow: scroll;
+        height: 185px;
+
+        .event
+        {
+          .vertical-padding(8px);
+          padding-left: 10px;
+          border-bottom: 1px solid @trans-white;
+          .transition(background-color @time-quick);
+
+          &:hover
+          {
+            background-color: lighten(@light-gray, 4%);
+          }
+
+          a
+          {
+            position: relative;
+            font-size: 12px;
+            // font-weight: 700;
+            letter-spacing: 1px;
+            background-color: transparent;
+            color: @black-text;
+            text-decoration: none;
+            .transition(color @time-quick);
+            &:hover
+            {
+              background-color: transparent;
+              color: @dark-highlight;
+            }
+          }
+        }
+      }
+    }
+
+    &.show-events
+    {
+      .days
+      {
+        left: -@cal-width;
+      }
+      .events
+      {
+        left: 0;
+      }
+    }
+  }
+}
