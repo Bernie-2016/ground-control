@@ -5,7 +5,7 @@
   "repository": "Bernie-2016/ground-control",
   "version": "0.1.0",
   "scripts": {
-    "start-graphql": "cd ./src/backend && forever --watch --watchDirectory ./ ./graphql-dev-server.js",
+    "start-graphql": "cd ./src/backend && nodemon -e js -w ./ --debug graphql-dev-server.js ",
     "start-app": "cd ./src/backend && babel-node ./app-server.js",
     "update-schema": "babel-node ./src/backend/data/updateSchema.js",
     "lint": "eslint src"
@@ -37,13 +37,13 @@
     "jquery": "^2.1.4",
     "moment-timezone": "^0.4.1",
     "bsd-api-auth": "^1.0.0",
-    "forever": "^0.15.1",
     "xml2json": "^0.9.0",
     "react-formal": "^0.14.2",
     "yup": "^0.11.0",
     "validator": "^4.2.1"
   },
   "devDependencies": {
+    "nodemon": "latest",
     "eslint": "latest",
     "eslint-plugin-react": "latest",
     "babel-eslint": "latest",

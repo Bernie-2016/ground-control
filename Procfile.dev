@@ -1,3 +1,2 @@
-graphql: npm run start-graphql
 web: npm run start-app
 db: rethinkdb

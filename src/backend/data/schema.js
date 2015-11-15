@@ -293,6 +293,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
       let callersPromise = BSDClient.getConstituents({cons_group: callerGroupId});
       let targetsPromise = BSDClient.getConstituents({cons_group: targetGroupId});
       let [survey, callers, targets] = await Promise.all([surveyPromise, callersPromise, targetsPromise]);
+      console.log(survey, callers, targets)
     } catch(err) {
       if (err && err.response && err.response.statusCode === 409) {
         throw new GraphQLError({

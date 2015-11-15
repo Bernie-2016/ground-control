@@ -6,9 +6,9 @@ import { Schema } from './schema';
 import { graphql }  from 'graphql';
 import { introspectionQuery, printSchema } from 'graphql/utilities';
 
-async function writeSchema() {
+export default async function writeSchema() {
   await async () => {
-    var result = await (graphql(Schema, introspectionQuery));
+    let result = await (graphql(Schema, introspectionQuery));
     if (result.errors) {
       console.error(
         'ERROR introspecting schema: ',
@@ -25,8 +25,4 @@ async function writeSchema() {
     path.join(__dirname, './schema.graphql'),
     printSchema(Schema)
   );
-
-  process.exit();
 }
-
-writeSchema();
