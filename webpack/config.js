@@ -5,9 +5,10 @@ module.exports = {
       {
         exclude: /node_modules/,
         loader: 'babel',
-        query: {stage: 0, plugins: ['./src/backend/babelRelayPlugin']},
+        query: {stage: 0, plugins: ['./webpack/babelRelayPlugin']},
         test: /\.js$/,
       }
     ]
   },
+  output: {filename: 'app.js', path: './src/frontend/public/js/'}
 }

@@ -4,3 +4,4 @@ npm-debug.log
 src/backend/data/schema.graphql
 src/backend/data/schema.json
 rethinkdb_data
+src/frontend/public/js

@@ -2,9 +2,13 @@ import WebpackDevServer from 'webpack-dev-server';
 import path from 'path';
 import webpack from 'webpack';
 import express from 'express';
-import config from '../../webpack.config'
+import config from './config'
 
 const port = process.env.WEBPACK_PORT
+config['output'] = {
+  filename: 'app.js',
+  path: '/'
+}
 let compiler = webpack(config);
 
 let app = new WebpackDevServer(compiler, {
