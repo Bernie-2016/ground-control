@@ -2,23 +2,10 @@ import WebpackDevServer from 'webpack-dev-server';
 import path from 'path';
 import webpack from 'webpack';
 import express from 'express';
+import config from '../../webpack.config'
 
 const port = process.env.WEBPACK_PORT
-// Serve the Relay app
-let compiler = webpack({
-  entry: path.resolve(__dirname, '../frontend', 'app.js'),
-  module: {
-    loaders: [
-      {
-        exclude: /node_modules/,
-        loader: 'babel',
-        query: {stage: 0, plugins: ['./babelRelayPlugin']},
-        test: /\.js$/,
-      }
-    ]
-  },
-  output: {filename: 'app.js', path: '/'}
-});
+let compiler = webpack(config);
 
 let app = new WebpackDevServer(compiler, {
   contentBase: '/js/',

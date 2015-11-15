@@ -6,8 +6,9 @@
   "version": "0.1.0",
   "scripts": {
     "start": "nf start",
-    "start-graphql": "nodemon -e js -w ./src/backend --exec babel-node -- ./src/backend/server.js",
-    "start-webpack": "cd ./src/backend && babel-node ./webpack-server.js",
+    "graphql-server": "nodemon -e js -w ./src/backend --exec babel-node -- ./src/backend/server.js",
+    "webpack-server": "babel-node ./src/backend/webpack-server.js",
+    "bundle": "mkdir -p ./src/frontend/public/js && webpack ./src/frontend/app.js ./src/frontend/public/js/app.js",
     "lint": "eslint src"
   },
   "dependencies": {
