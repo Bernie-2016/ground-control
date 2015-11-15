@@ -1,9 +1,8 @@
 import WebpackDevServer from 'webpack-dev-server';
 import path from 'path';
 import webpack from 'webpack';
-import express from 'express';
 
-const APP_PORT = process.env.APP_PORT
+const port = process.env.WEBPACK_SERVER_PORT
 
 // Serve the Relay app
 let compiler = webpack({
@@ -22,14 +21,11 @@ let compiler = webpack({
 });
 
 let app = new WebpackDevServer(compiler, {
-  contentBase: '/static/',
-  proxy: {'/graphql': `http://localhost:${process.env.GRAPHQL_PORT}`},
-  publicPath: '/static/',
+  contentBase: '/',
+  publicPath: '/',
   stats: {colors: true}
 });
 
-// Serve static resources
-app.use('/', express.static(path.resolve(__dirname, '../frontend/static')));
-app.listen(APP_PORT, () => {
-  console.log(`App is now running on http://localhost:${APP_PORT}`);
+app.listen(port, () => {
+  console.log(`Webpack dev server is now running on http://localhost:${port}`);
 });

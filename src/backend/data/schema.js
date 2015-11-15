@@ -339,7 +339,7 @@ const GraphQLBatchCreateGroupCall = mutationWithClientMutationId({
   },
   mutateAndGetPayload:async ({groupCallList}) => {
     let promises = [];
-    let maestro = new Maestro(process.env.MAESTRO_UID, process.env.MAESTRO_TOKEN, process.env.MAESTRO_URL, process.env.DEBUG);
+    let maestro = new Maestro(process.env.MAESTRO_UID, process.env.MAESTRO_TOKEN, process.env.MAESTRO_URL, process.env.NODE_ENV === 'debug');
 
     for (let index = 0; index < groupCallList.length; index++) {
       let groupCall = groupCallList[index];
