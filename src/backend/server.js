@@ -12,6 +12,9 @@ const publicPath = path.resolve(__dirname, '../frontend/public');
 app.use(express.static(publicPath))
 app.use(fallback('index.html', { root: publicPath }))
 app.use('/graphql', graphQLHTTP({schema: Schema}));
+app.post('/events', (req, resp) => {
+  console.log('hi');
+})
 app.listen(port, () => console.log(
   `Server is now running on http://localhost:${port}`
 ));
