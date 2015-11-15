@@ -1,6 +1,7 @@
 import WebpackDevServer from 'webpack-dev-server';
 import path from 'path';
 import webpack from 'webpack';
+import express from 'express';
 
 const port = process.env.WEBPACK_SERVER_PORT
 
@@ -22,10 +23,15 @@ let compiler = webpack({
 
 let app = new WebpackDevServer(compiler, {
   contentBase: '/public/',
-  publicPath: '/',
-  stats: {colors: true}
+  publicPath: '/public/',
+  proxy: {
+    '/graphql': `http://localhost:${process.env.GRAPHQL_PORT}`
+  },
+  stats: {colors: true},
 });
 
+const publicPath = path.resolve(__dirname, '../frontend/public');
+app.use('/', express.static(publicPath));
 app.listen(port, () => {
   console.log(`Webpack dev server is now running on http://localhost:${port}`);
 });
