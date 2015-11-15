@@ -7,7 +7,6 @@
   "scripts": {
     "start-graphql": "cd ./src/backend && nodemon -e js -w ./ --debug graphql-dev-server.js ",
     "start-app": "cd ./src/backend && babel-node ./app-server.js",
-    "update-schema": "babel-node ./src/backend/data/updateSchema.js",
     "lint": "eslint src"
   },
   "dependencies": {
