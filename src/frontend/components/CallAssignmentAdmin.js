@@ -1,15 +1,15 @@
 import React from 'react';
 import Relay from 'react-relay';
 import CallAssignmentList from './CallAssignmentList';
-import AdminSection from './AdminSection';
-import AdminHelpers from './helpers/admin-helpers';
+import SideBarLayout from './SideBarLayout';
+import RelayViewHelpers from './helpers/relay-view-helpers';
 import {RaisedButton} from 'material-ui';
 import CallAssignment from './CallAssignment';
 import CallAssignmentCreationForm from './CallAssignmentCreationForm';
 
 class CallAssignmentAdmin extends React.Component {
   render() {
-    let contentView = AdminHelpers.contentViewFromId(this.props.relay.variables.id,
+    let contentView = RelayViewHelpers.contentViewFromId(this.props.relay.variables.id,
       <CallAssignmentCreationForm viewer={this.props.viewer} />,
       <CallAssignment callAssignment={this.props.viewer.callAssignment} />
     )
@@ -28,7 +28,7 @@ class CallAssignmentAdmin extends React.Component {
       </div>
     )
     return (
-      <AdminSection
+      <SideBarLayout
         sideBar={sideBar}
         content={contentView}
       />
@@ -39,7 +39,7 @@ class CallAssignmentAdmin extends React.Component {
 export default Relay.createContainer(CallAssignmentAdmin, {
   initialVariables: { id: null },
 
-  prepareVariables: (prev) => AdminHelpers.variablesFromId(prev.id),
+  prepareVariables: (prev) => RelayViewHelpers.variablesFromId(prev.id),
 
   fragments: {
     viewer: () => Relay.QL`

@@ -13,6 +13,8 @@ import Survey from './components/Survey';
 import VolunteerDashboard from './components/VolunteerDashboard';
 import GCTextField from './components/forms/GCTextField';
 import Introduction from './components/Introduction';
+import CallAssignmentDashboard from './components/CallAssignmentDashboard';
+import CallAssignmentViewer from './components/CallAssignmentViewer';
 import Form from 'react-formal';
 import {createHistory} from 'history';
 
@@ -49,6 +51,17 @@ ReactDOM.render(
     <Route
       path="/"
       component={VolunteerDashboard}>
+      <Route
+        path="call-assignments"
+        component={CallAssignmentDashboard}
+        queries={ViewerQueries}
+      >
+        <Route
+          path=":id"
+          component={CallAssignmentViewer}
+          queries={ViewerQueries}
+        />
+      </Route>
       <Route
         path="/get-started"
         component={Introduction}

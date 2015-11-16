@@ -4,12 +4,12 @@ import GroupCallList from './GroupCallList';
 import GroupCall from './GroupCall';
 import GroupCallCreationForm from './GroupCallCreationForm';
 import {RaisedButton} from 'material-ui';
-import AdminSection from './AdminSection';
-import AdminHelpers from './helpers/admin-helpers';
+import SideBarLayout from './SideBarLayout';
+import RelayViewHelpers from './helpers/relay-view-helpers';
 
 export class GroupCallAdmin extends React.Component {
   render() {
-    let contentView = AdminHelpers.contentViewFromId(this.props.relay.variables.id,
+    let contentView = RelayViewHelpers.contentViewFromId(this.props.relay.variables.id,
       <GroupCallCreationForm viewer={this.props.viewer} />,
       <GroupCall groupCall={this.props.viewer.groupCall} />
     )
@@ -35,7 +35,7 @@ export class GroupCallAdmin extends React.Component {
     )
 
     return (
-      <AdminSection
+      <SideBarLayout
         sideBar={sideBar}
         content={contentView}
       />
@@ -46,7 +46,7 @@ export class GroupCallAdmin extends React.Component {
 export default Relay.createContainer(GroupCallAdmin, {
   initialVariables: { id: null },
 
-  prepareVariables: (prev) => AdminHelpers.variablesFromId(prev.id),
+  prepareVariables: (prev) => RelayViewHelpers.variablesFromId(prev.id),
 
   fragments: {
     viewer: () => Relay.QL`

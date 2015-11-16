@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default class AdminHelpers {
+export default class RelayViewHelpers {
   static contentViewFromId(id, creationForm, itemView) {
     let contentView = <div></div>;
     if (id === 'create')

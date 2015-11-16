@@ -1,7 +1,7 @@
 import React from 'react';
 import {Styles, Paper} from 'material-ui';
 
-export default class AdminSection extends React.Component {
+export default class SideBarLayout extends React.Component {
   styles = {
     container: {
       position: 'relative'
