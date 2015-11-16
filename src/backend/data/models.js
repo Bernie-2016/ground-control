@@ -9,6 +9,7 @@ export const Person = thinky.createModel('person', {
 
 export const Group = thinky.createModel('group', {
   id: type.string().options({enforce_missing: false}),
+  BSDId: type.string().allowNull(true),
   personIdList: [type.string()],
 })
 
@@ -32,7 +33,6 @@ export const Call = thinky.createModel('call', {
 
 export const Survey = thinky.createModel('survey', {
   id: type.string().options({enforce_missing: false}),
-  slug: type.string(),
   BSDId: type.string().allowNull(true)
 })
 

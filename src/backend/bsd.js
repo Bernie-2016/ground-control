@@ -66,7 +66,8 @@ export default class BSD {
     return JSON.parse(XMLParser.toJson(response));
   }
 
-  async getConstituents(filter) {
+  async getConstituents(filter, bundles) {
+    let bundleString = bundles.join(',')
     let filterStrings = []
     Object.keys(filter).forEach((key) => {
       let val = ''
@@ -78,8 +79,9 @@ export default class BSD {
       filterStrings.push(key + '=' + val)
     })
     let filterString = filterStrings.join(',');
-    let response = await this.request('cons/get_constituents', {filter: filterString}, 'GET');
-    return response;
+    console.log(bundleString)
+    let response = await this.request('cons/get_constituents', {filter: filterString, bundles: bundleString}, 'GET');
+    return JSON.parse(XMLParser.toJson(response));
   }
 
   async getConsIdsForGroup(groupId) {

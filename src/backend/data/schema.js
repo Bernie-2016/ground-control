@@ -287,13 +287,20 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
     }
   },
   mutateAndGetPayload:async ({name, callerGroupId, targetGroupId, surveyId, startDate, endDate}) => {
-
+    let [callerGroup, targetGroup, survey] = await Promise.all([
+      Group.filter({BSDId: callerGroupId}),
+      Group.filter({BSDId: targetGroupId}),
+      Survey.filter({BSDId: surveyId})]);
+    let BSDFetches = [];
+    if (callerGroup.length === 0)
+      BSDFetches.push(BSDClient.getConstituents({cons_group: callerGroupId}, ['cons_phone', 'cons_email', 'cons_addr']))
+    if (targetGroup.length === 0)
+      BSDFetches.push(BSDClient.getConstituents({cons_group: targetGroupId}, ['cons_phone', 'cons_email', 'cons_addr']))
+    if (survey.length === 0)
+      BSDFetches.push(BSDClient.getForm(surveyId));
+    let [BSDSurvey, BSDCallers, BSDTargets] = [null, null, null]
     try {
-      let surveyPromise = BSDClient.getForm(surveyId);
-      let callersPromise = BSDClient.getConstituents({cons_group: callerGroupId});
-      let targetsPromise = BSDClient.getConstituents({cons_group: targetGroupId});
-      let [survey, callers, targets] = await Promise.all([surveyPromise, callersPromise, targetsPromise]);
-      console.log(survey, callers, targets)
+      [BSDSurvey, BSDCallers, BSDTargets] = await Promise.all(BSDFetches);
     } catch(err) {
       if (err && err.response && err.response.statusCode === 409) {
         throw new GraphQLError({
@@ -303,6 +310,16 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
       }
       else
         throw err;
+    }
+
+    let savePromises = []
+    if (survey.length === 0)
+      savePromises.push(Survey.save({
+        BSDId: surveyId
+      }))
+    if (callerGroup.length === 0) {
+      console.log(BSDCallers.api.cons.length)
+      console.log(BSDCallers.api.cons[0])
     }
 
     return CallAssignment.save({
