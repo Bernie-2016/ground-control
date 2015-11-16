@@ -38,7 +38,7 @@ ReactDOM.render(
       path="/admin"
       component={AdminDashboard}>
       <Route
-        path="group-calls(/:id)"
+        path="group-calls"
         component={GroupCallAdmin}
         queries={ViewerQueries}
       />
@@ -65,11 +65,6 @@ ReactDOM.render(
       <Route
         path="/get-started"
         component={Introduction}
-      />
-      <Route
-        path="surveys(/:id)"
-        component={SurveyViewer}
-        queries={ViewerQueries}
       />
     </Route>
   </Router>,

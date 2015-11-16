@@ -2,6 +2,7 @@ import React from 'react';
 import Relay from 'react-relay';
 import {BernieText} from './styles/bernie-css';
 import {Paper, List, ListItem} from 'material-ui';
+import Survey from './Survey'
 import moment from 'moment';
 
 export class CallAssignmentViewer extends React.Component {
@@ -12,7 +13,8 @@ export class CallAssignmentViewer extends React.Component {
           {this.props.viewer.callAssignment.name}
         </div>
         <div>
-          <div>Test
+          <div>
+            <Survey survey={this.props.viewer.callAssignment.survey} />
           </div>
         </div>
       </div>
@@ -29,6 +31,9 @@ export default Relay.createContainer(CallAssignmentViewer, {
         callAssignment(id:$id) {
           id
           name
+          survey {
+            ${Survey.getFragment('survey')}
+          }
         }
       }
     `
