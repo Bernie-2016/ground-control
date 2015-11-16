@@ -11,20 +11,20 @@
    <meta name="twitter:site" content="@BernieSanders">
    <meta name="theme-color" content="#147FD7"/>
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-   <script src="./static/bsd.js" type="text/javascript"></script>
-   <script src="./static/vga4irg.js"></script>
+   <script src="./events/static/bsd.js" type="text/javascript"></script>
+   <script src="./events/static/vga4irg.js"></script>
    <style type="text/css">.tk-jubilat{font-family:"jubilat",sans-serif;}.tk-freight-sans-pro{font-family:"freight-sans-pro",sans-serif;}</style>
-   <link rel="stylesheet" href="./static/l" media="all">
+   <link rel="stylesheet" href="./events/static/l" media="all">
    <script>try{Typekit.load();}catch(e){}</script>
-   <script src="./static/yahoo-dom-event.js" type="text/javascript"></script>
-   <link rel="stylesheet/less" type="text/css" href="./static/clndr.less" />
-   <link rel="stylesheet" id="bsd-css" href="./static/signup.css" type="text/css" media="all">
+   <script src="./events/static/yahoo-dom-event.js" type="text/javascript"></script>
+   <link rel="stylesheet/less" type="text/css" href="./events/static/clndr.less" />
+   <link rel="stylesheet" id="bsd-css" href="./events/static/signup.css" type="text/css" media="all">
 
-<link rel="canonical" href="./static/EventDetails.html">
-<link rel="stylesheet" href="./static/skin.css" type="text/css">
-<link rel="stylesheet" href="./static/frontend.css" type="text/css">
-<link rel="stylesheet" href="./static/jquery_ui_reset.css" type="text/css">
-<!-- <link rel="stylesheet" href="./static/clndr.css"> -->
+<link rel="canonical" href="./events/static/EventDetails.html">
+<link rel="stylesheet" href="./events/static/skin.css" type="text/css">
+<link rel="stylesheet" href="./events/static/frontend.css" type="text/css">
+<link rel="stylesheet" href="./events/static/jquery_ui_reset.css" type="text/css">
+<!-- <link rel="stylesheet" href="./events/static/clndr.css"> -->
 
 <style>
 	
@@ -73,11 +73,11 @@
 </style>
 
 
-<script src="./static/ckeditor/ckeditor.js"></script>
-<script src="./static/less.js"></script>
-<script src="./static/moment.js"></script>
-<script src="./static/underscore-min.js"></script>
-<script src="./static/clndr.js"></script>
+<script src="./events/static/ckeditor/ckeditor.js"></script>
+<script src="./events/static/less.js"></script>
+<script src="./events/static/moment.js"></script>
+<script src="./events/static/underscore-min.js"></script>
+<script src="./events/static/clndr.js"></script>
 
 </head>
 <body class="event-central step2">
@@ -1363,9 +1363,6 @@ jQuery(document).ready(function() {
 
 		current_events = $.merge( $.merge( [], user_created_events ), generated_events );
 
-		console.log(current_events);
-		return;
-
 		formdata.push({ 
 			name: "event_dates",
 			value: JSON.stringify(current_events)
@@ -1373,7 +1370,7 @@ jQuery(document).ready(function() {
 
 		$.ajax({
 		    dataType: "json",
-		    url: '/create',
+		    url: '/events',
 		    data: formdata,
 		    type: 'POST',
 		    success: function(xhr, status){

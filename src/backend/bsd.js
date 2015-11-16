@@ -103,6 +103,12 @@ export default class BSD {
     })
   }
 
+  async fetchConstituent(email, cb) {
+    let response = await this.request('/cons/get_constituents_by_email', {emails: email}, 'GET');
+    cb(JSON.parse(XMLParser.toJson(response)));
+    // return JSON.parse(XMLParser.toJson(response));
+  }
+
   async makeRawRequest(callPath, params, method) {
     let finalURL = this.generateBSDURL(callPath, {params});
     let options = {
