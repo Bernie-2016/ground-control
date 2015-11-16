@@ -31,7 +31,7 @@ export default class TopNav extends React.Component {
     },
     bar: {
       height: 56,
-      minHeight: 56
+      minHeight: 56,
     },
     tab: {
       ...BernieText.secondaryTitle,

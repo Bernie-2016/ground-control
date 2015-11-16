@@ -31,7 +31,7 @@ export default class VolunteerDashboard extends React.Component {
     return (
       <div>
         <TopNav
-          zDepth={1}
+          zDepth={0}
           barColor={BernieColors.lightGray}
           tabColor={BernieColors.darkGray}
           selectedTabColor={BernieColors.gray}

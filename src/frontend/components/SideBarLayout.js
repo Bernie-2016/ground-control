@@ -11,7 +11,7 @@ export default class SideBarLayout extends React.Component {
       display: 'inline-block',
       width: 200,
       minHeight: '800px',
-      border: 'solid 1px ' + Styles.Colors.grey300,
+      borderRight: 'solid 1px ' + Styles.Colors.grey300,
     },
 
     content: {
@@ -20,19 +20,19 @@ export default class SideBarLayout extends React.Component {
       marginLeft: 15,
       marginTop: 15,
       marginRight: 15,
-      marginBottom: 15
+      marginBottom: 15,
     }
   }
 
   render() {
     return (
-      <Paper style={this.styles.container}>
-        <Paper zDepth={0} style={this.styles.sideBar}>
+      <Paper zDepth={1} style={this.styles.container}>
+        <div style={this.styles.sideBar}>
           {this.props.sideBar}
-        </Paper>
-        <Paper zDepth={0} style={this.styles.content}>
+        </div>
+        <div style={this.styles.content}>
           {this.props.content}
-        </Paper>
+        </div>
       </Paper>
     )
   }
