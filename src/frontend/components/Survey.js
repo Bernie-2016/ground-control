@@ -8,7 +8,8 @@ import {RaisedButton} from 'material-ui';
 class Survey extends React.Component {
   styles = {
     container: {
-      width: '100%'
+      width: '100%',
+      minWidth: 800
     },
     frame: {
       display: 'block',

@@ -9,8 +9,8 @@ export class CallAssignmentViewer extends React.Component {
   render() {
     return (
       <div>
-        <div style={BernieText.title}>
-          {this.props.viewer.callAssignment.name}
+        <div>
+
         </div>
         <div>
           <div>
