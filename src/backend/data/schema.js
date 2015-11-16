@@ -291,16 +291,19 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
       Group.filter({BSDId: callerGroupId}),
       Group.filter({BSDId: targetGroupId}),
       Survey.filter({BSDId: surveyId})]);
+    callerGroup = callerGroup[0]
+    targetGroup = targetGroup[0]
+    survey = survey[0]
     let BSDFetches = [];
-    if (callerGroup.length === 0)
-      BSDFetches.push(BSDClient.getConstituents({cons_group: callerGroupId}, ['cons_phone', 'cons_email', 'cons_addr']))
-    if (targetGroup.length === 0)
-      BSDFetches.push(BSDClient.getConstituents({cons_group: targetGroupId}, ['cons_phone', 'cons_email', 'cons_addr']))
-    if (survey.length === 0)
+    if (!callerGroup)
+      BSDFetches.push(BSDClient.getConstituentGroup(callerGroupId))
+    if (!targetGroup)
+      BSDFetches.push(BSDClient.getConstituentGroup(targetGroupId))
+    if (!survey)
       BSDFetches.push(BSDClient.getForm(surveyId));
-    let [BSDSurvey, BSDCallers, BSDTargets] = [null, null, null]
+    // Just to verify these BSD IDs exist
     try {
-      [BSDSurvey, BSDCallers, BSDTargets] = await Promise.all(BSDFetches);
+      await Promise.all(BSDFetches);
     } catch(err) {
       if (err && err.response && err.response.statusCode === 409) {
         throw new GraphQLError({
@@ -313,22 +316,28 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
     }
 
     let savePromises = []
-    if (survey.length === 0)
-      savePromises.push(Survey.save({
+    if (!survey)
+      survey = await Survey.save({
         BSDId: surveyId
-      }))
-    if (callerGroup.length === 0) {
-      console.log(BSDCallers.api.cons.length)
-      console.log(BSDCallers.api.cons[0])
+      })
+    if (!callerGroup) {
+      callerGroup = await Group.save({
+        BSDId: callerGroupId,
+        personIdList: []
+      })
+    }
+    if (!targetGroup) {
+      targetGroup = await Group.save({
+        BSDId: targetGroupId,
+        personIdList: []
+      })
     }
 
     return CallAssignment.save({
       name: name,
-      callerGroupId: callerGroupId,
-      targetGroupId: targetGroupId,
-      surveyId: surveyId,
-//      startDate: startDate,
-//      endDate: endDate
+      callerGroupId: callerGroup.id,
+      targetGroupId: targetGroup.id,
+      surveyId: survey.id,
     })
   }
 });
