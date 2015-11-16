@@ -12,6 +12,7 @@ import SurveyViewer from './components/SurveyViewer';
 import Survey from './components/Survey';
 import VolunteerDashboard from './components/VolunteerDashboard';
 import GCTextField from './components/forms/GCTextField';
+import Introduction from './components/Introduction';
 import Form from 'react-formal';
 import {createHistory} from 'history';
 
@@ -48,6 +49,10 @@ ReactDOM.render(
     <Route
       path="/"
       component={VolunteerDashboard}>
+      <Route
+        path="/get-started"
+        component={Introduction}
+      />
       <Route
         path="surveys(/:id)"
         component={SurveyViewer}
