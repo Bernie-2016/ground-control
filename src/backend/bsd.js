@@ -163,7 +163,7 @@ export default class BSD {
         attendee_volunteer_message: form['attendee_volunteer_message'],
         is_searchable: form['is_searchable'],
         public_phone: form['public_phone'],
-        // contact_phone: contact_phone,
+        contact_phone: contact_phone,
         host_receive_rsvp_emails: form['host_receive_rsvp_emails'],
         rsvp_use_reminder_email: form['rsvp_use_reminder_email'],
         rsvp_reminder_hours: form['rsvp_email_reminder_hours']
