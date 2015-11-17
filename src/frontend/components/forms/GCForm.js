@@ -28,8 +28,11 @@ export default class GCForm extends React.Component {
           component: GCSubmitButton
         })
       }
-      else if (child.props && child.props.children)
-        return this.renderChildren(child.props.children)
+      else if (child.props && child.props.children) {
+        return React.cloneElement(child, {
+          children: this.renderChildren(child.props.children)
+        })
+      }
       else
         return child;
     })

@@ -60,16 +60,17 @@ export class CallAssignmentViewer extends React.Component {
         <div style={this.styles.questions}>
           <GCForm
             schema={this.formSchema}
-            style={{width: '100%'}}
           >
-            <Form.Field
-              name='volunteerPickedUp'
-              label='Did the volunteer pick up?'
-            /><br />
-            <Form.Field
-              name='callCompleted'
-              label='Did you complete the call?'
-            />
+            <div>
+              <Form.Field
+                name='volunteerPickedUp'
+                label='Did the volunteer pick up?'
+              /><br />
+              <Form.Field
+                name='callCompleted'
+                label='Did you complete the call?'
+              />
+            </div>
             <div style={this.styles.surveyFrame}>
               <Survey survey={this.props.viewer.callAssignment.survey} />
             </div>
