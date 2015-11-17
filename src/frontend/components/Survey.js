@@ -31,6 +31,11 @@ class Survey extends React.Component {
     isSubmitted: false
   }
 
+  submit = () => {
+    console.log("here");
+    this.sendFrameMessage({message: 'submit'})
+  }
+
   frameMessageHandler = (event) => {
     if (event.origin !== this.frameHost())
       return;

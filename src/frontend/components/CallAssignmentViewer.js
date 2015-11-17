@@ -47,6 +47,10 @@ export class CallAssignmentViewer extends React.Component {
   })
 
   render() {
+    let submitHandler = (formValue) => {
+      this.refs.survey.refs.component.submit()
+    }
+    submitHandler = submitHandler.bind(this)
     return (
       <div style={this.styles.container}>
         <Paper
@@ -59,6 +63,7 @@ export class CallAssignmentViewer extends React.Component {
         <div style={this.styles.questions}>
           <GCForm
             schema={this.formSchema}
+            onSubmit={submitHandler}
           >
             <div>
               <Form.Field
@@ -71,7 +76,7 @@ export class CallAssignmentViewer extends React.Component {
               />
             </div>
             <div style={this.styles.surveyFrame}>
-              <Survey survey={this.props.viewer.callAssignment.survey} />
+              <Survey ref='survey' survey={this.props.viewer.callAssignment.survey} />
             </div>
             <div style={this.styles.submitButton}>
               <Form.Button type='submit' label='Submit and onto the next volunteer!' style={this.styles.submitButton} fullWidth={true}/>
