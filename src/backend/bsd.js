@@ -48,10 +48,8 @@ export default class BSD {
     let encodedQueryString = sortedParams.map((element) => {
       return querystring.stringify(element)
     }).join('&');
-
-    let protocol = secure ? 'https:' : 'http:'
-    let finalURL = url.parse(url.resolve(url.format(this.baseURL), callPath))
-    finalURL.protocol = protocol
+    let finalURL = url.parse(url.resolve(url.format(this.baseURL), callPath));
+    finalURL.protocol = 'https:';
     finalURL.search = '?' + encodedQueryString;
     return url.format(finalURL);
   };
@@ -103,10 +101,98 @@ export default class BSD {
     })
   }
 
-  async fetchConstituent(email, cb) {
+  async getEventTypes() {
+    let response = await this.request('event/get_available_types', {}, 'GET');
+    // console.log(response);
+    return response;
+  }
+
+  async fetchConstituent(email) {
     let response = await this.request('/cons/get_constituents_by_email', {emails: email}, 'GET');
-    cb(JSON.parse(XMLParser.toJson(response)));
-    // return JSON.parse(XMLParser.toJson(response));
+    return JSON.parse(XMLParser.toJson(response));
+  }
+
+  async createConstituent(email) {
+    var params = '<?xml version="1.0" encoding="utf-8"?><api><cons send_password="y"><cons_email><email>' + email + '</email></cons_email></cons></api>';
+    let response = await this.sendXML('/cons/set_constituent_data', params, 'POST');
+    return JSON.parse(XMLParser.toJson(response))
+  }
+
+  async setConstituentPassword(email, password) {
+    // response will be empty if successful
+    let response = await this.request('/account/set_password', {userid: email, password: password}, 'POST');    
+    return 'password set';
+  }
+
+  async checkCredentials(email, password) {
+    try{
+      let response = await this.request('/account/check_credentials', {userid: email, password: password}, 'POST');
+      console.log(response);
+    }
+    catch(e){
+      console.log(e);
+      return 'invalid username or password'
+    }
+    return JSON.parse(XMLParser.toJson(response))
+  }
+
+  async createEvents(cons_id, form) {
+    // validations
+    // Remove special characters from phone number
+    var contact_phone = form['contact_phone'].replace(/\D/g,'');
+
+    var params = {
+        event_type_id: form['event_type_id'],
+        creator_cons_id: cons_id,
+        name: form['name'],
+        description: form['description'],
+        venue_name: form['venue_name'],
+        venue_zip: form['venue_zip'],
+        venue_city: form['venue_city'],
+        venue_state_cd: form['venue_state_cd'],
+        venue_addr1: form['venue_addr1'],
+        venue_addr2: form['venue_addr2'],
+        venue_country: form['venue_country'],
+        venue_directions: form['venue_directions'],
+        days: [{
+            start_datetime_system: '',  // This will be defined below
+            duration: form['duration_num'] * form['duration_unit'],
+            capacity: form['capacity']
+        }],
+        local_timezone: form['start_tz'],
+        attendee_volunteer_message: form['attendee_volunteer_message'],
+        is_searchable: form['is_searchable'],
+        public_phone: form['public_phone'],
+        // contact_phone: contact_phone,
+        host_receive_rsvp_emails: form['host_receive_rsvp_emails'],
+        rsvp_use_reminder_email: form['rsvp_use_reminder_email'],
+        rsvp_reminder_hours: form['rsvp_email_reminder_hours']
+    };
+
+    if (form['start_time']['a'] == 'pm'){
+      var start_hour = Number(form['start_time']['h']) + 12;
+    }
+    else{
+      var start_hour = form['start_time']['h'];
+    }
+
+    var event_dates = JSON.parse(form['event_dates']);
+
+    event_dates.forEach(async (newEvent) => {
+      var start_time = newEvent['date'] + ' ' + start_hour + ':' + form['start_time']['i'] + ':00'
+      params['days'][0]['start_datetime_system'] = start_time;
+      try{
+        var response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'POST');
+        if (response.validation_errors){
+          console.log(response);
+        }
+      }
+      catch(e){
+        console.log(e);
+      }
+    });
+
+    return "events endpoint reached"
   }
 
   async makeRawRequest(callPath, params, method) {
@@ -120,8 +206,28 @@ export default class BSD {
     return requestPromise(options)
   }
 
+  async makeRawXMLRequest(callPath, params, method) {
+    let finalURL = this.generateBSDURL(callPath);
+    let options = {
+      uri: finalURL,
+      method: method,
+      body: params,
+      resolveWithFullResponse: true
+    }
+    // console.log(options);
+    return requestPromise(options)
+  }
+
   async request(callPath, params, method) {
     let response = await this.makeRawRequest(callPath, params, method);
+    if (response.statusCode === 202)
+      return this.getDeferredResult(response.body);
+    else
+      return response.body;
+  }
+
+  async sendXML(callPath, params, method) {
+    let response = await this.makeRawXMLRequest(callPath, params, method);
     if (response.statusCode === 202)
       return this.getDeferredResult(response.body);
     else
