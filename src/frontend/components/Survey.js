@@ -28,7 +28,6 @@ class Survey extends React.Component {
 
   state = {
     frameStyle : {height: 0},
-    isSubmitted: false
   }
 
   submit = () => {
@@ -52,7 +51,6 @@ class Survey extends React.Component {
         this.sendFrameMessage({message: 'getHeight'});
       }
       else {
-        this.setState({isSubmitted: true});
         this.props.onSubmit();
       }
     }
@@ -83,17 +81,15 @@ class Survey extends React.Component {
 
   render() {
     let source = this.props.survey.BSDData.fullURL;
-    let frame = <div></div>
-    if (!this.state.isSubmitted)
-      frame = (
-        <iframe
-          ref='frame'
-          scrolling='no'
-          src={source}
-          style={[this.styles.frame, this.state.frameStyle]}
-          onLoad={this.frameLoaded}
-        />
-      )
+    let frame = (
+      <iframe
+        ref='frame'
+        scrolling='no'
+        src={source}
+        style={[this.styles.frame, this.state.frameStyle]}
+        onLoad={this.frameLoaded}
+      />
+    )
 
     return (
       <div style={this.styles.container}>
