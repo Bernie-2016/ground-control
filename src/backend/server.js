@@ -16,9 +16,10 @@ app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
 // this endpoint is strictly for debugging
-app.get('/events/types', async (req, res) => {
-  var result2 = await BSDClient.getEventTypes();
-  res.send('<pre>' + JSON.stringify(result2, null, 2) + '</pre>');
+app.get('/events/types.json', async (req, res) => {
+  let result = await BSDClient.getEventTypes();
+  // res.send('<pre>' + JSON.stringify(result2, null, 2) + '</pre>');
+  res.json(result);
 });
 
 app.get('/events', function(req, res) {
