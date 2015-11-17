@@ -33,6 +33,12 @@ export class CallAssignmentViewer extends React.Component {
     },
     container: {
       width: '100%'
+    },
+    submitButton: {
+      width: '50%',
+      marginRight: 'auto',
+      marginLeft: 'auto',
+      backgroundColor: BernieColors.green
     }
   }
 
@@ -54,6 +60,7 @@ export class CallAssignmentViewer extends React.Component {
         <div style={this.styles.questions}>
           <GCForm
             schema={this.formSchema}
+            style={{width: '100%'}}
           >
             <Form.Field
               name='volunteerPickedUp'
@@ -63,12 +70,14 @@ export class CallAssignmentViewer extends React.Component {
               name='callCompleted'
               label='Did you complete the call?'
             />
+            <div style={this.styles.surveyFrame}>
+              <Survey survey={this.props.viewer.callAssignment.survey} />
+            </div>
+            <div style={this.styles.submitButton}>
+              <Form.Button type='submit' label='Submit and onto the next volunteer!' style={this.styles.submitButton} fullWidth={true}/>
+            </div>
           </GCForm>
-          <div style={this.styles.surveyFrame}>
-            <Survey survey={this.props.viewer.callAssignment.survey} />
-          </div>
         </div>
-
       </div>
     );
   }
