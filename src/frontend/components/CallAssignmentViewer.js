@@ -12,13 +12,18 @@ export class CallAssignmentViewer extends React.Component {
   styles = {
     assignmentBar: {
       backgroundColor: BernieColors.lightGray,
+      marginTop: 15,
+      marginBottom: 15,
+      marginRight: 15,
+      marginLeft: 15,
       paddingTop: 15,
       paddingLeft: 15,
       paddingRight: 15,
       paddingBottom: 15,
       width: '100%',
       color: BernieColors.darkGray,
-      fontSize: '1em'
+      fontSize: '1em',
+      width: 'auto'
     },
     surveyFrame: {
       borderTop: 'solid 1px ' + BernieColors.lightGray,
@@ -26,6 +31,9 @@ export class CallAssignmentViewer extends React.Component {
     questions: {
       paddingTop: 15,
     },
+    container: {
+      width: '100%'
+    }
   }
 
   formSchema = yup.object({
@@ -35,11 +43,12 @@ export class CallAssignmentViewer extends React.Component {
 
   render() {
     return (
-      <div>
-        <Paper zDepth={1} style={{
+      <div style={this.styles.container}>
+        <Paper
+          style={{
           ...BernieText.secondaryTitle,
           ...this.styles.assignmentBar}}
-          >
+        >
           <span>Saikat - 817-999-4303</span>
         </Paper>
         <div style={this.styles.questions}>
@@ -54,10 +63,10 @@ export class CallAssignmentViewer extends React.Component {
               name='callCompleted'
               label='Did you complete the call?'
             />
-            <div style={this.styles.surveyFrame}>
-              <Survey survey={this.props.viewer.callAssignment.survey} />
-            </div>
           </GCForm>
+          <div style={this.styles.surveyFrame}>
+            <Survey survey={this.props.viewer.callAssignment.survey} />
+          </div>
         </div>
 
       </div>

@@ -1,40 +1,39 @@
 import React from 'react';
 import {Styles, Paper} from 'material-ui';
 import {BernieColors} from './styles/bernie-css';
+import Radium from 'radium';
 
+@Radium
 export default class SideBarLayout extends React.Component {
   styles = {
     container: {
-      position: 'relative'
+      display: 'flex',
+      border: 'solid 1px ' + BernieColors.lightGray
     },
 
     sideBar: {
-      display: 'inline-block',
-      width: 200,
+      width: '12em',
       minHeight: '800px',
       borderRight: 'solid 1px ' + BernieColors.lightGray,
     },
 
     content: {
-      display: 'inline-block',
+      display: 'flex',
+      flex: 1,
       verticalAlign: 'top',
-      marginLeft: 15,
-      marginTop: 15,
-      marginRight: 15,
-      marginBottom: 15,
     }
   }
 
   render() {
     return (
-      <Paper zDepth={1} style={this.styles.container}>
-        <div style={this.styles.sideBar}>
+      <div zDepth={1} style={this.styles.container}>
+        <div zDepth={0} style={this.styles.sideBar}>
           {this.props.sideBar}
         </div>
-        <div style={this.styles.content}>
+        <div zDepth={0} style={this.styles.content}>
           {this.props.content}
         </div>
-      </Paper>
+      </div>
     )
   }
 }
