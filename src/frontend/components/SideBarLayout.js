@@ -1,5 +1,6 @@
 import React from 'react';
 import {Styles, Paper} from 'material-ui';
+import {BernieColors} from './styles/bernie-css';
 
 export default class SideBarLayout extends React.Component {
   styles = {
@@ -11,7 +12,7 @@ export default class SideBarLayout extends React.Component {
       display: 'inline-block',
       width: 200,
       minHeight: '800px',
-      borderRight: 'solid 1px ' + Styles.Colors.grey300,
+      borderRight: 'solid 1px ' + BernieColors.lightGray,
     },
 
     content: {

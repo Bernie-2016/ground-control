@@ -12,6 +12,7 @@ import SurveyViewer from './components/SurveyViewer';
 import Survey from './components/Survey';
 import VolunteerDashboard from './components/VolunteerDashboard';
 import GCTextField from './components/forms/GCTextField';
+import GCBooleanField from './components/forms/GCBooleanField';
 import Introduction from './components/Introduction';
 import CallAssignmentDashboard from './components/CallAssignmentDashboard';
 import CallAssignmentViewer from './components/CallAssignmentViewer';
@@ -22,6 +23,7 @@ injectTapEventPlugin();
 
 Form.addInputTypes({
   string: GCTextField,
+  boolean: GCBooleanField
 })
 
 const ViewerQueries = {

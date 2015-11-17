@@ -21,10 +21,6 @@ export default class CallAssignmentCreationForm extends React.Component {
     }
   }
 
-  state = {
-    global
-  }
-
   formSchema = yup.object({
     surveyId: yup.string().required(),
     callerGroupId: yup.string().required(),
@@ -33,6 +29,13 @@ export default class CallAssignmentCreationForm extends React.Component {
 //    startDate: yup.date().required(),
 //    endDate: yup.date()
   })
+
+  clearState() {
+    this.setState({
+      globalErrorMessage: null,
+      globalStatusMessage: null
+    })
+  }
 
   render() {
     return (
@@ -54,9 +57,10 @@ export default class CallAssignmentCreationForm extends React.Component {
               globalStatusMessage: null
             })
             let onFailure = (transaction) => {
+              this.clearState()
               let defaultMessage = 'Something went wrong.'
               let error = transaction.getError();
-              console.log(error);
+
               let errorMessage = error ? error.source.errors[0].message : defaultMessage;
               try {
                 errorMessage = JSON.parse(errorMessage)
@@ -68,6 +72,7 @@ export default class CallAssignmentCreationForm extends React.Component {
             };
 
             let onSuccess = (transaction) => {
+              this.clearState()
               this.setState({globalStatusMessage: 'Call assignment created successfully!'})
             };
 

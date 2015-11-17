@@ -14,7 +14,6 @@ export default class GCBooleanField extends React.Component {
     }
   }
   render() {
-
     let labelStyle = this.styles.label;
     let value = this.props.value;
 
