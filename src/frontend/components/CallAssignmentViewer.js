@@ -38,7 +38,6 @@ export class CallAssignmentViewer extends React.Component {
       width: '50%',
       marginRight: 'auto',
       marginLeft: 'auto',
-      backgroundColor: BernieColors.green
     }
   }
 
