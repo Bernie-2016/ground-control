@@ -32,7 +32,6 @@ class Survey extends React.Component {
   }
 
   submit = () => {
-    console.log("here");
     this.sendFrameMessage({message: 'submit'})
   }
 
@@ -41,8 +40,17 @@ class Survey extends React.Component {
       return;
 
     if (event.data.message == 'documentLoaded') {
-      if (event.data.details.location === this.props.survey.BSDData.fullURL)
+      if (event.data.details.location === this.props.survey.BSDData.fullURL) {
+        Object.keys(this.props.initialValues).forEach((fieldId) => {
+          this.sendFrameMessage({
+            message: 'setInputValue',
+            details: {
+              inputId: fieldId,
+              value: this.props.initialValues[fieldId]
+            }})
+        })
         this.sendFrameMessage({message: 'getHeight'});
+      }
       else {
         this.setState({isSubmitted: true});
         this.props.onSubmit();

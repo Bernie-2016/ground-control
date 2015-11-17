@@ -76,7 +76,7 @@ export class CallAssignmentViewer extends React.Component {
               />
             </div>
             <div style={this.styles.surveyFrame}>
-              <Survey ref='survey' survey={this.props.viewer.callAssignment.survey} />
+              <Survey ref='survey' survey={this.props.viewer.callAssignment.survey} initialValues={{'email' : 'saikat@gomockingbird.com'}} />
             </div>
             <div style={this.styles.submitButton}>
               <Form.Button type='submit' label='Submit and onto the next volunteer!' style={this.styles.submitButton} fullWidth={true}/>
