@@ -112,9 +112,10 @@ export default class BSD {
     return JSON.parse(XMLParser.toJson(response));
   }
 
-  async createConstituent(email) {
+  async createConstituent(email, password) {
     let params = '<?xml version="1.0" encoding="utf-8"?><api><cons send_password="y"><cons_email><email>' + email + '</email></cons_email></cons></api>';
     let response = await this.sendXML('/cons/set_constituent_data', params, 'POST');
+    this.setConstituentPassword(email, password);
     return JSON.parse(XMLParser.toJson(response))
   }
 

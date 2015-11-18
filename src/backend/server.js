@@ -56,7 +56,16 @@ app.get('/events/confirmation-email', async (req, res) => {
     cons_email: 'me@example.com',
     event_dates: '[{"date":"2015-11-20","title":"Test Event Title","location":"","auto_generated":false,"moment":"2015-11-20T08:00:00.000Z","_clndrStartDateObject":"2015-11-20T08:00:00.000Z","_clndrEndDateObject":"2015-11-20T08:00:00.000Z"},{"date":"2015-11-18","title":"Test Event Title","location":"","auto_generated":false,"moment":"2015-11-18T08:00:00.000Z","_clndrStartDateObject":"2015-11-18T08:00:00.000Z","_clndrEndDateObject":"2015-11-18T08:00:00.000Z"},{"date":"2015-12-31","title":"","location":"","auto_generated":false,"moment":"2015-12-31T08:00:00.000Z","_clndrStartDateObject":"2015-12-31T08:00:00.000Z","_clndrEndDateObject":"2015-12-31T08:00:00.000Z"},{"date":"2015-11-27","title":"Test Event Title","location":"","auto_generated":true,"moment":"2015-11-27T08:00:00.000Z","_clndrStartDateObject":"2015-11-27T08:00:00.000Z","_clndrEndDateObject":"2015-11-27T08:00:00.000Z"},{"date":"2015-12-04","title":"Test Event Title","location":"","auto_generated":true,"moment":"2015-12-04T08:00:00.000Z","_clndrStartDateObject":"2015-12-04T08:00:00.000Z","_clndrEndDateObject":"2015-12-04T08:00:00.000Z"},{"date":"2015-12-11","title":"Test Event Title","location":"","auto_generated":true,"moment":"2015-12-11T08:00:00.000Z","_clndrStartDateObject":"2015-12-11T08:00:00.000Z","_clndrEndDateObject":"2015-12-11T08:00:00.000Z"},{"date":"2015-12-18","title":"Test Event Title","location":"","auto_generated":true,"moment":"2015-12-18T08:00:00.000Z","_clndrStartDateObject":"2015-12-18T08:00:00.000Z","_clndrEndDateObject":"2015-12-18T08:00:00.000Z"},{"date":"2015-11-25","title":"Test Event Title","location":"","auto_generated":true,"moment":"2015-11-25T08:00:00.000Z","_clndrStartDateObject":"2015-11-25T08:00:00.000Z","_clndrEndDateObject":"2015-11-25T08:00:00.000Z"},{"date":"2015-12-02","title":"Test Event Title","location":"","auto_generated":true,"moment":"2015-12-02T08:00:00.000Z","_clndrStartDateObject":"2015-12-02T08:00:00.000Z","_clndrEndDateObject":"2015-12-02T08:00:00.000Z"},{"date":"2015-12-09","title":"Test Event Title","location":"","auto_generated":true,"moment":"2015-12-09T08:00:00.000Z","_clndrStartDateObject":"2015-12-09T08:00:00.000Z","_clndrEndDateObject":"2015-12-09T08:00:00.000Z"},{"date":"2015-12-16","title":"Test Event Title","location":"","auto_generated":true,"moment":"2015-12-16T08:00:00.000Z","_clndrStartDateObject":"2015-12-16T08:00:00.000Z","_clndrEndDateObject":"2015-12-16T08:00:00.000Z"},{"date":"2016-01-07","title":"Test Event Title","location":"","auto_generated":true,"moment":"2016-01-07T08:00:00.000Z","_clndrStartDateObject":"2016-01-07T08:00:00.000Z","_clndrEndDateObject":"2016-01-07T08:00:00.000Z"},{"date":"2016-01-14","title":"Test Event Title","location":"","auto_generated":true,"moment":"2016-01-14T08:00:00.000Z","_clndrStartDateObject":"2016-01-14T08:00:00.000Z","_clndrEndDateObject":"2016-01-14T08:00:00.000Z"},{"date":"2016-01-21","title":"Test Event Title","location":"","auto_generated":true,"moment":"2016-01-21T08:00:00.000Z","_clndrStartDateObject":"2016-01-21T08:00:00.000Z","_clndrEndDateObject":"2016-01-21T08:00:00.000Z"},{"date":"2016-01-28","title":"Test Event Title","location":"","auto_generated":true,"moment":"2016-01-28T08:00:00.000Z","_clndrStartDateObject":"2016-01-28T08:00:00.000Z","_clndrEndDateObject":"2016-01-28T08:00:00.000Z"}]'
   };
-  let result = await Mailgun.sendEventConfirmation(form);
+  if (form.capacity=='0'){form.capacity = 'unlimited'};
+  let constituent = {
+  	isNew: true,
+  	password: form.name.toLowerCase().replace(/\s+/g, '')
+  };
+  let data = {
+  	event: form,
+  	user: constituent
+  }
+  let result = await Mailgun.sendEventConfirmation(data);
   res.send(result.html)
   // res.json(result);
 });
@@ -75,7 +84,10 @@ app.post('/events', async (req, res) => {
   }
   else {
   	console.log('creating constituent...')
-  	result = await BSDClient.createConstituent(form.cons_email);
+  	// Generate a password
+  	let cons_pass = form.name.toLowerCase().replace(/\s+/g, '');
+
+  	result = await BSDClient.createConstituent(form.cons_email, cons_password);
   	var constituent_id = result.api.cons.id;
   }
 
