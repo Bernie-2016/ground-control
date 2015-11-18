@@ -76,7 +76,7 @@ export class CallAssignmentViewer extends React.Component {
               />
             </div>
             <div style={this.styles.surveyFrame}>
-              <Survey ref='survey' survey={this.props.viewer.callAssignment.survey} initialValues={{'email' : 'saikat@gomockingbird.com'}} />
+              <Survey ref='survey' survey={this.props.callAssignment.survey} initialValues={{'email' : 'saikat@gomockingbird.com'}} />
             </div>
             <div style={this.styles.submitButton}>
               <Form.Button type='submit' label='Submit and onto the next volunteer!' style={this.styles.submitButton} fullWidth={true}/>
@@ -92,14 +92,12 @@ export default Relay.createContainer(CallAssignmentViewer, {
   initialVariables: { id: null },
 
   fragments: {
-    viewer: () => Relay.QL`
-      fragment on Viewer {
-        callAssignment(id:$id) {
-          id
-          name
-          survey {
-            ${Survey.getFragment('survey')}
-          }
+    callAssignment: () => Relay.QL`
+      fragment on CallAssignment {
+        id
+        name
+        survey {
+          ${Survey.getFragment('survey')}
         }
       }
     `

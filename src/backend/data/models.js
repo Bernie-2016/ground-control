@@ -4,7 +4,13 @@ let type = thinky.type;
 
 export const Person = thinky.createModel('person', {
   id: type.string().options({enforce_missing: false}),
-  BSDId: type.string().allowNull(true)
+  BSDId: type.string().allowNull(true),
+  emails: [{
+    email: type.string().email().lowercase(),
+    isPrimary: type.boolean()
+  }],
+  phones: [type.string().regex(/[0-9]+/).length(10)],
+  zipCode: type.string().regex(/[0-9]+/)
 });
 
 export const Group = thinky.createModel('group', {
@@ -56,7 +62,7 @@ export const Field = thinky.createModel('field', {
   type: type.string().enum(['Number', 'String', 'Boolean', 'Date', 'Point']),
   validators: {
     function: type.string().enum([
-      'enum', 'min', 'max', 'email', 'regex', 'lowercase', 'uppercase', 'integer'
+      'enum', 'min', 'max', 'regex', 'lowercase', 'uppercase', 'integer'
     ]),
     args: []
   }

@@ -8,7 +8,6 @@ import CreateCallAssignment from '../mutations/CreateCallAssignment';
 import yup from 'yup';
 
 export default class CallAssignmentCreationForm extends React.Component {
-
   styles = {
     formContainer: {
       width: 280,
@@ -29,6 +28,11 @@ export default class CallAssignmentCreationForm extends React.Component {
 //    startDate: yup.date().required(),
 //    endDate: yup.date()
   })
+
+  state = {
+    globalErrorMessage: null,
+    globalStatusMessage: null
+  }
 
   clearState() {
     this.setState({
@@ -52,10 +56,7 @@ export default class CallAssignmentCreationForm extends React.Component {
           globalError={this.state.globalErrorMessage}
           globalStatus={this.state.globalStatusMessage}
           onSubmit={(formValue) => {
-            this.setState({
-              globalErrorMessage: null,
-              globalStatusMessage: null
-            })
+            this.clearState();
             let onFailure = (transaction) => {
               this.clearState()
               let defaultMessage = 'Something went wrong.'
@@ -78,7 +79,7 @@ export default class CallAssignmentCreationForm extends React.Component {
 
             Relay.Store.update(
               new CreateCallAssignment({
-                viewer: this.props.viewer,
+                listContainer: this.props.listContainer,
                 ...formValue
               }), {onFailure, onSuccess}
             );
@@ -111,9 +112,9 @@ export default class CallAssignmentCreationForm extends React.Component {
 
 export default Relay.createContainer(CallAssignmentCreationForm, {
   fragments: {
-    viewer: () => Relay.QL`
-      fragment on Viewer {
-        ${CreateCallAssignment.getFragment('viewer')},
+    listContainer: () => Relay.QL`
+      fragment on ListContainer {
+        ${CreateCallAssignment.getFragment('listContainer')},
       }
     `
   },

@@ -15,7 +15,11 @@ import GCTextField from './components/forms/GCTextField';
 import GCBooleanField from './components/forms/GCBooleanField';
 import Introduction from './components/Introduction';
 import CallAssignmentDashboard from './components/CallAssignmentDashboard';
+import CallAssignment from './components/CallAssignment';
 import CallAssignmentViewer from './components/CallAssignmentViewer';
+import CallAssignmentCreationForm from './components/CallAssignmentCreationForm';
+import GroupCall from './components/GroupCall';
+import GroupCallCreationForm from './components/GroupCallCreationForm';
 import Form from 'react-formal';
 import {createHistory} from 'history';
 
@@ -26,9 +30,21 @@ Form.addInputTypes({
   boolean: GCBooleanField
 })
 
-const ViewerQueries = {
-  viewer: () => Relay.QL`query { viewer }`
+const ListContainerQueries = {
+  listContainer: () => Relay.QL`query { listContainer }`
 };
+
+const CallAssignmentQueries = {
+  callAssignment: () => Relay.QL`query { callAssignment(id: $id) }`
+}
+
+const GroupCallQueries = {
+  groupCall: () => Relay.QL`query { groupCall(id: $id) }`
+}
+
+const CurrentUserQueries = {
+  currentUser: () => Relay.QL`query { currentUser}`
+}
 
 let history = createHistory()
 
@@ -37,35 +53,57 @@ ReactDOM.render(
     history={history}
     createElement={ReactRouterRelay.createElement}>
     <Route
-      path="/admin"
+      path='/admin'
       component={AdminDashboard}>
       <Route
-        path="group-calls"
+        path='group-calls'
         component={GroupCallAdmin}
-        queries={ViewerQueries}
-      />
-      <Route
-        path="call-assignments(/:id)"
-        component={CallAssignmentAdmin}
-        queries={ViewerQueries}
-      />
-    </Route>
-    <Route
-      path="/"
-      component={VolunteerDashboard}>
-      <Route
-        path="call-assignments"
-        component={CallAssignmentDashboard}
-        queries={ViewerQueries}
+        queries={ListContainerQueries}
       >
         <Route
-          path=":id"
-          component={CallAssignmentViewer}
-          queries={ViewerQueries}
+          path='create'
+          component={GroupCallCreationForm}
+          queries={ListContainerQueries}
+        />
+        <Route
+          path=':id'
+          component={GroupCall}
+          queries={GroupCallQueries}
         />
       </Route>
       <Route
-        path="/get-started"
+        path='call-assignments'
+        component={CallAssignmentAdmin}
+        queries={ListContainerQueries}
+      >
+        <Route
+          path='create'
+          component={CallAssignmentCreationForm}
+          queries={ListContainerQueries}
+        />
+        <Route
+          path=':id'
+          component={CallAssignment}
+          queries={CallAssignmentQueries}
+        />
+      </Route>
+    </Route>
+    <Route
+      path='/'
+      component={VolunteerDashboard}>
+      <Route
+        path='call-assignments'
+        component={CallAssignmentDashboard}
+        queries={CurrentUserQueries}
+      >
+        <Route
+          path=':id'
+          component={CallAssignmentViewer}
+          queries={CallAssignmentQueries}
+        />
+      </Route>
+      <Route
+        path='get-started'
         component={Introduction}
       />
     </Route>

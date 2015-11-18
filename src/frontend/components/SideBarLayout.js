@@ -20,7 +20,6 @@ export default class SideBarLayout extends React.Component {
     content: {
       display: 'flex',
       flex: 1,
-      verticalAlign: 'top',
     }
   }
 
@@ -30,7 +29,11 @@ export default class SideBarLayout extends React.Component {
         <div zDepth={0} style={this.styles.sideBar}>
           {this.props.sideBar}
         </div>
-        <div zDepth={0} style={this.styles.content}>
+        <div zDepth={0} style={
+          {
+            ...this.styles.content,
+            ...this.props.contentViewStyle
+          }}>
           {this.props.content}
         </div>
       </div>

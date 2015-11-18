@@ -4,7 +4,6 @@ import Survey from './Survey'
 import {BernieText} from './styles/bernie-css'
 import Radium from 'radium'
 import SideBarLayout from './SideBarLayout';
-import RelayViewHelpers from './helpers/relay-view-helpers';
 import CallAssignmentList from './CallAssignmentList';
 import CallAssignment from './CallAssignment';
 
@@ -29,7 +28,7 @@ class CallAssignmentDashboard extends React.Component {
     let sideBar = (
       <div>
         <CallAssignmentList
-          callAssignmentList={this.props.viewer.callAssignmentList}
+          callAssignmentList={this.props.currentUser.callAssignmentList}
           subheader="Active Assignments"
           onSelect={(id) => this.props.history.pushState(null, '/call-assignments/' + id)}
         />
@@ -46,8 +45,8 @@ class CallAssignmentDashboard extends React.Component {
 
 export default Relay.createContainer(CallAssignmentDashboard, {
   fragments: {
-    viewer: () => Relay.QL`
-      fragment on Viewer {
+    currentUser: () => Relay.QL`
+      fragment on Person {
         callAssignmentList(first:50) {
           ${CallAssignmentList.getFragment('callAssignmentList')}
         }

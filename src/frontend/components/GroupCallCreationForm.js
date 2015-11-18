@@ -28,10 +28,6 @@ class GroupCallCreationForm extends React.Component {
     this.state = defaultState
   }
 
-  static propTypes = {
-    viewer: React.PropTypes.object
-  }
-
   styles = {
     container: {
       paddingLeft: 15,
@@ -83,7 +79,7 @@ class GroupCallCreationForm extends React.Component {
     Relay.Store.update(
       new BatchCreateGroupCall({
         calls:this.state.calls,
-        viewer: this.props.viewer,
+        listContainer: this.props.listContainer,
       }),
       {onFailure, onSuccess}
     );
@@ -317,9 +313,9 @@ class GroupCallCreationForm extends React.Component {
 
 export default Relay.createContainer(GroupCallCreationForm, {
   fragments: {
-    viewer: () => Relay.QL`
-      fragment on Viewer {
-        ${BatchCreateGroupCall.getFragment('viewer')},
+    listContainer: () => Relay.QL`
+      fragment on ListContainer {
+        ${BatchCreateGroupCall.getFragment('listContainer')},
       }
     `
   },

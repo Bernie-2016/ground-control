@@ -5,15 +5,10 @@ import GroupCall from './GroupCall';
 import GroupCallCreationForm from './GroupCallCreationForm';
 import {RaisedButton} from 'material-ui';
 import SideBarLayout from './SideBarLayout';
-import RelayViewHelpers from './helpers/relay-view-helpers';
+import {BernieLayout} from './styles/bernie-css';
 
 export class GroupCallAdmin extends React.Component {
   render() {
-    let contentView = RelayViewHelpers.contentViewFromId(this.props.relay.variables.id,
-      <GroupCallCreationForm viewer={this.props.viewer} />,
-      <GroupCall groupCall={this.props.viewer.groupCall} />
-    )
-
     let sideBar = (
       <div>
         <RaisedButton label="Create Calls"
@@ -22,12 +17,12 @@ export class GroupCallAdmin extends React.Component {
           onTouchTap={() => this.props.history.pushState(null, '/admin/group-calls/create')}
         />
         <GroupCallList
-          groupCallList={this.props.viewer.upcomingCallList}
+          groupCallList={this.props.listContainer.upcomingCallList}
           subheader="Upcoming calls"
           onSelect={(id) => this.props.history.pushState(null, '/admin/group-calls/' + id)}
         />
         <GroupCallList
-          groupCallList={this.props.viewer.pastCallList}
+          groupCallList={this.props.listContainer.pastCallList}
           subheader="Past calls"
           onSelect={(id) => this.props.history.pushState(null, '/admin/group-calls/' + id)}
         />
@@ -37,30 +32,23 @@ export class GroupCallAdmin extends React.Component {
     return (
       <SideBarLayout
         sideBar={sideBar}
-        content={contentView}
+        content={this.props.children}
+        contentViewStyle={BernieLayout.admin.sideBarContentView}
       />
     )
   }
 }
 
 export default Relay.createContainer(GroupCallAdmin, {
-  initialVariables: { id: null },
-
-  prepareVariables: (prev) => RelayViewHelpers.variablesFromId(prev.id),
-
   fragments: {
-    viewer: () => Relay.QL`
-      fragment on Viewer {
+    listContainer: () => Relay.QL`
+      fragment on ListContainer {
         upcomingCallList:groupCallList(first:50, upcoming:true) {
           ${GroupCallList.getFragment('groupCallList')}
         }
         pastCallList:groupCallList(first:50, upcoming:false) {
           ${GroupCallList.getFragment('groupCallList')}
         }
-        groupCall(id:$id) @include(if: $fetchItem) {
-          ${GroupCall.getFragment('groupCall')}
-        }
-        ${GroupCallCreationForm.getFragment('viewer')}
       }
     `,
   },

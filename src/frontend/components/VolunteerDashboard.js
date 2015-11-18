@@ -19,11 +19,19 @@ export default class VolunteerDashboard extends React.Component {
     },
     {
       value: 'http://map.berniesanders.com',
-      label: 'Attend Events'
+      label: 'Events'
     },
     {
       value: 'https://go.berniesanders.com/page/share/share-for-bernie?source=homepage_organize',
-      label: 'Share with Friends'
+      label: 'Share'
+    },
+    {
+      value: 'https://go.berniesanders.com/page/share/share-for-bernie?source=homepage_organize',
+      label: 'Resources'
+    },
+    {
+      value: 'https://go.berniesanders.com/page/share/share-for-bernie?source=homepage_organize',
+      label: 'Gather Online'
     },
   ]
 

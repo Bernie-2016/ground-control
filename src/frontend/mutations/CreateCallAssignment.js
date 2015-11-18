@@ -2,8 +2,8 @@ import Relay from 'react-relay';
 
 export default class CreateCallAssignment extends Relay.Mutation {
   static fragments = {
-    viewer: () => Relay.QL`
-      fragment on Viewer {
+    listContainer: () => Relay.QL`
+      fragment on ListContainer {
         id
       }
     `,
@@ -18,7 +18,7 @@ export default class CreateCallAssignment extends Relay.Mutation {
   getFatQuery() {
     return Relay.QL`
       fragment on CreateCallAssignmentPayload {
-        viewer {
+        listContainer {
           id,
           callAssignmentList
         },
@@ -30,7 +30,7 @@ export default class CreateCallAssignment extends Relay.Mutation {
     return [{
       type: 'FIELDS_CHANGE',
       fieldIDs: {
-        viewer: this.props.viewer.id
+        listContainer: this.props.listContainer.id
       }
     }];
   }

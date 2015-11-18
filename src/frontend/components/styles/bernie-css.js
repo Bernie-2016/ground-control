@@ -49,3 +49,14 @@ export const BernieText = {
     letterSpacing: '0.1em',
   }
 }
+
+export const BernieLayout = {
+  admin: {
+    sideBarContentView: {
+      paddingLeft: 25,
+      paddingRight: 25,
+      paddingTop: 25,
+      paddingBottom: 25
+    }
+  }
+}

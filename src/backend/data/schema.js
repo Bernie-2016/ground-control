@@ -47,12 +47,13 @@ class GraphQLError extends Error {
   }
 }
 
-class Viewer {
+class ListContainer {
   constructor(identifier) {
     this.id = identifier
   }
 }
-const SharedViewer = new Viewer(1);
+const SharedListContainer = new ListContainer(1);
+
 const BSDClient = new BSD(process.env.BSD_HOST, process.env.BSD_API_ID, process.env.BSD_API_SECRET);
 
 let {nodeInterface, nodeField} = nodeDefinitions(
@@ -70,8 +71,8 @@ let {nodeInterface, nodeField} = nodeDefinitions(
       return Survey.get(id);
     if (type === 'GroupCall')
       return GroupCall.get(id);
-    if (type === 'Viewer')
-      return SharedViewer;
+    if (type === 'ListContainer')
+      return SharedListContainer;
     return null;
   },
   (obj) => {
@@ -87,16 +88,16 @@ let {nodeInterface, nodeField} = nodeDefinitions(
       return GraphQLSurvey;
     if (obj instanceof GroupCall)
       return GraphQLGroupCall;
-    if (obj instanceof Viewer)
-      return GraphQLViewer;
+    if (obj instanceof ListContainer)
+      return GraphQLListContainer;
     return null;
   }
 );
 
-const GraphQLViewer = new GraphQLObjectType({
-  name: 'Viewer',
+const GraphQLListContainer = new GraphQLObjectType({
+  name: 'ListContainer',
   fields: () => ({
-    id: globalIdField('Viewer'),
+    id: globalIdField('ListContainer'),
     groupCallList: {
       type: GraphQLGroupCallConnection,
       args: {
@@ -106,7 +107,7 @@ const GraphQLViewer = new GraphQLObjectType({
         },
         ...connectionArgs,
       },
-      resolve: async (viewer, {first, upcoming}) => {
+      resolve: async (listContainer, {first, upcoming}) => {
         let r = thinky.r;
         let queryFilter = {};
         if (upcoming)
@@ -122,42 +123,12 @@ const GraphQLViewer = new GraphQLObjectType({
         return connectionFromArray(calls, {first});
       }
     },
-    groupCall: {
-      type: GraphQLGroupCall,
-      args: {
-        id: { type: new GraphQLNonNull(GraphQLString) }
-      },
-      resolve: (viewer, {id}) => {
-        let localId = fromGlobalId(id).id;
-        return GroupCall.get(localId);
-      }
-    },
     callAssignmentList: {
       type: GraphQLCallAssignmentConnection,
       args: connectionArgs,
       resolve: async (assignment, {first}) => {
         let assignments = await CallAssignment.filter({})
         return connectionFromArray(assignments, {first});
-      }
-    },
-    callAssignment: {
-      type: GraphQLCallAssignment,
-      args: {
-        id: { type: new GraphQLNonNull(GraphQLString) }
-      },
-      resolve: (viewer, {id}) => {
-        let localId = fromGlobalId(id).id;
-        return CallAssignment.get(localId);
-      }
-    },
-    survey: {
-      type: GraphQLSurvey,
-      args: {
-        id: { type: new GraphQLNonNull(GraphQLString) }
-      },
-      resolve: (viewer, {id}) => {
-        let localId = fromGlobalId(id).id
-        return Survey.get(localId)
       }
     },
   }),
@@ -169,6 +140,14 @@ const GraphQLPerson = new GraphQLObjectType({
   description: 'A person.',
   fields: () => ({
     id: globalIdField('Person'),
+    callAssignmentList: {
+      type: GraphQLCallAssignmentConnection,
+      args: connectionArgs,
+      resolve: async (person, {first}) => {
+        let assignments = await CallAssignment.filter({})
+        return connectionFromArray(assignments, {first});
+      }
+    }
   }),
   interfaces: [nodeInterface]
 })
@@ -279,11 +258,9 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
 //    endDate: GraphQLInt
   },
   outputFields: {
-    viewer: {
-      type: GraphQLViewer,
-      resolve: () => {
-        return SharedViewer;
-      }
+    listContainer: {
+      type: GraphQLListContainer,
+      resolve: () => SharedListContainer
     }
   },
   mutateAndGetPayload:async ({name, callerGroupId, targetGroupId, surveyId, startDate, endDate}) => {
@@ -358,9 +335,9 @@ const GraphQLBatchCreateGroupCall = mutationWithClientMutationId({
     groupCallList: { type: new GraphQLNonNull(new GraphQLList(GraphQLGroupCallInput)) }
   },
   outputFields: {
-    viewer: {
-      type: GraphQLViewer,
-      resolve: () =>  SharedViewer
+    listContainer: {
+      type: GraphQLListContainer,
+      resolve: () => SharedListContainer
     }
   },
   mutateAndGetPayload:async ({groupCallList}) => {
@@ -381,8 +358,7 @@ const GraphQLBatchCreateGroupCall = mutationWithClientMutationId({
       }));
     };
 
-    await Promise.all(promises);
-    return SharedViewer;
+    return Promise.all(promises);
   }
 });
 
@@ -397,9 +373,46 @@ let RootMutation = new GraphQLObjectType({
 let RootQuery = new GraphQLObjectType({
   name: 'RootQuery',
   fields: () => ({
-    viewer: {
-      type: GraphQLViewer,
-      resolve: () => SharedViewer
+    // This wrapper is necessary because relay does not support handling connection types in the root query currently. See https://github.com/facebook/relay/issues/112
+    currentUser: {
+      type: GraphQLPerson,
+      resolve: () => {
+        return Person.get('5c1609da-449b-4a44-9a60-b95ae9f97541');
+      }
+    },
+    listContainer: {
+      type: GraphQLListContainer,
+      resolve: () => SharedListContainer
+    },
+    survey: {
+      type: GraphQLSurvey,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLString) }
+      },
+      resolve: (root, {id}) => {
+        let localId = fromGlobalId(id).id
+        return Survey.get(localId)
+      }
+    },
+    callAssignment: {
+      type: GraphQLCallAssignment,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLString) }
+      },
+      resolve: (root, {id}) => {
+        let localId = fromGlobalId(id).id;
+        return CallAssignment.get(localId);
+      }
+    },
+    groupCall: {
+      type: GraphQLGroupCall,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLString) }
+      },
+      resolve: (root, {id}) => {
+        let localId = fromGlobalId(id).id;
+        return GroupCall.get(localId);
+      }
     },
     node: nodeField
   }),
