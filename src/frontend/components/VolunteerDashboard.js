@@ -15,7 +15,7 @@ export default class VolunteerDashboard extends React.Component {
     },
     {
       value: '/group-calls',
-      label: 'Join Group Calls'
+      label: 'Group Calls'
     },
     {
       value: 'http://map.berniesanders.com',
