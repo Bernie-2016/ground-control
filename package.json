@@ -45,7 +45,10 @@
     "express-history-api-fallback": "2.0.0",
     "body-parser": "1.14.1",
     "express-session": "1.12.1",
-    "express-session-rethinkdb": "0.2.0"
+    "express-session-rethinkdb": "0.2.0",
+    "mailgun-js": "0.7.6",
+    "email-templates": "2.0.1",
+    "handlebars": "^3.0.0"
   },
   "devDependencies": {
     "foreman": "latest",
