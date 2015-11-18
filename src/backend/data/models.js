@@ -5,6 +5,8 @@ let type = thinky.type;
 export const Person = thinky.createModel('person', {
   id: type.string().options({enforce_missing: false}),
   BSDId: type.string().allowNull(true),
+  firstName: type.string(),
+  lastName: type.string(),
   emails: [{
     email: type.string().email().lowercase(),
     isPrimary: type.boolean()

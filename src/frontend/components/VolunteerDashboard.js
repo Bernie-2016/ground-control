@@ -1,58 +1,86 @@
 import React from 'react';
 import Relay from 'react-relay';
-import {Styles} from 'material-ui';
-import GroupCallAdmin from './GroupCallAdmin';
-import CallAssignmentAdmin from './CallAssignmentAdmin';
-import TopNav from './TopNav';
-import {BernieTheme} from './styles/bernie-theme';
-import {BernieColors} from './styles/bernie-css';
+import Survey from './Survey'
+import {BernieText} from './styles/bernie-css'
 
-@Styles.ThemeDecorator(Styles.ThemeManager.getMuiTheme(BernieTheme))
-export default class VolunteerDashboard extends React.Component {
-  tabs = [{
-      value:'/call-assignments',
-      label: 'Make Calls',
+class VolunteerDashboard extends React.Component {
+  styles = {
+    container: {
+      paddingLeft: 40,
+      paddingTop: 40,
+      paddingRight: 40,
+      paddingBottom: 40,
+      width: 720
     },
-    {
-      value: '/group-calls',
-      label: 'Group Calls'
+    paragraph: {
+      paddingTop: '0.5em',
+      paddingBottom: '0.5em',
+      paddingLeft: '0.5em',
+      paddingRight: '0.5em',
     },
-    {
-      value: 'http://map.berniesanders.com',
-      label: 'Events'
-    },
-    {
-      value: 'https://go.berniesanders.com/page/share/share-for-bernie?source=homepage_organize',
-      label: 'Share'
-    },
-    {
-      value: 'https://go.berniesanders.com/page/share/share-for-bernie?source=homepage_organize',
-      label: 'Resources'
-    },
-    {
-      value: 'https://go.berniesanders.com/page/share/share-for-bernie?source=homepage_organize',
-      label: 'Gather Online'
-    },
-  ]
+    signup: {
+      width: 200
+    }
+  }
 
-  render() {
+  renderIntroduction() {
     return (
-      <div>
-        <TopNav
-          zDepth={0}
-          barColor={BernieColors.lightGray}
-          tabColor={BernieColors.darkGray}
-          selectedTabColor={BernieColors.gray}
-          logoColors={{
-            primary: BernieColors.blue,
-            swoosh: BernieColors.red
-          }}
-          tabs={this.tabs}
-          history={this.props.history}
-          location={this.props.location}
-        />
-        {this.props.children}
+      <div style={this.styles.container}>
+        <div style={BernieText.secondaryTitle}>
+          Volunteer
+        </div>
+        <div style={BernieText.title}>
+          Get involved in the political revolution
+        </div>
+        <div style={BernieText.default}>
+          <p style={this.styles.paragraph}>
+            We must launch a political revolution which engages millions of Americans from all walks of life in the struggle for real change. This country belongs to all of us, not just the billionaire class. And that’s what this campaign is all about.
+            </p>
+            <p style={this.styles.paragraph}>
+              To win this campaign, all of us must be deeply involved. Our movement needs people like you to help it succeed.
+            </p>
+            <p style={this.styles.paragraph}>
+              Add your name now to volunteer for our campaign for president.
+            </p>
+            <p style={this.styles.paragraph}>
+              Thanks for all you do,
+            </p>
+            <img src='https://s.bsd.net/bernie16/main/page/-/Email%20Images/sig-red.png' width='170' alt='Bernie' />
+        </div>
       </div>
     )
   }
+
+  name() {
+    return this.props.currentUser.firstName + ' ' + this.props.currentUser.lastName
+  }
+
+  renderDashboard() {
+    return (
+      <div style={this.styles.container}>
+        <div style={BernieText.title}>
+        Welcome {this.name()}!
+        </div>
+      </div>
+    )
+  }
+
+  render() {
+    let contentView = this.renderIntroduction();
+    if (this.props.currentUser) {
+      contentView = this.renderDashboard();
+    }
+    return contentView;
+  }
 }
+
+export default Relay.createContainer(VolunteerDashboard, {
+  fragments: {
+    currentUser: () => Relay.QL`
+      fragment on Person {
+        firstName
+        lastName
+      }
+    `,
+  },
+});

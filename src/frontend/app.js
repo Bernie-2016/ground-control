@@ -11,6 +11,7 @@ import CallAssignmentAdmin from './components/CallAssignmentAdmin';
 import SurveyViewer from './components/SurveyViewer';
 import Survey from './components/Survey';
 import VolunteerDashboard from './components/VolunteerDashboard';
+import VolunteerNavigation from './components/VolunteerNavigation';
 import GCTextField from './components/forms/GCTextField';
 import GCBooleanField from './components/forms/GCBooleanField';
 import Introduction from './components/Introduction';
@@ -90,7 +91,12 @@ ReactDOM.render(
     </Route>
     <Route
       path='/'
-      component={VolunteerDashboard}>
+      component={VolunteerNavigation}>
+      <Route
+        path='dashboard'
+        component={VolunteerDashboard}
+        queries={CurrentUserQueries}
+      />
       <Route
         path='call-assignments'
         component={CallAssignmentDashboard}
@@ -102,10 +108,6 @@ ReactDOM.render(
           queries={CallAssignmentQueries}
         />
       </Route>
-      <Route
-        path='get-started'
-        component={Introduction}
-      />
     </Route>
   </Router>,
   document.getElementById('root')

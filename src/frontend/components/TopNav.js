@@ -65,6 +65,7 @@ export default class TopNav extends React.Component {
       <div>
         <AppBar
           {...this.props}
+          zDepth={1}
           style={{
             ...this.styles.bar,
             backgroundColor: this.props.barColor

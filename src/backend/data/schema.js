@@ -140,6 +140,8 @@ const GraphQLPerson = new GraphQLObjectType({
   description: 'A person.',
   fields: () => ({
     id: globalIdField('Person'),
+    firstName: { type: GraphQLString },
+    lastName: { type: GraphQLString },
     callAssignmentList: {
       type: GraphQLCallAssignmentConnection,
       args: connectionArgs,
