@@ -2,7 +2,7 @@ import 'babel/polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Relay from 'react-relay';
-import {Redirect, Route, Router, IndexRedirect} from 'react-router';
+import {Redirect, IndexRoute, Route, Router} from 'react-router';
 import ReactRouterRelay from 'react-router-relay';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import AdminDashboard from './components/AdminDashboard';
@@ -92,8 +92,7 @@ ReactDOM.render(
     <Route
       path='/'
       component={VolunteerNavigation}>
-      <Route
-        path='dashboard'
+      <IndexRoute
         component={VolunteerDashboard}
         queries={CurrentUserQueries}
       />

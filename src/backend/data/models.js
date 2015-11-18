@@ -5,14 +5,14 @@ let type = thinky.type;
 export const Person = thinky.createModel('person', {
   id: type.string().options({enforce_missing: false}),
   BSDId: type.string().allowNull(true),
-  firstName: type.string(),
-  lastName: type.string(),
-  emails: [{
+  firstName: type.string().allowNull(true),
+  lastName: type.string().allowNull(true),
+  emails: type.array().schema({
     email: type.string().email().lowercase(),
     isPrimary: type.boolean()
-  }],
+  }).validator((field) => field.length > 0),
   phones: [type.string().regex(/[0-9]+/).length(10)],
-  zipCode: type.string().regex(/[0-9]+/)
+  zipCode: type.string().regex(/[0-9]+/).allowNull(true)
 });
 
 export const Group = thinky.createModel('group', {
