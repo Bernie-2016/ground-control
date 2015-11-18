@@ -721,7 +721,8 @@
 <div class="inputgroup"><div class="label">
                     <label class="form_label">Time:</label><span style="color: red;">*</span> 
                 </div><div class="field">
-                    <div class="select-wrapper col-3"><select name="start_time[h]">
+                    <div class="select-wrapper col-3"><select name="start_time[h]" required>
+	<option selected="selected"></option>
 	<option value="1">01</option>
 	<option value="2">02</option>
 	<option value="3">03</option>
@@ -733,9 +734,10 @@
 	<option value="9">09</option>
 	<option value="10">10</option>
 	<option value="11">11</option>
-	<option value="00" selected="selected">12</option>
-</select></div><div class="select-wrapper col-3"><select name="start_time[i]">
-	<option value="00" selected="selected">00</option>
+	<option value="00">12</option>
+</select></div><div class="select-wrapper col-3"><select name="start_time[i]" required>
+	<option selected="selected"></option>
+	<option value="00">00</option>
 	<option value="01">01</option>
 	<option value="02">02</option>
 	<option value="03">03</option>
@@ -1138,7 +1140,7 @@
                                         <input size="30" name="venue_name" id="venue_name" type="text" placeholder="" required></div></div><div class="inputgroup"><div class="label">
                                         <label class="form_label">Capacity Limit: </label><span style="color: red;">*</span> 
                                     </div><div class="field">
-                                        <input size="4" name="capacity" type="text" value="0" required></div></div><span class="explain">(includes guests; zero for no limit)</span>
+                                        <input size="4" name="capacity" type="number" value="0" step="1" min="0" required></div></div><span class="explain">(includes guests; zero for no limit)</span>
 
                     <div class="inputgroup"><div class="label">
                     <label class="form_label">Directions To Event:</label></div><div class="field">
