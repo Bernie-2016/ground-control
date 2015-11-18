@@ -113,7 +113,7 @@ export default class BSD {
   }
 
   async createConstituent(email) {
-    var params = '<?xml version="1.0" encoding="utf-8"?><api><cons send_password="y"><cons_email><email>' + email + '</email></cons_email></cons></api>';
+    let params = '<?xml version="1.0" encoding="utf-8"?><api><cons send_password="y"><cons_email><email>' + email + '</email></cons_email></cons></api>';
     let response = await this.sendXML('/cons/set_constituent_data', params, 'POST');
     return JSON.parse(XMLParser.toJson(response))
   }
@@ -139,9 +139,9 @@ export default class BSD {
   async createEvents(cons_id, form) {
     // validations
     // Remove special characters from phone number
-    var contact_phone = form['contact_phone'].replace(/\D/g,'');
+    let contact_phone = form['contact_phone'].replace(/\D/g,'');
 
-    var params = {
+    let params = {
         event_type_id: form['event_type_id'],
         creator_cons_id: cons_id,
         name: form['name'],
@@ -176,13 +176,13 @@ export default class BSD {
       var start_hour = form['start_time']['h'];
     }
 
-    var event_dates = JSON.parse(form['event_dates']);
+    let event_dates = JSON.parse(form['event_dates']);
 
     event_dates.forEach(async (newEvent) => {
-      var start_time = newEvent['date'] + ' ' + start_hour + ':' + form['start_time']['i'] + ':00'
+      let start_time = newEvent['date'] + ' ' + start_hour + ':' + form['start_time']['i'] + ':00'
       params['days'][0]['start_datetime_system'] = start_time;
       try{
-        var response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'POST');
+        let response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'POST');
         if (response.validation_errors){
           console.log(response);
         }
@@ -192,7 +192,7 @@ export default class BSD {
       }
     });
 
-    return "events endpoint reached"
+    return 'events endpoint reached'
   }
 
   async makeRawRequest(callPath, params, method) {
