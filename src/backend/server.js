@@ -57,6 +57,13 @@ app.get('/events/confirmation-email', async (req, res) => {
     event_dates: '[{"date":"2015-11-20","title":"Test Event Title","location":"","auto_generated":false,"moment":"2015-11-20T08:00:00.000Z","_clndrStartDateObject":"2015-11-20T08:00:00.000Z","_clndrEndDateObject":"2015-11-20T08:00:00.000Z"},{"date":"2015-11-18","title":"Test Event Title","location":"","auto_generated":false,"moment":"2015-11-18T08:00:00.000Z","_clndrStartDateObject":"2015-11-18T08:00:00.000Z","_clndrEndDateObject":"2015-11-18T08:00:00.000Z"},{"date":"2015-12-31","title":"","location":"","auto_generated":false,"moment":"2015-12-31T08:00:00.000Z","_clndrStartDateObject":"2015-12-31T08:00:00.000Z","_clndrEndDateObject":"2015-12-31T08:00:00.000Z"},{"date":"2015-11-27","title":"Test Event Title","location":"","auto_generated":true,"moment":"2015-11-27T08:00:00.000Z","_clndrStartDateObject":"2015-11-27T08:00:00.000Z","_clndrEndDateObject":"2015-11-27T08:00:00.000Z"},{"date":"2015-12-04","title":"Test Event Title","location":"","auto_generated":true,"moment":"2015-12-04T08:00:00.000Z","_clndrStartDateObject":"2015-12-04T08:00:00.000Z","_clndrEndDateObject":"2015-12-04T08:00:00.000Z"},{"date":"2015-12-11","title":"Test Event Title","location":"","auto_generated":true,"moment":"2015-12-11T08:00:00.000Z","_clndrStartDateObject":"2015-12-11T08:00:00.000Z","_clndrEndDateObject":"2015-12-11T08:00:00.000Z"},{"date":"2015-12-18","title":"Test Event Title","location":"","auto_generated":true,"moment":"2015-12-18T08:00:00.000Z","_clndrStartDateObject":"2015-12-18T08:00:00.000Z","_clndrEndDateObject":"2015-12-18T08:00:00.000Z"},{"date":"2015-11-25","title":"Test Event Title","location":"","auto_generated":true,"moment":"2015-11-25T08:00:00.000Z","_clndrStartDateObject":"2015-11-25T08:00:00.000Z","_clndrEndDateObject":"2015-11-25T08:00:00.000Z"},{"date":"2015-12-02","title":"Test Event Title","location":"","auto_generated":true,"moment":"2015-12-02T08:00:00.000Z","_clndrStartDateObject":"2015-12-02T08:00:00.000Z","_clndrEndDateObject":"2015-12-02T08:00:00.000Z"},{"date":"2015-12-09","title":"Test Event Title","location":"","auto_generated":true,"moment":"2015-12-09T08:00:00.000Z","_clndrStartDateObject":"2015-12-09T08:00:00.000Z","_clndrEndDateObject":"2015-12-09T08:00:00.000Z"},{"date":"2015-12-16","title":"Test Event Title","location":"","auto_generated":true,"moment":"2015-12-16T08:00:00.000Z","_clndrStartDateObject":"2015-12-16T08:00:00.000Z","_clndrEndDateObject":"2015-12-16T08:00:00.000Z"},{"date":"2016-01-07","title":"Test Event Title","location":"","auto_generated":true,"moment":"2016-01-07T08:00:00.000Z","_clndrStartDateObject":"2016-01-07T08:00:00.000Z","_clndrEndDateObject":"2016-01-07T08:00:00.000Z"},{"date":"2016-01-14","title":"Test Event Title","location":"","auto_generated":true,"moment":"2016-01-14T08:00:00.000Z","_clndrStartDateObject":"2016-01-14T08:00:00.000Z","_clndrEndDateObject":"2016-01-14T08:00:00.000Z"},{"date":"2016-01-21","title":"Test Event Title","location":"","auto_generated":true,"moment":"2016-01-21T08:00:00.000Z","_clndrStartDateObject":"2016-01-21T08:00:00.000Z","_clndrEndDateObject":"2016-01-21T08:00:00.000Z"},{"date":"2016-01-28","title":"Test Event Title","location":"","auto_generated":true,"moment":"2016-01-28T08:00:00.000Z","_clndrStartDateObject":"2016-01-28T08:00:00.000Z","_clndrEndDateObject":"2016-01-28T08:00:00.000Z"}]'
   };
   if (form.capacity=='0'){form.capacity = 'unlimited'};
+  
+  // Sort event dates by date
+  form.event_dates = JSON.parse(form.event_dates);
+  form.event_dates.sort(function(a, b) {
+      return a.date.localeCompare(b.date);
+  });
+
   let constituent = {
   	isNew: true,
   	password: form.name.toLowerCase().replace(/\s+/g, '')
@@ -70,11 +77,11 @@ app.get('/events/confirmation-email', async (req, res) => {
   // res.json(result);
 });
 
-app.get('/events', (req, res) => {
+app.get('/events/create', (req, res) => {
   res.sendFile(publicPath + '/events/create_event.html');
 });
 
-app.post('/events', async (req, res) => {
+app.post('/events/create', async (req, res) => {
   let form = req.body;
   let result = await BSDClient.fetchConstituent(form.cons_email);
 
