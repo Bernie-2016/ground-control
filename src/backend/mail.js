@@ -2,7 +2,10 @@ import Mailgun from 'mailgun-js';
 import {EmailTemplate} from 'email-templates';
 import Handlebars from 'handlebars';
 import path from 'path';
+import fs from 'fs';
 const templateDir = path.resolve(__dirname, './email-templates');
+const headerHTML = fs.readFileSync(templateDir + '/header.hbs', {encoding: 'utf-8'});
+const footerHTML = fs.readFileSync(templateDir + '/footer.hbs', {encoding: 'utf-8'});
 
 Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
   switch (operator) {
@@ -26,6 +29,8 @@ Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
       return options.inverse(this);
   }
 });
+Handlebars.registerPartial('header', headerHTML);
+Handlebars.registerPartial('footer', footerHTML);
 
 export default class MG {
   constructor(apiKey, domain) {
