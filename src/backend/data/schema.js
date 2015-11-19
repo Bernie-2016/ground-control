@@ -379,7 +379,8 @@ let RootQuery = new GraphQLObjectType({
     currentUser: {
       type: GraphQLPerson,
       resolve: () => {
-        return Person.get('5c1609da-449b-4a44-9a60-b95ae9f97541');
+        //return Person.get('5c1609da-449b-4a44-9a60-b95ae9f97541');
+        return null;
       }
     },
     listContainer: {
