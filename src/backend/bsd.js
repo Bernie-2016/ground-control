@@ -112,11 +112,26 @@ export default class BSD {
     return JSON.parse(XMLParser.toJson(response));
   }
 
-  async createConstituent(email, password) {
+  async createConstituent(email) {
     let params = '<?xml version="1.0" encoding="utf-8"?><api><cons send_password="y"><cons_email><email>' + email + '</email></cons_email></cons></api>';
     let response = await this.sendXML('/cons/set_constituent_data', params, 'POST');
+    response = JSON.parse(XMLParser.toJson(response));
+    let password = randString(12);
     this.setConstituentPassword(email, password);
-    return JSON.parse(XMLParser.toJson(response))
+    return {
+      id: response.api.cons.id,
+      isNew: true,
+      password: password
+    }
+
+    function randString(x){
+        let s = '';
+        while(s.length<x&&x>0){
+            let r = Math.random();
+            s+= (r<0.1?Math.floor(r*100):String.fromCharCode(Math.floor(r*26) + (r>0.5?97:65)));
+        }
+        return s;
+    }
   }
 
   async setConstituentPassword(email, password) {
@@ -161,6 +176,7 @@ export default class BSD {
             capacity: form['capacity']
         }],
         local_timezone: form['start_tz'],
+        attendee_volunteer_show: form['attendee_volunteer_show'],
         attendee_volunteer_message: form['attendee_volunteer_message'],
         is_searchable: form['is_searchable'],
         public_phone: form['public_phone'],

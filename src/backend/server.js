@@ -27,7 +27,7 @@ app.get('/events/types.json', async (req, res) => {
 app.get('/events/confirmation-email', async (req, res) => {
   let form = {
   	is_searchable: '-2',
-    event_type_id: '36',
+    event_type_id: '1',
     name: 'Rally for Bernie',
     description: '<p><u><strong>What is Lorem Ipsum?</strong></u></p><p><em>Lorem Ipsum</em> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.',
     host_receive_rsvp_emails: '1',
@@ -56,23 +56,15 @@ app.get('/events/confirmation-email', async (req, res) => {
     cons_email: 'me@example.com',
     event_dates: '[{"date":"2015-11-20","title":"Test Event Title","location":"","auto_generated":false,"moment":"2015-11-20T08:00:00.000Z","_clndrStartDateObject":"2015-11-20T08:00:00.000Z","_clndrEndDateObject":"2015-11-20T08:00:00.000Z"},{"date":"2015-11-18","title":"Test Event Title","location":"","auto_generated":false,"moment":"2015-11-18T08:00:00.000Z","_clndrStartDateObject":"2015-11-18T08:00:00.000Z","_clndrEndDateObject":"2015-11-18T08:00:00.000Z"},{"date":"2015-12-31","title":"","location":"","auto_generated":false,"moment":"2015-12-31T08:00:00.000Z","_clndrStartDateObject":"2015-12-31T08:00:00.000Z","_clndrEndDateObject":"2015-12-31T08:00:00.000Z"},{"date":"2015-11-27","title":"Test Event Title","location":"","auto_generated":true,"moment":"2015-11-27T08:00:00.000Z","_clndrStartDateObject":"2015-11-27T08:00:00.000Z","_clndrEndDateObject":"2015-11-27T08:00:00.000Z"},{"date":"2015-12-04","title":"Test Event Title","location":"","auto_generated":true,"moment":"2015-12-04T08:00:00.000Z","_clndrStartDateObject":"2015-12-04T08:00:00.000Z","_clndrEndDateObject":"2015-12-04T08:00:00.000Z"},{"date":"2015-12-11","title":"Test Event Title","location":"","auto_generated":true,"moment":"2015-12-11T08:00:00.000Z","_clndrStartDateObject":"2015-12-11T08:00:00.000Z","_clndrEndDateObject":"2015-12-11T08:00:00.000Z"},{"date":"2015-12-18","title":"Test Event Title","location":"","auto_generated":true,"moment":"2015-12-18T08:00:00.000Z","_clndrStartDateObject":"2015-12-18T08:00:00.000Z","_clndrEndDateObject":"2015-12-18T08:00:00.000Z"},{"date":"2015-11-25","title":"Test Event Title","location":"","auto_generated":true,"moment":"2015-11-25T08:00:00.000Z","_clndrStartDateObject":"2015-11-25T08:00:00.000Z","_clndrEndDateObject":"2015-11-25T08:00:00.000Z"},{"date":"2015-12-02","title":"Test Event Title","location":"","auto_generated":true,"moment":"2015-12-02T08:00:00.000Z","_clndrStartDateObject":"2015-12-02T08:00:00.000Z","_clndrEndDateObject":"2015-12-02T08:00:00.000Z"},{"date":"2015-12-09","title":"Test Event Title","location":"","auto_generated":true,"moment":"2015-12-09T08:00:00.000Z","_clndrStartDateObject":"2015-12-09T08:00:00.000Z","_clndrEndDateObject":"2015-12-09T08:00:00.000Z"},{"date":"2015-12-16","title":"Test Event Title","location":"","auto_generated":true,"moment":"2015-12-16T08:00:00.000Z","_clndrStartDateObject":"2015-12-16T08:00:00.000Z","_clndrEndDateObject":"2015-12-16T08:00:00.000Z"},{"date":"2016-01-07","title":"Test Event Title","location":"","auto_generated":true,"moment":"2016-01-07T08:00:00.000Z","_clndrStartDateObject":"2016-01-07T08:00:00.000Z","_clndrEndDateObject":"2016-01-07T08:00:00.000Z"},{"date":"2016-01-14","title":"Test Event Title","location":"","auto_generated":true,"moment":"2016-01-14T08:00:00.000Z","_clndrStartDateObject":"2016-01-14T08:00:00.000Z","_clndrEndDateObject":"2016-01-14T08:00:00.000Z"},{"date":"2016-01-21","title":"Test Event Title","location":"","auto_generated":true,"moment":"2016-01-21T08:00:00.000Z","_clndrStartDateObject":"2016-01-21T08:00:00.000Z","_clndrEndDateObject":"2016-01-21T08:00:00.000Z"},{"date":"2016-01-28","title":"Test Event Title","location":"","auto_generated":true,"moment":"2016-01-28T08:00:00.000Z","_clndrStartDateObject":"2016-01-28T08:00:00.000Z","_clndrEndDateObject":"2016-01-28T08:00:00.000Z"}]'
   };
-  if (form.capacity=='0'){form.capacity = 'unlimited'};
-  
-  // Sort event dates by date
-  form.event_dates = JSON.parse(form.event_dates);
-  form.event_dates.sort(function(a, b) {
-      return a.date.localeCompare(b.date);
-  });
 
   let constituent = {
-  	isNew: true,
-  	password: form.name.toLowerCase().replace(/\s+/g, '')
+    isNew: true,
+    password: 'MsKDwz9GJGIK'
   };
-  let data = {
-  	event: form,
-  	user: constituent
-  }
-  let result = await Mailgun.sendEventConfirmation(data);
+  
+  let event_types = await BSDClient.getEventTypes();
+
+  let result = await Mailgun.sendEventConfirmation(form, constituent, event_types, true);
   res.send(result.html)
   // res.json(result);
 });
@@ -83,24 +75,28 @@ app.get('/events/create', (req, res) => {
 
 app.post('/events/create', async (req, res) => {
   let form = req.body;
+
   let result = await BSDClient.fetchConstituent(form.cons_email);
 
   if (result.api.cons){
-  	console.log('constituent found')
-  	var constituent_id = result.api.cons.id;
+  	console.log('constituent found');
+  	var constituent = {
+  		id: result.api.cons.id,
+  		isNew: false
+  	};
   }
   else {
   	console.log('creating constituent...')
-  	// Generate a password
-  	let cons_pass = form.name.toLowerCase().replace(/\s+/g, '');
-
-  	result = await BSDClient.createConstituent(form.cons_email, cons_password);
-  	var constituent_id = result.api.cons.id;
+  	var constituent = await BSDClient.createConstituent(form.cons_email);
   }
 
+  console.log(constituent);
+
   try{
-  	let status = await BSDClient.createEvents(constituent_id, form);
+  	let status = await BSDClient.createEvents(constituent.id, form);
   	res.send(status);
+  	let event_types = await BSDClient.getEventTypes();
+  	Mailgun.sendEventConfirmation(form, constituent, event_types);
   }
   catch(e){
   	console.log(e);

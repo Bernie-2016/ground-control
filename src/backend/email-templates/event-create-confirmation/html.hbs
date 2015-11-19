@@ -1,54 +1,46 @@
-<head>
-<style>
-div{
-font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
-   font-weight: 400;
-font-size: 17px;
-line-height:1.4;
-color: #364350;
-}
-a{
-color: #147FD7;
-}
-.express-lane-links .link{
-  margin: 0;
-}
-.express-lane-links .link a{
-  font-family: sans-serif;
-  font-size: 18px;
-  background-color: #147FD7;
-  border-top: 1px solid #1e88e0;
-  border-bottom: 2px solid #0e72c4;
-  width: 290px;
-  margin: 12px auto;
-  border-radius: 4px;
-  text-align: center;
-  color: white;
-  text-decoration: none;
-  padding: 12px 5px;
-  font-weight:700;
-  display: block;
-  text-transform: uppercase;
-  letter-spacing: 0.075em;
-}
-.express-lane-links .link a:hover{
-  background-color: #1e88e0;
-}
-.express-lane-links .link.other a{
-  font-size: 17px;
-}
-</style>
-</head>
 <h1 style="text-align: center; padding: 25px 0; border: 0; margin: 0;"><img width="200" alt="Bernie Sanders for President" src="https://s.bsd.net/bernie16/main/page/-/logo-2x.png"></h1>
 <div style="max-width: 600px; margin: 0 auto;">
 
+  <p>Thank you for creating an event for the Bernie Sanders campaign! The details of the event you submitted are included below. To manage the events you have created, please visit <a href="https://secure.berniesanders.com/page/event/myevents">secure.berniesanders.com/page/event/myevents</a>.</p>
 
-	<h1>{{name}}</h1>
-	<h3>Event Description:</h3>
-	{{{description}}}
+  <p>
+  Your username on berniesanders.com is <b>{{event.cons_email}}</b>
+  {{#if user.isNew}}
+    <br>
+    Your password is <b>{{user.password}}</b>
+    <br><br>IMPORTANT: Please change your password the first time you log in.
+  {{/if}}
+  </p>
 
-	<h3>Event Venue:</h3>
-	{{venue_name}}, {{venue_city}} {{venue_state_cd}}
+  <hr>
+
+	<h1>{{event.name}}</h1>
+
+	<h4>Event Description</h4>
+  <p>{{event.event_type_name}}</p>
+	{{{event.description}}}
+
+	<h4>Event Venue</h4>
+	{{event.venue_name}}, capacity {{event.capacity}}
+  <br>
+  {{event.venue_addr1}} {{event.venue_city}} {{event.venue_state_cd}} {{event.venue_zip}}
+  <p>{{event.venue_directions}}</p>
+
+  <h4>Event Time</h4>
+  {{event.start_time.h}}:{{event.start_time.i}} {{event.start_time.a}} {{event.start_tz}},
+  Duration: {{event.duration_num}}
+  {{#ifCond event.duration_unit '==' 1}}minute{{/ifCond}}{{#ifCond event.duration_unit '==' 60}}hour{{/ifCond}}{{#ifCond event.duration_unit '==' 1440}}day{{/ifCond}}{{#ifCond event.duration_num '>' 1}}s{{/ifCond}}
+  <h4>Event Date{{#ifCond event.event_dates.length '>' 1}}s{{/ifCond}}</h4>
+  <ul class="date_list">
+    {{#each event.event_dates}}
+      <li>{{this.date}}</li>
+    {{/each}}
+  </ul>
+
+  {{#if event.attendee_volunteer_show}}
+  <h4>Volunteer Message</h4>
+  <p>{{event.attendee_volunteer_message}}</p>
+  {{/if}}
 
 
 </div>
@@ -59,5 +51,5 @@ color: #147FD7;
 
 <p style="font-size: 9px; margin: 15px 0 15px; color: #444;">PO Box 905 - Burlington VT 05402 United States - (855) 4-BERNIE</p>
 
-<p style="font-size: 9px; color: #444;">This email was sent to {{cons_email}}. If you need to update or change your information or email address, click here to <a href="https://go.berniesanders.com/page/s/change-your-information?source=email_footer">update your info</a>. Email is one of the most important tools we have to reach supporters like you, but you can let us know if you'd like to <a href="https://go.berniesanders.com/page/s/fewer-emails?source=email_footer&email=%%EMAIL%%&zip=%%ZIP%%">receive fewer emails</a>. We'd hate to see you go, but if you need to do so, click here to <a href="https://go.berniesanders.com/page/unsubscribe/">unsubscribe</a>. Stand against the powerful special interests who are systematically buying our Congress and have their sights set on the presidency by <a href="https://secure.actblue.com/contribute/page/lets-go-bernie?refcode=email_footer">contributing to Bernie here</a>.</p>
+<p style="font-size: 9px; color: #444;">This email was sent to {{event.cons_email}}. If you need to update or change your information or email address, click here to <a href="https://go.berniesanders.com/page/s/change-your-information?source=email_footer">update your info</a>. Email is one of the most important tools we have to reach supporters like you, but you can let us know if you'd like to <a href="https://go.berniesanders.com/page/s/fewer-emails?source=email_footer&email=%%EMAIL%%&zip=%%ZIP%%">receive fewer emails</a>. We'd hate to see you go, but if you need to do so, click here to <a href="https://go.berniesanders.com/page/unsubscribe/">unsubscribe</a>. Stand against the powerful special interests who are systematically buying our Congress and have their sights set on the presidency by <a href="https://secure.actblue.com/contribute/page/lets-go-bernie?refcode=email_footer">contributing to Bernie here</a>.</p>
 </div>
