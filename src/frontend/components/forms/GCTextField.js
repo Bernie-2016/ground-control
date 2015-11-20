@@ -6,7 +6,7 @@ export default class GCTextField extends React.Component {
     return <TextField
       {...this.props}
       onChange={(event) => {this.props.onChange(event.target.value)}}
-      floatingLabelText={this.props.label}
+      hintText={this.props.label}
     />
   }
 }
