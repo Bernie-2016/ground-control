@@ -2,12 +2,6 @@ import thinky from './thinky';
 import validator from 'validator';
 let type = thinky.type;
 
-export const Permissions = thinky.createModel('permissions', {
-  id: type.string().options({enforce_missing: false}),
-  personId: type.string(),
-  permissionLevel: type.string().enum(['ADMIN'])
-})
-
 export const Person = thinky.createModel('person', {
   id: type.string().options({enforce_missing: false}),
   BSDId: type.string().allowNull(true),

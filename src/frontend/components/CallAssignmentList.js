@@ -13,7 +13,7 @@ export class CallAssignmentList extends React.Component {
     return this.props.callAssignmentList.edges.map(assignment => {
         let node = assignment.node;
         let primaryText = node.name
-        let secondaryText = '670 calls made, 30 callers'
+        let secondaryText = 'What'
         return (
           <ListItem
             key={node.id}

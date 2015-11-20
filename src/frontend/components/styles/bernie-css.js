@@ -9,7 +9,6 @@ export const BernieColors = {
   darkGray: 'rgb(54, 67, 80)',
   gray: 'rgb(153, 155, 158)',
   lightGray: 'rgb(239, 243, 247)',
-  white: Styles.Colors.white
 }
 
 export const BernieText = {

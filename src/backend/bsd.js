@@ -2,10 +2,8 @@ import requestPromise from 'request-promise';
 import url from 'url';
 import crypto from 'crypto';
 import querystring from 'querystring';
-import {parseString} from 'xml2js';
+import XMLParser from 'xml2json';
 import Promise from 'bluebird';
-
-const parseStringPromise = Promise.promisify(parseString);
 
 export default class BSD {
   constructor(host, id, secret) {
@@ -14,59 +12,6 @@ export default class BSD {
     this.apiId = id;
     this.apiVersion = 2;
     this.apiSecret = secret;
-  }
-
-  createConstituentObject(constituent) {
-    let consObj = {}
-    consObj['id'] = constituent['$']['id'];
-    consObj['modified_dt'] = constituent['$']['modified_dt'];
-
-    let keys = ['firstname', 'middlename', 'lastname', 'has_account', 'is_banned', 'create_dt', 'prefix', 'suffix', 'gender', 'source', 'subsource']
-
-    let cleanField = (field) => {
-      if (field && field.length) {
-        if (field[0] && field[0] != '')
-          return field[0]
-        else
-          return null
-      }
-      else
-        return null
-    }
-    keys.forEach((key) => {
-      consObj[key] = cleanField(constituent[key])
-    })
-    consObj['cons_addr'] = []
-    constituent.cons_addr.forEach((address) => {
-      let addrObj = {}
-      let keys = ['addr1', 'addr2', 'city', 'state_cd', 'zip', 'country', 'latitude', 'longitude', 'is_primary', 'cons_addr_type_id', 'cons_addr_type'];
-      keys.forEach((key) => {
-        addrObj[key] = cleanField(address[key])
-      })
-      consObj['cons_addr'].push(addrObj)
-    })
-    consObj['cons_phone'] = []
-    constituent.cons_phone.forEach((phone) => {
-      let phoneObj = {}
-      let keys = ['phone', 'phone_type', 'is_subscribed', 'is_primary']
-      keys.forEach((key) => {
-        phoneObj[key] = cleanField(phone[key]);
-      })
-      consObj['cons_phone'].push(phoneObj)
-    })
-    consObj['cons_email'] = []
-
-    constituent.cons_email.forEach((email) => {
-      let emailObj = {}
-      let keys = ['email', 'email_type', 'is_subscribed', 'is_primary']
-      keys.forEach((key) => {
-        emailObj[key] = cleanField(email[key])
-      })
-      consObj['cons_email'].push(emailObj)
-    })
-
-    console.log(consObj)
-    return consObj;
   }
 
   generateBSDURL(callPath, {params={}, secure=false}={}) {
@@ -119,27 +64,8 @@ export default class BSD {
     return JSON.parse(XMLParser.toJson(response));
   }
 
-  createBundleString(bundles) {
-    return bundles.join(',')
-  }
-
-  async getConstituentByEmail(email) {
-    let response = await this.request('/cons/get_constituents_by_email', {
-      emails: email, bundles: this.createBundleString(['cons_email', 'cons_addr', 'cons_phone'])}, 'GET');
-
-    let constituent = await parseStringPromise(response)
-    constituent = constituent.api.cons
-
-    if (!constituent)
-      return null;
-    if (constituent.length && constituent.length > 0)
-      constituent = constituent[0]
-
-    return this.createConstituentObject(constituent)
-  }
-
-// This is probably broken now, and we aren't using it.
-/*  async getConstituents(filter, bundles) {
+  async getConstituents(filter, bundles) {
+    let bundleString = bundles.join(',')
     let filterStrings = []
     Object.keys(filter).forEach((key) => {
       let val = ''
@@ -151,9 +77,10 @@ export default class BSD {
       filterStrings.push(key + '=' + val)
     })
     let filterString = filterStrings.join(',');
-    let response = await this.request('cons/get_constituents', {filter: filterString, bundles: this.createBundleString(bundles)}, 'GET');
-    return JSON.parse(XMLParser.toJson(response)).map((element) => this.cleanConstituent(this.cleanOutput(element)));
-  }*/
+    console.log(bundleString)
+    let response = await this.request('cons/get_constituents', {filter: filterString, bundles: bundleString}, 'GET');
+    return JSON.parse(XMLParser.toJson(response));
+  }
 
   async getConsIdsForGroup(groupId) {
     let response = await this.request('/cons_group/get_cons_ids_for_group', {cons_group_id: groupId})
@@ -180,6 +107,11 @@ export default class BSD {
     return response;
   }
 
+  async fetchConstituent(email) {
+    let response = await this.request('/cons/get_constituents_by_email', {emails: email}, 'GET');
+    return JSON.parse(XMLParser.toJson(response));
+  }
+
   async createConstituent(email) {
     let params = '<?xml version="1.0" encoding="utf-8"?><api><cons send_password="y"><cons_email><email>' + email + '</email></cons_email></cons></api>';
     let response = await this.sendXML('/cons/set_constituent_data', params, 'POST');
@@ -204,7 +136,7 @@ export default class BSD {
 
   async setConstituentPassword(email, password) {
     // response will be empty if successful
-    let response = await this.request('/account/set_password', {userid: email, password: password}, 'POST');
+    let response = await this.request('/account/set_password', {userid: email, password: password}, 'POST');    
     return 'password set';
   }
 
@@ -253,20 +185,20 @@ export default class BSD {
         rsvp_use_reminder_email: form['rsvp_use_reminder_email'],
         rsvp_reminder_hours: form['rsvp_email_reminder_hours']
     };
-    let startHour = null;
+
     if (form['start_time']['a'] == 'pm'){
-      let startHour = Number(form['start_time']['h']) + 12;
+      var start_hour = Number(form['start_time']['h']) + 12;
     }
     else{
-      let startHour = form['start_time']['h'];
+      var start_hour = form['start_time']['h'];
     }
 
-    let eventDates = JSON.parse(form['event_dates']);
+    let event_dates = JSON.parse(form['event_dates']);
 
-    eventDates.forEach(async (newEvent) => {
-      let startTime = newEvent['date'] + ' ' + startHour + ':' + form['start_time']['i'] + ':00'
-      params['days'][0]['start_datetime_system'] = startTime;
-      try {
+    event_dates.forEach(async (newEvent) => {
+      let start_time = newEvent['date'] + ' ' + start_hour + ':' + form['start_time']['i'] + ':00'
+      params['days'][0]['start_datetime_system'] = start_time;
+      try{
         let response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'POST');
         if (response.validation_errors){
           console.log(response);
