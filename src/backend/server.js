@@ -61,7 +61,7 @@ app.get('/events/confirmation-email', async (req, res) => {
     isNew: true,
     password: 'MsKDwz9GJGIK'
   };
-  
+
   let event_types = await BSDClient.getEventTypes();
 
   let result = await Mailgun.sendEventConfirmation(form, constituent, event_types, true);
@@ -76,23 +76,19 @@ app.get('/events/create', (req, res) => {
 app.post('/events/create', async (req, res) => {
   let form = req.body;
 
-  let result = await BSDClient.fetchConstituent(form.cons_email);
+  let result = await BSDClient.getConstituentsByEmail(form.cons_email);
 
-  if (result.api.cons){
-  	console.log('constituent found');
+  if (result){
   	var constituent = {
-  		id: result.api.cons.id,
+  		id: result.id,
   		isNew: false
   	};
   }
   else {
-  	console.log('creating constituent...')
   	var constituent = await BSDClient.createConstituent(form.cons_email);
   }
 
-  console.log(constituent);
-
-  try{
+  try {
   	let status = await BSDClient.createEvents(constituent.id, form);
   	res.send(status);
   	let event_types = await BSDClient.getEventTypes();
