@@ -42,13 +42,15 @@ export default class MG {
     if (form.capacity=='0'){form.capacity = 'unlimited'};
     
     // Sort event dates by date
-    form.event_dates = JSON.parse(form.event_dates);
-    form.event_dates.sort(function(a, b) {
+    if (typeof form.event_dates == 'string'){
+      form.event_dates = JSON.parse(form.event_dates);
+    };
+    form.event_dates.sort((a, b) => {
         return a.date.localeCompare(b.date);
     });
 
     // Get the event type name
-    event_types.forEach( function(type){
+    event_types.forEach((type) => {
       if (type.event_type_id == form.event_type_id){
         form.event_type_name = type.name;
       }
@@ -78,5 +80,4 @@ export default class MG {
       return response;
     }
   }
-
 }
