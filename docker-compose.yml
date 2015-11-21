@@ -1,0 +1,37 @@
+shared:
+  image: tianon/true
+  volumes:
+    - /tmp
+graph:
+  build: ./
+  links:
+    - rethinkdb
+  volumes_from:
+    - shared
+  environment:
+    - RETHINK_HOST=rethinkdb
+    - APP_PORT=3001
+  expose:
+    - 3001
+  command: npm run graphql-server
+webpack:
+  build: ./
+  ports:
+    - 3000:3000
+  links:
+    - graph
+  volumes_from:
+    - shared
+  environment:
+    - WEBPACK_PORT=3000
+    - APP_PORT=3001
+    - APP_HOST=graph
+  command: npm run webpack-server
+rethinkdb:
+  image: rethinkdb:2.1.1
+  expose:
+    - 28015
+  ports:
+    - 8080:8080
+db:
+  image: mdillon/postgis
