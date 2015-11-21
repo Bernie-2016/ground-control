@@ -16,13 +16,13 @@ export default async function writeSchema() {
       );
     } else {
       fs.writeFileSync(
-        path.join(__dirname, './schema.json'),
+        path.join('/', 'tmp', 'schema.json'),
         JSON.stringify(result, null, 2)
       );
     }
   }();
   fs.writeFileSync(
-    path.join(__dirname, './schema.graphql'),
+    path.join('/', 'tmp', 'schema.graphql'),
     printSchema(Schema)
   );
 }
