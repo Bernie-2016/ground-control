@@ -5,11 +5,11 @@ shared:
 graph:
   build: ./
   links:
-    - db
+    - rethinkdb
   volumes_from:
     - shared
   environment:
-    - RETHINK_HOST=db
+    - RETHINK_HOST=rethinkdb
     - APP_PORT=3001
   expose:
     - 3001
@@ -27,9 +27,11 @@ webpack:
     - APP_PORT=3001
     - APP_HOST=graph
   command: npm run webpack-server
-db:
+rethinkdb:
   image: rethinkdb:2.1.1
   expose:
     - 28015
   ports:
     - 8080:8080
+db:
+  image: mdillon/postgis
