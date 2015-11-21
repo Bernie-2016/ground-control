@@ -1,30 +1,22 @@
-<html class="wf-freightsanspro-i4-active wf-freightsanspro-i7-active wf-freightsanspro-n4-active wf-freightsanspro-n5-active wf-freightsanspro-n7-active wf-jubilat-i5-active wf-jubilat-n5-active wf-active"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-   <script async="" src="https://www.google-analytics.com/analytics.js"></script><script src="https://cdn.optimizely.com/js/3397600851.js"></script>
    <meta charset="UTF-8">
    <meta http-equiv="x-ua-compatible" content="IE8">
    <meta name="viewport" content="width=device-width, initial-scale=1">
-   <title>Bernie Sanders for President  |  Event Details</title>
+   <title>Bernie Sanders for President  |  Create Event</title>
    <meta property="og:image" content="https://s.bsd.net/bernie16/main/page/-/website/bsd-fb-share.png">
    <link rel="shortcut icon" href="https://s.bsd.net/bernie16/main/page/-/favicon.ico">
    <meta name="twitter:card" content="summary_large_image">
    <meta name="twitter:site" content="@BernieSanders">
    <meta name="theme-color" content="#147FD7"/>
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-   <script src="../events/static/bsd.js" type="text/javascript"></script>
+
+   <!-- this has to do with fonts -->
    <script src="../events/static/vga4irg.js"></script>
-   <style type="text/css">.tk-jubilat{font-family:"jubilat",sans-serif;}.tk-freight-sans-pro{font-family:"freight-sans-pro",sans-serif;}</style>
-   <link rel="stylesheet" href="../events/static/l" media="all">
    <script>try{Typekit.load();}catch(e){}</script>
-   <script src="../events/static/yahoo-dom-event.js" type="text/javascript"></script>
+
    <link rel="stylesheet/less" type="text/css" href="../events/static/clndr.less" />
    <link rel="stylesheet" id="bsd-css" href="../events/static/signup.css" type="text/css" media="all">
-
-<link rel="canonical" href="../events/static/EventDetails.html">
-<link rel="stylesheet" href="../events/static/skin.css" type="text/css">
-<link rel="stylesheet" href="../events/static/frontend.css" type="text/css">
-<link rel="stylesheet" href="../events/static/jquery_ui_reset.css" type="text/css">
-<!-- <link rel="stylesheet" href="../events/static/clndr.css"> -->
 
 <style>
 	
@@ -104,11 +96,11 @@
 <div class="intro-content">
 	<div class="ui-widget-header">
 		<h1>Create Event</h1>
-    	<h2 class="header bsd-widget-header">Step 2 of 2</h2>
+    	<h2 class="header bsd-widget-header">Step 1 of 1</h2>
   	</div>
   	<div class="bsd-widget-inner-content">
     	<p class="instructions"></p>
-    	<p>Now, fill in the form below with the details of your event.</p>
+    	<p>Please fill in the form below with the details of your event.</p>
 	</div>
 </div>
 
@@ -1377,6 +1369,9 @@ jQuery(document).ready(function() {
 		    type: 'POST',
 		    success: function(xhr, status){
 		          console.log(xhr);
+
+		          // temporary success message, to be replaced with a nice UI update in the future
+		          alert('Thanks for submitting an event for the Bernie Sanders campaign! You should receive a confirmation email with a link to manage your event in a few minutes.');
 		    },
 		    error: function(i){
 		      console.log(i);
@@ -1386,14 +1381,6 @@ jQuery(document).ready(function() {
       
 });
 </script>
-
-
-
-
-
-
-
-
 
 <script>
 // This example displays an address form, using the autocomplete feature
