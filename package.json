@@ -48,7 +48,7 @@
     "thinky": "^2.1.9",
     "validator": "^4.2.1",
     "webpack": "^1.10.5",
-    "xml2json": "^0.9.0",
+    "xml2js": "0.4.15",
     "yup": "^0.11.0"
   },
   "devDependencies": {
