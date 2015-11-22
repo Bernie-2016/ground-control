@@ -2,15 +2,28 @@
 
 ## Getting started
 
-Install [RethinkDB](http://rethinkdb.com/docs/install/) and [Node.js](https://nodejs.org/en/download/). Then run the following once to install all the packages
+Install [Docker](https://docs.docker.com/). Then run:
 
-`npm install`
+`docker-machine create --driver virtualbox ground-control-dev`
 
-Then to start Ground Control, you will run this every time:
+Then to start Ground Control, you can run:
 
-`npm start`
+`./start && docker-compose up`
 
-Ground Control should be running at `http://localhost:3000`.  The [RethinkDB database admin](https://www.rethinkdb.com/docs/administration-tools/) will be running at `http://localhost:8080`.
+To find where Ground Control is running, run:
+
+`./start && docker-machine ip ground-control-dev`
+
+Ground Control will be running on port 3000 of the IP that shows there.
+
+## More development info
+
+Any time you open a new terminal window, if you want to use any of the Docker commands, be sure to run `./start` first.
+
+Any changes you make in the `src` directory will automagically show up.  For other changes, you'll need to stop your running server, then run:
+
+`docker-compose build`
+`docker-compose up`
 
 ## What is this?
 
@@ -40,30 +53,6 @@ We are using RethinkDB for our database.  Take a look at the [RethinkDB query la
 On top of that, we are creating a [GraphQL](http://graphql.org/) API.  GraphQL is designed to make it easy to build APIs for objects that have many relationships.  On the frontend, we are using [React](https://facebook.github.io/react/) for the view layer, and React talks to GraphQL via [Relay](https://facebook.github.io/relay/).
 
 If you are feeling stuck/aren't familiar with any of this and want some help, please don't bang your head against a wall!  Talk to me (saikat@berniesanders.com, @saikat in the BernieBuilders Slack).
-
-## Using Docker
-
-For local development, we have included a dockerized version of this stack. To use it, you will need a recent version of:
-
-* [Docker](https://docs.docker.com/engine/installation/)
-* [docker-compose](https://docs.docker.com/compose/install/)
-
-IMPORTANT: remove your `node_modules` directory BEFORE running docker, less you encounter segfaults for native modules.
-
-If you want to develop with the entire project in Docker, simply:
-
-      docker-compose up
-
-docker-compose will handle reloading all of the proper services and re-running npm install if necessary as you change files! :-)
-
-If you want to work on the code outside of Docker, but use the dockerized databases, simply:
-
-      docker-compose start rethinkdb && docker-compose start db
-
-> Note:
-> If you see the error "Please increase the amount of inotify watches allowed per user"
-> you need to run `sudo sysctl fs.inotify.max_user_watches=524288` either on your laptop
-> if you run Docker natively, or inside the boot2docker virtual machine
 
 ## More info?
 

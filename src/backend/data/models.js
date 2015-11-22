@@ -1,3 +1,5 @@
+import Sequelize from 'sequelize';
+
 import thinky from './thinky';
 import validator from 'validator';
 
