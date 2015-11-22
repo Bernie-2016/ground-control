@@ -1,0 +1,36 @@
+Thank you for creating an event for the Bernie Sanders campaign! The details of the event you submitted are included below. To manage the events you have created, please visit https://secure.berniesanders.com/page/event/myevents
+
+  Your username on berniesanders.com is {{event.cons_email}}
+  {{#if user.password}}
+
+    Your password is {{user.password}}
+    
+    IMPORTANT: Please change your password the first time you log in.
+  {{/if}}
+
+  {{event.name}}
+
+  Event Description
+  {{event.event_type_name}}
+  {{{event.description}}}
+
+  Event Venue
+  {{event.venue_name}}, capacity {{event.capacity}}
+  
+  {{event.venue_addr1}} {{event.venue_city}} {{event.venue_state_cd}} {{event.venue_zip}}
+  {{event.venue_directions}}
+
+  Event Time
+  {{event.start_time.h}}:{{event.start_time.i}} {{event.start_time.a}} {{event.start_tz}},
+  Duration: {{event.duration_num}}
+  {{#ifCond event.duration_unit '==' 1}}minute{{/ifCond}}{{#ifCond event.duration_unit '==' 60}}hour{{/ifCond}}{{#ifCond event.duration_unit '==' 1440}}day{{/ifCond}}{{#ifCond event.duration_num '>' 1}}s{{/ifCond}}
+  Event Date{{#ifCond event.event_dates.length '>' 1}}s{{/ifCond}}
+    {{#each event.event_dates}}
+      {{this.date}}
+    {{/each}}
+  
+
+  {{#if event.attendee_volunteer_show}}
+  Volunteer Message
+  {{event.attendee_volunteer_message}}
+  {{/if}}

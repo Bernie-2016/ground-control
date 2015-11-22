@@ -120,12 +120,13 @@ class GroupCallCreationForm extends React.Component {
     this.setState(newState);
   }
 
-  textField(label, stateKey) {
+  textField(label, stateKey, type) {
     return (
       <TextField
         hintText={label}
         floatingLabelText={label}
         value={this.state[stateKey]}
+        type={type}
         onChange={(e) => {
           this.setStateFromInput(stateKey, e.target.value)
         }} />
@@ -163,7 +164,7 @@ class GroupCallCreationForm extends React.Component {
     return (
       <div>
         {this.textField('Name', 'name')} <br />
-        {this.textField('# of calls', 'numCalls')}
+        {this.textField('# of calls', 'numCalls', 'number')}
         <DatePicker
           floatingLabelText='From date'
           hintText='From date'
@@ -183,7 +184,7 @@ class GroupCallCreationForm extends React.Component {
           floatingLabelText='Default time'
           hintText='Default time'
           onChange={(nil, time) => this.setStateFromInput('defaultTime', moment(time))} />
-        {this.textField('Max signups', 'maxSignups')}
+        {this.textField('Max signups', 'maxSignups', 'number')}
         <RaisedButton label='Create!'
           fullWidth={true}
           primary={true}

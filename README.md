@@ -2,15 +2,28 @@
 
 ## Getting started
 
-Install [RethinkDB](http://rethinkdb.com/docs/install/) and [Node.js](https://nodejs.org/en/download/). Then run the following once to install all the packages
+Install [Docker](https://docs.docker.com/). Then run:
 
-`npm install`
+`docker-machine create --driver virtualbox ground-control-dev`
 
-Then to start Ground Control, you will run this every time:
+Then to start Ground Control, you can run:
 
-`npm start`
+`./start && docker-compose up`
 
-Ground Control should be running at `http://localhost:3000`.  The [RethinkDB database admin](https://www.rethinkdb.com/docs/administration-tools/) will be running at `http://localhost:8080`.
+To find where Ground Control is running, run:
+
+`./start && docker-machine ip ground-control-dev`
+
+Ground Control will be running on port 3000 of the IP that shows there.
+
+## More development info
+
+Any time you open a new terminal window, if you want to use any of the Docker commands, be sure to run `./start` first.
+
+Any changes you make in the `src` directory will automagically show up.  For other changes, you'll need to stop your running server, then run:
+
+`docker-compose build`
+`docker-compose up`
 
 ## What is this?
 

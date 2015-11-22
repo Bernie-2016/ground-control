@@ -87,20 +87,20 @@ export default class CallAssignmentCreationForm extends React.Component {
         >
           <Form.Field
             name='name'
-            label='Name'
+            hintText='Name'
           />
           <br />
           <Form.Field
             name='surveyId'
-            label='Survey ID (BSD ID)'
+            hintText='Survey ID (BSD ID)'
           /><br />
           <Form.Field
             name='callerGroupId'
-            label='Caller Group (BSD cons_group ID)'
+            hintText='Caller Group (BSD cons_group ID)'
           /><br />
           <Form.Field
             name='targetGroupId'
-            label='Target Group (BSD cons_group ID)'
+            hintText='Target Group (BSD cons_group ID)'
           /><br />
           <Form.Button type='submit' label='Create!' fullWidth={true} />
         </GCForm>

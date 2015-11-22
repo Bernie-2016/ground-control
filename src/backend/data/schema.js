@@ -141,7 +141,9 @@ const GraphQLPerson = new GraphQLObjectType({
   fields: () => ({
     id: globalIdField('Person'),
     firstName: { type: GraphQLString },
+    middleName: { type: GraphQLString},
     lastName: { type: GraphQLString },
+
     callAssignmentList: {
       type: GraphQLCallAssignmentConnection,
       args: connectionArgs,
@@ -153,6 +155,8 @@ const GraphQLPerson = new GraphQLObjectType({
   }),
   interfaces: [nodeInterface]
 })
+
+
 
 let {
   connectionType: GraphQLPersonConnection,
@@ -379,12 +383,35 @@ let RootQuery = new GraphQLObjectType({
     currentUser: {
       type: GraphQLPerson,
       resolve: () => {
-        return Person.get('5c1609da-449b-4a44-9a60-b95ae9f97541');
+        //return Person.get('5c1609da-449b-4a44-9a60-b95ae9f97541');
+        return null;
       }
     },
     listContainer: {
       type: GraphQLListContainer,
       resolve: () => SharedListContainer
+    },
+    person: {
+      type: GraphQLPerson,
+      args: {
+        id: { type: GraphQLString },
+        email: { type: GraphQLString }
+      },
+      resolve: async (root, {id, email}) => {
+        if (id) {
+          let localId = fromGlobalId(id).id
+          return Person.get(localId)
+        }
+        else if (email) {
+          let BSDPerson = await BSDClient.getConstituentByEmail(email)
+
+          if (BSDPerson) {
+            return Person.createFromBSDConstituent(BSDPerson)
+          }
+          else
+            return null;
+        }
+      }
     },
     survey: {
       type: GraphQLSurvey,
