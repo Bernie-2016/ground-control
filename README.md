@@ -48,13 +48,22 @@ For local development, we have included a dockerized version of this stack. To u
 * [Docker](https://docs.docker.com/engine/installation/)
 * [docker-compose](https://docs.docker.com/compose/install/)
 
+IMPORTANT: remove your `node_modules` directory BEFORE running docker, less you encounter segfaults for native modules.
+
 If you want to develop with the entire project in Docker, simply:
 
       docker-compose up
 
+docker-compose will handle reloading all of the proper services and re-running npm install if necessary as you change files! :-)
+
 If you want to work on the code outside of Docker, but use the dockerized databases, simply:
 
       docker-compose start rethinkdb && docker-compose start db
+
+> Note:
+> If you see the error "Please increase the amount of inotify watches allowed per user"
+> you need to run `sudo sysctl fs.inotify.max_user_watches=524288` either on your laptop
+> if you run Docker natively, or inside the boot2docker virtual machine
 
 ## More info?
 

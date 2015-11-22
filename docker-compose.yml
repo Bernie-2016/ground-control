@@ -4,29 +4,35 @@ shared:
     - /tmp
 graph:
   build: ./
+  dockerfile: dockerfiles/graph.dockerfile
   links:
     - rethinkdb
   volumes_from:
     - shared
+  volumes:
+    - ./src:/usr/src/app/src
+    - ./package.json:/usr/src/app/package.json
   environment:
     - RETHINK_HOST=rethinkdb
     - APP_PORT=3001
   expose:
     - 3001
-  command: npm run graphql-server
 webpack:
   build: ./
+  dockerfile: dockerfiles/webpack.dockerfile
   ports:
     - 3000:3000
   links:
     - graph
   volumes_from:
     - shared
+  volumes:
+    - ./webpack:/usr/src/app/webpack
+    - ./package.json:/usr/src/app/package.json
   environment:
     - WEBPACK_PORT=3000
     - APP_PORT=3001
     - APP_HOST=graph
-  command: npm run webpack-server
 rethinkdb:
   image: rethinkdb:2.1.1
   expose:
