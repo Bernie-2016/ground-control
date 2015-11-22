@@ -49,7 +49,8 @@
     "webpack": "^1.10.5",
     "xml2js": "0.4.15",
     "yup": "^0.11.0",
-    "sequelize": "^3.14.1"
+    "sequelize": "^3.14.1",
+    "pg": "^4.4.3"
   },
   "devDependencies": {
     "foreman": "latest",

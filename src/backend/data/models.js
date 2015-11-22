@@ -1,4 +1,9 @@
 import Sequelize from 'sequelize';
+let sequelize = new Sequelize(process.env.POSTGRES_DBNAME, process.env.POSTGRES_USER, process.env.POSTGRES_PASSWORD, {
+  host: process.env.POSTGRES_HOST,
+  port: process.env.POSTGRES_PORT,
+  dialect: 'postgres'
+});
 
 import thinky from './thinky';
 import validator from 'validator';
