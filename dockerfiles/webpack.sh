@@ -1,5 +1,21 @@
 #!/usr/bin/env bash
 
+if [ ! -f "/tmp/schema.json" ]; then
+  # Wait for scheam.json to appear
+  echo "Waiting for schema.json"
+  change=$(inotifywait -e create /tmp)
+  file=$(echo "$change" | cut -d " " -f 3)
+  folder=$(echo "$change" | cut -d " " -f 1)
+
+  # watch for schema.json to appear in /tmp
+  while ! echo "$folder/$file" | grep -E "schema\.json" > /dev/null; do
+    change=$(inotifywait -r -e close_write,moved_to,create ./webpack ./package.json /tmp/schema.json)
+    file=$(echo "$change" | cut -d " " -f 3)
+    folder=$(echo "$change" | cut -d " " -f 1)
+  done
+
+fi
+
 while true; do
   echo "Starting ${@}"
 
@@ -8,7 +24,7 @@ while true; do
   pid=$!
 
   # watch for file changes. This blocks.
-  change=$(inotifywait -r -e close_write,moved_to,create ./webpack ./package.json)
+  change=$(inotifywait -r -e close_write,moved_to,create ./webpack ./package.json /tmp/schema.json)
 
   # Get the filename that changed
   file=$(echo "$change" | cut -d " " -f 3)
@@ -17,7 +33,7 @@ while true; do
   # ignore .git directory and .swp files from vim
   until ! echo "$folder/$file" | grep -E "\.git|\.swp" > /dev/null; do
     echo "Ignoring change"
-    change=$(inotifywait -r -e close_write,moved_to,create ./webpack ./package.json)
+    change=$(inotifywait -r -e close_write,moved_to,create ./webpack ./package.json /tmp/schema.json)
     file=$(echo "$change" | cut -d " " -f 3)
     folder=$(echo "$change" | cut -d " " -f 1)
   done
