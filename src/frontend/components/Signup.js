@@ -1,5 +1,5 @@
 import React from 'react';
-import {Paper} from 'material-ui';
+import {Paper, TextField} from 'material-ui';
 import {BernieText, BernieColors} from './styles/bernie-css';
 import GCForm from './forms/GCForm';
 import Form from 'react-formal';
@@ -13,9 +13,10 @@ export default class Signup extends React.Component {
         email: yup.string(),
       }),
       formElement: (
-        <Form.Field
+        <TextField
           name='email'
-          label='E-mail Address'
+          hintText='E-mail Address'
+          type='email'
         />
       )
     },

@@ -18,7 +18,7 @@ export default class VolunteerNavigation extends React.Component {
       label: 'Group Calls'
     },
     {
-      value: 'http://map.berniesanders.com',
+      value: '/events',
       label: 'Events'
     },
     {
