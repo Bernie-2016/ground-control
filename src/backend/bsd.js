@@ -17,7 +17,7 @@ export default class BSD {
   }
 
   createConstituentObject(constituent) {
-    let consObj = {}
+    let consObj = {};
     consObj['id'] = constituent['$']['id'];
     consObj['modified_dt'] = constituent['$']['modified_dt'];
 
@@ -111,12 +111,14 @@ export default class BSD {
 
   async getConstituentGroup(groupId) {
     let response = await this.request('cons_group/get_constituent_group', {cons_group_id: groupId}, 'GET');
-    return JSON.parse(XMLParser.toJson(response));
+    response = await parseStringPromise(response);
+    return response;
   }
 
   async getForm(formId) {
     let response = await this.request('signup/get_form', {signup_form_id: formId}, 'GET');
-    return JSON.parse(XMLParser.toJson(response));
+    response = await parseStringPromise(response);
+    return response;
   }
 
   createBundleString(bundles) {
@@ -124,11 +126,17 @@ export default class BSD {
   }
 
   async getConstituentByEmail(email) {
-    let response = await this.request('/cons/get_constituents_by_email', {
-      emails: email, bundles: this.createBundleString(['cons_email', 'cons_addr', 'cons_phone'])}, 'GET');
+    let response = await this.request(
+      '/cons/get_constituents_by_email',
+      {
+        emails: email,
+        bundles: this.createBundleString(['cons_email', 'cons_addr', 'cons_phone'])
+      },
+      'GET'
+    );
 
-    let constituent = await parseStringPromise(response)
-    constituent = constituent.api.cons
+    response = await parseStringPromise(response);
+    let constituent = response.api.cons;
 
     if (!constituent)
       return null;
@@ -181,16 +189,19 @@ export default class BSD {
   }
 
   async createConstituent(email) {
-    let params = '<?xml version="1.0" encoding="utf-8"?><api><cons send_password="y"><cons_email><email>' + email + '</email></cons_email></cons></api>';
+    let params = '<?xml version="1.0" encoding="utf-8"?><api><cons><cons_email><email>' + email + '</email></cons_email></cons></api>';
     let response = await this.sendXML('/cons/set_constituent_data', params, 'POST');
-    response = JSON.parse(XMLParser.toJson(response));
-    let password = randString(12);
+    response = await parseStringPromise(response);
+
+    let constituent = await this.getConstituentByEmail(email);
+
+    // generate a 'random' 9-14 character alphanumeric password
+    let password = randString(Math.floor(Math.random() * 6) + 9);
+    constituent['password'] = password;
+
+    // set the constituent password asynchronously
     this.setConstituentPassword(email, password);
-    return {
-      id: response.api.cons.id,
-      isNew: true,
-      password: password
-    }
+    return constituent;
 
     function randString(x){
         let s = '';
@@ -217,7 +228,8 @@ export default class BSD {
       console.log(e);
       return 'invalid username or password'
     }
-    return JSON.parse(XMLParser.toJson(response))
+    let response = await parseStringPromise(response);
+    return response
   }
 
   async createEvents(cons_id, form) {

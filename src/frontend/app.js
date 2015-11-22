@@ -21,6 +21,10 @@ import CallAssignmentViewer from './components/CallAssignmentViewer';
 import CallAssignmentCreationForm from './components/CallAssignmentCreationForm';
 import GroupCall from './components/GroupCall';
 import GroupCallCreationForm from './components/GroupCallCreationForm';
+import GroupCallDashboard from './components/GroupCallDashboard';
+import VolunteerEventsDashboard from './components/VolunteerEventsDashboard';
+import EventViewer from './components/EventViewer';
+import EventEditor from './components/EventEditor';
 import Form from 'react-formal';
 import {createHistory} from 'history';
 
@@ -45,6 +49,10 @@ const GroupCallQueries = {
 
 const CurrentUserQueries = {
   currentUser: () => Relay.QL`query { currentUser}`
+}
+
+const EventQueries = {
+  currentUser: () => Relay.QL`query { events}`
 }
 
 let history = createHistory()
@@ -106,6 +114,29 @@ ReactDOM.render(
           component={CallAssignmentViewer}
           queries={CallAssignmentQueries}
         />
+      </Route>
+      <Route
+        path='group-calls'
+        component={GroupCallDashboard}
+      >
+        <Route
+          path=':id'
+          component={CallAssignmentViewer}
+        />
+      </Route>
+      <Route
+        path='events'
+        component={VolunteerEventsDashboard}
+      >
+        <Route
+          path=':id'
+          component={EventViewer}
+        >
+          <Route
+            path='edit'
+            component={EventEditor}
+          />
+        </Route>
       </Route>
     </Route>
   </Router>,
