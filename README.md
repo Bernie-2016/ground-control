@@ -41,6 +41,21 @@ On top of that, we are creating a [GraphQL](http://graphql.org/) API.  GraphQL i
 
 If you are feeling stuck/aren't familiar with any of this and want some help, please don't bang your head against a wall!  Talk to me (saikat@berniesanders.com, @saikat in the BernieBuilders Slack).
 
+## Using Docker
+
+For local development, we have included a dockerized version of this stack. To use it, you will need a recent version of:
+
+* [Docker](https://docs.docker.com/engine/installation/)
+* [docker-compose](https://docs.docker.com/compose/install/)
+
+If you want to develop with the entire project in Docker, simply:
+
+      docker-compose up
+
+If you want to work on the code outside of Docker, but use the dockerized databases, simply:
+
+      docker-compose start rethinkdb && docker-compose start db
+
 ## More info?
 
 See the [docs](docs).
