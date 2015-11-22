@@ -10,7 +10,7 @@ graph:
   volumes_from:
     - shared
   volumes:
-    - ./src:/usr/src/app/src
+    - ./src/backend:/usr/src/app/src/backend
     - ./package.json:/usr/src/app/package.json
   environment:
     - RETHINK_HOST=rethinkdb
@@ -28,6 +28,7 @@ webpack:
     - shared
   volumes:
     - ./webpack:/usr/src/app/webpack
+    - ./src/frontend:/usr/src/app/src/frontend
     - ./package.json:/usr/src/app/package.json
   environment:
     - WEBPACK_PORT=3000
