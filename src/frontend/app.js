@@ -107,7 +107,7 @@ ReactDOM.render(
       <Route
         path='call-assignments'
         component={CallAssignmentDashboard}
-        queries={CurrentUserQueries}
+        queries={ListContainerQueries}
       >
         <Route
           path=':id'

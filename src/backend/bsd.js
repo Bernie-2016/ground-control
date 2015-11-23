@@ -16,6 +16,25 @@ export default class BSD {
     this.apiSecret = secret;
   }
 
+  cleanField(field) {
+    if (field && field.length) {
+      if (field[0] && field[0] != '')
+        return field[0]
+      else
+        return null
+    }
+    else
+      return null
+  }
+
+  createSurveyObject(survey) {
+    let surveyObj = {}
+    Object.keys(survey).forEach((key) => {
+      surveyObj[key] = this.cleanField(survey[key])
+    })
+    return surveyObj;
+  }
+
   createConstituentObject(constituent) {
     let consObj = {};
     consObj['id'] = constituent['$']['id'];
@@ -23,25 +42,15 @@ export default class BSD {
 
     let keys = ['firstname', 'middlename', 'lastname', 'has_account', 'is_banned', 'create_dt', 'prefix', 'suffix', 'gender', 'source', 'subsource']
 
-    let cleanField = (field) => {
-      if (field && field.length) {
-        if (field[0] && field[0] != '')
-          return field[0]
-        else
-          return null
-      }
-      else
-        return null
-    }
     keys.forEach((key) => {
-      consObj[key] = cleanField(constituent[key])
+      consObj[key] = this.cleanField(constituent[key])
     })
     consObj['cons_addr'] = []
     constituent.cons_addr.forEach((address) => {
       let addrObj = {}
       let keys = ['addr1', 'addr2', 'city', 'state_cd', 'zip', 'country', 'latitude', 'longitude', 'is_primary', 'cons_addr_type_id', 'cons_addr_type'];
       keys.forEach((key) => {
-        addrObj[key] = cleanField(address[key])
+        addrObj[key] = this.cleanField(address[key])
       })
       consObj['cons_addr'].push(addrObj)
     })
@@ -50,7 +59,7 @@ export default class BSD {
       let phoneObj = {}
       let keys = ['phone', 'phone_type', 'is_subscribed', 'is_primary']
       keys.forEach((key) => {
-        phoneObj[key] = cleanField(phone[key]);
+        phoneObj[key] = this.cleanField(phone[key]);
       })
       consObj['cons_phone'].push(phoneObj)
     })
@@ -60,7 +69,7 @@ export default class BSD {
       let emailObj = {}
       let keys = ['email', 'email_type', 'is_subscribed', 'is_primary']
       keys.forEach((key) => {
-        emailObj[key] = cleanField(email[key])
+        emailObj[key] = this.cleanField(email[key])
       })
       consObj['cons_email'].push(emailObj)
     })
@@ -117,8 +126,15 @@ export default class BSD {
 
   async getForm(formId) {
     let response = await this.request('signup/get_form', {signup_form_id: formId}, 'GET');
+
     response = await parseStringPromise(response);
-    return response;
+    let survey = response.api.signup_form;
+    if (!survey)
+      return null;
+    if (survey.length && survey.length > 0)
+      survey = survey[0];
+
+    return this.createSurveyObject(survey);
   }
 
   createBundleString(bundles) {

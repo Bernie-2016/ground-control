@@ -189,7 +189,9 @@ const GraphQLCallAssignment = new GraphQLObjectType({
     },
     survey: {
       type: GraphQLSurvey,
-      resolve: (assignment) => Survey.get(assignment.surveyId)
+      resolve: (assignment) => {
+        return Survey.get(assignment.surveyId)
+      }
     }
   }),
   interfaces: [nodeInterface]
@@ -221,10 +223,10 @@ const GraphQLSurvey = new GraphQLObjectType({
       type: GraphQLBSDSurvey,
       resolve: async (survey) => {
         if (survey.BSDId) {
-          let surveyData = await BSDClient.getForm(survey.BSDId);
+          let BSDSurvey = await BSDClient.getForm(survey.BSDId);
           return {
             id: survey.BSDId,
-            fullURL: url.resolve('https://' + process.env.BSD_HOST, '/page/s/' + surveyData.api.signup_form.signup_form_slug)
+            fullURL: url.resolve('https://' + process.env.BSD_HOST, '/page/s/' + BSDSurvey.signup_form_slug)
           }
         }
         return null;
