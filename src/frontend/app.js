@@ -52,7 +52,7 @@ const CurrentUserQueries = {
 }
 
 const EventQueries = {
-  currentUser: () => Relay.QL`query { events}`
+  currentUser: () => Relay.QL`query { events }`
 }
 
 let history = createHistory()
