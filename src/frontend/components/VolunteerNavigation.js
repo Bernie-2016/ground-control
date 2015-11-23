@@ -13,10 +13,10 @@ export default class VolunteerNavigation extends React.Component {
       value:'/call-assignments',
       label: 'Make Calls',
     },
-    {
-      value: '/group-calls',
-      label: 'Group Calls'
-    },
+//    {
+//      value: '/group-calls',
+//      label: 'Group Calls'
+//    },
     {
       value: '/events',
       label: 'Events'
@@ -30,7 +30,7 @@ export default class VolunteerNavigation extends React.Component {
       label: 'Resources'
     },
     {
-      value: 'https://go.berniesanders.com/page/share/share-for-bernie?source=homepage_organize',
+      value: 'https://organize.berniesanders.com/slack/berniebuilders',
       label: 'Gather Online'
     },
   ]
