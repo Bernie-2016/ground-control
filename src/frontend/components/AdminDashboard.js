@@ -16,6 +16,10 @@ export default class AdminDashboard extends React.Component {
     {
       value: '/admin/call-assignments',
       label: 'Call Assignments',
+    },
+    {
+      value: '/admin/events',
+      label: 'Events',
     }
   ]
 

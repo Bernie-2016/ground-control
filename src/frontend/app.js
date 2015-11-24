@@ -25,6 +25,7 @@ import GroupCallDashboard from './components/GroupCallDashboard';
 import VolunteerEventsDashboard from './components/VolunteerEventsDashboard';
 import EventViewer from './components/EventViewer';
 import EventEditor from './components/EventEditor';
+import EventAdmin from './components/EventAdmin';
 import Form from 'react-formal';
 import {createHistory} from 'history';
 
@@ -96,6 +97,11 @@ ReactDOM.render(
           queries={CallAssignmentQueries}
         />
       </Route>
+      <Route
+        path='events'
+        component={EventAdmin}
+        queries={ListContainerQueries}
+      />
     </Route>
     <Route
       path='/'

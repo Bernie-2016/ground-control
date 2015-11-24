@@ -112,6 +112,12 @@ export const Group = thinky.createModel('group', {
   personIdList: [type.string()],
 })
 
+export const Event = thinky.createModel('event', {
+  id: type.string().options({enforce_missing: false}),
+  BSDId: type.string().allowNull(true),
+  name: type.string().allowNull(true)
+})
+
 export const CallAssignment = thinky.createModel('call_assignment', {
   id: type.string().options({enforce_missing: false}),
   name: type.string(),
