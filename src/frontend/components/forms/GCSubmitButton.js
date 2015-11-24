@@ -6,6 +6,7 @@ export default class GCSubmitButton extends React.Component {
   render() {
     return <RaisedButton
       primary={true}
+      type='submit'
       {...this.props}
     />
   }

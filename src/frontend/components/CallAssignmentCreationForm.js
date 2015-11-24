@@ -62,7 +62,7 @@ export default class CallAssignmentCreationForm extends React.Component {
               let defaultMessage = 'Something went wrong.'
               let error = transaction.getError();
 
-              let errorMessage = error ? error.source.errors[0].message : defaultMessage;
+              let errorMessage = error.source ? error.source.errors[0].message : defaultMessage;
               try {
                 errorMessage = JSON.parse(errorMessage)
                 errorMessage = errorMessage.message;
