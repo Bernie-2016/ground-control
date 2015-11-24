@@ -2,19 +2,35 @@
 
 ## Getting started
 
-Install [Docker](https://docs.docker.com/). Then run:
+### Linux
 
-`docker-machine create --driver virtualbox ground-control-dev`
+The easiest way to get started in Linux is with [Docker](https://docs.docker.com/engine/installation/ubuntulinux/).  After installing Docker, just run:
 
-Then to start Ground Control, you can run:
+`docker compose up`
 
-`./start && docker-compose up`
+### OS X
 
-To find where Ground Control is running, run:
+In OS X, we currently run everything locally using a Procfile and node-foreman. To get started, install [Node.js](https://nodejs.org/en/download/) and [Homebrew](http://brew.sh/). Then do the following PostgreSQL:
 
-`./start && docker-machine ip ground-control-dev`
+`brew install postgres`
+`npm install`
 
-Ground Control will be running on port 3000 of the IP that shows there.
+Once that is done, start postgres in one tab with
+
+`postgres -D /usr/local/var/postgres`
+
+In a second tab, run:
+
+`createdb ground_control`
+`psql -c "CREATE ROLE ground_control WITH LOGIN SUPERUSER;" -d ground_control`
+
+Then you should be able to start Ground Control on `http://localhost:3000` with
+
+`npm start`
+
+### Windows
+
+The best way to run everything on Windows is probably to try to get Docker working on Windows and use the Linux installation instructions.
 
 ## More development info
 

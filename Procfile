@@ -1,3 +1,3 @@
 -graphql: npm run graphql-server
 -webpack: npm run webpack-server
--db: rethinkdb
+-postgres: postgres -D /usr/local/var/postgres

@@ -1,184 +1,100 @@
 import Sequelize from 'sequelize';
-let sequelize = new Sequelize(process.env.POSTGRES_DBNAME, process.env.POSTGRES_USER, process.env.POSTGRES_PASSWORD, {
-  host: process.env.POSTGRES_HOST || 'localhost',
-  port: process.env.POSTGRES_PORT || 5432,
-  dialect: 'postgres'
-});
-
-import thinky from './thinky';
-import validator from 'validator';
-
-let type = thinky.type;
-
-export const Account = thinky.createModel('account', {
-  id: type.string().options({enforce_missing: false}),
-  personId: type.string(),
-  password: type.boolean(),
-  role: type.string().enum(['ADMIN', 'VOLUNTEER'])
-})
-
-export const Address = thinky.createModel('address', {
-  id: type.string().options({enforce_missing: false}),
-  personId: type.string(),
-  line1: type.string().allowNull(true),
-  line2: type.string().allowNull(true),
-  city: type.string().allowNull(true),
-  state: type.string().allowNull(true),
-  country: type.string().allowNull(true),
-  zip: type.string().regex(/[0-9]+/),
-  location: type.point()
-})
-
-export const Phone = thinky.createModel('phone', {
-  id: type.string().options({enforce_missing: false}),
-  personId: type.string(),
-  number: type.string().regex(/[0-9]+/).length(10)
-})
-
-export const Email = thinky.createModel('email', {
-  id: type.string().options({enforce_missing: false}),
-  personId: type.string(),
-  address: type.string().email().lowercase()
-})
-
-export const Person = thinky.createModel('person', {
-  id: type.string().options({enforce_missing: false}),
-  BSDId: type.string().allowNull(true),
-  firstName: type.string().allowNull(true),
-  middleName: type.string().allowNull(true),
-  lastName: type.string().allowNull(true),
-});
-
-Person.defineStatic('createFromBSDConstituent', async (BSDModel) => {
-  let existingPerson = await Person.filter({BSDId: BSDModel.id})
-  existingPerson = existingPerson[0];
-  let personInfo = {
-    BSDId: BSDModel.id,
-    firstName: BSDModel.firstname,
-    middleName: BSDModel.middlename,
-    lastName: BSDModel.lastname
+let sequelize = new Sequelize(
+  process.env.POSTGRES_DBNAME,
+  process.env.POSTGRES_USER,
+  process.env.POSTGRES_PASSWORD,
+  {
+    host: process.env.POSTGRES_HOST,
+    port: process.env.POSTGRES_PORT,
+    dialect: 'postgres'
   }
-  console.log(existingPerson.id)
-  if (existingPerson) {
-    // I AM HERE TRYING TO MAKE THIS WORK
-//    await Promise.all([
-//      Email.filter({personId: existingPerson.id}).delete(),
-//        Phone.filter({personId: existingPerson.id}).delete(),
-//        Address.filter({personId: existingPerson.id}).delete
-//    ])
-    personInfo['id'] = existingPerson.id
+);
+
+export const Person = sequelize.define('person', {
+  BSDId: {
+    type: Sequelize.INTEGER,
+    field: 'cons_id'
+  },
+  firstName: {
+    type: Sequelize.STRING,
+    field: 'firstname',
+    allowNull: true
+  },
+  middleName: {
+    type: Sequelize.STRING,
+    field: 'middlename',
+    allowNull: true
+  },
+  lastName: {
+    type: Sequelize.STRING,
+    field: 'lastname',
+    allowNull: true
   }
-
-  let person = await Person.save(personInfo, {conflict: 'update'})
-
-  let emails = BSDModel.cons_email.map((emailObj) => {
-    return {
-      personId: person.id,
-      address: emailObj.email
-
-    }
-    emailObj.email
-  })
-
-  let phones = BSDModel.cons_phone.map((phoneObj) => {
-    return {
-      personId: person.id,
-      number: phoneObj.phone
-    }
-  })
-
-  let addresses = BSDModel.cons_addr.map((addressObj) => {
-    return {
-      personId: person.id,
-      line1: addressObj.addr1,
-      line2: addressObj.addr2,
-      city: addressObj.city,
-      state: addressObj.state_cd,
-      country: addressObj.country,
-      zip: addressObj.zip,
-      location: {
-        latitude: parseFloat(addressObj.latitude),
-        longitude: parseFloat(addressObj.longitude)
-      }
-    }
-  })
-  await Promise.all([Email.save(emails), Phone.save(phones), Address.save(addresses)])
-  return person
+}, {
+  updatedAt: 'modified_dt',
+  createdAt: 'create_dt',
+  underscored: true
 })
 
-export const Group = thinky.createModel('group', {
-  id: type.string().options({enforce_missing: false}),
-  BSDId: type.string().allowNull(true),
-  personIdList: [type.string()],
+export const Email = sequelize.define('email', {
+  BSDId: {
+    type: Sequelize.INTEGER,
+    field: 'cons_email_id',
+  },
+  isPrimary: {
+    type: Sequelize.BOOLEAN,
+    field: 'is_primary'
+  },
+  address: {
+    type: Sequelize.STRING,
+    isEmail: true,
+    unique: true
+  }
+}, {
+  updatedAt: 'modified_dt',
+  createdAt: 'create_dt',
+  underscored: true
 })
 
-export const Event = thinky.createModel('event', {
-  id: type.string().options({enforce_missing: false}),
-  BSDId: type.string().allowNull(true),
-  name: type.string().allowNull(true)
+//export const Event = sequelize.define('Event', {
+//  id: type.string().options({enforce_missing: false}),
+//  BSDId: type.string().allowNull(true),
+//  name: type.string().allowNull(true)
+//})
+
+export const CallAssignment = sequelize.define('call_assignment', {
+  name: Sequelize.STRING,
+}, {
+  underscored: true
 })
 
-export const CallAssignment = thinky.createModel('call_assignment', {
-  id: type.string().options({enforce_missing: false}),
-  name: type.string(),
-  callerGroupId: type.string(),
-  targetGroupId : type.string(),
-  surveyId: type.string(),
-//  startDate: type.date(),
-//  endDate: type.date().allowNull(true)
+export const Group = sequelize.define('group', {
+  BSDId: {
+    type: Sequelize.INTEGER,
+    field: 'cons_group_id',
+  }
 })
 
-export const Call = thinky.createModel('call', {
-  id: type.string().options({enforce_missing: false}),
-  callAssignmentId: type.string(),
-  callerId: type.string(),
-  intervieweeId: type.string(),
-  callAssignedAt: type.date()
-})
+export const Survey = sequelize.define('survey', {
+  BSDId: {
+    type: Sequelize.INTEGER,
+    field: 'signup_form_id'
+  }
+}, { underscored: true })
 
-export const Survey = thinky.createModel('survey', {
-  id: type.string().options({enforce_missing: false}),
-  BSDId: type.string().allowNull(true)
-})
-
-export const GroupCall = thinky.createModel('group_call', {
-  id: type.string().options({enforce_missing: false}),
-  name: type.string(),
-  scheduledTime: type.date(),
-  maxSignups: type.number(),
-  duration: type.number(),
-  maestroConferenceUID: type.string(),
+export const GroupCall = sequelize.define('group_call', {
+  name: Sequelize.STRING,
+  scheduledTime: Sequelize.DATE,
+  maxSignups: Sequelize.INTEGER,
+  duration: Sequelize.INTEGER,
+  maestroConferenceUID: Sequelize.STRING,
   signups: [{
-    personId: type.string(),
-    attended: type.boolean(),
-    role: type.string().enum(['host', 'note_taker', 'participant'])
+    personId: Sequelize.STRING,
+    attended: Sequelize.BOOLEAN,
+    role: Sequelize.ENUM(['host', 'note_taker', 'participant'])
   }]
 })
 
-export const Field = thinky.createModel('field', {
-  id: type.string().options({enforce_missing: false}),
-  label: type.string(),
-  type: type.string().enum(['Number', 'String', 'Boolean', 'Date', 'Point']),
-  validators: {
-    function: type.string().enum([
-      'enum', 'min', 'max', 'regex', 'lowercase', 'uppercase', 'integer'
-    ]),
-    args: []
-  }
-})
-
-export const Note = thinky.createModel('note', {
-  id: type.string().options({enforce_missing: false}),
-  personId: type.string(),
-  fieldId: type.string(),
-  value: type.any(),
-  entryTime: type.date(),
-  source: {
-    type: type.string().enum(['survey', 'group_call', 'BSD']),
-    id: type.string()
-  }
-}, {
-  validator: (data) => {
-    return true;
-  }
-})
+CallAssignment.hasOne(Group, {as: 'callerGroup', foreignKey : 'callerGroupId'});
+CallAssignment.hasOne(Group, {as: 'targetGroup', foreignKey : 'targetGroupId'});
+Person.hasMany(Email, {as: 'emails'})
