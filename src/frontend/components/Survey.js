@@ -1,7 +1,7 @@
 import React from 'react';
 import Relay from 'react-relay';
 import Radium from 'radium';
-import {RaisedButton} from 'material-ui';
+import {LinearProgress} from 'material-ui';
 
 // This just handles rendering and interacting with a BSD survey in an iFrame
 @Radium
@@ -10,11 +10,23 @@ class Survey extends React.Component {
     container: {
       width: '100%',
     },
+    progress: {
+      width: '50%',
+      margin: '0 auto',
+      marginTop: '30px',
+      marginBottom: '30px',
+      textAlign: 'center',
+    },
+    progressHeader: {
+      marginBottom: '10px',
+    },
     frame: {
       display: 'block',
       border: 'none',
       width: '100%',
       height: 0,
+      opacity: 0,
+      transition: 'opacity 0.7s',
     }
   }
 
@@ -56,7 +68,15 @@ class Survey extends React.Component {
     }
 
     else if (event.data.message == 'documentHeight')
-      this.setState({frameStyle: {height: event.data.details.height}})
+      this.setState({
+        frameStyle: {
+          height: event.data.details.height,
+          opacity: '1',
+        },
+        loadingStyle: {
+          display: 'none',
+        }
+      })
   }
 
   sendFrameMessage(message) {
@@ -81,6 +101,12 @@ class Survey extends React.Component {
 
   render() {
     let source = this.props.survey.BSDData.fullURL;
+    let loading = (
+      <div style={[this.styles.progress, this.state.loadingStyle]}>
+        <h3 style={this.styles.progressHeader}>Loading Volunteer Survey...</h3>
+        <LinearProgress mode="indeterminate" />
+      </div>
+    )
     let frame = (
       <iframe
         ref='frame'
@@ -93,6 +119,7 @@ class Survey extends React.Component {
 
     return (
       <div style={this.styles.container}>
+        {loading}
         {frame}
       </div>
     )
