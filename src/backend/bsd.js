@@ -253,7 +253,7 @@ export default class BSD {
     return response
   }
 
-  async createEvents(cons_id, form, event_types) {
+  async createEvents(cons_id, form, event_types, callback) {
     let eventType = null;
     event_types.forEach((type) => {
       if (type.event_type_id == form['event_type_id']){
@@ -307,20 +307,21 @@ export default class BSD {
 
     let eventDates = JSON.parse(form['event_dates']);
 
-    let status = 'success';
-
-    await eventDates.forEach(async (newEvent) => {
+    eventDates.forEach(async (newEvent, index, array) => {
       let startTime = newEvent['date'] + ' ' + startHour + ':' + form['start_time']['i'] + ':00'
       params['days'][0]['start_datetime_system'] = startTime;
       let response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'POST');
-      // console.log(response);
       if (response.validation_errors){
         console.log(response);
-        status = 'error';
+        callback(response.validation_errors);
+      }
+      else if (response.event_id_obfuscated && index == array.length - 1){
+        // successfully created events
+        callback('success');
       }
     });
 
-    return status
+    return null
   }
 
   async makeRawRequest(callPath, params, method) {

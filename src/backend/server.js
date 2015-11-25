@@ -21,7 +21,6 @@ app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x
 // this endpoint may be used for caching and serving available event types and their attributes to the event creation form
 app.get('/events/types.json', async (req, res) => {
   let result = await BSDClient.getEventTypes();
-  console.log(result);
   res.json(result);
 });
 
@@ -30,7 +29,6 @@ app.get('/events/confirmation-email', async (req, res) => {
   let event_types = await BSDClient.getEventTypes();
   let result = await Mailgun.sendEventConfirmation(demoData.EventCreationForm, demoData.EventCreationConstituent, event_types, true);
   res.send(result.html)
-  // res.json(result);
 });
 
 app.get('/events/create', (req, res) => {
@@ -44,18 +42,19 @@ app.post('/events/create', async (req, res) => {
   let constituent = await BSDClient.getConstituentByEmail(form.cons_email);
 
   if (!constituent){
-  	console.log('creating constituent...');
     constituent = await BSDClient.createConstituent(form.cons_email);
   }
 
   let event_types = await BSDClient.getEventTypes();
 
-  let result = await BSDClient.createEvents(constituent.id, form, event_types);
-  res.json(result);
+  let result = await BSDClient.createEvents(constituent.id, form, event_types, eventCreationCallback);
 
   // send event creation confirmation email
-  if (result == 'success'){
-  	Mailgun.sendEventConfirmation(form, constituent, event_types);
+  function eventCreationCallback(status){
+  	res.json(status);
+  	if (status == 'success'){
+  		Mailgun.sendEventConfirmation(form, constituent, event_types);
+  	}
   }
 });
 
