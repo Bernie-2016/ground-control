@@ -55,7 +55,7 @@ app.post('/events/create', async (req, res) => {
 
   // send event creation confirmation email
   if (result == 'success'){
-  	Mailgun.sendEventConfirmation(form, constituent, event_types, true);
+  	Mailgun.sendEventConfirmation(form, constituent, event_types);
   }
 });
 
