@@ -62,7 +62,7 @@ export default class CallAssignmentCreationForm extends React.Component {
               let defaultMessage = 'Something went wrong.'
               let error = transaction.getError();
 
-              let errorMessage = error ? error.source.errors[0].message : defaultMessage;
+              let errorMessage = error.source ? error.source.errors[0].message : defaultMessage;
               try {
                 errorMessage = JSON.parse(errorMessage)
                 errorMessage = errorMessage.message;
@@ -88,19 +88,23 @@ export default class CallAssignmentCreationForm extends React.Component {
           <Form.Field
             name='name'
             hintText='Name'
+            label='Name'
           />
           <br />
           <Form.Field
             name='surveyId'
             hintText='Survey ID (BSD ID)'
+            label='Survey ID'
           /><br />
           <Form.Field
             name='callerGroupId'
             hintText='Caller Group (BSD cons_group ID)'
+            label='Caller Group'
           /><br />
           <Form.Field
             name='targetGroupId'
             hintText='Target Group (BSD cons_group ID)'
+            label='Target Group'
           /><br />
           <Form.Button type='submit' label='Create!' fullWidth={true} />
         </GCForm>

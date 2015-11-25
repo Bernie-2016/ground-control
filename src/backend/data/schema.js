@@ -28,6 +28,7 @@ import {
   Call,
   Survey,
   GroupCall,
+  Event
 } from './models';
 
 import moment from 'moment-timezone';
@@ -71,6 +72,8 @@ let {nodeInterface, nodeField} = nodeDefinitions(
       return Survey.get(id);
     if (type === 'GroupCall')
       return GroupCall.get(id);
+    if (type === 'Event')
+      return Event.get(id);
     if (type === 'ListContainer')
       return SharedListContainer;
     return null;
@@ -90,6 +93,8 @@ let {nodeInterface, nodeField} = nodeDefinitions(
       return GraphQLGroupCall;
     if (obj instanceof ListContainer)
       return GraphQLListContainer;
+    if (obj instanceof Event)
+      return GraphQLEvent;
     return null;
   }
 );
@@ -121,6 +126,14 @@ const GraphQLListContainer = new GraphQLObjectType({
           .limit(first)
 
         return connectionFromArray(calls, {first});
+      }
+    },
+    eventList: {
+      type: GraphQLEventConnection,
+      args: connectionArgs,
+      resolve: async(event, {first}) => {
+        let events = await Event.filter({})
+        return connectionFromArray(events, {first});
       }
     },
     callAssignmentList: {
@@ -156,13 +169,27 @@ const GraphQLPerson = new GraphQLObjectType({
   interfaces: [nodeInterface]
 })
 
-
-
 let {
   connectionType: GraphQLPersonConnection,
 } = connectionDefinitions({
   name: 'Person',
   nodeType: GraphQLPerson
+});
+
+const GraphQLEvent = new GraphQLObjectType({
+  name: 'Event',
+  description: 'An event',
+  fields: () => ({
+    id: globalIdField('Event'),
+    name: { type: GraphQLString }
+  })
+})
+
+let {
+  connectionType: GraphQLEventConnection,
+} = connectionDefinitions({
+  name: 'Event',
+  nodeType: GraphQLEvent
 });
 
 const GraphQLGroup = new GraphQLObjectType({
@@ -189,7 +216,9 @@ const GraphQLCallAssignment = new GraphQLObjectType({
     },
     survey: {
       type: GraphQLSurvey,
-      resolve: (assignment) => Survey.get(assignment.surveyId)
+      resolve: (assignment) => {
+        return Survey.get(assignment.surveyId)
+      }
     }
   }),
   interfaces: [nodeInterface]
@@ -221,10 +250,10 @@ const GraphQLSurvey = new GraphQLObjectType({
       type: GraphQLBSDSurvey,
       resolve: async (survey) => {
         if (survey.BSDId) {
-          let surveyData = await BSDClient.getForm(survey.BSDId);
+          let BSDSurvey = await BSDClient.getForm(survey.BSDId);
           return {
             id: survey.BSDId,
-            fullURL: url.resolve('https://' + process.env.BSD_HOST, '/page/s/' + surveyData.api.signup_form.signup_form_slug)
+            fullURL: url.resolve('https://' + process.env.BSD_HOST, '/page/s/' + BSDSurvey.signup_form_slug)
           }
         }
         return null;

@@ -56,6 +56,12 @@ export default class MG {
       }
     });
 
+    constituent.cons_email.forEach((email) => {
+      if (email.is_primary == '1'){
+        constituent['email'] = email.email;
+      }
+    });
+
     let data = {
       event: form,
       user: constituent

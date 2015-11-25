@@ -79,7 +79,7 @@ export class CallAssignmentViewer extends React.Component {
               <Survey ref='survey' survey={this.props.callAssignment.survey} initialValues={{'email' : 'saikat@gomockingbird.com'}} />
             </div>
             <div style={this.styles.submitButton}>
-              <Form.Button type='submit' label='Submit and onto the next volunteer!' style={this.styles.submitButton} fullWidth={true}/>
+              <Form.Button type='submit' label='Submit and on to the next volunteer!' style={this.styles.submitButton} fullWidth={true}/>
             </div>
           </GCForm>
         </div>
