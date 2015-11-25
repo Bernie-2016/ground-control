@@ -25,6 +25,7 @@ import GroupCallDashboard from './components/GroupCallDashboard';
 import VolunteerEventsDashboard from './components/VolunteerEventsDashboard';
 import EventViewer from './components/EventViewer';
 import EventEditor from './components/EventEditor';
+import EventAdmin from './components/EventAdmin';
 import Form from 'react-formal';
 import {createHistory} from 'history';
 
@@ -52,7 +53,7 @@ const CurrentUserQueries = {
 }
 
 const EventQueries = {
-  currentUser: () => Relay.QL`query { events}`
+  currentUser: () => Relay.QL`query { events }`
 }
 
 let history = createHistory()
@@ -96,6 +97,11 @@ ReactDOM.render(
           queries={CallAssignmentQueries}
         />
       </Route>
+      <Route
+        path='events'
+        component={EventAdmin}
+        queries={ListContainerQueries}
+      />
     </Route>
     <Route
       path='/'
@@ -107,7 +113,7 @@ ReactDOM.render(
       <Route
         path='call-assignments'
         component={CallAssignmentDashboard}
-        queries={CurrentUserQueries}
+        queries={ListContainerQueries}
       >
         <Route
           path=':id'

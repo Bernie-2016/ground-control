@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
 let sequelize = new Sequelize(process.env.POSTGRES_DBNAME, process.env.POSTGRES_USER, process.env.POSTGRES_PASSWORD, {
-  host: process.env.POSTGRES_HOST,
-  port: process.env.POSTGRES_PORT,
+  host: process.env.POSTGRES_HOST || 'localhost',
+  port: process.env.POSTGRES_PORT || 5432,
   dialect: 'postgres'
 });
 
@@ -110,6 +110,12 @@ export const Group = thinky.createModel('group', {
   id: type.string().options({enforce_missing: false}),
   BSDId: type.string().allowNull(true),
   personIdList: [type.string()],
+})
+
+export const Event = thinky.createModel('event', {
+  id: type.string().options({enforce_missing: false}),
+  BSDId: type.string().allowNull(true),
+  name: type.string().allowNull(true)
 })
 
 export const CallAssignment = thinky.createModel('call_assignment', {

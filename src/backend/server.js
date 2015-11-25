@@ -21,6 +21,7 @@ app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x
 // this endpoint may be used for caching and serving available event types and their attributes to the event creation form
 app.get('/events/types.json', async (req, res) => {
   let result = await BSDClient.getEventTypes();
+  console.log(result);
   res.json(result);
 });
 
@@ -43,15 +44,19 @@ app.post('/events/create', async (req, res) => {
   let constituent = await BSDClient.getConstituentByEmail(form.cons_email);
 
   if (!constituent){
+  	console.log('creating constituent...');
     constituent = await BSDClient.createConstituent(form.cons_email);
   }
 
-  let result = await BSDClient.createEvents(constituent.id, form);
-  res.send(result);
+  let event_types = await BSDClient.getEventTypes();
+
+  let result = await BSDClient.createEvents(constituent.id, form, event_types);
+  res.json(result);
 
   // send event creation confirmation email
-  let event_types = await BSDClient.getEventTypes();
-  Mailgun.sendEventConfirmation(form, constituent, event_types);
+  if (result == 'success'){
+  	Mailgun.sendEventConfirmation(form, constituent, event_types);
+  }
 });
 
 app.use(express.static(publicPath))

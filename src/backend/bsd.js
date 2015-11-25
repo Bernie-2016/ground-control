@@ -16,6 +16,25 @@ export default class BSD {
     this.apiSecret = secret;
   }
 
+  cleanField(field) {
+    if (field && field.length) {
+      if (field[0] && field[0] != '')
+        return field[0]
+      else
+        return null
+    }
+    else
+      return null
+  }
+
+  createSurveyObject(survey) {
+    let surveyObj = {}
+    Object.keys(survey).forEach((key) => {
+      surveyObj[key] = this.cleanField(survey[key])
+    })
+    return surveyObj;
+  }
+
   createConstituentObject(constituent) {
     let consObj = {};
     consObj['id'] = constituent['$']['id'];
@@ -23,49 +42,43 @@ export default class BSD {
 
     let keys = ['firstname', 'middlename', 'lastname', 'has_account', 'is_banned', 'create_dt', 'prefix', 'suffix', 'gender', 'source', 'subsource']
 
-    let cleanField = (field) => {
-      if (field && field.length) {
-        if (field[0] && field[0] != '')
-          return field[0]
-        else
-          return null
-      }
-      else
-        return null
-    }
     keys.forEach((key) => {
-      consObj[key] = cleanField(constituent[key])
+      consObj[key] = this.cleanField(constituent[key])
     })
     consObj['cons_addr'] = []
-    constituent.cons_addr.forEach((address) => {
-      let addrObj = {}
-      let keys = ['addr1', 'addr2', 'city', 'state_cd', 'zip', 'country', 'latitude', 'longitude', 'is_primary', 'cons_addr_type_id', 'cons_addr_type'];
-      keys.forEach((key) => {
-        addrObj[key] = cleanField(address[key])
+    if (constituent.cons_addr){
+      constituent.cons_addr.forEach((address) => {
+        let addrObj = {}
+        let keys = ['addr1', 'addr2', 'city', 'state_cd', 'zip', 'country', 'latitude', 'longitude', 'is_primary', 'cons_addr_type_id', 'cons_addr_type'];
+        keys.forEach((key) => {
+          addrObj[key] = this.cleanField(address[key])
+        })
+        consObj['cons_addr'].push(addrObj)
       })
-      consObj['cons_addr'].push(addrObj)
-    })
+    }
     consObj['cons_phone'] = []
-    constituent.cons_phone.forEach((phone) => {
-      let phoneObj = {}
-      let keys = ['phone', 'phone_type', 'is_subscribed', 'is_primary']
-      keys.forEach((key) => {
-        phoneObj[key] = cleanField(phone[key]);
+    if (constituent.cons_phone){
+      constituent.cons_phone.forEach((phone) => {
+        let phoneObj = {}
+        let keys = ['phone', 'phone_type', 'is_subscribed', 'is_primary']
+        keys.forEach((key) => {
+          phoneObj[key] = this.cleanField(phone[key]);
+        })
+        consObj['cons_phone'].push(phoneObj)
       })
-      consObj['cons_phone'].push(phoneObj)
-    })
+    }
     consObj['cons_email'] = []
-
-    constituent.cons_email.forEach((email) => {
-      let emailObj = {}
-      let keys = ['email', 'email_type', 'is_subscribed', 'is_primary']
-      keys.forEach((key) => {
-        emailObj[key] = cleanField(email[key])
+    if (constituent.cons_email){
+      constituent.cons_email.forEach((email) => {
+        let emailObj = {}
+        let keys = ['email', 'email_type', 'is_subscribed', 'is_primary']
+        keys.forEach((key) => {
+          emailObj[key] = this.cleanField(email[key])
+        })
+        consObj['cons_email'].push(emailObj)
       })
-      consObj['cons_email'].push(emailObj)
-    })
+    }
 
-    console.log(consObj)
     return consObj;
   }
 
@@ -117,8 +130,15 @@ export default class BSD {
 
   async getForm(formId) {
     let response = await this.request('signup/get_form', {signup_form_id: formId}, 'GET');
+
     response = await parseStringPromise(response);
-    return response;
+    let survey = response.api.signup_form;
+    if (!survey)
+      return null;
+    if (survey.length && survey.length > 0)
+      survey = survey[0];
+
+    return this.createSurveyObject(survey);
   }
 
   createBundleString(bundles) {
@@ -184,8 +204,7 @@ export default class BSD {
 
   async getEventTypes() {
     let response = await this.request('event/get_available_types', {}, 'GET');
-    // console.log(response);
-    return response;
+    return response
   }
 
   async createConstituent(email) {
@@ -194,6 +213,8 @@ export default class BSD {
     response = await parseStringPromise(response);
 
     let constituent = await this.getConstituentByEmail(email);
+
+    console.log(constituent);
 
     // generate a 'random' 9-14 character alphanumeric password
     let password = randString(Math.floor(Math.random() * 6) + 9);
@@ -232,7 +253,14 @@ export default class BSD {
     return response
   }
 
-  async createEvents(cons_id, form) {
+  async createEvents(cons_id, form, event_types) {
+    let eventType = null;
+    event_types.forEach((type) => {
+      if (type.event_type_id == form['event_type_id']){
+        eventType = type;
+      }
+    })
+
     // validations
     // Remove special characters from phone number
     let contact_phone = form['contact_phone'].replace(/\D/g,'');
@@ -251,12 +279,10 @@ export default class BSD {
         venue_country: form['venue_country'],
         venue_directions: form['venue_directions'],
         days: [{
-            start_datetime_system: '',  // This will be defined below
             duration: form['duration_num'] * form['duration_unit'],
             capacity: form['capacity']
         }],
         local_timezone: form['start_tz'],
-        attendee_volunteer_show: form['attendee_volunteer_show'],
         attendee_volunteer_message: form['attendee_volunteer_message'],
         is_searchable: form['is_searchable'],
         public_phone: form['public_phone'],
@@ -265,31 +291,36 @@ export default class BSD {
         rsvp_use_reminder_email: form['rsvp_use_reminder_email'],
         rsvp_reminder_hours: form['rsvp_email_reminder_hours']
     };
+
+    // Add params if supported by event type
+    if (Number(eventType.attendee_volunteer_show) == 1){
+      params['attendee_volunteer_show'] = form['attendee_volunteer_show'];
+    }
+
     let startHour = null;
     if (form['start_time']['a'] == 'pm'){
-      let startHour = Number(form['start_time']['h']) + 12;
+      startHour = Number(form['start_time']['h']) + 12;
     }
     else{
-      let startHour = form['start_time']['h'];
+      startHour = form['start_time']['h'];
     }
 
     let eventDates = JSON.parse(form['event_dates']);
 
-    eventDates.forEach(async (newEvent) => {
+    let status = 'success';
+
+    await eventDates.forEach(async (newEvent) => {
       let startTime = newEvent['date'] + ' ' + startHour + ':' + form['start_time']['i'] + ':00'
       params['days'][0]['start_datetime_system'] = startTime;
-      try {
-        let response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'POST');
-        if (response.validation_errors){
-          console.log(response);
-        }
-      }
-      catch(e){
-        console.log(e);
+      let response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'POST');
+      // console.log(response);
+      if (response.validation_errors){
+        console.log(response);
+        status = 'error';
       }
     });
 
-    return 'events endpoint reached'
+    return status
   }
 
   async makeRawRequest(callPath, params, method) {

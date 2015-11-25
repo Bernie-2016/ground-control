@@ -1,2 +1,0 @@
-#!/bin/bash
-eval "$(docker-machine env ground-control-dev)"
