@@ -3,7 +3,7 @@
   <p>Thank you for creating an event for the Bernie Sanders campaign! The details of the event you submitted are included below. To manage the events you have created, please visit <a href="https://secure.berniesanders.com/page/event/myevents">secure.berniesanders.com/page/event/myevents</a>.</p>
 
   <p>
-  Your username on berniesanders.com is <b>{{event.cons_email}}</b>
+  Your username on berniesanders.com is <b>{{user.email}}</b>
   {{#if user.password}}
     <br>
     Your password is <b>{{user.password}}</b>
@@ -41,4 +41,4 @@
   <p>{{event.attendee_volunteer_message}}</p>
   {{/if}}
 
-{{> footer email=event.cons_email }}
+{{> footer email=user.email }}

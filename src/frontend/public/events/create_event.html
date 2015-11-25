@@ -19,6 +19,10 @@
    <link rel="stylesheet" id="bsd-css" href="../events/static/signup.css" type="text/css" media="all">
 
 <style>
+
+	.hidden {
+		display:none;
+	}
 	
 	input[type="number"], input[type="tel"], input[type="email"] {
 	    display: inline-block;
@@ -62,6 +66,13 @@
 	    margin-top: 2px;
 	}
 
+	@media (min-width: 768px){
+		.event-central.edit-event #SKIN #secondform, .event-central.step2 #SKIN #secondform {
+	    	width: 100% !important;
+	    	float: none !important;
+		}
+	}
+
 </style>
 
 
@@ -89,20 +100,7 @@
 <div id="SKIN" class="module_event2 bsd-page bsd-event bsd-event-createdetails">
 
 
-
 <div class="basic container">
-
-
-<div class="intro-content">
-	<div class="ui-widget-header">
-		<h1>Create Event</h1>
-    	<h2 class="header bsd-widget-header">Step 1 of 1</h2>
-  	</div>
-  	<div class="bsd-widget-inner-content">
-    	<p class="instructions"></p>
-    	<p>Please fill in the form below with the details of your event.</p>
-	</div>
-</div>
 
 
 <form method="post" name="secondform" id="secondform">
@@ -1127,7 +1125,7 @@
                     <input size="6" maxlength="12" id="postal_code" name="venue_zip" type="number" value=""></div></div><div class="clear"></div>
 
                     <div class="inputgroup"><div class="label">
-                                        <label class="form_label">Location Name:</label><span style="color: red;">*</span> 
+                                        <label class="form_label">Venue Name:</label><span style="color: red;">*</span> 
                                     </div><div class="field">
                                         <input size="30" name="venue_name" id="venue_name" type="text" placeholder="" required></div></div><div class="inputgroup"><div class="label">
                                         <label class="form_label">Capacity Limit: </label><span style="color: red;">*</span> 
@@ -1136,7 +1134,14 @@
 
                     <div class="inputgroup"><div class="label">
                     <label class="form_label">Directions To Event:</label></div><div class="field">
-                    <textarea rows="4" cols="30" name="venue_directions"></textarea></div></div><div class="inputgroup"><div class="label">
+                    <textarea rows="4" cols="30" name="venue_directions"></textarea></div></div>
+                    <span class="explain">(Optional; only necessary if guests will need additional directions after arriving at address.)</span>
+                    </div>
+
+
+
+<div class="section-wrap"><div class="sectionheader section-where"><h3>Who:<span class="bsd-image-replacement"></span></h3></div>
+                    <div class="inputgroup"><div class="label">
                     <label class="form_label">Contact Phone:</label><span style="color: red;">*</span> 
                 </div><div class="field">
                     <input size="30" name="contact_phone" type="tel" required></div><div class="phone-instruct"><span style="color: red;">*</span><div class="explain"> A contact phone number is required.</div></div></div>
@@ -1204,8 +1209,6 @@ jQuery(document).ready(function() {
 	      	// Create an event on this date if date is valid (occuring in the future)
 	      	var new_events = [{
 	      	  	date: target.date.format('YYYY-MM-DD'),
-	      	  	title: eventform.elements["name"].value,
-	      	  	location: eventform.elements["venue_name"].value,
 	      	  	auto_generated: false,
 	      	  	moment: target.date
 	      	  }];
@@ -1262,8 +1265,6 @@ jQuery(document).ready(function() {
 
 		   			var new_event = {
 		   			  date: next_date.format('YYYY-MM-DD'),
-		   			  title: event_title,
-		   			  location: event_location,
 		   			  auto_generated: true,
 		   			  moment: next_date
 		   			};
@@ -1299,8 +1300,6 @@ jQuery(document).ready(function() {
 
 		    		var new_event = {
 		    		  date: next_date.format('YYYY-MM-DD'),
-		    		  title: event_title,
-		    		  location: event_location,
 		    		  auto_generated: true,
 		    		  moment: next_date
 		    		};
@@ -1326,8 +1325,6 @@ jQuery(document).ready(function() {
 
 		    		var new_event = {
 		    		  date: next_date.format('YYYY-MM-DD'),
-		    		  title: event_title,
-		    		  location: event_location,
 		    		  auto_generated: true,
 		    		  moment: next_date
 		    		};
@@ -1357,6 +1354,11 @@ jQuery(document).ready(function() {
 
 		current_events = $.merge( $.merge( [], user_created_events ), generated_events );
 
+		if (current_events.length < 1){
+			alert('Please select a date for your event from the calendar.');
+			return
+		}
+
 		formdata.push({ 
 			name: "event_dates",
 			value: JSON.stringify(current_events)
@@ -1368,7 +1370,7 @@ jQuery(document).ready(function() {
 		    data: formdata,
 		    type: 'POST',
 		    success: function(xhr, status){
-		          console.log(xhr);
+		          console.log(xhr, status);
 
 		          // temporary success message, to be replaced with a nice UI update in the future
 		          alert('Thanks for submitting an event for the Bernie Sanders campaign! You should receive a confirmation email with a link to manage your event in a few minutes.');
@@ -1422,10 +1424,7 @@ function fillInAddress() {
   // Get the place details from the autocomplete object.
   var place = autocomplete.getPlace();
 
-  console.log(place);
-
   for (var component in componentForm) {
-  	console.log(component);
   	document.getElementById(component).value = '';
   	document.getElementById(component).disabled = false;
   }
