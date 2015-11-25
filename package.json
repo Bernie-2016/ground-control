@@ -9,7 +9,8 @@
     "graphql-server": "nodemon -e js -w ./src/backend --exec babel-node -- ./src/backend/server.js",
     "webpack-server": "babel-node ./webpack/server.js",
     "bundle": "mkdir -p ./src/frontend/public/js && webpack --config ./webpack/config.js",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "sequelize": "cd src/backend/data && sequelize"
   },
   "dependencies": {
     "babel": "^5.8.21",
@@ -50,6 +51,7 @@
     "xml2js": "0.4.15",
     "yup": "^0.11.0",
     "sequelize": "^3.14.1",
+    "sequelize-cli": "^2.2.1",
     "pg": "^4.4.3"
   },
   "devDependencies": {

@@ -17,44 +17,12 @@ sequelize.beforeDefine('defaultModelAttributes', (model) => {
 /*
 For now, we are just wholesale copying models from BSD.  These models are partial versions of models in BSD. In the future, we may have other underlying sources for some of these models, at that point, we plan to migrate objects over into a more abstract architecture.  For now, if you need new properties on these models, if they map to existing columns in BSD, you can just add them without needing to do a migration.
 */
-let commonBSDProps = {
-  createApp: {
-    type: Sequelize.STRING,
-    field: 'create_app',
-    allowNull: true
-  },
-  createUser: {
-    type: Sequelize.STRING,
-    field: 'create_user',
-    alowNull: true
-  },
-  modifiedApp: {
-    type: Sequelize.STRING,
-    field: 'modified_app',
-    allowNull: true
-  },
-  modifiedUser: {
-    type: Sequelize.STRING,
-    field: 'modified_user',
-    allowNull: true
-  },
-  status: {
-    type: Sequelize.BIGINT,
-  },
-  note: {
-    type: Sequelize.STRING,
-    allowNull: true
-  }
-}
+
 export const Person = sequelize.define('person', {
   id: {
     type: Sequelize.BIGINT,
     field: 'cons_id',
     primaryKey: true
-  },
-  sourceID: {
-    type: Sequelize.BIGINT,
-    field: 'cons_source_id',
   },
   prefix: {
     type: Sequelize.STRING,
@@ -79,10 +47,6 @@ export const Person = sequelize.define('person', {
     type: Sequelize.STRING,
     allowNull: true
   },
-  salutation: {
-    type: Sequelize.STRING,
-    allowNull: true
-  },
   gender: {
     type: Sequelize.CHAR(1),
     allowNull: true
@@ -104,43 +68,6 @@ export const Person = sequelize.define('person', {
     type: Sequelize.STRING,
     allowNull: true
   },
-  income: {
-    type: Sequelize.NUMERIC,
-    allowNull: true
-  },
-  source: {
-    type: Sequelize.STRING,
-    allowNull: true
-  },
-  subsource: {
-    type: Sequelize.STRING,
-    allowNull: true
-  },
-  userid: {
-    type: Sequelize.STRING,
-    allowNull: true
-  },
-  password: {
-    type: Sequelize.STRING,
-    allowNull: true
-  },
-  isValidated: {
-    type: Sequelize.BOOLEAN,
-    field: 'is_validated'
-  },
-  isBanned: {
-    type: Sequelize.BOOLEAN,
-    field: 'is_banned'
-  },
-  changePasswordNextLogin: {
-    type: Sequelize.BOOLEAN,
-    field: 'change_password_next_login'
-  },
-  isDeleted: {
-    type: Sequelize.BOOLEAN,
-    allowNull: true
-  },
-  ...commonBSDProps
 }, {
   updatedAt: 'modified_dt',
   createdAt: 'create_dt',
@@ -161,10 +88,6 @@ export const Email = sequelize.define('email', {
       key: 'id',
     }
   },
-  emailTypeId: {
-    type: Sequelize.BIGINT,
-    field: 'cons_email_type_id',
-  },
   isPrimary: {
     type: Sequelize.BOOLEAN,
     field: 'is_primary'
@@ -177,12 +100,6 @@ export const Email = sequelize.define('email', {
       isLowercase: true
     }
   },
-  doubleValidation: {
-    type: Sequelize.STRING,
-    allowNull: true,
-    field: 'double_validation'
-  },
-  ...commonBSDProps
 }, {
   updatedAt: 'modified_dt',
   createdAt: 'create_dt',
@@ -220,12 +137,11 @@ export const Phone = sequelize.define('phone', {
       isNumeric: true
     }
   },
-  isUnsub: {
+  textOptOut: {
     type: Sequelize.BOOLEAN,
     allowNull: true,
     field: 'isunsub'
   },
-  ...commonBSDProps
 }, {
   updatedAt: 'modified_dt',
   createdAt: 'create_dt',

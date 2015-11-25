@@ -33,7 +33,6 @@ import {
 import moment from 'moment-timezone';
 import Promise from 'bluebird';
 import Maestro from '../maestro';
-import thinky from './thinky';
 import BSD from '../bsd';
 import url from 'url';
 
