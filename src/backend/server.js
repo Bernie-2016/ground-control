@@ -64,3 +64,10 @@ app.use('/graphql', graphQLHTTP({schema: Schema}));
 app.listen(port, () => console.log(
   `Server is now running on http://localhost:${port}`
 ));
+
+app.use((e,req,res,next) => {
+  e = e || new Error("Reached end of the middleware stack with no response")
+  console.error(e)
+  console.error(e.stack)
+  res.status(500).end()
+});
