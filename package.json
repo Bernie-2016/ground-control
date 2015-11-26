@@ -10,7 +10,7 @@
     "webpack-server": "babel-node ./webpack/server.js",
     "bundle": "mkdir -p ./src/frontend/public/js && webpack --config ./webpack/config.js",
     "lint": "eslint src",
-    "sequelize": "cd src/backend/data && sequelize"
+    "sequelize": "babel-node ./node_modules/.bin/sequelize"
   },
   "dependencies": {
     "babel": "^5.8.21",
