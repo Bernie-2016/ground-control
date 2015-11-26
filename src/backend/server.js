@@ -57,6 +57,7 @@ app.post('/events/create', async (req, res) => {
 app.use(express.static(publicPath))
 app.use(fallback('index.html', { root: publicPath }))
 app.use('/graphql', graphQLHTTP({schema: Schema}));
+
 app.listen(port, () => console.log(
   `Server is now running on http://localhost:${port}`
 ));

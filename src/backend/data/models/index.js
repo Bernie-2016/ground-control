@@ -1,20 +1,30 @@
 import fs from 'fs';
 import path from 'path';
 import Sequelize from 'sequelize';
+import configOpts from '../config/config';
 
 let basename  = path.basename(module.filename);
 let env       = process.env.NODE_ENV || 'development';
-let config    = require(__dirname + '/../config/config')[env];
 let db        = {};
 let sequelize = null;
-
-console.log(config)
+let config = configOpts[env];
 
 if (config.use_env_variable) {
   sequelize = new Sequelize(process.env[config.use_env_variable]);
 } else {
   sequelize = new Sequelize(config.database, config.username, config.password, config);
 }
+
+sequelize.beforeDefine('defaultAttributes', (attrs) => {
+  Object.keys(attrs).forEach((key) => {
+    if (typeof attrs[key]['allowNull'] === 'undefined')
+      attrs[key]['allowNull'] = false;
+    if (typeof attrs[key]['validate'] === 'undefined')
+      attrs[key]['validate'] = {};
+    if (typeof attrs[key]['validate']['notEmpty'] === 'undefined')
+      attrs[key]['validate']['notEmpty'] = true
+  })
+})
 
 fs
   .readdirSync(__dirname)

@@ -1,5 +1,5 @@
 export default function(sequelize, DataTypes) {
-  let Phone = sequelize.define('Phone', {
+  return sequelize.define('Phone', {
     id: {
       type: DataTypes.BIGINT,
       field: 'cons_phone_id',
