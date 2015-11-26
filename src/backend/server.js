@@ -8,6 +8,7 @@ import bodyParser from 'body-parser';
 import BSD from './bsd';
 import MG from './mail';
 import demoData from './data/demo.json';
+import models from './data/models'
 writeSchema();
 
 const Mailgun = new MG(process.env.MAILGUN_KEY, process.env.MAILGUN_DOMAIN);
@@ -61,14 +62,15 @@ app.post('/events/create', async (req, res) => {
 app.use(express.static(publicPath))
 app.use(fallback('index.html', { root: publicPath }))
 app.use('/graphql', graphQLHTTP({schema: Schema}));
-
-app.listen(port, () => console.log(
-  `Server is now running on http://localhost:${port}`
-));
-
 app.use((e,req,res,next) => {
-  e = e || new Error("Reached end of the middleware stack with no response")
+  e = e || new Error('Reached end of the middleware stack with no response')
   console.error(e)
   console.error(e.stack)
   res.status(500).end()
+});
+
+models.sequelize.sync({}).then(() => {
+  app.listen(port, () => console.log(
+    `Server is now running on http://localhost:${port}`
+  ))
 });

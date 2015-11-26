@@ -5,10 +5,11 @@
   "repository": "Bernie-2016/ground-control",
   "version": "0.1.0",
   "scripts": {
-    "start": "./run",
+    "start": "./run ./src/backend/server.js",
     "dev": "nf start",
     "bundle": "mkdir -p ./src/frontend/public/js && webpack --config ./webpack/config.js",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "seed": "./run ./src/backend/data/seed.js"
   },
   "dependencies": {
     "babel": "^5.8.21",
@@ -51,7 +52,8 @@
     "sequelize": "^3.14.1",
     "sequelize-cli": "^2.2.1",
     "pg": "^4.4.3",
-    "faker": "^3.0.1"
+    "faker": "^3.0.1",
+    "dotenv": "^1.2.0"
   },
   "devDependencies": {
     "foreman": "latest",

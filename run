@@ -1,3 +1,4 @@
 #!/usr/bin/env node
 require('babel/register');
-require('./src/backend/server.js');
+require('dotenv').load();
+require(process.argv[2]);

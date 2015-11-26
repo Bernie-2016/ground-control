@@ -1,3 +1,3 @@
--graphql: ./node_modules/.bin/nodemon -e js -w ./src/backend --exec ./run -- ./src/backend/server.js
+-graphql: nodemon -e js -w ./src/backend --exec ./run -- ./src/backend/server.js
 -webpack: ./run ./webpack/server.js
 -postgres: postgres -D /usr/local/var/postgres
