@@ -10,23 +10,18 @@ The easiest way to get started in Linux is with [Docker](https://docs.docker.com
 
 ### OS X
 
-In OS X, we currently run everything locally using a Procfile and node-foreman. To get started, install [Node.js](https://nodejs.org/en/download/) and [Homebrew](http://brew.sh/). Then do the following PostgreSQL:
+In OS X, we currently run everything locally using a Procfile and node-foreman. To get started, install [Node.js](https://nodejs.org/en/download/) and [Homebrew](http://brew.sh/). Then do the following:
 
-`brew install postgres`
 `npm install`
-
-Once that is done, start postgres in one tab with
-
-`postgres -D /usr/local/var/postgres`
-
-In a second tab, run:
-
-`createdb ground_control`
-`psql -c "CREATE ROLE ground_control WITH LOGIN SUPERUSER;" -d ground_control`
+`./setup-osx`
 
 Then you should be able to start Ground Control on `http://localhost:3000` with
 
-`npm start`
+`npm run dev`
+
+If you ever want to re-seed the database, run
+
+`npm run seed`
 
 ### Windows
 
