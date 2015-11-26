@@ -29,7 +29,6 @@ app.get('/events/confirmation-email', async (req, res) => {
   let event_types = await BSDClient.getEventTypes();
   let result = await Mailgun.sendEventConfirmation(demoData.EventCreationForm, demoData.EventCreationConstituent, event_types, true);
   res.send(result.html)
-  // res.json(result);
 });
 
 app.get('/events/create', (req, res) => {
@@ -46,12 +45,17 @@ app.post('/events/create', async (req, res) => {
     constituent = await BSDClient.createConstituent(form.cons_email);
   }
 
-  let result = await BSDClient.createEvents(constituent.id, form);
-  res.send(result);
+  let event_types = await BSDClient.getEventTypes();
+
+  let result = await BSDClient.createEvents(constituent.id, form, event_types, eventCreationCallback);
 
   // send event creation confirmation email
-  let event_types = await BSDClient.getEventTypes();
-  Mailgun.sendEventConfirmation(form, constituent, event_types);
+  function eventCreationCallback(status){
+  	res.json(status);
+  	if (status == 'success'){
+  		Mailgun.sendEventConfirmation(form, constituent, event_types);
+  	}
+  }
 });
 
 app.use(express.static(publicPath))
@@ -61,3 +65,10 @@ app.use('/graphql', graphQLHTTP({schema: Schema}));
 app.listen(port, () => console.log(
   `Server is now running on http://localhost:${port}`
 ));
+
+app.use((e,req,res,next) => {
+  e = e || new Error("Reached end of the middleware stack with no response")
+  console.error(e)
+  console.error(e.stack)
+  res.status(500).end()
+});
