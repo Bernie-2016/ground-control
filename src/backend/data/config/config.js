@@ -1,12 +1,14 @@
-let configOptions = {
-  'development': {
-    'use_env_variable': 'DB_CONNECTION_STRING',
-    'migrationStorageTableName': 'sequelize_meta'
+var configOptions = {
+  development: {
+    use_env_variable: 'DB_CONNECTION_STRING',
+    migrationStorageTableName: 'sequelize_meta',
+    dialect: 'postgres'
   },
-  'production': {
-    'use_env_variable': 'DB_CONNECTION_STRING',
-    'migrationStorageTableName': 'sequelize_meta'
+  production: {
+    use_env_variable: 'DB_CONNECTION_STRING',
+    migrationStorageTableName: 'sequelize_meta',
+    dialect: 'postgres'
   }
 }
 
-export default configOptions;
+module.exports = configOptions;
