@@ -10,7 +10,7 @@
     "webpack-server": "babel-node ./webpack/server.js",
     "bundle": "mkdir -p ./src/frontend/public/js && webpack --config ./webpack/config.js",
     "lint": "eslint src",
-    "sequelize": "babel-node ./node_modules/.bin/sequelize"
+    "data": "cd ./src/backend/data && babel-node ../../../node_modules/.bin/sequelize"
   },
   "dependencies": {
     "babel": "^5.8.21",
@@ -52,7 +52,8 @@
     "yup": "^0.11.0",
     "sequelize": "^3.14.1",
     "sequelize-cli": "^2.2.1",
-    "pg": "^4.4.3"
+    "pg": "^4.4.3",
+    "faker": "^3.0.1"
   },
   "devDependencies": {
     "foreman": "latest",
