@@ -12,7 +12,7 @@ let randomChoice = (arr) => {
   return arr[index];
 }
 
-models.sequelize.sync({force: true}).then(() => {
+models.sequelize.sync({force: true}).then(async () => {
   let persons = [];
   let emails = [];
   let phones = [];
@@ -32,18 +32,20 @@ models.sequelize.sync({force: true}).then(() => {
     })
     emails.push({
       id: index,
+      cons_id: index,
       isPrimary: randomChoice([true, false]),
-      address: nully(faker.internet.email),
+      address: faker.internet.email(),
     })
     phones.push({
       id: index,
+      cons_id: index,
       isPrimary: randomChoice([true, false]),
       number: faker.phone.phoneNumber(),
       textOptOut: randomChoice([true, false])
     })
   }
   console.log('Creating...')
-  models.Person.bulkCreate(persons);
+  await models.Person.bulkCreate(persons);
   models.Email.bulkCreate(emails);
   models.Phone.bulkCreate(phones);
   console.log('Done!');

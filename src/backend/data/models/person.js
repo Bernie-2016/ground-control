@@ -56,8 +56,8 @@ export default function(sequelize, DataTypes) {
     tableName: 'people',
     classMethods: {
       associate: (models) => {
-        Person.hasMany(models.Email, { foreignKey: 'cons_id' })
-        Person.hasMany(models.Phone, { foreignKey: 'cons_id' })
+        Person.hasMany(models.Email, { foreignKey: 'cons_id', as: 'email'})
+        Person.hasMany(models.Phone, { foreignKey: 'cons_id', as: 'phone' })
       }
     }
   });

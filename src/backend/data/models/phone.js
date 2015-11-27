@@ -5,12 +5,6 @@ export default function(sequelize, DataTypes) {
       field: 'cons_phone_id',
       primaryKey: true
     },
-
-    phoneTypeId: {
-      type: DataTypes.BIGINT,
-      field: 'cons_phone_type_id',
-      allowNull: true
-    },
     isPrimary: {
       type: DataTypes.BOOLEAN,
       field: 'is_primary'
