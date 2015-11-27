@@ -26,7 +26,6 @@ import {
   Group,
   CallAssignment,
   Survey,
-  GroupCall,
   Event
 } from './models';
 
@@ -68,8 +67,6 @@ let {nodeInterface, nodeField} = nodeDefinitions(
       return Call.get(id);
     if (type === 'Survey')
       return Survey.get(id);
-    if (type === 'GroupCall')
-      return GroupCall.get(id);
     if (type === 'Event')
       return Event.get(id);
     if (type === 'ListContainer')
@@ -87,8 +84,6 @@ let {nodeInterface, nodeField} = nodeDefinitions(
       return GraphQLCall;
     if (obj instanceof Survey)
       return GraphQLSurvey;
-    if (obj instanceof GroupCall)
-      return GraphQLGroupCall;
     if (obj instanceof ListContainer)
       return GraphQLListContainer;
     if (obj instanceof Event)
@@ -101,31 +96,6 @@ const GraphQLListContainer = new GraphQLObjectType({
   name: 'ListContainer',
   fields: () => ({
     id: globalIdField('ListContainer'),
-    groupCallList: {
-      type: GraphQLGroupCallConnection,
-      args: {
-       upcoming: {
-          type: GraphQLBoolean,
-          defaultValue: null
-        },
-        ...connectionArgs,
-      },
-      resolve: async (listContainer, {first, upcoming}) => {
-        let r = thinky.r;
-        let queryFilter = {};
-        if (upcoming)
-          queryFilter = (row) => row('scheduledTime').gt(new Date());
-        else if (upcoming == false)
-          queryFilter = (row) => row('scheduledTime').le(new Date());
-
-        let calls = await r.table(GroupCall.getTableName())
-          .orderBy('scheduledTime')
-          .filter(queryFilter)
-          .limit(first)
-
-        return connectionFromArray(calls, {first});
-      }
-    },
     eventList: {
       type: GraphQLEventConnection,
       args: connectionArgs,
@@ -261,25 +231,6 @@ const GraphQLSurvey = new GraphQLObjectType({
   interfaces: [nodeInterface]
 })
 
-const GraphQLGroupCall = new GraphQLObjectType({
-  name: 'GroupCall',
-  description: 'A group call',
-  fields: () => ({
-    id: globalIdField('GroupCall'),
-    name: { type: GraphQLString },
-    scheduledTime: { type: GraphQLInt },
-    maxSignups: { type: GraphQLInt }
-  }),
-  interfaces: [nodeInterface]
-});
-
-let {
-  connectionType: GraphQLGroupCallConnection,
-} = connectionDefinitions({
-  name: 'GroupCall',
-  nodeType: GraphQLGroupCall
-});
-
 const GraphQLCreateCallAssignment = mutationWithClientMutationId({
   name: 'CreateCallAssignment',
   inputFields: {
@@ -352,53 +303,9 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
   }
 });
 
-const GraphQLGroupCallInput = new GraphQLInputObjectType({
-  name: 'GroupCallInput',
-  fields: {
-    name: { type: new GraphQLNonNull(GraphQLString) },
-    scheduledTime: { type: new GraphQLNonNull(GraphQLInt) },
-    maxSignups: { type: new GraphQLNonNull(GraphQLInt) },
-    duration: { type: new GraphQLNonNull(GraphQLInt) }
-  }
-})
-
-const GraphQLBatchCreateGroupCall = mutationWithClientMutationId({
-  name: 'BatchCreateGroupCall',
-  inputFields: {
-    groupCallList: { type: new GraphQLNonNull(new GraphQLList(GraphQLGroupCallInput)) }
-  },
-  outputFields: {
-    listContainer: {
-      type: GraphQLListContainer,
-      resolve: () => SharedListContainer
-    }
-  },
-  mutateAndGetPayload:async ({groupCallList}) => {
-    let promises = [];
-    let maestro = new Maestro(process.env.MAESTRO_UID, process.env.MAESTRO_TOKEN, process.env.MAESTRO_URL, process.env.NODE_ENV === 'debug');
-
-    for (let index = 0; index < groupCallList.length; index++) {
-      let groupCall = groupCallList[index];
-      let response = await maestro.createConferenceCall(groupCall.name, groupCall.maxSignups, moment(groupCall.scheduledTime).tz('America/Los_Angeles').format('YYYY.MM.DD HH:mm:ss'), groupCall.duration)
-
-      promises.push(GroupCall.save({
-        name: groupCall.name,
-        scheduledTime: groupCall.scheduledTime,
-        maxSignups: groupCall.maxSignups,
-        duration: groupCall.duration,
-        maestroConferenceUID: response.value.UID,
-        signups: []
-      }));
-    };
-
-    return Promise.all(promises);
-  }
-});
-
 let RootMutation = new GraphQLObjectType({
   name: 'RootMutation',
   fields: () => ({
-    batchCreateGroupCall: GraphQLBatchCreateGroupCall,
     createCallAssignment: GraphQLCreateCallAssignment
   })
 });
@@ -458,16 +365,6 @@ let RootQuery = new GraphQLObjectType({
       resolve: (root, {id}) => {
         let localId = fromGlobalId(id).id;
         return CallAssignment.get(localId);
-      }
-    },
-    groupCall: {
-      type: GraphQLGroupCall,
-      args: {
-        id: { type: new GraphQLNonNull(GraphQLString) }
-      },
-      resolve: (root, {id}) => {
-        let localId = fromGlobalId(id).id;
-        return GroupCall.get(localId);
       }
     },
     node: nodeField

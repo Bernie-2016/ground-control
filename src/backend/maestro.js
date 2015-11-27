@@ -10,7 +10,7 @@ export default class Maestro {
 
   createConferenceCall(name, maxReservations, startDate, duration, {contactEmail=null, greenroom=null, recording=null, backgroundMusic=null}={}) {
 
-    var postParams = {contactEmail, greenroom, recording, backgroundMusic}
+    let postParams = {contactEmail, greenroom, recording, backgroundMusic}
 
     Object.keys(postParams).forEach((key) => typeof postParams[key] === 'undefined' ? delete postParams[key] : true);
 
@@ -25,7 +25,7 @@ export default class Maestro {
       type: 'json'
     });
 
-    var options = {
+    let options = {
       uri: this.host + '/createConferenceReserved',
       method: 'POST',
       form: postParams,
