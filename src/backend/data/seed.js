@@ -13,7 +13,9 @@ let randomChoice = (arr) => {
 }
 
 models.sequelize.sync({force: true}).then(() => {
-  let persons = []
+  let persons = [];
+  let emails = [];
+  let phones = [];
   for (let index = 0; index < NUM_PERSONS; index++) {
     persons.push({
       id: index,
@@ -26,10 +28,23 @@ models.sequelize.sync({force: true}).then(() => {
       birthDate: nully(faker.date.past()),
       title: nully(faker.name.jobTitle()),
       employer: nully(faker.company.companyName()),
-      occupation: nully(faker.name.jobType())
+      occupation: nully(faker.name.jobType()),
+    })
+    emails.push({
+      id: index,
+      isPrimary: randomChoice([true, false]),
+      address: nully(faker.internet.email),
+    })
+    phones.push({
+      id: index,
+      isPrimary: randomChoice([true, false]),
+      number: faker.phone.phoneNumber(),
+      textOptOut: randomChoice([true, false])
     })
   }
   console.log('Creating...')
   models.Person.bulkCreate(persons);
+  models.Email.bulkCreate(emails);
+  models.Phone.bulkCreate(phones);
   console.log('Done!');
 })
