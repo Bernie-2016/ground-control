@@ -27,15 +27,6 @@ If you ever want to re-seed the database, run
 
 The best way to run everything on Windows is probably to try to get Docker working on Windows and use the Linux installation instructions.
 
-## More development info
-
-Any time you open a new terminal window, if you want to use any of the Docker commands, be sure to run `./start` first.
-
-Any changes you make in the `src` directory will automagically show up.  For other changes, you'll need to stop your running server, then run:
-
-`docker-compose build`
-`docker-compose up`
-
 ## What is this?
 
 The purposes of Ground Control are:

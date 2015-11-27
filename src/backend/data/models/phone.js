@@ -26,7 +26,7 @@ export default function(sequelize, DataTypes) {
     updatedAt: 'modified_dt',
     createdAt: 'create_dt',
     underscored: true,
-    tableName: 'phones',
+    tableName: 'bsd_cons_phone',
   })
   return Phone;
 }

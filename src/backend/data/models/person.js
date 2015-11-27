@@ -53,11 +53,11 @@ export default function(sequelize, DataTypes) {
     updatedAt: 'modified_dt',
     createdAt: 'create_dt',
     underscored: true,
-    tableName: 'people',
+    tableName: 'bsd_cons',
     classMethods: {
       associate: (models) => {
-        Person.hasMany(models.Email, { foreignKey: 'cons_id', as: 'email'})
-        Person.hasMany(models.Phone, { foreignKey: 'cons_id', as: 'phone' })
+        Person.hasMany(models.Email, { foreignKey: 'cons_id'})
+        Person.hasMany(models.Phone, { foreignKey: 'cons_id'})
       }
     }
   });

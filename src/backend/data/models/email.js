@@ -21,7 +21,7 @@ export default function(sequelize, DataTypes) {
     updatedAt: 'modified_dt',
     createdAt: 'create_dt',
     underscored: true,
-    tableName: 'emails',
+    tableName: 'bsd_cons_email',
   })
   return Email;
 }
