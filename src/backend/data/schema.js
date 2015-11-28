@@ -297,9 +297,11 @@ let RootQuery = new GraphQLObjectType({
     // This wrapper is necessary because relay does not support handling connection types in the root query currently. See https://github.com/facebook/relay/issues/112
     currentUser: {
       type: GraphQLPerson,
-      resolve: () => {
-        //return Person.get('5c1609da-449b-4a44-9a60-b95ae9f97541');
-        return null;
+      resolve: (parent, _, {rootValue}) => {
+        if (rootValue.session && rootValue.session.personId)
+          return Person.findById(rootValue.session.personId);
+        else
+          return null;
       }
     },
     listContainer: {

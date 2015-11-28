@@ -32,18 +32,6 @@ app.use(session({
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
-// Auth endpoints live outside relay because we want to deal with cookies
-/*app.get('/people/:email', (req, res) => {
-  let email = req.params.email;
-  let BSDPerson = await BSDClient.getConstituentByEmail(email)
-
-  if (BSDPerson) {
-    let person = Person.createFromBSDObject(BSDPerson)
-  }
-  else
-    return null;
-})
-*/
 // this endpoint may be used for caching and serving available event types and their attributes to the event creation form
 app.get('/events/types.json', async (req, res) => {
   let result = await BSDClient.getEventTypes();
@@ -57,7 +45,7 @@ app.post('/set_password', async (req, res) => {
 app.post('/login', async (req, res) => {
   let person = fromGlobalId(req.body.id);
   req.session.regenerate(() => {
-    req.session.person = person.id
+    req.session.personId = person.id
     res.send('Success!')
   })
 })
@@ -98,7 +86,12 @@ app.post('/events/create', async (req, res) => {
 
 app.use(express.static(publicPath))
 app.use(fallback('index.html', { root: publicPath }))
-app.use('/graphql', graphQLHTTP({schema: Schema}));
+app.use('/graphql', graphQLHTTP((request) => {
+  return {
+    rootValue: { session: request.session },
+    schema: Schema
+  }
+}));
 app.use((e,req,res,next) => {
   e = e || new Error('Reached end of the middleware stack with no response')
   console.error(e)

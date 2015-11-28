@@ -36,7 +36,7 @@ class CallAssignmentListViewer extends React.Component {
     let sideBar = (
       <div>
         <CallAssignmentList
-          callAssignmentList={this.props.listContainer.callAssignmentList}
+          callAssignmentList={this.props.currentUser.callAssignmentList}
           subheader="Active Assignments"
           onSelect={(id) => this.props.history.pushState(null, '/call-assignments/' + id)}
         />

@@ -70,7 +70,6 @@ class Signup extends React.Component {
             password: formState.password
           })
           .end((err, res) => {
-            console.log(res)
             this.props.history.pushState(null, '/call-assignments')
           })
       }
