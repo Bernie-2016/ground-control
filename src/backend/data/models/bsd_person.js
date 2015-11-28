@@ -1,5 +1,5 @@
 export default function(sequelize, DataTypes) {
-  let Person = sequelize.define('Person', {
+  let BSDPerson = sequelize.define('BSDPerson', {
     id: {
       type: DataTypes.BIGINT,
       field: 'cons_id',
@@ -56,10 +56,10 @@ export default function(sequelize, DataTypes) {
     tableName: 'bsd_cons',
     classMethods: {
       associate: (models) => {
-        Person.hasMany(models.Email, { foreignKey: 'cons_id'})
-        Person.hasMany(models.Phone, { foreignKey: 'cons_id'})
+        BSDPerson.hasMany(models.BSDEmail, { foreignKey: 'cons_id'})
+        BSDPerson.hasMany(models.BSDPhone, { foreignKey: 'cons_id'})
       }
     }
   });
-  return Person;
+  return BSDPerson;
 }

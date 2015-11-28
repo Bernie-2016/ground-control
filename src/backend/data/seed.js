@@ -1,7 +1,7 @@
 import models from './models';
 import faker from 'faker';
 
-const NUM_PERSONS=500;
+const NUM_PERSONS=1000;
 // Generate a null value 1/3 of the time
 let nully = (value) => {
   return randomChoice([null, value, value])
@@ -16,6 +16,26 @@ models.sequelize.sync({force: true}).then(async () => {
   let persons = [];
   let emails = [];
   let phones = [];
+  let personGroups = [];
+  let groups = [
+    {
+      name: 'Volunteers',
+      description: 'Volunteers'
+    },
+    {
+      name: 'Event hosts',
+      description: 'Event hosts'
+    },
+    {
+      name: 'Elite callers',
+      description: 'The top 1% of the top 0.1% of the top 1% of the top 0.1%'
+    }
+  ]
+  await models.Group.bulkCreate(groups);
+  let groupIDs = await models.Group.findAll({
+    attributes: ['id']
+  })
+  groupIDs = groupIDs.map((queryObj) => queryObj.id)
   for (let index = 0; index < NUM_PERSONS; index++) {
     persons.push({
       id: index,
@@ -43,10 +63,29 @@ models.sequelize.sync({force: true}).then(async () => {
       number: faker.phone.phoneNumber(),
       textOptOut: randomChoice([true, false])
     })
+
+    // Randomly add each person to a group.
+    let numGroups = Math.floor(Math.random() * groupIDs.length);
+
+    let groups = {}
+    for (let i = 0; i < numGroups; i++) {
+      groups[randomChoice(groupIDs)] = true;
+    }
+
+    Object.keys(groups).forEach((key) => {
+      personGroups.push({
+        cons_id: index,
+        group_id: key
+      })
+    })
   }
   console.log('Creating...')
-  await models.Person.bulkCreate(persons);
-  models.Email.bulkCreate(emails);
-  models.Phone.bulkCreate(phones);
+  await models.BSDPerson.bulkCreate(persons);
+  let promises = [
+    models.BSDPersonGroup.bulkCreate(personGroups),
+    models.BSDEmail.bulkCreate(emails),
+    models.BSDPhone.bulkCreate(phones)
+  ]
+  await Promise.all(promises);
   console.log('Done!');
 })

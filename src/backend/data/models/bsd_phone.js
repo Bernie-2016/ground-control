@@ -1,5 +1,5 @@
 export default function(sequelize, DataTypes) {
-  return sequelize.define('Phone', {
+  return sequelize.define('BSDPhone', {
     id: {
       type: DataTypes.BIGINT,
       field: 'cons_phone_id',
@@ -28,5 +28,4 @@ export default function(sequelize, DataTypes) {
     underscored: true,
     tableName: 'bsd_cons_phone',
   })
-  return Phone;
 }

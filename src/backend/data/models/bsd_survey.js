@@ -1,5 +1,5 @@
 export default function(sequelize, DataTypes) {
-  let Survey = sequelize.define('Survey', {
+  let BSDSurvey = sequelize.define('BSDSurvey', {
     id: {
       type: DataTypes.BIGINT,
       field: 'signup_form_id',
@@ -16,5 +16,5 @@ export default function(sequelize, DataTypes) {
     underscored: true,
     tableName: 'bsd_signup_form',
   })
-  return Survey;
+  return BSDSurvey;
 }

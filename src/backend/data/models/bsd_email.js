@@ -1,5 +1,5 @@
 export default function(sequelize, DataTypes) {
-  let Email = sequelize.define('Email', {
+  return sequelize.define('BSDEmail', {
     id: {
       type: DataTypes.BIGINT,
       field: 'cons_email_id',
@@ -23,5 +23,4 @@ export default function(sequelize, DataTypes) {
     underscored: true,
     tableName: 'bsd_cons_email',
   })
-  return Email;
 }

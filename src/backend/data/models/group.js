@@ -1,21 +1,14 @@
 export default function(sequelize, DataTypes) {
-  let Group = sequelize.define('Group', {
-    id: {
+  return sequelize.define('Group', {
+    BSDId: {
       type: DataTypes.BIGINT,
-      field: 'cons_group_id',
-      primaryKey: true
-    },
-    name: DataTypes.STRING,
-    publicName: {
-      type: DataTypes.STRING,
-      field: 'public_name',
+      field: 'bsd_id',
       allowNull: true
     },
+    name: DataTypes.STRING,
+    description: DataTypes.STRING
   }, {
-    updatedAt: 'modified_dt',
-    createdAt: 'create_dt',
     underscored: true,
-    tableName: 'bsd_cons_group',
+    tableName: 'groups',
   })
-  return Group;
 }
