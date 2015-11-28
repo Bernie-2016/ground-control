@@ -5,20 +5,24 @@ import {BernieText, BernieColors} from './styles/bernie-css';
 import GCForm from './forms/GCForm';
 import Form from 'react-formal';
 import yup from 'yup';
+import superagent from 'superagent';
 
 class Signup extends React.Component {
-  static FormStates = {
+  formStates = {
     enterEmail: {
       formTitle: 'Enter your e-mail to get started!',
       formSchema: yup.object({
-        email: yup.string(),
+        email: yup.string().required(),
       }),
       formElement: (
         <Form.Field
           name='email'
           label='E-mail Address'
         />
-      )
+      ),
+      onSubmit: (formState) => {
+        this.props.history.pushState(null, '/signup/' + formState.email)
+      }
     },
     newAccount: {
       formTitle: 'Sign up to make calls',
@@ -42,7 +46,10 @@ class Signup extends React.Component {
             label='Zip Code'
           />
         </div>
-      )
+      ),
+      onSubmit: (formState) => {
+        console.log('Implement this')
+      }
     },
     enterPassword: {
       formTitle: 'Set a password to get started',
@@ -54,7 +61,19 @@ class Signup extends React.Component {
           name='password'
           label='Password'
         />
-      )
+      ),
+      onSubmit: (formState) => {
+        superagent
+          .post('/login')
+          .send({
+            email: formState.email,
+            password: formState.password
+          })
+          .end((err, res) => {
+            console.log('done')
+//            this.props.history.pushState(null, '/call-assignments')
+          })
+      }
     },
     login: {
       formTitle: 'Login to get started',
@@ -66,7 +85,10 @@ class Signup extends React.Component {
           name='password'
           label='Password'
         />
-      )
+      ),
+      onSubmit: (formState) => {
+
+      }
     }
   }
 
@@ -142,20 +164,21 @@ class Signup extends React.Component {
   }
 
   renderSignupForm() {
-    let signupState = Signup.FormStates.enterEmail;
+    let signupState = this.formStates.enterEmail;
     if (this.props.email) {
       if (this.props.person) {
         if (this.props.person.hasPassword)
-          signupState = Signup.FormStates.login
+          signupState = this.formStates.login
         else
-          signupState = Signup.FormStates.enterPassword
+          signupState = this.formStates.enterPassword
       }
       else
-        signupState = Signup.FormStates.newAccount;
+        signupState = this.formStates.newAccount;
     }
     let formElement = signupState.formElement;
     let formTitle = signupState.formTitle;
     let formSchema = signupState.formSchema;
+    let submitHandler = signupState.onSubmit;
 
     return (
       <Paper style={this.styles.signupForm}>
@@ -167,6 +190,9 @@ class Signup extends React.Component {
           }}>
           <GCForm
             schema={formSchema}
+            onSubmit={(formData) => {
+              submitHandler(formData)
+            }}
           >
             {formTitle}
             <Paper zDepth={0} style={{

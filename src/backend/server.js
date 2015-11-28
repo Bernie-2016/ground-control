@@ -37,6 +37,14 @@ app.get('/events/types.json', async (req, res) => {
   res.json(result);
 });
 
+app.post('/set_password', async (req, res) => {
+  console.log('set password')
+})
+
+app.post('/login', async (req, res) => {
+  console.log('login')
+})
+
 // this endpoint is for testing email rendering/sending
 app.get('/events/confirmation-email', async (req, res) => {
   let event_types = await BSDClient.getEventTypes();
