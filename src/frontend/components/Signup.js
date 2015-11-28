@@ -21,7 +21,7 @@ class Signup extends React.Component {
       )
     },
     newAccount: {
-      formTitle: 'Sign up to Volunteer',
+      formTitle: 'Sign up to make calls',
       formSchema: yup.object({
         firstName: yup.string().required(),
         lastName: yup.string().required(),
@@ -150,7 +150,8 @@ class Signup extends React.Component {
         else
           signupState = Signup.FormStates.enterPassword
       }
-      signupState = Signup.FormStates.newAccount;
+      else
+        signupState = Signup.FormStates.newAccount;
     }
     let formElement = signupState.formElement;
     let formTitle = signupState.formTitle;
