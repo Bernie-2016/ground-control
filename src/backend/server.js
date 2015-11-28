@@ -9,13 +9,26 @@ import BSD from './bsd';
 import MG from './mail';
 import demoData from './data/demo.json';
 import models from './data/models'
+import sequelizeSession from 'connect-session-sequelize';
+import cookieParser from 'cookie-parser';
+import session from 'express-session';
+import {fromGlobalId} from 'graphql-relay'
 writeSchema();
 
 const Mailgun = new MG(process.env.MAILGUN_KEY, process.env.MAILGUN_DOMAIN);
 const BSDClient = new BSD(process.env.BSD_HOST, process.env.BSD_API_ID, process.env.BSD_API_SECRET);
 const port = process.env.APP_PORT;
-const app = express();
 const publicPath = path.resolve(__dirname, '../frontend/public');
+const SequelizeStore = sequelizeSession(session.Store);
+const app = express();
+
+app.use(cookieParser())
+app.use(session({
+  secret: 'secret',
+  store: new SequelizeStore({
+    db: models.sequelize
+  })
+}))
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
@@ -42,7 +55,11 @@ app.post('/set_password', async (req, res) => {
 })
 
 app.post('/login', async (req, res) => {
-  console.log('login')
+  let person = fromGlobalId(req.body.id);
+  req.session.regenerate(() => {
+    req.session.person = person.id
+    res.send('Success!')
+  })
 })
 
 // this endpoint is for testing email rendering/sending

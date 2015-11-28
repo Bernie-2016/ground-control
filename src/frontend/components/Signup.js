@@ -66,12 +66,12 @@ class Signup extends React.Component {
         superagent
           .post('/login')
           .send({
-            email: formState.email,
+            id: this.props.person.id,
             password: formState.password
           })
           .end((err, res) => {
-            console.log('done')
-//            this.props.history.pushState(null, '/call-assignments')
+            console.log(res)
+            this.props.history.pushState(null, '/call-assignments')
           })
       }
     },
@@ -179,7 +179,6 @@ class Signup extends React.Component {
     let formTitle = signupState.formTitle;
     let formSchema = signupState.formSchema;
     let submitHandler = signupState.onSubmit;
-
     return (
       <Paper style={this.styles.signupForm}>
         <div style={
@@ -222,6 +221,8 @@ export default Relay.createContainer(Signup, {
   fragments: {
     person: () => Relay.QL`
       fragment on Person {
+        id
+        firstName
         hasPassword
       }
     `

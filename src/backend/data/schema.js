@@ -317,7 +317,9 @@ let RootQuery = new GraphQLObjectType({
         let BSDPerson = await BSDClient.getConstituentByEmail(email)
 
         if (BSDPerson) {
-          return Person.createFromBSDObject(BSDPerson)
+          let person = await Person.createFromBSDObject(BSDPerson);
+          console.log(person)
+          return person
         }
         else
           return null;

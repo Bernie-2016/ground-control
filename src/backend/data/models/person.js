@@ -77,11 +77,12 @@ export default function(sequelize, DataTypes) {
         if (person) {
           let id = newPerson.id;
           delete newPerson.id;
-          return Person.update(newPerson, {
+          let updated = await Person.update(newPerson, {
             where: {
               id: id
             }
           });
+          return Person.findById(id);
         }
         else
           return Person.create(newPerson);
