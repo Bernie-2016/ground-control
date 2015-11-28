@@ -18,13 +18,14 @@ import CallAssignmentDashboard from './components/CallAssignmentDashboard';
 import CallAssignment from './components/CallAssignment';
 import CallAssignmentViewer from './components/CallAssignmentViewer';
 import CallAssignmentCreationForm from './components/CallAssignmentCreationForm';
-import CallAssignmentsViewer from './components/CallAssignmentsViewer';
+import CallAssignmentListViewer from './components/CallAssignmentListViewer';
 import VolunteerEventsDashboard from './components/VolunteerEventsDashboard';
 import EventViewer from './components/EventViewer';
 import EventEditor from './components/EventEditor';
 import EventAdmin from './components/EventAdmin';
 import Form from 'react-formal';
 import {createHistory} from 'history';
+import Signup from './components/Signup';
 
 injectTapEventPlugin();
 
@@ -46,7 +47,11 @@ const CurrentUserQueries = {
 }
 
 const EventQueries = {
-  currentUser: () => Relay.QL`query { events }`
+  eventList: () => Relay.QL`query { events }`
+}
+
+const PersonQueries = {
+  person: () => Relay.QL`query { person(email: $email, id: $id) }`
 }
 
 let history = createHistory()
@@ -89,7 +94,7 @@ ReactDOM.render(
         component={CallAssignmentDashboard}
       >
         <IndexRoute
-          component={CallAssignmentsViewer}
+          component={CallAssignmentListViewer}
           queries={CurrentUserQueries}
         />
         <Route
@@ -98,6 +103,9 @@ ReactDOM.render(
           queries={CallAssignmentQueries}
         />
       </Route>
+      <Route
+        path='/signup'
+        component={Signup} />
       <Route
         path='events'
         component={VolunteerEventsDashboard}

@@ -71,25 +71,87 @@ export default class Signup extends React.Component {
   }
 
   styles = {
-    container: {
+    signupForm: {
       width: '100%',
       backgroundColor: BernieColors.blue,
       color: BernieColors.white,
       padding: '15px 15px 15px 15px'
-    }
+    },
+    paragraph: {
+      paddingTop: '0.5em',
+      paddingBottom: '0.5em',
+      paddingLeft: '0.5em',
+      paddingRight: '0.5em',
+    },
+    introContainer: {
+      display: 'flex',
+      flexDirection: 'row'
+    },
+    introTextContainer: {
+      flex: 1,
+      marginRight: 40
+    },
+    signupFormContainer: {
+      flex: 'auto',
+      width: '12em'
+    },
+    container: {
+      padding: 40,
+      paddingTop: 40,
+      paddingRight: 40,
+      paddingBottom: 40,
+    },
   }
 
   state = {
     signupState: 'enterEmail'
   }
 
-  render() {
+  renderSplash() {
+    return (
+      <div style={this.styles.container} >
+        <div style={this.styles.introContainer}>
+          <div style={this.styles.introTextContainer}>
+            <div style={{
+              ...BernieText.secondaryTitle,
+              display: 'block'
+            }}>
+              Make Calls
+            </div>
+            <div style={BernieText.title}>
+              Let them hear you loud and clear
+            </div>
+            <div style={BernieText.default}>
+              <p style={this.styles.paragraph}>
+                Get riled up get riled up get riled up get riled up.
+                </p>
+                <p style={this.styles.paragraph}>
+                  Are you riled yet?  Get riled up a bit more.
+                </p>
+                <p style={this.styles.paragraph}>
+                  Ok calm down now.
+                </p>
+                <p style={this.styles.paragraph}>
+                  Thanks for all you do,
+                </p>
+                <img src='https://s.bsd.net/bernie16/main/page/-/Email%20Images/sig-red.png' width='170' alt='Bernie' />
+            </div>
+          </div>
+          <div styles={this.styles.signupFormContainer}>
+            {this.renderSignupForm()}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  renderSignupForm() {
     let formElement = Signup.FormStates[this.state.signupState].formElement;
     let formTitle = Signup.FormStates[this.state.signupState].formTitle;
     let formSchema = Signup.FormStates[this.state.signupState].formSchema;
 
     return (
-      <Paper style={this.styles.container}>
+      <Paper style={this.styles.signupForm}>
         <div style={
           {
             ...BernieText.title,
@@ -116,5 +178,9 @@ export default class Signup extends React.Component {
         </div>
       </Paper>
     )
+  }
+
+  render() {
+    return this.renderSplash();
   }
 }
