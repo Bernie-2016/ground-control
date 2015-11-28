@@ -2,7 +2,7 @@ import 'babel/polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Relay from 'react-relay';
-import {Redirect, IndexRoute, Route, Router} from 'react-router';
+import {Redirect, IndexRoute, IndexRedirect, Route, Router} from 'react-router';
 import ReactRouterRelay from 'react-router-relay';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import AdminDashboard from './components/AdminDashboard';
@@ -18,7 +18,7 @@ import CallAssignmentDashboard from './components/CallAssignmentDashboard';
 import CallAssignment from './components/CallAssignment';
 import CallAssignmentViewer from './components/CallAssignmentViewer';
 import CallAssignmentCreationForm from './components/CallAssignmentCreationForm';
-import CallAssignmentHome from './components/CallAssignmentHome';
+import CallAssignmentsViewer from './components/CallAssignmentsViewer';
 import VolunteerEventsDashboard from './components/VolunteerEventsDashboard';
 import EventViewer from './components/EventViewer';
 import EventEditor from './components/EventEditor';
@@ -83,17 +83,14 @@ ReactDOM.render(
     <Route
       path='/'
       component={VolunteerNavigation}>
-      <IndexRoute
-        component={VolunteerDashboard}
-        queries={CurrentUserQueries}
-      />
+      <IndexRedirect to='/call-assignments' />
       <Route
         path='call-assignments'
         component={CallAssignmentDashboard}
       >
         <IndexRoute
-          component={CallAssignmentHome}
-          queries={ListContainerQueries}
+          component={CallAssignmentsViewer}
+          queries={CurrentUserQueries}
         />
         <Route
           path=':id'

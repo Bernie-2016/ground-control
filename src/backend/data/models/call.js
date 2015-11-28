@@ -12,5 +12,5 @@ export default function(sequelize, DataTypes) {
       }
     }
   })
-  return CallAssignment;
+  return Call;
 }
