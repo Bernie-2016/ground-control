@@ -59,9 +59,10 @@ export default class CallAssignmentCreationForm extends React.Component {
             this.clearState();
             let onFailure = (transaction) => {
               this.clearState()
+
               let defaultMessage = 'Something went wrong.'
               let error = transaction.getError();
-
+              console.log(error);
               let errorMessage = error.source ? error.source.errors[0].message : defaultMessage;
               try {
                 errorMessage = JSON.parse(errorMessage)

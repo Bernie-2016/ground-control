@@ -6,7 +6,7 @@ export default function(sequelize, DataTypes) {
     tableName: 'call_assignments',
     classMethods: {
       associate: (models) => {
-        CallAssignment.belongsTo(models.BSDSurvey)
+        CallAssignment.belongsTo(models.Survey)
         CallAssignment.belongsTo(models.Group, {as: 'targetGroup'});
         CallAssignment.belongsTo(models.Group, {as: 'callerGroup'});
       }

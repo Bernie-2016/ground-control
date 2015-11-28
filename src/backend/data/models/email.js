@@ -1,31 +1,26 @@
 export default function(sequelize, DataTypes) {
-  return sequelize.define('BSDPhone', {
+  return sequelize.define('Email', {
     id: {
       type: DataTypes.BIGINT,
-      field: 'cons_phone_id',
+      field: 'cons_email_id',
       primaryKey: true
     },
     isPrimary: {
       type: DataTypes.BOOLEAN,
       field: 'is_primary'
     },
-    number: {
+    address: {
       type: DataTypes.STRING,
-      field: 'phone',
       unique: true,
       validate: {
-        isNumeric: true
+        isEmail: true,
+        isLowercase: true
       }
-    },
-    textOptOut: {
-      type: DataTypes.BOOLEAN,
-      allowNull: true,
-      field: 'isunsub'
     },
   }, {
     updatedAt: 'modified_dt',
     createdAt: 'create_dt',
     underscored: true,
-    tableName: 'bsd_cons_phone',
+    tableName: 'bsd_cons_email',
   })
 }

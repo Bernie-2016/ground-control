@@ -26,7 +26,6 @@ import {
   Group,
   CallAssignment,
   Survey,
-  Event
 } from './models';
 
 import moment from 'moment-timezone';
@@ -58,17 +57,15 @@ let {nodeInterface, nodeField} = nodeDefinitions(
   (globalId) => {
     let {type, id} = fromGlobalId(globalId);
     if (type === 'Person')
-      return Person.get(id);
+      return Person.findById(id);
     if (type === 'Group')
-      return Group.get(id);
+      return Group.findById(id);
     if (type === 'CallAssignment')
-      return CallAssignment.get(id);
-    if (type === 'Call')
-      return Call.get(id);
+      return CallAssignment.findById(id);
     if (type === 'Survey')
-      return Survey.get(id);
+      return Survey.findById(id);
     if (type === 'Event')
-      return Event.get(id);
+      return Event.findById(id);
     if (type === 'ListContainer')
       return SharedListContainer;
     return null;
@@ -100,7 +97,7 @@ const GraphQLListContainer = new GraphQLObjectType({
       type: GraphQLEventConnection,
       args: connectionArgs,
       resolve: async(event, {first}) => {
-        let events = await Event.filter({})
+        let events = await Event.all()
         return connectionFromArray(events, {first});
       }
     },
@@ -108,7 +105,7 @@ const GraphQLListContainer = new GraphQLObjectType({
       type: GraphQLCallAssignmentConnection,
       args: connectionArgs,
       resolve: async (assignment, {first}) => {
-        let assignments = await CallAssignment.filter({})
+        let assignments = await CallAssignment.all()
         return connectionFromArray(assignments, {first});
       }
     },
@@ -129,7 +126,7 @@ const GraphQLPerson = new GraphQLObjectType({
       type: GraphQLCallAssignmentConnection,
       args: connectionArgs,
       resolve: async (person, {first}) => {
-        let assignments = await CallAssignment.filter({})
+        let assignments = await CallAssignment.all()
         return connectionFromArray(assignments, {first});
       }
     }
@@ -199,34 +196,12 @@ let {
   nodeType: GraphQLCallAssignment
 });
 
-const GraphQLBSDSurvey = new GraphQLObjectType({
-  name: 'BSDSurvey',
-  description: 'Underlying survey object in BSD',
-  fields: () => ({
-    id: { type: GraphQLString },
-    fullURL: { type: GraphQLString }
-  })
-})
-
 const GraphQLSurvey = new GraphQLObjectType({
   name: 'Survey',
   description: 'A survey to be filled out by a person',
   fields: () => ({
     id: globalIdField('Survey'),
     slug: { type: GraphQLString },
-    BSDData: {
-      type: GraphQLBSDSurvey,
-      resolve: async (survey) => {
-        if (survey.BSDId) {
-          let BSDSurvey = await BSDClient.getForm(survey.BSDId);
-          return {
-            id: survey.BSDId,
-            fullURL: url.resolve('https://' + process.env.BSD_HOST, '/page/s/' + BSDSurvey.signup_form_slug)
-          }
-        }
-        return null;
-      }
-    }
   }),
   interfaces: [nodeInterface]
 })
@@ -249,38 +224,32 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
   },
   mutateAndGetPayload:async ({name, callerGroupId, targetGroupId, surveyId, startDate, endDate}) => {
     let [callerGroup, targetGroup, survey] = await Promise.all([
-      Group.filter({BSDId: callerGroupId}),
-      Group.filter({BSDId: targetGroupId}),
-      Survey.filter({BSDId: surveyId})]);
-    callerGroup = callerGroup[0]
-    targetGroup = targetGroup[0]
-    survey = survey[0]
+      Group.findById(callerGroupId),
+      Group.findById(targetGroupId),
+      Survey.findById(surveyId)]);
     let BSDFetches = [];
-    if (!callerGroup)
-      BSDFetches.push(BSDClient.getConstituentGroup(callerGroupId))
-    if (!targetGroup)
-      BSDFetches.push(BSDClient.getConstituentGroup(targetGroupId))
-    if (!survey)
-      BSDFetches.push(BSDClient.getForm(surveyId));
-    // Just to verify these BSD IDs exist
-    try {
-      await Promise.all(BSDFetches);
-    } catch(err) {
-      if (err && err.response && err.response.statusCode === 409) {
-        throw new GraphQLError({
-          status: 400,
-          message: 'One of BSD IDs provided was not found in BSD.'
-        });
+    // Fix this
+//    if (!callerGroup)
+//      BSDFetches.push(BSDClient.getConstituentGroup(callerGroupId))
+//    if (!targetGroup)
+//      BSDFetches.push(BSDClient.getConstituentGroup(targetGroupId))
+    if (!survey) {
+      try {
+        let BSDSurvey = await BSDClient.getForm(surveyId)
+        survey = await Survey.createFromBSDObject(BSDSurvey)
+      } catch(err) {
+        if (err && err.response && err.response.statusCode === 409) {
+            throw new GraphQLError({
+            status: 400,
+            message: 'Provided Survey ID does not exist in BSD.'
+          });
+        }
+        else
+          throw err;
       }
-      else
-        throw err;
     }
 
-    let savePromises = []
-    if (!survey)
-      survey = await Survey.save({
-        BSDId: surveyId
-      })
+    /*
     if (!callerGroup) {
       callerGroup = await Group.save({
         BSDId: callerGroupId,
@@ -293,12 +262,13 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
         personIdList: []
       })
     }
+    */
 
-    return CallAssignment.save({
+    return CallAssignment.create({
       name: name,
-      callerGroupId: callerGroup.id,
-      targetGroupId: targetGroup.id,
-      surveyId: survey.id,
+      callerGroup: callerGroup,
+      targetGroup: targetGroup,
+      survey: survey,
     })
   }
 });
@@ -364,7 +334,7 @@ let RootQuery = new GraphQLObjectType({
       },
       resolve: (root, {id}) => {
         let localId = fromGlobalId(id).id;
-        return CallAssignment.get(localId);
+        return CallAssignment.findById(localId);
       }
     },
     node: nodeField

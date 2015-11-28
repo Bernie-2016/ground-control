@@ -80,11 +80,11 @@ models.sequelize.sync({force: true}).then(async () => {
     })
   }
   console.log('Creating...')
-  await models.BSDPerson.bulkCreate(persons);
+  await models.Person.bulkCreate(persons);
   let promises = [
-    models.BSDPersonGroup.bulkCreate(personGroups),
-    models.BSDEmail.bulkCreate(emails),
-    models.BSDPhone.bulkCreate(phones)
+    models.PersonGroup.bulkCreate(personGroups),
+    models.Email.bulkCreate(emails),
+    models.Phone.bulkCreate(phones)
   ]
   await Promise.all(promises);
   console.log('Done!');
