@@ -59,15 +59,36 @@ export default function(sequelize, DataTypes) {
         Person.hasMany(models.Email, { foreignKey: 'cons_id'})
         Person.hasMany(models.Phone, { foreignKey: 'cons_id'})
       },
-      createFromBSDObject: (constituent) => {
+      createFromBSDObject: async (constituent) => {
         let newPerson = {...constituent}
         newPerson.firstName = newPerson.firstname;
         newPerson.lastName = newPerson.lastname;
         newPerson.middleName = newPerson.middlename;
         newPerson.birthDate = newPerson.birth_dt;
-        newPerson.updatedAt = newPerson.modified_dt;
-        newPerson.createdAt = newPerson.create_dt;
-        return Person.create(newPerson);
+
+        // Set these
+//        delete newPerson.modified_dt;
+//        delete newPerson.create_dt;
+//        delete newPerson.cons_id;
+//        newPerson.updatedAt = newPerson.modified_dt);
+//        newPerson.createdAt = newPerson.create_dt;
+
+        let person = await Person.findById(newPerson.id)
+        if (person) {
+          let id = newPerson.id;
+          delete newPerson.id;
+          return Person.update(newPerson, {
+            where: {
+              id: id
+            }
+          });
+        }
+        else
+          return Person.create(newPerson);
+
+        // This breaks because of but this is what we should be doinghttps://github.com/sequelize/sequelize/issues/4755
+        //let person = await Person.upsert(newPerson);
+        //return person
       }
     }
   });

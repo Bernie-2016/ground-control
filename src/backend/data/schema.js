@@ -121,7 +121,12 @@ const GraphQLPerson = new GraphQLObjectType({
     firstName: { type: GraphQLString },
     middleName: { type: GraphQLString},
     lastName: { type: GraphQLString },
-
+    hasPassword: {
+      type: GraphQLBoolean,
+      resolve: () => {
+        return false;
+      }
+    },
     callAssignmentList: {
       type: GraphQLCallAssignmentConnection,
       args: connectionArgs,
@@ -304,23 +309,18 @@ let RootQuery = new GraphQLObjectType({
     person: {
       type: GraphQLPerson,
       args: {
-        id: { type: GraphQLString },
         email: { type: GraphQLString }
       },
-      resolve: async (root, {id, email}) => {
-        if (id) {
-          let localId = fromGlobalId(id).id
-          return Person.findById(localId)
-        }
-        else if (email) {
-          let BSDPerson = await BSDClient.getConstituentByEmail(email)
+      resolve: async (root, {email}) => {
+        if (!email)
+          return null;
+        let BSDPerson = await BSDClient.getConstituentByEmail(email)
 
-          if (BSDPerson) {
-            return Person.createFromBSDConstituent(BSDPerson)
-          }
-          else
-            return null;
+        if (BSDPerson) {
+          return Person.createFromBSDObject(BSDPerson)
         }
+        else
+          return null;
       }
     },
     survey: {

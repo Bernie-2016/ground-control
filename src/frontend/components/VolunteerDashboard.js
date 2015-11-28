@@ -32,9 +32,6 @@ class VolunteerDashboard extends React.Component {
       paddingLeft: '0.5em',
       paddingRight: '0.5em',
     },
-    signup: {
-      width: 200
-    }
   }
 
   renderIntroduction() {

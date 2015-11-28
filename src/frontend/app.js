@@ -51,7 +51,7 @@ const EventQueries = {
 }
 
 const PersonQueries = {
-  person: () => Relay.QL`query { person(email: $email, id: $id) }`
+  person: () => Relay.QL`query { person(email: $email) }`
 }
 
 let history = createHistory()
@@ -105,7 +105,17 @@ ReactDOM.render(
       </Route>
       <Route
         path='/signup'
-        component={Signup} />
+        component={Signup}
+        queries={PersonQueries}
+        prepareParams={(initialVars) => {
+          return {email: null}
+        }}
+        />
+      <Route
+        path='/signup/:email'
+        component={Signup}
+        queries={PersonQueries}
+      />
       <Route
         path='events'
         component={VolunteerEventsDashboard}

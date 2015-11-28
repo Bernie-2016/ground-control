@@ -1,11 +1,12 @@
 import React from 'react';
+import Relay from 'react-relay';
 import {Paper, TextField} from 'material-ui';
 import {BernieText, BernieColors} from './styles/bernie-css';
 import GCForm from './forms/GCForm';
 import Form from 'react-formal';
 import yup from 'yup';
 
-export default class Signup extends React.Component {
+class Signup extends React.Component {
   static FormStates = {
     enterEmail: {
       formTitle: 'Enter your e-mail to get started!',
@@ -13,10 +14,9 @@ export default class Signup extends React.Component {
         email: yup.string(),
       }),
       formElement: (
-        <TextField
+        <Form.Field
           name='email'
-          hintText='E-mail Address'
-          type='email'
+          label='E-mail Address'
         />
       )
     },
@@ -103,10 +103,6 @@ export default class Signup extends React.Component {
     },
   }
 
-  state = {
-    signupState: 'enterEmail'
-  }
-
   renderSplash() {
     return (
       <div style={this.styles.container} >
@@ -146,9 +142,19 @@ export default class Signup extends React.Component {
   }
 
   renderSignupForm() {
-    let formElement = Signup.FormStates[this.state.signupState].formElement;
-    let formTitle = Signup.FormStates[this.state.signupState].formTitle;
-    let formSchema = Signup.FormStates[this.state.signupState].formSchema;
+    let signupState = Signup.FormStates.enterEmail;
+    if (this.props.email) {
+      if (this.props.person) {
+        if (this.props.person.hasPassword)
+          signupState = Signup.FormStates.login
+        else
+          signupState = Signup.FormStates.enterPassword
+      }
+      signupState = Signup.FormStates.newAccount;
+    }
+    let formElement = signupState.formElement;
+    let formTitle = signupState.formTitle;
+    let formSchema = signupState.formSchema;
 
     return (
       <Paper style={this.styles.signupForm}>
@@ -184,3 +190,13 @@ export default class Signup extends React.Component {
     return this.renderSplash();
   }
 }
+
+export default Relay.createContainer(Signup, {
+  fragments: {
+    person: () => Relay.QL`
+      fragment on Person {
+        hasPassword
+      }
+    `
+  }
+})
