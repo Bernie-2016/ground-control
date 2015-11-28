@@ -46,6 +46,23 @@ export class CallAssignmentViewer extends React.Component {
     callCompleted: yup.boolean()
   })
 
+  renderCalleeInfo() {
+    let callee = this.props.callAssignment.targetForUser
+    let name = callee.firstName + " " + callee.lastName
+    return (
+      <div>
+        <div style={BernieText.secondaryTitle}>
+          {name} - 817-999-4303<br />
+        </div>
+        <div style={BernieText.default}>
+          Email: filler@filler.com<br />
+          Location: New York, NY 10014<br />
+          Local Time: 4:00 PM<br />
+        </div>
+      </div>
+    )
+  }
+
   render() {
     let submitHandler = (formValue) => {
       this.refs.survey.refs.component.submit()
@@ -54,11 +71,9 @@ export class CallAssignmentViewer extends React.Component {
     return (
       <div style={this.styles.container}>
         <Paper
-          style={{
-          ...BernieText.secondaryTitle,
-          ...this.styles.assignmentBar}}
+          style={this.styles.assignmentBar}
         >
-          <span>Saikat - 817-999-4303</span>
+          <span>{this.renderCalleeInfo()}</span>
         </Paper>
         <div style={this.styles.questions}>
           <GCForm
@@ -89,8 +104,6 @@ export class CallAssignmentViewer extends React.Component {
 }
 
 export default Relay.createContainer(CallAssignmentViewer, {
-  initialVariables: { id: null },
-
   fragments: {
     callAssignment: () => Relay.QL`
       fragment on CallAssignment {
@@ -98,6 +111,10 @@ export default Relay.createContainer(CallAssignmentViewer, {
         name
         survey {
           ${Survey.getFragment('survey')}
+        }
+        targetForUser(personId:"6") {
+          firstName
+          lastName
         }
       }
     `

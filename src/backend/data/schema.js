@@ -187,6 +187,18 @@ const GraphQLCallAssignment = new GraphQLObjectType({
     survey: {
       type: GraphQLSurvey,
       resolve: (assignment) => assignment.getSurvey()
+    },
+    targetForUser: {
+      type: GraphQLPerson,
+      args: {
+        personId: { type: GraphQLString }
+      },
+      resolve: async (assignment, {personId}) => {
+        let targetGroup = await assignment.getTargetGroup()
+        let people = await targetGroup.getPeople()
+        let person = people[Math.floor(Math.random() * people.length)]
+        return person
+      }
     }
   }),
   interfaces: [nodeInterface]
