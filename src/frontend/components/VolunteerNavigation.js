@@ -30,22 +30,28 @@ export default class VolunteerNavigation extends React.Component {
     },
   ]
 
+  renderTopNav() {
+    return (
+      <TopNav
+        zDepth={0}
+        barColor={BernieColors.lightGray}
+        tabColor={BernieColors.darkGray}
+        selectedTabColor={BernieColors.gray}
+        logoColors={{
+          primary: BernieColors.blue,
+          swoosh: BernieColors.red
+        }}
+        tabs={this.tabs}
+        history={this.props.history}
+        location={this.props.location}
+      />
+    )
+  }
+
   render() {
+    // No volunteer navigation for now.
     return (
       <div>
-        <TopNav
-          zDepth={0}
-          barColor={BernieColors.lightGray}
-          tabColor={BernieColors.darkGray}
-          selectedTabColor={BernieColors.gray}
-          logoColors={{
-            primary: BernieColors.blue,
-            swoosh: BernieColors.red
-          }}
-          tabs={this.tabs}
-          history={this.props.history}
-          location={this.props.location}
-        />
         {this.props.children}
       </div>
     )
