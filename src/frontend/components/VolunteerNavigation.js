@@ -1,7 +1,6 @@
 import React from 'react';
 import Relay from 'react-relay';
 import {Styles} from 'material-ui';
-import GroupCallAdmin from './GroupCallAdmin';
 import CallAssignmentAdmin from './CallAssignmentAdmin';
 import TopNav from './TopNav';
 import {BernieTheme} from './styles/bernie-theme';
@@ -13,10 +12,6 @@ export default class VolunteerNavigation extends React.Component {
       value:'/call-assignments',
       label: 'Make Calls',
     },
-//    {
-//      value: '/group-calls',
-//      label: 'Group Calls'
-//    },
     {
       value: '/events',
       label: 'Events'

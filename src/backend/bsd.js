@@ -166,7 +166,6 @@ export default class BSD {
     return this.createConstituentObject(constituent)
   }
 
-// This is probably broken now, and we aren't using it.
 /*  async getConstituents(filter, bundles) {
     let filterStrings = []
     Object.keys(filter).forEach((key) => {

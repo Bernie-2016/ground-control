@@ -12,7 +12,8 @@ class Survey extends React.Component {
     },
     progress: {
       width: '50%',
-      margin: '0 auto',
+      marginLeft: 'auto',
+      marginRight: 'auto',
       marginTop: '30px',
       marginBottom: '30px',
       textAlign: 'center',
@@ -51,7 +52,7 @@ class Survey extends React.Component {
       return;
 
     if (event.data.message == 'documentLoaded') {
-      if (event.data.details.location === this.props.survey.BSDData.fullURL) {
+      if (event.data.details.location === this.props.survey.fullURL) {
         Object.keys(this.props.initialValues).forEach((fieldId) => {
           this.sendFrameMessage({
             message: 'setInputValue',
@@ -96,11 +97,11 @@ class Survey extends React.Component {
   }
 
   frameHost() {
-    return this.hostFromURLString(this.props.survey.BSDData.fullURL);
+    return this.hostFromURLString(this.props.survey.fullURL);
   }
 
   render() {
-    let source = this.props.survey.BSDData.fullURL;
+    let source = this.props.survey.fullURL;
     let loading = (
       <div style={[this.styles.progress, this.state.loadingStyle]}>
         <h3 style={this.styles.progressHeader}>Loading Volunteer Survey...</h3>
@@ -130,9 +131,7 @@ export default Relay.createContainer(Survey, {
   fragments: {
     survey: () => Relay.QL`
       fragment on Survey {
-        BSDData {
-          fullURL
-        }
+        fullURL
       }
     `
   }

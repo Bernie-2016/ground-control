@@ -2,28 +2,30 @@
 
 ## Getting started
 
-Install [Docker](https://docs.docker.com/). Then run:
+### Linux
 
-`docker-machine create --driver virtualbox ground-control-dev`
+The easiest way to get started in Linux is with [Docker](https://docs.docker.com/engine/installation/ubuntulinux/).  After installing Docker, just run:
 
-Then to start Ground Control, you can run:
+`docker compose up`
 
-`./start && docker-compose up`
+### OS X
 
-To find where Ground Control is running, run:
+In OS X, we currently run everything locally using a Procfile and node-foreman. To get started, install [Node.js](https://nodejs.org/en/download/) and [Homebrew](http://brew.sh/). Then do the following:
 
-`./start && docker-machine ip ground-control-dev`
+`npm install`
+`./setup-osx`
 
-Ground Control will be running on port 3000 of the IP that shows there.
+Then you should be able to start Ground Control on `http://localhost:3000` with
 
-## More development info
+`npm run dev`
 
-Any time you open a new terminal window, if you want to use any of the Docker commands, be sure to run `./start` first.
+If you ever want to re-seed the database, run
 
-Any changes you make in the `src` directory will automagically show up.  For other changes, you'll need to stop your running server, then run:
+`npm run seed`
 
-`docker-compose build`
-`docker-compose up`
+### Windows
+
+The best way to run everything on Windows is probably to try to get Docker working on Windows and use the Linux installation instructions.
 
 ## What is this?
 

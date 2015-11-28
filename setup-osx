@@ -1,0 +1,25 @@
+#!/usr/bin/env node
+
+var childProcess = require('child_process')
+console.log("Installing PostgreSQL...")
+childProcess.execSync('brew install postgres')
+
+console.log("Starting up database...")
+childProcess.exec('postgres -D /usr/local/var/postgres')
+
+setTimeout(function() {
+    try {
+        childProcess.execSync('createdb ground_control')
+    } catch (ex) {
+        console.warn(ex)
+    }
+    try {
+        childProcess.execSync('psql -c "CREATE ROLE ground_control WITH LOGIN SUPERUSER;" -d ground_control')
+    } catch (ex) {
+        console.warn(ex);
+    }
+
+    console.log("Seeding data...")
+    childProcess.execSync('npm run seed');
+    console.log("Done!")
+}, 2000)

@@ -1,7 +1,6 @@
 import React from 'react';
 import Relay from 'react-relay';
 import {Styles} from 'material-ui';
-import GroupCallAdmin from './GroupCallAdmin';
 import CallAssignmentAdmin from './CallAssignmentAdmin';
 import TopNav from './TopNav';
 import {BernieTheme} from './styles/bernie-theme';
@@ -9,10 +8,7 @@ import {BernieColors} from './styles/bernie-css';
 
 @Styles.ThemeDecorator(Styles.ThemeManager.getMuiTheme(BernieTheme))
 export default class AdminDashboard extends React.Component {
-  tabs = [{
-      value:'/admin/group-calls',
-      label: 'Group Calls',
-    },
+  tabs = [
     {
       value: '/admin/call-assignments',
       label: 'Call Assignments',

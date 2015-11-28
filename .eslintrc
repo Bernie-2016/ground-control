@@ -10,8 +10,7 @@
   },
   "rules": {
     "quotes": [2, "single"],
-    "strict": [2, "never"],
-    "no-var": 2,
+    "no-var": 1,
     "no-this-before-super": 2,
     "constructor-super": 1,
     "prefer-arrow-callback": 1,

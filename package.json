@@ -5,11 +5,11 @@
   "repository": "Bernie-2016/ground-control",
   "version": "0.1.0",
   "scripts": {
-    "start": "nf start",
-    "graphql-server": "nodemon -e js -w ./src/backend --exec babel-node -- ./src/backend/server.js",
-    "webpack-server": "babel-node ./webpack/server.js",
+    "start": "./run ./src/backend/server.js",
+    "dev": "nf start",
     "bundle": "mkdir -p ./src/frontend/public/js && webpack --config ./webpack/config.js",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "seed": "./run ./src/backend/data/seed.js"
   },
   "dependencies": {
     "babel": "^5.8.21",
@@ -50,7 +50,10 @@
     "xml2js": "0.4.15",
     "yup": "^0.11.0",
     "sequelize": "^3.14.1",
-    "pg": "^4.4.3"
+    "sequelize-cli": "^2.2.1",
+    "pg": "^4.4.3",
+    "faker": "^3.0.1",
+    "dotenv": "^1.2.0"
   },
   "devDependencies": {
     "foreman": "latest",
