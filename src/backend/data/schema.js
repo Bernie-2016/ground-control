@@ -173,17 +173,15 @@ const GraphQLCallAssignment = new GraphQLObjectType({
     name: { type: GraphQLString },
     callerGroup: {
       type: GraphQLGroup,
-      resolve: (assignment) => Group.get(assignment.callerGroupId)
+      resolve: (assignment) => assignment.getCallerGroup()
     },
     targetGroup: {
       type: GraphQLGroup,
-      resolve: (assignment) => Group.get(assignment.targetGroupId)
+      resolve: (assignment) => assignment.getTargetGroup()
     },
     survey: {
       type: GraphQLSurvey,
-      resolve: (assignment) => {
-        return Survey.get(assignment.surveyId)
-      }
+      resolve: (assignment) => assignment.getSurvey()
     }
   }),
   interfaces: [nodeInterface]
@@ -202,6 +200,12 @@ const GraphQLSurvey = new GraphQLObjectType({
   fields: () => ({
     id: globalIdField('Survey'),
     slug: { type: GraphQLString },
+    fullURL: {
+      type: GraphQLString,
+      resolve: (survey) => {
+        return url.resolve('https://' + process.env.BSD_HOST, '/page/s/' + survey.slug)
+      }
+    }
   }),
   interfaces: [nodeInterface]
 })
@@ -264,12 +268,14 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
     }
     */
 
-    return CallAssignment.create({
-      name: name,
-      callerGroup: callerGroup,
-      targetGroup: targetGroup,
-      survey: survey,
+    let callAssignment = await CallAssignment.create({
+      name: name
     })
+    return Promise.all([
+      callAssignment.setCallerGroup(callerGroup),
+      callAssignment.setTargetGroup(targetGroup),
+      callAssignment.setSurvey(survey)
+    ])
   }
 });
 
@@ -304,7 +310,7 @@ let RootQuery = new GraphQLObjectType({
       resolve: async (root, {id, email}) => {
         if (id) {
           let localId = fromGlobalId(id).id
-          return Person.get(localId)
+          return Person.findById(localId)
         }
         else if (email) {
           let BSDPerson = await BSDClient.getConstituentByEmail(email)
@@ -324,7 +330,7 @@ let RootQuery = new GraphQLObjectType({
       },
       resolve: (root, {id}) => {
         let localId = fromGlobalId(id).id
-        return Survey.get(localId)
+        return Survey.findById(localId)
       }
     },
     callAssignment: {
