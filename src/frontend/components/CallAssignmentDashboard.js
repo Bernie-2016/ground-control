@@ -1,56 +1,44 @@
 import React from 'react';
 import Relay from 'react-relay';
 import Survey from './Survey'
-import {BernieText} from './styles/bernie-css'
+import {BernieText, BernieColors} from './styles/bernie-css'
 import Radium from 'radium'
 import SideBarLayout from './SideBarLayout';
 import CallAssignmentList from './CallAssignmentList';
 import CallAssignment from './CallAssignment';
+import TopNav from './TopNav';
 
 @Radium
-class CallAssignmentDashboard extends React.Component {
-  styles = {
-    container: {
-      paddingLeft: 40,
-      paddingTop: 40,
-      paddingRight: 40,
-      paddingBottom: 40,
-    },
-    paragraph: {
-      paddingTop: '0.5em',
-      paddingBottom: '0.5em',
-      paddingLeft: '0.5em',
-      paddingRight: '0.5em',
-
-    }
-  }
+export default class CallAssignmentDashboard extends React.Component {
   render() {
-    let sideBar = (
-      <div>
-        <CallAssignmentList
-          callAssignmentList={this.props.listContainer.callAssignmentList}
-          subheader="Active Assignments"
-          onSelect={(id) => this.props.history.pushState(null, '/call-assignments/' + id)}
-        />
-      </div>
-    )
     return (
-      <SideBarLayout
-        sideBar={sideBar}
-        content={this.props.children}
-      />
+      <div>
+        <TopNav
+          zDepth={0}
+          barColor={BernieColors.lightGray}
+          tabColor={BernieColors.darkGray}
+          selectedTabColor={BernieColors.gray}
+          logoColors={{
+            primary: BernieColors.blue,
+            swoosh: BernieColors.red
+          }}
+          tabs={[{
+            value: '/call-assignments/stats',
+            label: 'Stats'
+          },
+          {
+            value: '/call-assignments/invite',
+            label: 'Invite'
+          },
+          {
+            value: '/call-assignments',
+            label: 'All Assignments'
+          }]}
+          history={this.props.history}
+          location={this.props.location}
+        />
+        {this.props.children}
+      </div>
     )
   }
 }
-
-export default Relay.createContainer(CallAssignmentDashboard, {
-  fragments: {
-    listContainer: () => Relay.QL`
-      fragment on ListContainer {
-        callAssignmentList(first:50) {
-          ${CallAssignmentList.getFragment('callAssignmentList')}
-        }
-      }
-    `,
-  },
-});

@@ -14,7 +14,7 @@ export default class SideBarLayout extends React.Component {
     sideBar: {
       width: '12em',
       minHeight: '800px',
-      borderRight: 'solid 1px ' + BernieColors.lightGray,
+      borderRight: 'solid 1px ' + BernieColors.lightGray
     },
 
     content: {

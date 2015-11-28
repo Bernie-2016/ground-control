@@ -18,6 +18,7 @@ import CallAssignmentDashboard from './components/CallAssignmentDashboard';
 import CallAssignment from './components/CallAssignment';
 import CallAssignmentViewer from './components/CallAssignmentViewer';
 import CallAssignmentCreationForm from './components/CallAssignmentCreationForm';
+import CallAssignmentHome from './components/CallAssignmentHome';
 import VolunteerEventsDashboard from './components/VolunteerEventsDashboard';
 import EventViewer from './components/EventViewer';
 import EventEditor from './components/EventEditor';
@@ -89,8 +90,11 @@ ReactDOM.render(
       <Route
         path='call-assignments'
         component={CallAssignmentDashboard}
-        queries={ListContainerQueries}
       >
+        <IndexRoute
+          component={CallAssignmentHome}
+          queries={ListContainerQueries}
+        />
         <Route
           path=':id'
           component={CallAssignmentViewer}
