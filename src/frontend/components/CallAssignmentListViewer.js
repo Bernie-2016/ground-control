@@ -33,6 +33,8 @@ class CallAssignmentListViewer extends React.Component {
   }
 
   render() {
+    if (!this.props.currentUser)
+      return <div></div>
     let sideBar = (
       <div>
         <CallAssignmentList
