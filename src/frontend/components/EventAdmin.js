@@ -9,6 +9,7 @@ import {BernieLayout} from './styles/bernie-css';
 
 class EventAdmin extends React.Component {
   renderEvents() {
+    console.log(this.props.listContainer.eventList);
     return this.props.listContainer.eventList.edges.map((event) => {
       return <div>event.name</div>
     })

@@ -152,7 +152,8 @@ const GraphQLEvent = new GraphQLObjectType({
   fields: () => ({
     id: globalIdField('Event'),
     name: { type: GraphQLString }
-  })
+  }),
+  interfaces: [nodeInterface]
 })
 
 let {
