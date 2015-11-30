@@ -38,7 +38,7 @@ class CallAssignmentListViewer extends React.Component {
     let sideBar = (
       <div>
         <CallAssignmentList
-          callAssignmentList={this.props.currentUser.callAssignmentList}
+          callAssignments={this.props.currentUser.callAssignments}
           subheader="Active Assignments"
           onSelect={(id) => this.props.history.pushState(null, '/call-assignments/' + id)}
         />
@@ -71,9 +71,9 @@ class CallAssignmentListViewer extends React.Component {
 export default Relay.createContainer(CallAssignmentListViewer, {
   fragments: {
     currentUser: () => Relay.QL`
-      fragment on Person {
-        callAssignmentList(first:50) {
-          ${CallAssignmentList.getFragment('callAssignmentList')}
+      fragment on User {
+        callAssignments(first:50) {
+          ${CallAssignmentList.getFragment('callAssignments')}
         }
       }
     `,

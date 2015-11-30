@@ -7,7 +7,7 @@ import Form from 'react-formal';
 import yup from 'yup';
 import superagent from 'superagent';
 
-class Signup extends React.Component {
+export default class Signup extends React.Component {
   formStates = {
     enterEmail: {
       formTitle: 'Enter your e-mail to get started!',
@@ -215,15 +215,3 @@ class Signup extends React.Component {
     return this.renderSplash();
   }
 }
-
-export default Relay.createContainer(Signup, {
-  fragments: {
-    person: () => Relay.QL`
-      fragment on Person {
-        id
-        firstName
-        hasPassword
-      }
-    `
-  }
-})
