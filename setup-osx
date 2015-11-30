@@ -9,9 +9,14 @@ childProcess.exec('postgres -D /usr/local/var/postgres')
 
 setTimeout(function() {
     try {
-        childProcess.execSync('createdb ground_control')
+        childProcess.execSync('dropdb ground_control')
     } catch (ex) {
         console.warn(ex)
+    }
+    try {
+        childProcess.execSync('createdb ground_control')
+    } catch(ex) {
+        console.warn(ex);
     }
     try {
         childProcess.execSync('psql -c "CREATE ROLE ground_control WITH LOGIN SUPERUSER;" -d ground_control')
