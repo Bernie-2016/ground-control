@@ -5,27 +5,81 @@ import writeSchema from './data/writeSchema';
 import path from 'path';
 import fallback from 'express-history-api-fallback';
 import bodyParser from 'body-parser';
+import session from 'express-session';
 import BSD from './bsd';
 import MG from './mail';
 import demoData from './data/demo.json';
 import models from './data/models'
 import {fromGlobalId} from 'graphql-relay'
+import passport from 'passport';
+import cookieParser from 'cookie-parser';
+import LocalStrategy  from 'passport-local'
+
 writeSchema();
 
 const Mailgun = new MG(process.env.MAILGUN_KEY, process.env.MAILGUN_DOMAIN);
 const BSDClient = new BSD(process.env.BSD_HOST, process.env.BSD_API_ID, process.env.BSD_API_SECRET);
 const port = process.env.APP_PORT;
 const publicPath = path.resolve(__dirname, '../frontend/public');
-const app = express();
 
-app.use(bodyParser.json()); // for parsing application/json
-app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+passport.use('signup', new LocalStrategy(
+  {
+    usernameField: 'email',
+    passwordField: 'password',
+    passReqToCallback: true
+  },
+  async (req, email, password, done) => {
+    let user = await models.User.findOne({
+      where: {
+        email: email
+      }
+    });
+
+    if (!user) {
+      let newUser = await models.User.create({
+        email: email,
+        password: password,
+      });
+      return done(null, newUser);
+    }
+    else if (!await user.verifyPassword(password)) {
+      return done(null, false, { message: 'Incorrect password.' });
+    }
+    return done(null, user);
+  }
+));
+
+const app = express();
+app.use(express.static(publicPath))
+app.use(cookieParser());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(session({ secret: 'keyboard cat' }));
+app.use(passport.initialize());
+app.use(passport.session());
+app.use('/graphql', graphQLHTTP((request) => {
+  return {
+    rootValue: { session: request.session },
+    schema: Schema
+  }
+}));
+app.use((e,req,res,next) => {
+  e = e || new Error('Reached end of the middleware stack with no response')
+  res.status(500).send()
+});
 
 // this endpoint may be used for caching and serving available event types and their attributes to the event creation form
 app.get('/events/types.json', async (req, res) => {
   let result = await BSDClient.getEventTypes();
   res.json(result);
 });
+
+app.post('/signup',
+  passport.authenticate('signup'),
+  (req, res) => {
+  console.log('here')
+  res.send('Success!')
+})
 
 app.post('/login', async (req, res) => {
   // Implement
@@ -71,23 +125,9 @@ app.post('/events/create', async (req, res) => {
   }
 });
 
-app.use(express.static(publicPath))
 app.use(fallback('index.html', { root: publicPath }))
-app.use('/graphql', graphQLHTTP((request) => {
-  return {
-    rootValue: { session: request.session },
-    schema: Schema
-  }
-}));
-app.use((e,req,res,next) => {
-  e = e || new Error('Reached end of the middleware stack with no response')
-  console.error(e)
-  console.error(e.stack)
-  res.status(500).end()
-});
 
-models.sequelize.sync({}).then(() => {
-  app.listen(port, () => console.log(
-    `Server is now running on http://localhost:${port}`
-  ))
-});
+app.listen(port, () => console.log(
+  `Server is now running on http://localhost:${port}`
+))
+
