@@ -54,7 +54,12 @@
     "pg": "^4.4.3",
     "faker": "^3.0.1",
     "dotenv": "^1.2.0",
-    "superagent": "^1.4.0"
+    "superagent": "^1.4.0",
+    "passport": "^0.3.2",
+    "passport-local": "^1.0.0",
+    "bcrypt": "^0.8.5",
+    "express-session": "^1.4.0",
+    "cookie-parser": "^1.12.1"
   },
   "devDependencies": {
     "foreman": "latest",

@@ -9,7 +9,10 @@ export default function(sequelize, DataTypes) {
           through: BSDPersonGroup,
           foreignKey: 'cons_id'
         });
-        models.BSDGroup.belongsToMany(models.BSDPerson, { through: BSDPersonGroup });
+        models.BSDGroup.belongsToMany(models.BSDPerson, {
+          through: BSDPersonGroup,
+          foreignKey: 'bsd_group_id'
+        });
       }
     }
   })

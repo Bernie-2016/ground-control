@@ -8,65 +8,32 @@ import yup from 'yup';
 import superagent from 'superagent';
 
 export default class Signup extends React.Component {
+  state = {
+    formState : 'signup'
+  }
   formStates = {
-    enterEmail: {
-      formTitle: 'Enter your e-mail to get started!',
+    login: {
+      formTitle: 'Login to get started',
       formSchema: yup.object({
-        email: yup.string().required(),
-      }),
-      formElement: (
-        <Form.Field
-          name='email'
-          label='E-mail Address'
-        />
-      ),
-      onSubmit: (formState) => {
-        this.props.history.pushState(null, '/signup/' + formState.email)
-      }
-    },
-    newAccount: {
-      formTitle: 'Sign up to make calls',
-      formSchema: yup.object({
-        firstName: yup.string().required(),
-        lastName: yup.string().required(),
-        zip: yup.string().required()
+        email: yup.string().email().required(),
       }),
       formElement: (
         <div>
           <Form.Field
-            name='firstName'
-            label='First Name'
-          /><br />
+            name='email'
+            label='E-mail Address'
+          />
           <Form.Field
-            name='lastName'
-            label='Last Name'
-          /><br />
-          <Form.Field
-            name='zip'
-            label='Zip Code'
+            name='password'
+            label='Password'
           />
         </div>
-      ),
-      onSubmit: (formState) => {
-        console.log('Implement this')
-      }
-    },
-    enterPassword: {
-      formTitle: 'Set a password to get started',
-      formSchema: yup.object({
-        password: yup.string().required()
-      }),
-      formElement: (
-        <Form.Field
-          name='password'
-          label='Password'
-        />
       ),
       onSubmit: (formState) => {
         superagent
           .post('/login')
           .send({
-            id: this.props.person.id,
+            email: formState.email,
             password: formState.password
           })
           .end((err, res) => {
@@ -74,19 +41,35 @@ export default class Signup extends React.Component {
           })
       }
     },
-    login: {
-      formTitle: 'Login to get started',
+    signup: {
+      formTitle: 'Login or sign up make calls',
       formSchema: yup.object({
-        password: yup.string().required()
+        email: yup.string().email().required(),
+        password: yup.string().required(),
       }),
       formElement: (
-        <Form.Field
-          name='password'
-          label='Password'
-        />
+        <div>
+          <Form.Field
+            name='email'
+            label='E-mail Address'
+          /><br />
+          <Form.Field
+            name='password'
+            label='Password'
+          /><br />
+        </div>
       ),
       onSubmit: (formState) => {
-
+        superagent
+          .post('/signup')
+          .send({
+            email: formState.email,
+            password: formState.password
+          })
+          .end((err, res) => {
+            console.log("here", err, res)
+            this.props.history.pushState(null, '/call-assignments')
+          })
       }
     }
   }
@@ -163,17 +146,7 @@ export default class Signup extends React.Component {
   }
 
   renderSignupForm() {
-    let signupState = this.formStates.enterEmail;
-    if (this.props.email) {
-      if (this.props.person) {
-        if (this.props.person.hasPassword)
-          signupState = this.formStates.login
-        else
-          signupState = this.formStates.enterPassword
-      }
-      else
-        signupState = this.formStates.newAccount;
-    }
+    let signupState = this.formStates[this.state.formState];
     let formElement = signupState.formElement;
     let formTitle = signupState.formTitle;
     let formSchema = signupState.formSchema;
@@ -205,6 +178,13 @@ export default class Signup extends React.Component {
                 label='Go!'
                 fullWidth={true}
               />
+              <div style={{
+                ...BernieText.default,
+                fontSize: '0.7em',
+                color: BernieColors.white,
+                marginTop: 10
+              }}>
+              </div>
           </GCForm>
         </div>
       </Paper>

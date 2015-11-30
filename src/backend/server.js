@@ -49,6 +49,15 @@ passport.use('signup', new LocalStrategy(
   }
 ));
 
+passport.serializeUser(async (user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  let user = await User.findById(id);
+  done(null, user);
+});
+
 const app = express();
 app.use(express.static(publicPath))
 app.use(cookieParser());
@@ -77,7 +86,6 @@ app.get('/events/types.json', async (req, res) => {
 app.post('/signup',
   passport.authenticate('signup'),
   (req, res) => {
-  console.log('here')
   res.send('Success!')
 })
 
