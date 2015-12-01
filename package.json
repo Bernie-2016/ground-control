@@ -59,7 +59,6 @@
     "passport-local": "^1.0.0",
     "bcrypt": "^0.8.5",
     "express-session": "^1.4.0",
-    "cookie-parser": "^1.12.1",
     "connect-session-sequelize": "^2.3.1"
   },
   "devDependencies": {

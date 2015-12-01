@@ -12,7 +12,6 @@ import demoData from './data/demo.json';
 import models from './data/models'
 import {fromGlobalId} from 'graphql-relay'
 import passport from 'passport';
-import cookieParser from 'cookie-parser';
 import LocalStrategy  from 'passport-local'
 import SequelizeStoreFactory from 'connect-session-sequelize'
 
@@ -81,10 +80,6 @@ app.use('/graphql', graphQLHTTP((request) => {
     schema: Schema
   }
 }));
-app.use((e,req,res,next) => {
-  e = e || new Error('Reached end of the middleware stack with no response')
-  res.status(500).send()
-});
 
 // this endpoint may be used for caching and serving available event types and their attributes to the event creation form
 app.get('/events/types.json', async (req, res) => {
@@ -155,6 +150,10 @@ app.post('/events/create', async (req, res) => {
 });
 
 app.use(fallback('index.html', { root: publicPath }))
+app.use((e,req,res,next) => {
+  e = e || new Error('Reached end of the middleware stack with no response')
+  res.status(500).send()
+});
 
 sessionStore.sync().then(
   app.listen(port, () => console.log(
