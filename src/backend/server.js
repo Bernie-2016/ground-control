@@ -87,16 +87,6 @@ app.get('/events/types.json', async (req, res) => {
   res.json(result);
 });
 
-app.get('/test', (req, res) => {
-  throw new Error("Oh no");
-  console.log(req)
-  console.log(req.passport)
-  console.log(req.isAuthenticated())
-  console.log('user')
-  console.log(req.user)
-  res.send('done')
-})
-
 app.post('/signup',
   passport.authenticate('signup'),
   (req, res) => {
