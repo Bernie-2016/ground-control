@@ -62,7 +62,7 @@ passport.deserializeUser(async (id, done) => {
 const app = express();
 const sessionStore = new SequelizeStore({
   db: models.sequelize,
-  table: 'sessions'
+  table: 'Session'
 })
 
 app.use(express.static(publicPath))

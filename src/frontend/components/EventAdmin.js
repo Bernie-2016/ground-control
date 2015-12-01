@@ -30,8 +30,8 @@ class EventAdmin extends React.Component {
   }
 
   renderEvents() {
-    console.log(this.props.listContainer.eventList);
-    return this.props.listContainer.eventList.edges.map((edge) => {
+    console.log(this.props.listContainer.events);
+    return this.props.listContainer.events.edges.map((edge) => {
       return (
         <TableRow key={edge.node.id}>
           <TableRowColumn>{edge.node.eventIdObfuscated}</TableRowColumn>
@@ -145,7 +145,7 @@ class EventAdmin extends React.Component {
         <TableFooter>
             <TableRow>
               <TableRowColumn colSpan="7" style={{textAlign: 'center'}}>
-                {this.props.listContainer.eventList.edges[this.props.listContainer.eventList.edges.length-1].cursor}
+                {this.props.listContainer.events.edges[this.props.listContainer.events.edges.length-1].cursor}
               </TableRowColumn>
             </TableRow>
         </TableFooter>
@@ -159,13 +159,12 @@ export default Relay.createContainer(EventAdmin, {
   fragments: {
     listContainer: () => Relay.QL`
       fragment on ListContainer {
-        eventList(first: 20) {
+        events(first: 20) {
           edges {
             cursor
             node {
               name
               id
-              BSDId
               eventIdObfuscated
               flagApproval
               eventTypeId
