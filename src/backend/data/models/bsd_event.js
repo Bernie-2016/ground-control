@@ -1,18 +1,14 @@
 export default function(sequelize, DataTypes) {
-  return sequelize.define('Event', {
-    BSDId: {
-      type: DataTypes.BIGINT,
-      field: 'bsd_id',
-      allowNull: true
-    },
+  let Event = sequelize.define('BSDEvent', {
     id: {
       type: DataTypes.BIGINT,
-      field: 'id',
+      field: 'event_id',
       primaryKey: true
     },
     eventIdObfuscated: {
       type: DataTypes.STRING,
       field: 'event_id_obfuscated',
+      allowNull: true
     },
     flagApproval: {
       type: DataTypes.BOOLEAN,
@@ -21,10 +17,6 @@ export default function(sequelize, DataTypes) {
     eventTypeId: {
       type: DataTypes.INTEGER,
       field: 'event_type_id',
-    },
-    creatorConsId: {
-      type: DataTypes.INTEGER,
-      field: 'creator_cons_id',
     },
     name: {
       type: DataTypes.STRING,
@@ -41,6 +33,7 @@ export default function(sequelize, DataTypes) {
     venueZip: {
       type: DataTypes.STRING,
       field: 'venue_zip',
+      allowNull: true
     },
     venueCity: {
       type: DataTypes.STRING,
@@ -48,8 +41,7 @@ export default function(sequelize, DataTypes) {
     },
     venueState: {
       type: DataTypes.STRING,
-      field: 'venue_state_cd',
-      allowNull: true
+      field: 'venue_state_cd'
     },
     venueAddr1: {
       type: DataTypes.STRING,
@@ -71,15 +63,18 @@ export default function(sequelize, DataTypes) {
     },
     localTimezone: {
       type: DataTypes.STRING,
-      field: 'local_timezone',
+      field: 'start_tz',
+      allowNull: true
     },
-    startDatetime: {
-      type: DataTypes.STRING,
-      field: 'start_datetime_system'
+    startDate: {
+      type: DataTypes.DATE,
+      field: 'start_dt',
+      allowNull: true
     },
     duration: {
       type: DataTypes.FLOAT,
-      field: 'duration'
+      field: 'duration',
+      allowNull: true
     },
     capacity: {
       type: DataTypes.INTEGER,
@@ -88,12 +83,10 @@ export default function(sequelize, DataTypes) {
     attendeeVolunteerShow: {
       type: DataTypes.BOOLEAN,
       field: 'attendee_volunteer_show',
-      allowNull: true
     },
     attendeeVolunteerMessage: {
       type: DataTypes.TEXT,
       field: 'attendee_volunteer_message',
-      allowNull: true
     },
     isSearchable: {
       type: DataTypes.BIGINT,
@@ -106,16 +99,15 @@ export default function(sequelize, DataTypes) {
     contactPhone: {
       type: DataTypes.STRING,
       field: 'contact_phone',
+      allowNull: true
     },
     hostReceiveRsvpEmails: {
       type: DataTypes.BOOLEAN,
       field: 'host_receive_rsvp_emails',
-      allowNull: true
     },
     rsvpUseReminderEmail: {
       type: DataTypes.BOOLEAN,
       field: 'rsvp_use_reminder_email',
-      allowNull: true
     },
     rsvpReminderHours: {
       type: DataTypes.FLOAT,
@@ -124,6 +116,12 @@ export default function(sequelize, DataTypes) {
     }
   }, {
     underscored: true,
-    tableName: 'events',
+    tableName: 'bsd_event',
+    classMethods: {
+      associate: (models) => {
+        Event.belongsTo(models.BSDPerson, {foreignKey: 'creator_cons_id', as: 'host'})
+      }
+    }
   })
+  return Event;
 }

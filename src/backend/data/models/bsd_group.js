@@ -1,14 +1,17 @@
 export default function(sequelize, DataTypes) {
   return sequelize.define('BSDGroup', {
-    BSDId: {
+    id: {
       type: DataTypes.BIGINT,
-      field: 'bsd_id',
-      allowNull: true
+      field: 'cons_group_id',
+      primaryKey: true
     },
     name: DataTypes.STRING,
-    description: DataTypes.STRING
+    description: {
+      type: DataTypes.STRING,
+      allowNull: true
+    }
   }, {
     underscored: true,
-    tableName: 'bsd_groups',
+    tableName: 'bsd_cons_group',
   })
 }

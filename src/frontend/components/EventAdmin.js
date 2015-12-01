@@ -29,8 +29,8 @@ class EventAdmin extends React.Component {
     };
   }
 
-  renderEvents() {  
-    console.log(this.props.listContainer.eventList);  
+  renderEvents() {
+    console.log(this.props.listContainer.eventList);
     return this.props.listContainer.eventList.edges.map((edge) => {
       return (
         <TableRow key={edge.node.id}>
@@ -58,7 +58,7 @@ class EventAdmin extends React.Component {
       this.setState({
         showDeleteEventDialog: true
       });
-      ReactDOM.findDOMNode(this.refs.deleteConfirmationInput).focus(); 
+      ReactDOM.findDOMNode(this.refs.deleteConfirmationInput).focus();
     }
 
     return (
@@ -180,7 +180,7 @@ export default Relay.createContainer(EventAdmin, {
               venueCountry
               venueDirections
               localTimezone
-              startDatetime
+              startDate
               duration
               capacity
               attendeeVolunteerShow

@@ -56,8 +56,8 @@ export default function(sequelize, DataTypes) {
     tableName: 'bsd_cons',
     classMethods: {
       associate: (models) => {
-        BSDPerson.hasMany(models.BSDEmail, { foreignKey: 'cons_id'})
-        BSDPerson.hasMany(models.BSDPhone, { foreignKey: 'cons_id'})
+        BSDPerson.hasMany(models.BSDEmail, { foreignKey: 'cons_id', as: 'emails'})
+        BSDPerson.hasMany(models.BSDPhone, { foreignKey: 'cons_id', as: 'phones'})
       },
       createFromBSDObject: async (BSDObject) => {
         let newPerson = {...BSDObject}

@@ -2,6 +2,12 @@ import models from './models';
 import faker from 'faker';
 
 const NUM_PERSONS=1000;
+const NUM_EVENTS=5000;
+
+// Use this instead of faker because we want it to be just digits
+let randomPhoneNumber = () => {
+  return faker.phone.phoneNumber().replace(/\D/g,'').slice(0, 10);
+}
 // Generate a null value 1/3 of the time
 let nully = (value) => {
   return faker.random.arrayElement([null, value, value])
@@ -32,14 +38,17 @@ models.sequelize.sync({force: true}).then(async () => {
   let events = [];
   let groups = [
     {
+      id: 1,
       name: 'Volunteers',
       description: 'Volunteers'
     },
     {
+      id: 2,
       name: 'Event hosts',
       description: 'Event hosts'
     },
     {
+      id: 3,
       name: 'Elite callers',
       description: 'The top 1% of the top 0.1% of the top 1% of the top 0.1%'
     }
@@ -49,7 +58,7 @@ models.sequelize.sync({force: true}).then(async () => {
     attributes: ['id']
   })
   groupIDs = groupIDs.map((queryObj) => queryObj.id)
-  for (let index = 0; index < NUM_PERSONS; index++) {
+  for (let index = 1; index <= NUM_PERSONS; index++) {
     persons.push({
       id: index,
       prefix: nully(faker.name.prefix()),
@@ -67,13 +76,13 @@ models.sequelize.sync({force: true}).then(async () => {
       id: index,
       cons_id: index,
       isPrimary: faker.random.boolean(),
-      address: faker.internet.email(),
+      address: faker.internet.email().toLowerCase(),
     })
     phones.push({
       id: index,
       cons_id: index,
       isPrimary: faker.random.boolean(),
-      number: faker.phone.phoneNumber(),
+      number: randomPhoneNumber(),
       textOptOut: faker.random.boolean()
     })
 
@@ -88,22 +97,21 @@ models.sequelize.sync({force: true}).then(async () => {
     Object.keys(groups).forEach((key) => {
       personGroups.push({
         cons_id: index,
-        bsd_group_id: key
+        cons_group_id: key
       })
     })
   }
 
-  for (let index = 0; index < 5000; index++) {
+  for (let index = 1; index <= NUM_EVENTS; index++) {
     let rsvp_use_reminder_boolean = faker.random.boolean();
     let rsvp_use_reminder_email = rsvp_use_reminder_boolean;
     let rsvp_reminder_hours = rsvp_use_reminder_boolean ? null : faker.random.number({min:0, max:30});
     events.push({
-      BSDId: null,
       id: index,
       eventIdObfuscated: faker.internet.password(5),
       flagApproval: true,
       eventTypeId: faker.random.arrayElement([1,2]),
-      creatorConsId: faker.random.number(NUM_PERSONS),
+      creator_cons_id: faker.random.number({min: 1, max: NUM_PERSONS}),
       name: toTitleCase(faker.lorem.sentence(3,5)),
       description: faker.lorem.paragraph(),
       venueName: toTitleCase(faker.lorem.sentence(1,4)),
@@ -114,16 +122,16 @@ models.sequelize.sync({force: true}).then(async () => {
       venueAddr2: nully(faker.address.secondaryAddress()),
       venueCountry: faker.address.countryCode(),
       venueDirections: nully(faker.lorem.paragraph()),
-      startDatetime: formatDate(faker.date.future()),
+      startDate: formatDate(faker.date.future()),
       duration: faker.random.number({min:1, max:1600}),
       capacity: faker.random.arrayElement([0, faker.random.number({min:0, max:500})]),
       localTimezone: faker.random.arrayElement(['US/Eastern', 'US/Pacific', 'Africa/Cairo']),
-      attendeeVolunteerShow: nully(1),
-      attendeeVolunteerMessage: nully(faker.lorem.sentence()),
+      attendeeVolunteerShow: faker.random.arrayElement([0, 1]),
+      attendeeVolunteerMessage: faker.lorem.sentence(),
       isSearchable: -2,
       publicPhone: faker.random.boolean(),
-      contactPhone: faker.phone.phoneNumber().replace(/\D/g,''),
-      hostReceiveRsvpEmails: nully(1),
+      contactPhone: randomPhoneNumber(),
+      hostReceiveRsvpEmails: 1,
       rsvpUseReminderEmail: rsvp_use_reminder_email,
       rsvpReminderHours: rsvp_reminder_hours
     })
@@ -132,7 +140,7 @@ models.sequelize.sync({force: true}).then(async () => {
   console.log('Creating...')
   await models.BSDPerson.bulkCreate(persons);
   let promises = [
-    models.Event.bulkCreate(events),
+    models.BSDEvent.bulkCreate(events),
     models.BSDPersonGroup.bulkCreate(personGroups),
     models.BSDEmail.bulkCreate(emails),
     models.BSDPhone.bulkCreate(phones)

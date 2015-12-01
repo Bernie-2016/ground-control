@@ -26,7 +26,7 @@ import {
   BSDGroup,
   BSDCallAssignment,
   BSDSurvey,
-  Event,
+  BSDEvent,
   User
 } from './models';
 
@@ -103,7 +103,7 @@ const GraphQLListContainer = new GraphQLObjectType({
       type: GraphQLEventConnection,
       args: connectionArgs,
       resolve: async(event, {first}) => {
-        let events = await Event.all()
+        let events = await BSDEvent.all()
         return connectionFromArray(events, {first});
       }
     },
@@ -162,7 +162,6 @@ const GraphQLEvent = new GraphQLObjectType({
   description: 'An event',
   fields: () => ({
     id: globalIdField('Event'),
-    BSDId: { type: GraphQLInt },
     eventIdObfuscated: { type: GraphQLString },
     flagApproval: { type: GraphQLBoolean },
     eventTypeId: { type: GraphQLInt },
@@ -178,7 +177,7 @@ const GraphQLEvent = new GraphQLObjectType({
     venueCountry: { type: GraphQLString },
     venueDirections: { type: GraphQLString },
     localTimezone: { type: GraphQLString },
-    startDatetime: { type: GraphQLString },
+    startDate: { type: GraphQLString },
     duration: { type: GraphQLInt },
     capacity: { type: GraphQLInt },
     attendeeVolunteerShow: { type: GraphQLBoolean },
