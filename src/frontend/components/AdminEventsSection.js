@@ -1,11 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Relay from 'react-relay';
+import CallAssignmentList from './CallAssignmentList';
 import SideBarLayout from './SideBarLayout';
 import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle, DropDownMenu, DropDownIcon, RaisedButton, Dialog, TextField, Table, TableBody, TableFooter, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui';
+import CallAssignment from './CallAssignment';
 import {BernieLayout, BernieColors} from './styles/bernie-css';
 
-class EventAdmin extends React.Component {
+class AdminEventSection extends React.Component {
   constructor() {
     super();
     this.setState = this.setState.bind(this);
@@ -152,7 +154,7 @@ class EventAdmin extends React.Component {
   }
 }
 
-export default Relay.createContainer(EventAdmin, {
+export default Relay.createContainer(AdminEventSection, {
   fragments: {
     listContainer: () => Relay.QL`
       fragment on ListContainer {

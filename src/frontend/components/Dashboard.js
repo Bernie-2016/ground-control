@@ -1,13 +1,12 @@
 import React from 'react';
 import Relay from 'react-relay';
 import {Styles} from 'material-ui';
-import CallAssignmentAdmin from './CallAssignmentAdmin';
 import TopNav from './TopNav';
 import {BernieTheme} from './styles/bernie-theme';
 import {BernieColors} from './styles/bernie-css';
 
 @Styles.ThemeDecorator(Styles.ThemeManager.getMuiTheme(BernieTheme))
-export default class VolunteerNavigation extends React.Component {
+export default class Dashboard extends React.Component {
   tabs = [{
       value:'/call-assignments',
       label: 'Make Calls',

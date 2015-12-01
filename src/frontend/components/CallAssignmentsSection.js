@@ -9,7 +9,7 @@ import CallAssignment from './CallAssignment';
 import TopNav from './TopNav';
 import Signup from './Signup';
 
-class CallAssignmentListViewer extends React.Component {
+class CallAssignmentsSection extends React.Component {
   styles = {
     container: {
       paddingLeft: 40,
@@ -68,7 +68,7 @@ class CallAssignmentListViewer extends React.Component {
   }
 }
 
-export default Relay.createContainer(CallAssignmentListViewer, {
+export default Relay.createContainer(CallAssignmentsSection, {
   fragments: {
     currentUser: () => Relay.QL`
       fragment on User {

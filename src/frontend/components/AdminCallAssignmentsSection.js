@@ -3,11 +3,11 @@ import Relay from 'react-relay';
 import CallAssignmentList from './CallAssignmentList';
 import SideBarLayout from './SideBarLayout';
 import {RaisedButton} from 'material-ui';
-import CallAssignment from './CallAssignment';
-import CallAssignmentCreationForm from './CallAssignmentCreationForm';
+import AdminCallAssignment from './AdminCallAssignment';
+import AdminCallAssignmentCreationForm from './AdminCallAssignmentCreationForm';
 import {BernieLayout} from './styles/bernie-css';
 
-class CallAssignmentAdmin extends React.Component {
+class AdminCallAssignmentAdmin extends React.Component {
   render() {
     let sideBar = (
       <div>
@@ -33,7 +33,7 @@ class CallAssignmentAdmin extends React.Component {
   }
 }
 
-export default Relay.createContainer(CallAssignmentAdmin, {
+export default Relay.createContainer(AdminCallAssignmentAdmin, {
   fragments: {
     listContainer: () => Relay.QL`
       fragment on ListContainer {

@@ -7,7 +7,7 @@ import Form from 'react-formal';
 import CreateCallAssignment from '../mutations/CreateCallAssignment';
 import yup from 'yup';
 
-export default class CallAssignmentCreationForm extends React.Component {
+export default class AdminCallAssignmentCreationForm extends React.Component {
   styles = {
     formContainer: {
       width: 280,
@@ -111,7 +111,7 @@ export default class CallAssignmentCreationForm extends React.Component {
   }
 }
 
-export default Relay.createContainer(CallAssignmentCreationForm, {
+export default Relay.createContainer(AdminCallAssignmentCreationForm, {
   fragments: {
     listContainer: () => Relay.QL`
       fragment on ListContainer {

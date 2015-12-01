@@ -9,7 +9,7 @@ import CallAssignment from './CallAssignment';
 import TopNav from './TopNav';
 
 @Radium
-export default class CallAssignmentDashboard extends React.Component {
+export default class CallAssignmentsDashboard extends React.Component {
   render() {
     return (
       <div>
