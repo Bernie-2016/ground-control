@@ -284,6 +284,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
     let callAssignment = await BSDCallAssignment.create({
       name: name
     })
+
     return Promise.all([
       callAssignment.setCallerGroup(callerGroup),
       callAssignment.setTargetGroup(targetGroup),
@@ -310,11 +311,7 @@ let RootQuery = new GraphQLObjectType({
     currentUser: {
       type: GraphQLUser,
       resolve: (parent, _, {rootValue}) => {
-        console.log(rootValue)
-        if (rootValue.user)
-          return Person.findById(rootValue.user);
-        else
-          return null;
+        return rootValue.user
       }
     },
     callAssignment: {

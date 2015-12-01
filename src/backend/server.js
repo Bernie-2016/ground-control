@@ -70,13 +70,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
   secret: 'keyboard cat',
   store: sessionStore,
-  domain: null
 }));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use('/graphql', graphQLHTTP((request) => {
   return {
-    rootValue: { session: request.user },
+    rootValue: { user: request.user },
     schema: Schema
   }
 }));
@@ -90,9 +89,6 @@ app.get('/events/types.json', async (req, res) => {
 app.post('/signup',
   passport.authenticate('signup'),
   (req, res) => {
-  console.log(req.isAuthenticated());
-  console.log('here?')
-  console.log(req.user)
   res.send('Success!')
 })
 

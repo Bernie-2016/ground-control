@@ -47,8 +47,12 @@ export class CallAssignmentViewer extends React.Component {
   })
 
   renderCalleeInfo() {
-    let callee = this.props.callAssignment.targetForUser
-    let name = callee.firstName + " " + callee.lastName
+//    let callee = this.props.callAssignment.targetForUser
+    let callee = {
+      firstName: 'Saikat',
+      lastName: 'Chakrabarti'
+    }
+    let name = callee.firstName + ' ' + callee.lastName
     return (
       <div>
         <div style={BernieText.secondaryTitle}>
@@ -111,10 +115,6 @@ export default Relay.createContainer(CallAssignmentViewer, {
         name
         survey {
           ${Survey.getFragment('survey')}
-        }
-        targetForUser(personId:"6") {
-          firstName
-          lastName
         }
       }
     `

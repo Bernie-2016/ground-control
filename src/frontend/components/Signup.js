@@ -38,7 +38,9 @@ export default class Signup extends React.Component {
           })
           .end((err, res) => {
             console.log(res)
-            this.props.history.pushState(null, '/call-assignments')
+            window.location = '/call-assignments';
+            // Ideally this would work with pushState, but it doesn't because relay has already cached the current user and has no idea that things are session-based.
+            //this.props.history.pushState(null, '/call-assignments')
           })
       }
     },
