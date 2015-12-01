@@ -61,8 +61,15 @@ export class CallAssignment extends React.Component {
 
   formSchema = yup.object({
     contacted: yup.boolean().required(),
-    reasonNotContacted: yup.string().oneOf(Object.keys(this.notContactedReasons)),
-    leftVoicemail: yup.boolean()
+    reasonNotContacted: yup.string().oneOf(Object.keys(this.notContactedReasons)).nullable(),
+    leftVoicemail: yup.boolean().nullable()
+  }).test('not-contacted-reasons-required',
+  'If you did not contact the person, please fill out all the questions',
+    (value) => {
+      if (value.contacted)
+        return true
+      else
+        return value.reasonNotContacted !== null && value.leftVoicemail !== null
   })
 
   renderCalleeInfo() {
@@ -88,7 +95,8 @@ export class CallAssignment extends React.Component {
 
   render() {
     let submitHandler = (formValue) => {
-      this.refs.survey.refs.component.submit()
+      if (this.state.contacted)
+        this.refs.survey.refs.component.submit()
     }
 
     let survey = (
@@ -130,13 +138,12 @@ export class CallAssignment extends React.Component {
           <GCForm
             schema={this.formSchema}
             onSubmit={submitHandler}
-            value={{
-              contacted: this.state.contacted,
-              leftVoicemail: this.state.leftVoicemail,
-              reasonNotContacted: this.state.reasonNotContacted
-            }}
+            value={this.state}
             onChange={(formValue) => {
               this.setState(formValue)
+            }}
+            onError={(errors) => {
+              // Implement
             }}
           >
             <div style={this.styles.callAssignmentQuestions}>
