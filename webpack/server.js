@@ -18,6 +18,7 @@ console.log("Proxying requests to:",connstring)
 let app = new WebpackDevServer(compiler, {
   contentBase: '/js/',
   publicPath: '/js/',
+  headers: { 'Access-Control-Allow-Origin': '*' },
   proxy: {
     '*': `http://${process.env.APP_HOST}:${process.env.APP_PORT}`
   },

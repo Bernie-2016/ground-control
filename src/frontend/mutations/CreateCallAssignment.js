@@ -20,7 +20,7 @@ export default class CreateCallAssignment extends Relay.Mutation {
       fragment on CreateCallAssignmentPayload {
         listContainer {
           id,
-          callAssignmentList
+          callAssignments
         },
       }
     `;

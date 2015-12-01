@@ -44,8 +44,8 @@ models.sequelize.sync({force: true}).then(async () => {
       description: 'The top 1% of the top 0.1% of the top 1% of the top 0.1%'
     }
   ]
-  await models.Group.bulkCreate(groups);
-  let groupIDs = await models.Group.findAll({
+  await models.BSDGroup.bulkCreate(groups);
+  let groupIDs = await models.BSDGroup.findAll({
     attributes: ['id']
   })
   groupIDs = groupIDs.map((queryObj) => queryObj.id)
@@ -88,7 +88,7 @@ models.sequelize.sync({force: true}).then(async () => {
     Object.keys(groups).forEach((key) => {
       personGroups.push({
         cons_id: index,
-        group_id: key
+        bsd_group_id: key
       })
     })
   }
@@ -130,12 +130,12 @@ models.sequelize.sync({force: true}).then(async () => {
   };
 
   console.log('Creating...')
-  await models.Person.bulkCreate(persons);
+  await models.BSDPerson.bulkCreate(persons);
   let promises = [
-    models.PersonGroup.bulkCreate(personGroups),
-    models.Email.bulkCreate(emails),
-    models.Phone.bulkCreate(phones),
-    models.Event.bulkCreate(events)
+    models.Event.bulkCreate(events),
+    models.BSDPersonGroup.bulkCreate(personGroups),
+    models.BSDEmail.bulkCreate(emails),
+    models.BSDPhone.bulkCreate(phones)
   ]
   await Promise.all(promises);
   console.log('Done!');

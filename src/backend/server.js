@@ -5,32 +5,80 @@ import writeSchema from './data/writeSchema';
 import path from 'path';
 import fallback from 'express-history-api-fallback';
 import bodyParser from 'body-parser';
+import session from 'express-session';
 import BSD from './bsd';
 import MG from './mail';
 import demoData from './data/demo.json';
 import models from './data/models'
-import sequelizeSession from 'connect-session-sequelize';
-import cookieParser from 'cookie-parser';
-import session from 'express-session';
 import {fromGlobalId} from 'graphql-relay'
+import passport from 'passport';
+import LocalStrategy  from 'passport-local'
+import SequelizeStoreFactory from 'connect-session-sequelize'
+
 writeSchema();
 
+const SequelizeStore = SequelizeStoreFactory(session.Store)
 const Mailgun = new MG(process.env.MAILGUN_KEY, process.env.MAILGUN_DOMAIN);
 const BSDClient = new BSD(process.env.BSD_HOST, process.env.BSD_API_ID, process.env.BSD_API_SECRET);
 const port = process.env.APP_PORT;
 const publicPath = path.resolve(__dirname, '../frontend/public');
-const SequelizeStore = sequelizeSession(session.Store);
-const app = express();
 
-app.use(cookieParser())
+passport.use('signup', new LocalStrategy(
+  {
+    usernameField: 'email',
+    passwordField: 'password',
+    passReqToCallback: true
+  },
+  async (req, email, password, done) => {
+    let user = await models.User.findOne({
+      where: {
+        email: email
+      }
+    });
+
+    if (!user) {
+      let newUser = await models.User.create({
+        email: email,
+        password: password,
+      });
+      return done(null, newUser);
+    }
+    else if (!await user.verifyPassword(password)) {
+      return done(null, false, { message: 'Incorrect password.' });
+    }
+    return done(null, user);
+  }
+));
+
+passport.serializeUser(async (user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  let user = await models.User.findById(id);
+  done(null, user);
+});
+
+const app = express();
+const sessionStore = new SequelizeStore({
+  db: models.sequelize,
+})
+
+app.use(express.static(publicPath))
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
-  secret: 'secret',
-  store: new SequelizeStore({
-    db: models.sequelize
-  })
-}))
-app.use(bodyParser.json()); // for parsing application/json
-app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+  secret: 'keyboard cat',
+  store: sessionStore,
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+app.use('/graphql', graphQLHTTP((request) => {
+  return {
+    rootValue: { user: request.user },
+    schema: Schema
+  }
+}));
 
 // this endpoint may be used for caching and serving available event types and their attributes to the event creation form
 app.get('/events/types.json', async (req, res) => {
@@ -38,16 +86,20 @@ app.get('/events/types.json', async (req, res) => {
   res.json(result);
 });
 
-app.post('/set_password', async (req, res) => {
-  console.log('set password')
+app.post('/signup',
+  passport.authenticate('signup'),
+  (req, res) => {
+  res.send('Success!')
 })
 
 app.post('/login', async (req, res) => {
-  let person = fromGlobalId(req.body.id);
+  // Implement
+/*  let person = fromGlobalId(req.body.id);
   req.session.regenerate(() => {
     req.session.personId = person.id
     res.send('Success!')
   })
+*/
 })
 
 // this endpoint is for testing email rendering/sending
@@ -84,23 +136,10 @@ app.post('/events/create', async (req, res) => {
   }
 });
 
-app.use(express.static(publicPath))
 app.use(fallback('index.html', { root: publicPath }))
-app.use('/graphql', graphQLHTTP((request) => {
-  return {
-    rootValue: { session: request.session },
-    schema: Schema
-  }
-}));
-app.use((e,req,res,next) => {
-  e = e || new Error('Reached end of the middleware stack with no response')
-  console.error(e)
-  console.error(e.stack)
-  res.status(500).end()
-});
 
-models.sequelize.sync({}).then(() => {
-  app.listen(port, () => console.log(
-    `Server is now running on http://localhost:${port}`
-  ))
-});
+app.listen(port, () => console.log(
+  `Server is now running on http://localhost:${port}`
+))
+
+

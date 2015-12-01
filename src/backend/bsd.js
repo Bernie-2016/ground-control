@@ -245,7 +245,6 @@ export default class BSD {
       console.log(response);
     }
     catch(e){
-      console.log(e);
       return 'invalid username or password'
     }
     let response = await parseStringPromise(response);

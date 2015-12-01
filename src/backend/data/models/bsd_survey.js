@@ -1,5 +1,5 @@
 export default function(sequelize, DataTypes) {
-  let Survey = sequelize.define('Survey', {
+  let BSDSurvey = sequelize.define('BSDSurvey', {
     id: {
       type: DataTypes.BIGINT,
       field: 'signup_form_id',
@@ -16,13 +16,13 @@ export default function(sequelize, DataTypes) {
     underscored: true,
     tableName: 'bsd_signup_form',
     classMethods: {
-      createFromBSDObject: (BSDSurvey) => {
-        let newSurvey = {...BSDSurvey};
+      createFromBSDObject: (BSDObject) => {
+        let newSurvey = {...BSDObject};
         newSurvey.id = newSurvey.signup_form_id;
         newSurvey.slug = newSurvey.signup_form_slug;
-        return Survey.create(newSurvey);
+        return BSDSurvey.create(newSurvey);
       }
     }
   })
-  return Survey;
+  return BSDSurvey;
 }

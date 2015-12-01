@@ -7,86 +7,86 @@ import Form from 'react-formal';
 import yup from 'yup';
 import superagent from 'superagent';
 
-class Signup extends React.Component {
+export default class Signup extends React.Component {
+  state = {
+    formState : 'signup',
+    errorMessage: null
+  }
+
+  clearError() {
+    this.setState({errorMessage: null})
+  }
+
   formStates = {
-    enterEmail: {
-      formTitle: 'Enter your e-mail to get started!',
+    login: {
+      formTitle: 'Login to get started',
       formSchema: yup.object({
-        email: yup.string().required(),
-      }),
-      formElement: (
-        <Form.Field
-          name='email'
-          label='E-mail Address'
-        />
-      ),
-      onSubmit: (formState) => {
-        this.props.history.pushState(null, '/signup/' + formState.email)
-      }
-    },
-    newAccount: {
-      formTitle: 'Sign up to make calls',
-      formSchema: yup.object({
-        firstName: yup.string().required(),
-        lastName: yup.string().required(),
-        zip: yup.string().required()
+        email: yup.string().email().required(),
       }),
       formElement: (
         <div>
           <Form.Field
-            name='firstName'
-            label='First Name'
-          /><br />
+            name='email'
+            label='E-mail Address'
+          />
           <Form.Field
-            name='lastName'
-            label='Last Name'
-          /><br />
-          <Form.Field
-            name='zip'
-            label='Zip Code'
+            name='password'
+            label='Password'
           />
         </div>
-      ),
-      onSubmit: (formState) => {
-        console.log('Implement this')
-      }
-    },
-    enterPassword: {
-      formTitle: 'Set a password to get started',
-      formSchema: yup.object({
-        password: yup.string().required()
-      }),
-      formElement: (
-        <Form.Field
-          name='password'
-          label='Password'
-        />
       ),
       onSubmit: (formState) => {
         superagent
           .post('/login')
           .send({
-            id: this.props.person.id,
+            email: formState.email,
             password: formState.password
           })
           .end((err, res) => {
-            this.props.history.pushState(null, '/call-assignments')
+            console.log(err, res)
+            if (!err)
+              window.location = '/call-assignments';
+              // Ideally this would work with pushState, but it doesn't because relay has already cached the current user and has no idea that things are session-based.
+              //this.props.history.pushState(null, '/call-assignments')
+            else
+              this.setState({errorMessage: 'Incorrect login or password'});
           })
       }
     },
-    login: {
-      formTitle: 'Login to get started',
+    signup: {
+      formTitle: 'Login or sign up make calls',
       formSchema: yup.object({
-        password: yup.string().required()
+        email: yup.string().required().email(),
+        password: yup.string().required(),
       }),
       formElement: (
-        <Form.Field
-          name='password'
-          label='Password'
-        />
+        <div>
+          <Form.Field
+            name='email'
+            label='E-mail Address'
+          /><br />
+          <Form.Field
+            name='password'
+            label='Password'
+          /><br />
+        </div>
       ),
       onSubmit: (formState) => {
-
+        superagent
+          .post('/signup')
+          .send({
+            email: formState.email,
+            password: formState.password
+          })
+          .end((err, res) => {
+            console.log(err, res)
+            if (!err)
+              window.location = '/call-assignments';
+              // Ideally this would work with pushState, but it doesn't because relay has already cached the current user and has no idea that things are session-based.
+              //this.props.history.pushState(null, '/call-assignments')
+            else
+              this.setState({errorMessage: 'Incorrect e-mail or password'});
+          })
       }
     }
   }
@@ -122,6 +122,12 @@ class Signup extends React.Component {
       paddingRight: 40,
       paddingBottom: 40,
     },
+    errorMessage: {
+      ...BernieText.default,
+      color: BernieColors.red,
+      fontSize: '0.8em',
+      marginTop: 15
+    }
   }
 
   renderSplash() {
@@ -163,21 +169,15 @@ class Signup extends React.Component {
   }
 
   renderSignupForm() {
-    let signupState = this.formStates.enterEmail;
-    if (this.props.email) {
-      if (this.props.person) {
-        if (this.props.person.hasPassword)
-          signupState = this.formStates.login
-        else
-          signupState = this.formStates.enterPassword
-      }
-      else
-        signupState = this.formStates.newAccount;
-    }
+    let signupState = this.formStates[this.state.formState];
     let formElement = signupState.formElement;
     let formTitle = signupState.formTitle;
     let formSchema = signupState.formSchema;
     let submitHandler = signupState.onSubmit;
+    let errorElement = <div></div>
+    if (this.state.errorMessage) {
+      errorElement = <div style={this.styles.errorMessage}>{this.state.errorMessage}</div>
+    }
     return (
       <Paper style={this.styles.signupForm}>
         <div style={
@@ -193,6 +193,7 @@ class Signup extends React.Component {
             }}
           >
             {formTitle}
+            {errorElement}
             <Paper zDepth={0} style={{
               padding: '15px 15px 15px 15px',
               marginTop: 15,
@@ -205,6 +206,13 @@ class Signup extends React.Component {
                 label='Go!'
                 fullWidth={true}
               />
+              <div style={{
+                ...BernieText.default,
+                fontSize: '0.7em',
+                color: BernieColors.white,
+                marginTop: 10
+              }}>
+              </div>
           </GCForm>
         </div>
       </Paper>
@@ -215,15 +223,3 @@ class Signup extends React.Component {
     return this.renderSplash();
   }
 }
-
-export default Relay.createContainer(Signup, {
-  fragments: {
-    person: () => Relay.QL`
-      fragment on Person {
-        id
-        firstName
-        hasPassword
-      }
-    `
-  }
-})
