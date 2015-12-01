@@ -26,6 +26,7 @@ import {
   Group,
   CallAssignment,
   Survey,
+  Event
 } from './models';
 
 import moment from 'moment-timezone';
@@ -146,12 +147,40 @@ let {
   nodeType: GraphQLPerson
 });
 
+
+
 const GraphQLEvent = new GraphQLObjectType({
   name: 'Event',
   description: 'An event',
   fields: () => ({
     id: globalIdField('Event'),
-    name: { type: GraphQLString }
+    BSDId: { type: GraphQLInt },
+    eventIdObfuscated: { type: GraphQLString },
+    flagApproval: { type: GraphQLBoolean },
+    eventTypeId: { type: GraphQLInt },
+    creatorConsId: { type: GraphQLInt },
+    name: { type: GraphQLString },
+    description: { type: GraphQLString },
+    venueName: { type: GraphQLString },
+    venueZip: { type: GraphQLString },
+    venueCity: { type: GraphQLString },
+    venueState: { type: GraphQLString },
+    venueAddr1: { type: GraphQLString },
+    venueAddr2: { type: GraphQLString },
+    venueCountry: { type: GraphQLString },
+    venueDirections: { type: GraphQLString },
+    localTimezone: { type: GraphQLString },
+    startDatetime: { type: GraphQLString },
+    duration: { type: GraphQLInt },
+    capacity: { type: GraphQLInt },
+    attendeeVolunteerShow: { type: GraphQLBoolean },
+    attendeeVolunteerMessage: { type: GraphQLString },
+    isSearchable: { type: GraphQLInt },
+    publicPhone: { type: GraphQLBoolean },
+    contactPhone: { type: GraphQLString },
+    hostReceiveRsvpEmails: { type: GraphQLBoolean },
+    rsvpUseReminderEmail: { type: GraphQLBoolean },
+    rsvpReminderHours: { type: GraphQLInt }
   }),
   interfaces: [nodeInterface]
 })

@@ -12,6 +12,18 @@ let toTitleCase = (str) => {
   return str.replace(/\w\S*/g, (txt) => {return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 }
 
+let formatDate = (date) => {
+  let addLeadingZero = (val) => {
+    val = val < 10 ? '0'+val : val;
+    return val
+  }
+
+  let minutes = addLeadingZero(date.getMinutes());
+  let hours = addLeadingZero(date.getHours());
+  let strTime = hours + ':' + minutes + ':00';
+  return date.getFullYear() + '-' + addLeadingZero(date.getMonth()+1) + '-' + addLeadingZero(date.getDate()) + ' ' + strTime
+}
+
 models.sequelize.sync({force: true}).then(async () => {
   let persons = [];
   let emails = [];
@@ -102,7 +114,7 @@ models.sequelize.sync({force: true}).then(async () => {
       venueAddr2: nully(faker.address.secondaryAddress()),
       venueCountry: faker.address.countryCode(),
       venueDirections: nully(faker.lorem.paragraph()),
-      startDatetime: faker.date.future().toLocaleString('ne', { hour12: false }),
+      startDatetime: formatDate(faker.date.future()),
       duration: faker.random.number({min:1, max:1600}),
       capacity: faker.random.arrayElement([0, faker.random.number({min:0, max:500})]),
       localTimezone: faker.random.arrayElement(['US/Eastern', 'US/Pacific', 'Africa/Cairo']),

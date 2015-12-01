@@ -57,7 +57,8 @@
     "superagent": "^1.4.0",
     "express-session": "^1.12.1",
     "connect-session-sequelize ": "^2.3.1",
-    "cookie-parser": "^1.4.0"
+    "cookie-parser": "^1.4.0",
+    "fixed-data-table": "^0.6.0"
   },
   "devDependencies": {
     "foreman": "latest",
