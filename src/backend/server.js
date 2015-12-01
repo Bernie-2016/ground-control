@@ -14,9 +14,11 @@ import {fromGlobalId} from 'graphql-relay'
 import passport from 'passport';
 import cookieParser from 'cookie-parser';
 import LocalStrategy  from 'passport-local'
+import SequelizeStoreFactory from 'connect-session-sequelize'
 
 writeSchema();
 
+const SequelizeStore = SequelizeStoreFactory(session.Store)
 const Mailgun = new MG(process.env.MAILGUN_KEY, process.env.MAILGUN_DOMAIN);
 const BSDClient = new BSD(process.env.BSD_HOST, process.env.BSD_API_ID, process.env.BSD_API_SECRET);
 const port = process.env.APP_PORT;
@@ -59,16 +61,23 @@ passport.deserializeUser(async (id, done) => {
 });
 
 const app = express();
+const sessionStore = new SequelizeStore({
+  db: models.sequelize,
+})
+
 app.use(express.static(publicPath))
-app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(session({ secret: 'keyboard cat' }));
+app.use(session({
+  secret: 'keyboard cat',
+  store: sessionStore,
+  domain: null
+}));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use('/graphql', graphQLHTTP((request) => {
   return {
-    rootValue: { session: request.session },
+    rootValue: { session: request.user },
     schema: Schema
   }
 }));
@@ -83,9 +92,21 @@ app.get('/events/types.json', async (req, res) => {
   res.json(result);
 });
 
+app.get('/test', (req, res) => {
+  console.log(req)
+  console.log(req.passport)
+  console.log(req.isAuthenticated())
+  console.log('user')
+  console.log(req.user)
+  res.send('done')
+})
+
 app.post('/signup',
   passport.authenticate('signup'),
   (req, res) => {
+  console.log(req.isAuthenticated());
+  console.log('here?')
+  console.log(req.user)
   res.send('Success!')
 })
 
@@ -135,7 +156,9 @@ app.post('/events/create', async (req, res) => {
 
 app.use(fallback('index.html', { root: publicPath }))
 
-app.listen(port, () => console.log(
-  `Server is now running on http://localhost:${port}`
-))
+sessionStore.sync().then(
+  app.listen(port, () => console.log(
+    `Server is now running on http://localhost:${port}`
+  ))
+)
 

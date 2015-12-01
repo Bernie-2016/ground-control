@@ -20,8 +20,6 @@ let compare = (expected, hash) => {
   })
 }
 
-const bcryptPromise = Promise.promisifyAll(bcrypt)
-
 export default function(sequelize, DataTypes) {
   let User = sequelize.define('User', {
     email: {

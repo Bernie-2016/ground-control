@@ -310,8 +310,9 @@ let RootQuery = new GraphQLObjectType({
     currentUser: {
       type: GraphQLUser,
       resolve: (parent, _, {rootValue}) => {
-        if (rootValue.session && rootValue.session.personId)
-          return Person.findById(rootValue.session.personId);
+        console.log(rootValue)
+        if (rootValue.user)
+          return Person.findById(rootValue.user);
         else
           return null;
       }
