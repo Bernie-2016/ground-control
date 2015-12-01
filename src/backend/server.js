@@ -62,6 +62,7 @@ passport.deserializeUser(async (id, done) => {
 const app = express();
 const sessionStore = new SequelizeStore({
   db: models.sequelize,
+  table: 'sessions'
 })
 
 app.use(express.static(publicPath))
@@ -139,7 +140,8 @@ app.post('/events/create', async (req, res) => {
 app.use(fallback('index.html', { root: publicPath }))
 
 app.listen(port, () => console.log(
-  `Server is now running on http://localhost:${port}`
+`Server is now running on http://localhost:${port}`
 ))
+
 
 

@@ -11,17 +11,17 @@ setTimeout(function() {
     try {
         childProcess.execSync('dropdb ground_control')
     } catch (ex) {
-        console.warn(ex)
+        console.warn("dropdb did not run. This is probably because the database does not already exist, which is fine.")
     }
     try {
         childProcess.execSync('createdb ground_control')
     } catch(ex) {
-        console.warn(ex);
+        console.warn("createdb did not run. This is probably because the database already exists, which is fine.");
     }
     try {
         childProcess.execSync('psql -c "CREATE ROLE ground_control WITH LOGIN SUPERUSER;" -d ground_control')
     } catch (ex) {
-        console.warn(ex);
+        console.warn("ground_control role not created.  This is probably because the role already exists, which is fine.");
     }
 
     console.log("Seeding data...")
