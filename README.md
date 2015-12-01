@@ -12,8 +12,10 @@ The easiest way to get started in Linux is with [Docker](https://docs.docker.com
 
 In OS X, we currently run everything locally using a Procfile and node-foreman. To get started, install [Node.js](https://nodejs.org/en/download/) and [Homebrew](http://brew.sh/). Then do the following:
 
-`npm install`
-`./setup-osx`
+```
+npm install
+./setup-osx
+```
 
 Then you should be able to start Ground Control on `http://localhost:3000` with
 
