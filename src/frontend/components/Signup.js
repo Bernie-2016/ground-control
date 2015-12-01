@@ -9,8 +9,14 @@ import superagent from 'superagent';
 
 export default class Signup extends React.Component {
   state = {
-    formState : 'signup'
+    formState : 'signup',
+    errorMessage: null
   }
+
+  clearError() {
+    this.setState({errorMessage: null})
+  }
+
   formStates = {
     login: {
       formTitle: 'Login to get started',
@@ -37,17 +43,20 @@ export default class Signup extends React.Component {
             password: formState.password
           })
           .end((err, res) => {
-            console.log(res)
-            window.location = '/call-assignments';
-            // Ideally this would work with pushState, but it doesn't because relay has already cached the current user and has no idea that things are session-based.
-            //this.props.history.pushState(null, '/call-assignments')
+            console.log(err, res)
+            if (!err)
+              window.location = '/call-assignments';
+              // Ideally this would work with pushState, but it doesn't because relay has already cached the current user and has no idea that things are session-based.
+              //this.props.history.pushState(null, '/call-assignments')
+            else
+              this.setState({errorMessage: 'Incorrect login or password'});
           })
       }
     },
     signup: {
       formTitle: 'Login or sign up make calls',
       formSchema: yup.object({
-        email: yup.string().email().required(),
+        email: yup.string().required().email(),
         password: yup.string().required(),
       }),
       formElement: (
@@ -70,8 +79,13 @@ export default class Signup extends React.Component {
             password: formState.password
           })
           .end((err, res) => {
-            console.log("here", err, res)
-            this.props.history.pushState(null, '/call-assignments')
+            console.log(err, res)
+            if (!err)
+              window.location = '/call-assignments';
+              // Ideally this would work with pushState, but it doesn't because relay has already cached the current user and has no idea that things are session-based.
+              //this.props.history.pushState(null, '/call-assignments')
+            else
+              this.setState({errorMessage: 'Incorrect e-mail or password'});
           })
       }
     }
@@ -108,6 +122,12 @@ export default class Signup extends React.Component {
       paddingRight: 40,
       paddingBottom: 40,
     },
+    errorMessage: {
+      ...BernieText.default,
+      color: BernieColors.red,
+      fontSize: '0.8em',
+      marginTop: 15
+    }
   }
 
   renderSplash() {
@@ -154,6 +174,10 @@ export default class Signup extends React.Component {
     let formTitle = signupState.formTitle;
     let formSchema = signupState.formSchema;
     let submitHandler = signupState.onSubmit;
+    let errorElement = <div></div>
+    if (this.state.errorMessage) {
+      errorElement = <div style={this.styles.errorMessage}>{this.state.errorMessage}</div>
+    }
     return (
       <Paper style={this.styles.signupForm}>
         <div style={
@@ -169,6 +193,7 @@ export default class Signup extends React.Component {
             }}
           >
             {formTitle}
+            {errorElement}
             <Paper zDepth={0} style={{
               padding: '15px 15px 15px 15px',
               marginTop: 15,
