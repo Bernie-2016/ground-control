@@ -252,6 +252,24 @@ const GraphQLSurvey = new GraphQLObjectType({
   interfaces: [nodeInterface]
 })
 
+
+const GraphQLCheckoutCallTarget = mutationWithClientMutationId({
+  name: 'CheckoutCallTarget',
+  inputFields: {
+    callAssignmentId: { type: new GraphQLNonNull(GraphQLString) },
+    userId: { type: new GraphQLNonNull(GraphQLString) },
+  },
+  outputFields: {
+    callAssignment: {
+      type: GraphQLListContainer,
+      resolve: () => SharedListContainer
+    }
+  },
+  mutateAndGetPayload: () => {
+
+  }
+})
+
 const GraphQLCreateCallAssignment = mutationWithClientMutationId({
   name: 'CreateCallAssignment',
   inputFields: {
@@ -268,7 +286,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
       resolve: () => SharedListContainer
     }
   },
-  mutateAndGetPayload:async ({name, callerGroupId, targetGroupId, surveyId, startDate, endDate}) => {
+  mutateAndGetPayload: async ({name, callerGroupId, targetGroupId, surveyId, startDate, endDate}) => {
     let [callerGroup, targetGroup, survey] = await Promise.all([
       BSDGroup.findById(callerGroupId),
       BSDGroup.findById(targetGroupId),
@@ -325,7 +343,8 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
 let RootMutation = new GraphQLObjectType({
   name: 'RootMutation',
   fields: () => ({
-    createCallAssignment: GraphQLCreateCallAssignment
+    createCallAssignment: GraphQLCreateCallAssignment,
+    checkoutCallTarget: GraphQLCheckoutCallTarget
   })
 });
 
