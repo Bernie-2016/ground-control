@@ -20,21 +20,15 @@ export default class GCSelectField extends React.Component {
   }
 
   render() {
-    let valueKey = this.props.value;
-    let valueObj = {
-      name: this.props.choices[valueKey],
-      value: valueKey
-    }
-    console.log(valueObj)
     return (
       <div>
         <div style={this.styles.label}>{this.props.label}</div>
         <SelectField
           {...this.props}
-          value={valueObj}
           displayMember='name'
           valueMember='value'
           menuItems={this.createMenuItems()}
+          onChange={(event) => {this.props.onChange(event.target.value)}}
         />
       </div>
     )
