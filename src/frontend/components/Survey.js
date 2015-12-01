@@ -8,7 +8,7 @@ import {LinearProgress} from 'material-ui';
 class Survey extends React.Component {
   styles = {
     container: {
-      width: '100%',
+//      width: '100%',
     },
     progress: {
       width: '50%',
@@ -104,7 +104,7 @@ class Survey extends React.Component {
     let source = this.props.survey.fullURL;
     let loading = (
       <div style={[this.styles.progress, this.state.loadingStyle]}>
-        <h3 style={this.styles.progressHeader}>Loading Volunteer Survey...</h3>
+        <h3 style={this.styles.progressHeader}>Loading survey...</h3>
         <LinearProgress mode="indeterminate" />
       </div>
     )

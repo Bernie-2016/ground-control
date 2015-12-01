@@ -20,10 +20,14 @@ export class CallAssignment extends React.Component {
       paddingLeft: 15,
       paddingRight: 15,
       paddingBottom: 15,
-      width: '100%',
       color: BernieColors.darkGray,
       fontSize: '1em',
       width: 'auto'
+    },
+    callAssignmentQuestions: {
+      fontSize: '1.2em',
+      textAlign: 'center',
+      marginBottom: 15,
     },
     surveyFrame: {
       borderTop: 'solid 1px ' + BernieColors.lightGray,
@@ -32,18 +36,26 @@ export class CallAssignment extends React.Component {
       paddingTop: 15,
     },
     container: {
-      width: '100%'
+
     },
     submitButton: {
+      textAlign: 'center',
       width: '50%',
       marginRight: 'auto',
       marginLeft: 'auto',
     }
   }
 
+  state = {
+    contacted: true,
+    reasonNotContacted: null,
+    leftVoicemail: null
+  }
+
   formSchema = yup.object({
-    volunteerPickedUp: yup.boolean().required(),
-    callCompleted: yup.boolean()
+    contacted: yup.boolean().required(),
+    reasonNotContacted: yup.string().oneOf(['NO_PICKUP', 'DECEASED', 'OTHER_LANGUAGE', 'CALL_BACK', 'NOT_INTERESTED', 'WRONG_NUMBER', 'BAD_NUMBER']),
+    leftVoicemail: yup.boolean()
   })
 
   renderCalleeInfo() {
@@ -71,6 +83,30 @@ export class CallAssignment extends React.Component {
     let submitHandler = (formValue) => {
       this.refs.survey.refs.component.submit()
     }
+    let survey = (
+      <div style={{
+        ...this.styles.surveyFrame,
+        display: this.state.contacted ? 'block' : 'none'
+      }}>
+        <Survey ref='survey' survey={this.props.callAssignment.survey} initialValues={{'email' : 'saikat@gomockingbird.com'}} />
+      </div>
+    )
+
+    let notContactedQuestions = <div></div>
+    if (!this.state.contacted)
+      notContactedQuestions = (
+        <div>
+          <br />
+          <Form.Field
+            name='reasonNotContacted'
+            label='Why not?' />
+          <br />
+          <Form.Field
+            name='leftVoicemail'
+            label='Did you leave a voicemail?'
+          />
+        </div>
+      )
     submitHandler = submitHandler.bind(this)
     return (
       <div style={this.styles.container}>
@@ -83,22 +119,25 @@ export class CallAssignment extends React.Component {
           <GCForm
             schema={this.formSchema}
             onSubmit={submitHandler}
+            value={{
+              contacted: this.state.contacted,
+              leftVoicemail: this.state.leftVoicemail,
+              reasonNotContacted: this.state.reasonNotContacted
+            }}
           >
-            <div>
+            <div style={this.styles.callAssignmentQuestions}>
               <Form.Field
-                name='volunteerPickedUp'
-                label='Did the volunteer pick up?'
-              /><br />
-              <Form.Field
-                name='callCompleted'
-                label='Did you complete the call?'
+                name='contacted'
+                label='Were you able to talk to the person?'
+                onChange={(val) => {
+                  this.setState({contacted: val})
+                }}
               />
+              {notContactedQuestions}
             </div>
-            <div style={this.styles.surveyFrame}>
-              <Survey ref='survey' survey={this.props.callAssignment.survey} initialValues={{'email' : 'saikat@gomockingbird.com'}} />
-            </div>
+            {survey}
             <div style={this.styles.submitButton}>
-              <Form.Button type='submit' label='Submit and on to the next volunteer!' style={this.styles.submitButton} fullWidth={true}/>
+              <Form.Button type='submit' label='Submit and on to the next volunteer!' fullWidth={true} style={this.styles.submitButton}/>
             </div>
           </GCForm>
         </div>
