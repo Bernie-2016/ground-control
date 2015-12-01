@@ -1,5 +1,5 @@
 export default function(sequelize, DataTypes) {
-  return sequelize.define('Group', {
+  return sequelize.define('BSDGroup', {
     BSDId: {
       type: DataTypes.BIGINT,
       field: 'bsd_id',
@@ -9,6 +9,6 @@ export default function(sequelize, DataTypes) {
     description: DataTypes.STRING
   }, {
     underscored: true,
-    tableName: 'groups',
+    tableName: 'bsd_groups',
   })
 }

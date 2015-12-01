@@ -1,5 +1,5 @@
 export default function(sequelize, DataTypes) {
-  let Call = sequelize.define('Call', {
+  let BSDCall = sequelize.define('BSDCall', {
     completed: DataTypes.BOOLEAN,
     leftVoicemail: DataTypes.BOOLEAN,
   }, {
@@ -7,10 +7,10 @@ export default function(sequelize, DataTypes) {
     tableName: 'calls',
     classMethods: {
       associate: (models) => {
-        Call.belongsTo(models.Person, {as: 'caller'})
-        Call.belongsTo(models.Person, {as: 'interviewee'});
+        BSDCall.belongsTo(models.BSDPerson, {as: 'caller'})
+        BSDCall.belongsTo(models.BSDPerson, {as: 'interviewee'});
       }
     }
   })
-  return Call;
+  return BSDCall;
 }

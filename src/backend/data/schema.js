@@ -22,10 +22,11 @@ import {
 } from 'graphql-relay';
 
 import {
-  Person,
-  Group,
-  CallAssignment,
-  Survey,
+  BSDPerson,
+  BSDGroup,
+  BSDCallAssignment,
+  BSDSurvey,
+  User
 } from './models';
 
 import moment from 'moment-timezone';
@@ -57,34 +58,38 @@ let {nodeInterface, nodeField} = nodeDefinitions(
   (globalId) => {
     let {type, id} = fromGlobalId(globalId);
     if (type === 'Person')
-      return Person.findById(id);
+      return BSDPerson.findById(id);
     if (type === 'Group')
-      return Group.findById(id);
+      return BSDGroup.findById(id);
     if (type === 'CallAssignment')
-      return CallAssignment.findById(id);
+      return BSDCallAssignment.findById(id);
     if (type === 'Survey')
-      return Survey.findById(id);
+      return BSDSurvey.findById(id);
     if (type === 'Event')
-      return Event.findById(id);
+      return BSDEvent.findById(id);
+    if (type === 'User')
+      return User.findById(id);
     if (type === 'ListContainer')
       return SharedListContainer;
     return null;
   },
   (obj) => {
-    if (obj instanceof Person)
+    if (obj instanceof BSDPerson)
       return GraphQLPerson;
-    if (obj instanceof Group)
+    if (obj instanceof BSDGroup)
       return GraphQLGroup;
-    if (obj instanceof CallAssignment)
+    if (obj instanceof BSDCallAssignment)
       return GraphQLCallAssignment;
-    if (obj instanceof Call)
+    if (obj instanceof BSDCall)
       return GraphQLCall;
-    if (obj instanceof Survey)
+    if (obj instanceof BSDSurvey)
       return GraphQLSurvey;
     if (obj instanceof ListContainer)
       return GraphQLListContainer;
-    if (obj instanceof Event)
+    if (obj instanceof BSDEvent)
       return GraphQLEvent;
+    if (obj instanceof User)
+      return GraphQLUser;
     return null;
   }
 );
@@ -93,7 +98,7 @@ const GraphQLListContainer = new GraphQLObjectType({
   name: 'ListContainer',
   fields: () => ({
     id: globalIdField('ListContainer'),
-    eventList: {
+    events: {
       type: GraphQLEventConnection,
       args: connectionArgs,
       resolve: async(event, {first}) => {
@@ -101,14 +106,31 @@ const GraphQLListContainer = new GraphQLObjectType({
         return connectionFromArray(events, {first});
       }
     },
-    callAssignmentList: {
+    callAssignments: {
       type: GraphQLCallAssignmentConnection,
       args: connectionArgs,
-      resolve: async (assignment, {first}) => {
-        let assignments = await CallAssignment.all()
+      resolve: async (root, {first}) => {
+        let assignments = await BSDCallAssignment.all()
         return connectionFromArray(assignments, {first});
       }
     },
+  }),
+  interfaces: [nodeInterface]
+})
+
+const GraphQLUser = new GraphQLObjectType({
+  name: 'User',
+  description: "User of ground control",
+  fields: () => ({
+    id: globalIdField('User'),
+    callAssignments: {
+      type: GraphQLCallAssignmentConnection,
+      args: connectionArgs,
+      resolve: async (person, {first}) => {
+        let assignments = await BSDCallAssignment.all()
+        return connectionFromArray(assignments, {first});
+      }
+    }
   }),
   interfaces: [nodeInterface]
 })
@@ -121,20 +143,6 @@ const GraphQLPerson = new GraphQLObjectType({
     firstName: { type: GraphQLString },
     middleName: { type: GraphQLString},
     lastName: { type: GraphQLString },
-    hasPassword: {
-      type: GraphQLBoolean,
-      resolve: () => {
-        return false;
-      }
-    },
-    callAssignmentList: {
-      type: GraphQLCallAssignmentConnection,
-      args: connectionArgs,
-      resolve: async (person, {first}) => {
-        let assignments = await CallAssignment.all()
-        return connectionFromArray(assignments, {first});
-      }
-    }
   }),
   interfaces: [nodeInterface]
 })
@@ -188,18 +196,6 @@ const GraphQLCallAssignment = new GraphQLObjectType({
       type: GraphQLSurvey,
       resolve: (assignment) => assignment.getSurvey()
     },
-    targetForUser: {
-      type: GraphQLPerson,
-      args: {
-        personId: { type: GraphQLString }
-      },
-      resolve: async (assignment, {personId}) => {
-        let targetGroup = await assignment.getTargetGroup()
-        let people = await targetGroup.getPeople()
-        let person = people[Math.floor(Math.random() * people.length)]
-        return person
-      }
-    }
   }),
   interfaces: [nodeInterface]
 });
@@ -245,9 +241,9 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
   },
   mutateAndGetPayload:async ({name, callerGroupId, targetGroupId, surveyId, startDate, endDate}) => {
     let [callerGroup, targetGroup, survey] = await Promise.all([
-      Group.findById(callerGroupId),
-      Group.findById(targetGroupId),
-      Survey.findById(surveyId)]);
+      BSDGroup.findById(callerGroupId),
+      BSDGroup.findById(targetGroupId),
+      BSDSurvey.findById(surveyId)]);
     let BSDFetches = [];
     // Fix this
 //    if (!callerGroup)
@@ -256,8 +252,8 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
 //      BSDFetches.push(BSDClient.getConstituentGroup(targetGroupId))
     if (!survey) {
       try {
-        let BSDSurvey = await BSDClient.getForm(surveyId)
-        survey = await Survey.createFromBSDObject(BSDSurvey)
+        let BSDSurveyResponse = await BSDClient.getForm(surveyId)
+        survey = await BSDSurvey.createFromBSDObject(BSDSurveyResponse)
       } catch(err) {
         if (err && err.response && err.response.statusCode === 409) {
             throw new GraphQLError({
@@ -285,9 +281,10 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
     }
     */
 
-    let callAssignment = await CallAssignment.create({
+    let callAssignment = await BSDCallAssignment.create({
       name: name
     })
+
     return Promise.all([
       callAssignment.setCallerGroup(callerGroup),
       callAssignment.setTargetGroup(targetGroup),
@@ -307,46 +304,14 @@ let RootQuery = new GraphQLObjectType({
   name: 'RootQuery',
   fields: () => ({
     // This wrapper is necessary because relay does not support handling connection types in the root query currently. See https://github.com/facebook/relay/issues/112
-    currentUser: {
-      type: GraphQLPerson,
-      resolve: (parent, _, {rootValue}) => {
-        if (rootValue.session && rootValue.session.personId)
-          return Person.findById(rootValue.session.personId);
-        else
-          return null;
-      }
-    },
     listContainer: {
       type: GraphQLListContainer,
       resolve: () => SharedListContainer
     },
-    person: {
-      type: GraphQLPerson,
-      args: {
-        email: { type: GraphQLString }
-      },
-      resolve: async (root, {email}) => {
-        if (!email)
-          return null;
-        let BSDPerson = await BSDClient.getConstituentByEmail(email)
-
-        if (BSDPerson) {
-          let person = await Person.createFromBSDObject(BSDPerson);
-          console.log(person)
-          return person
-        }
-        else
-          return null;
-      }
-    },
-    survey: {
-      type: GraphQLSurvey,
-      args: {
-        id: { type: new GraphQLNonNull(GraphQLString) }
-      },
-      resolve: (root, {id}) => {
-        let localId = fromGlobalId(id).id
-        return Survey.findById(localId)
+    currentUser: {
+      type: GraphQLUser,
+      resolve: (parent, _, {rootValue}) => {
+        return rootValue.user
       }
     },
     callAssignment: {
@@ -356,7 +321,7 @@ let RootQuery = new GraphQLObjectType({
       },
       resolve: (root, {id}) => {
         let localId = fromGlobalId(id).id;
-        return CallAssignment.findById(localId);
+        return BSDCallAssignment.findById(localId);
       }
     },
     node: nodeField

@@ -1,5 +1,5 @@
 export default function(sequelize, DataTypes) {
-  let Person = sequelize.define('Person', {
+  let BSDPerson = sequelize.define('BSDPerson', {
     id: {
       type: DataTypes.BIGINT,
       field: 'cons_id',
@@ -56,11 +56,11 @@ export default function(sequelize, DataTypes) {
     tableName: 'bsd_cons',
     classMethods: {
       associate: (models) => {
-        Person.hasMany(models.Email, { foreignKey: 'cons_id'})
-        Person.hasMany(models.Phone, { foreignKey: 'cons_id'})
+        BSDPerson.hasMany(models.BSDEmail, { foreignKey: 'cons_id'})
+        BSDPerson.hasMany(models.BSDPhone, { foreignKey: 'cons_id'})
       },
-      createFromBSDObject: async (constituent) => {
-        let newPerson = {...constituent}
+      createFromBSDObject: async (BSDObject) => {
+        let newPerson = {...BSDObject}
         newPerson.firstName = newPerson.firstname;
         newPerson.lastName = newPerson.lastname;
         newPerson.middleName = newPerson.middlename;
@@ -73,26 +73,26 @@ export default function(sequelize, DataTypes) {
 //        newPerson.updatedAt = newPerson.modified_dt);
 //        newPerson.createdAt = newPerson.create_dt;
 
-        let person = await Person.findById(newPerson.id)
+        let person = await BSDPerson.findById(newPerson.id)
         if (person) {
           let id = newPerson.id;
           delete newPerson.id;
-          let updated = await Person.update(newPerson, {
+          let updated = await BSDPerson.update(newPerson, {
             where: {
               id: id
             }
           });
-          return Person.findById(id);
+          return BSDPerson.findById(id);
         }
         else
-          return Person.create(newPerson);
+          return BSDPerson.create(newPerson);
 
-        // This breaks because of but this is what we should be doinghttps://github.com/sequelize/sequelize/issues/4755
+        // This breaks because of but this is what we should be doing https://github.com/sequelize/sequelize/issues/4755
         //let person = await Person.upsert(newPerson);
         //return person
       }
     }
   });
 
-  return Person;
+  return BSDPerson;
 }

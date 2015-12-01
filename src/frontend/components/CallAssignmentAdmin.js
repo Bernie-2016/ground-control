@@ -17,7 +17,7 @@ class CallAssignmentAdmin extends React.Component {
           onTouchTap={() => this.props.history.pushState(null, '/admin/call-assignments/create')}
         />
         <CallAssignmentList
-          callAssignmentList={this.props.listContainer.callAssignmentList}
+          callAssignments={this.props.listContainer.callAssignments}
           subheader="Active Assignments"
           onSelect={(id) => this.props.history.pushState(null, '/admin/call-assignments/' + id)}
         />
@@ -37,8 +37,8 @@ export default Relay.createContainer(CallAssignmentAdmin, {
   fragments: {
     listContainer: () => Relay.QL`
       fragment on ListContainer {
-        callAssignmentList(first:50) {
-          ${CallAssignmentList.getFragment('callAssignmentList')}
+        callAssignments(first:50) {
+          ${CallAssignmentList.getFragment('callAssignments')}
         }
       }
     `,

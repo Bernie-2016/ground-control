@@ -10,7 +10,7 @@ export class CallAssignmentList extends React.Component {
   }
 
   renderCallAssignments() {
-    return this.props.callAssignmentList.edges.map(assignment => {
+    return this.props.callAssignments.edges.map(assignment => {
         let node = assignment.node;
         let primaryText = node.name
         let secondaryText = '670 calls made, 30 callers'
@@ -36,7 +36,7 @@ export class CallAssignmentList extends React.Component {
 
 export default Relay.createContainer(CallAssignmentList, {
   fragments: {
-    callAssignmentList: () => Relay.QL`
+    callAssignments: () => Relay.QL`
       fragment on CallAssignmentConnection {
         edges {
           node {
