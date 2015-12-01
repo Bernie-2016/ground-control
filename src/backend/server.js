@@ -55,7 +55,7 @@ passport.serializeUser(async (user, done) => {
 });
 
 passport.deserializeUser(async (id, done) => {
-  let user = await User.findById(id);
+  let user = await models.User.findById(id);
   done(null, user);
 });
 
@@ -88,6 +88,7 @@ app.get('/events/types.json', async (req, res) => {
 });
 
 app.get('/test', (req, res) => {
+  throw new Error("Oh no");
   console.log(req)
   console.log(req.passport)
   console.log(req.isAuthenticated())
@@ -150,14 +151,9 @@ app.post('/events/create', async (req, res) => {
 });
 
 app.use(fallback('index.html', { root: publicPath }))
-app.use((e,req,res,next) => {
-  e = e || new Error('Reached end of the middleware stack with no response')
-  res.status(500).send()
-});
 
-sessionStore.sync().then(
-  app.listen(port, () => console.log(
-    `Server is now running on http://localhost:${port}`
-  ))
-)
+app.listen(port, () => console.log(
+  `Server is now running on http://localhost:${port}`
+))
+
 
