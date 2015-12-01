@@ -10,6 +10,8 @@ import AdminEventsSection from './components/AdminEventsSection';
 import AdminCallAssignmentsSection from './components/AdminCallAssignmentsSection';
 import AdminCallAssignmentCreationForm from './components/AdminCallAssignmentCreationForm';
 import GCTextField from './components/forms/GCTextField';
+import GCRadioButtonsField from './components/forms/GCRadioButtonsField';
+import GCSelectField from './components/forms/GCSelectField';
 import GCBooleanField from './components/forms/GCBooleanField';
 import CallAssignmentsDashboard from './components/CallAssignmentsDashboard';
 import AdminCallAssignment from './components/AdminCallAssignment';
@@ -24,7 +26,9 @@ injectTapEventPlugin();
 
 Form.addInputTypes({
   string: GCTextField,
-  boolean: GCBooleanField
+  boolean: GCBooleanField,
+  radio: GCRadioButtonsField,
+  select: GCSelectField
 })
 
 const ListContainerQueries = {
@@ -37,10 +41,6 @@ const CallAssignmentQueries = {
 
 const CurrentUserQueries = {
   currentUser: () => Relay.QL`query { currentUser}`
-}
-
-const EventQueries = {
-  eventList: () => Relay.QL`query { events }`
 }
 
 let history = createHistory()

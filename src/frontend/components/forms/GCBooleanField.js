@@ -5,13 +5,12 @@ import {BernieText, BernieColors} from '../styles/bernie-css'
 export default class GCBooleanField extends React.Component {
   styles = {
     label: {
-      paddingLeft: 10,
-      ...BernieText.inputLabel,
+      ...BernieText.inputLabel
     },
     selectedButton: {
       color: BernieColors.lightBlue,
       backgroundColor: BernieColors.blue
-    }
+    },
   }
   render() {
     let labelStyle = this.styles.label;
@@ -47,13 +46,14 @@ export default class GCBooleanField extends React.Component {
     }
 
     return (
-      <span>
+      <div>
+        <div style={labelStyle}>
+          {this.props.label}
+        </div>
+        <br />
         {yesButton}
         {noButton}
-        <span style={labelStyle}>
-          {this.props.label}
-        </span>
-      </span>
+      </div>
     )
   }
 }

@@ -26,8 +26,8 @@ export class CallAssignment extends React.Component {
     },
     callAssignmentQuestions: {
       fontSize: '1.2em',
-      textAlign: 'center',
       marginBottom: 15,
+      textAlign: 'center'
     },
     surveyFrame: {
       borderTop: 'solid 1px ' + BernieColors.lightGray,
@@ -35,26 +35,33 @@ export class CallAssignment extends React.Component {
     questions: {
       paddingTop: 15,
     },
-    container: {
-
-    },
     submitButton: {
       textAlign: 'center',
       width: '50%',
       marginRight: 'auto',
-      marginLeft: 'auto',
+      marginLeft: 'auto'
     }
   }
 
   state = {
     contacted: true,
-    reasonNotContacted: null,
+    reasonNotContacted: 'NO_PICKUP',
     leftVoicemail: null
+  }
+
+  notContactedReasons =
+  {
+    'NO_PICKUP' : 'Did not pick up',
+    'CALL_BACK' : 'Busy/call back later',
+    'NOT_INTERESTED' : 'Not interested in talking',
+    'OTHER_LANGUAGE' : 'Spoke different language',
+    'WRONG_NUMBER' : 'Wrong number',
+    'DISCONNECTED_NUMBER' : 'Disconnected number'
   }
 
   formSchema = yup.object({
     contacted: yup.boolean().required(),
-    reasonNotContacted: yup.string().oneOf(['NO_PICKUP', 'DECEASED', 'OTHER_LANGUAGE', 'CALL_BACK', 'NOT_INTERESTED', 'WRONG_NUMBER', 'BAD_NUMBER']),
+    reasonNotContacted: yup.string().oneOf(Object.keys(this.notContactedReasons)),
     leftVoicemail: yup.boolean()
   })
 
@@ -83,6 +90,7 @@ export class CallAssignment extends React.Component {
     let submitHandler = (formValue) => {
       this.refs.survey.refs.component.submit()
     }
+
     let survey = (
       <div style={{
         ...this.styles.surveyFrame,
@@ -99,7 +107,10 @@ export class CallAssignment extends React.Component {
           <br />
           <Form.Field
             name='reasonNotContacted'
-            label='Why not?' />
+            type='select'
+            choices={this.notContactedReasons}
+            label='Why not?'
+            />
           <br />
           <Form.Field
             name='leftVoicemail'
@@ -124,14 +135,14 @@ export class CallAssignment extends React.Component {
               leftVoicemail: this.state.leftVoicemail,
               reasonNotContacted: this.state.reasonNotContacted
             }}
+            onChange={(formValue) => {
+              this.setState(formValue)
+            }}
           >
             <div style={this.styles.callAssignmentQuestions}>
               <Form.Field
                 name='contacted'
                 label='Were you able to talk to the person?'
-                onChange={(val) => {
-                  this.setState({contacted: val})
-                }}
               />
               {notContactedQuestions}
             </div>
