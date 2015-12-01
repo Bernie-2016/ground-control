@@ -51,6 +51,7 @@
     "faker": "^3.0.1",
     "dotenv": "^1.2.0",
     "superagent": "^1.4.0",
+    "fixed-data-table": "^0.6.0",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
     "bcrypt": "^0.8.5",
