@@ -3,8 +3,8 @@ import bcrypt from 'bcrypt';
 
 let hash = (password, salt) => {
   salt = salt || 10
-  return new Promise(function (resolve, reject) {
-    bcrypt.hash(password, salt, function (err, hash) {
+  return new Promise((resolve, reject) => {
+    bcrypt.hash(password, salt, (err, hash) => {
       if (err) return reject(err)
       resolve(hash)
     })
@@ -12,8 +12,8 @@ let hash = (password, salt) => {
 }
 
 let compare = (expected, hash) => {
-  return new Promise(function (resolve, reject) {
-    bcrypt.compare(expected, hash, function (err, res) {
+  return new Promise((resolve, reject) => {
+    bcrypt.compare(expected, hash, (err, res) => {
       if (err) return reject(err)
       resolve(res)
     })
@@ -38,7 +38,7 @@ export default function(sequelize, DataTypes) {
       verifyPassword: function(password) {
         return compare(password, this.password)
       }
-    }
+    },
   })
   let hashPassword = async (user, options) => {
     return hash(user.password, 8).then((res) => {
