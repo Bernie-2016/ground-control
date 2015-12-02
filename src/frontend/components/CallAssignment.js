@@ -202,7 +202,9 @@ export default Relay.createContainer(CallAssignment, {
     currentUser: () => Relay.QL`
       fragment on User {
         id
-        intervieweeForCallAssignment(callAssignmentId:$id)
+        intervieweeForCallAssignment(callAssignmentId:$id) {
+          firstName
+        }
       }
     `
   }

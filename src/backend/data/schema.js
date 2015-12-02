@@ -23,6 +23,8 @@ import {
 
 import {
   BSDPerson,
+  BSDPhone,
+  BSDEmail,
   BSDGroup,
   BSDCallAssignment,
   BSDAssignedCall,
@@ -138,14 +140,40 @@ const GraphQLUser = new GraphQLObjectType({
       args: {
         callAssignmentId: { type: GraphQLString }
       },
-      resolve: (user, {callAssignmentId}) => {
+      resolve: async (user, {callAssignmentId}) => {
+        try {
         let localId = fromGlobalId(callAssignmentId).id;
-        return user.getAssignedCalls({
+        let interviewee = await user.getAssignedCalls({
           where: {
             call_assignment_id: localId
+          },
+        })[0]
+
+        if (interviewee)
+          return interviewee
+        else {
+          let person = await BSDPerson.findOne({
+            include: [
+            {
+              model: BSDPhone,
+              required: true,
+              as: 'phones'
+            },
+            {
+              model: BSDEmail,
+              required: true,
+              as: 'emails'
+            }
+          ]})
+
+          console.log(person)
+          return person
+        }
+                  } catch(ex) {
+            console.log(ex)
           }
-        })
       }
+
     }
   }),
   interfaces: [nodeInterface]
@@ -159,6 +187,7 @@ const GraphQLPerson = new GraphQLObjectType({
     firstName: { type: GraphQLString },
     middleName: { type: GraphQLString},
     lastName: { type: GraphQLString },
+
   }),
   interfaces: [nodeInterface]
 })
@@ -323,7 +352,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
     */
 
     let callAssignment = await BSDCallAssignment.create({
-      name: name
+      name: name,
     })
 
     return Promise.all([
