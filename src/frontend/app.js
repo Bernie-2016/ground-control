@@ -89,7 +89,10 @@ ReactDOM.render(
         <Route
           path=':id'
           component={CallAssignment}
-          queries={CallAssignmentQueries}
+          queries={{
+            ...CallAssignmentQueries,
+            ...CurrentUserQueries
+          }}
         />
       </Route>
       <Route

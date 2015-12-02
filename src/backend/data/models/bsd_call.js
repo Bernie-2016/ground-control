@@ -15,7 +15,7 @@ export default function(sequelize, DataTypes) {
     }
   }, {
     underscored: true,
-    tableName: 'calls',
+    tableName: 'bsd_calls',
     classMethods: {
       associate: (models) => {
         BSDCall.belongsTo(models.User, {as: 'caller'})

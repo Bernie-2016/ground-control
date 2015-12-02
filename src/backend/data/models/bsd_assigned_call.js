@@ -3,10 +3,10 @@ export default function(sequelize, DataTypes) {
 
   }, {
     underscored: true,
-    tableName: 'calls',
+    tableName: 'bsd_assigned_calls',
     classMethods: {
       associate: (models) => {
-        BSDCall.belongsTo(models.User,
+        BSDAssignedCall.belongsTo(models.User,
           {
             as: 'caller',
             foreignKey: {
@@ -14,7 +14,7 @@ export default function(sequelize, DataTypes) {
               uniqe: true
             }
           })
-        BSDCall.belongsTo(models.BSDPerson,
+        BSDAssignedCall.belongsTo(models.BSDPerson,
           {
             as: 'interviewee',
             foreignKey: {
@@ -22,9 +22,9 @@ export default function(sequelize, DataTypes) {
               unique: true
             }
           })
-        BSDCall.belongsTo(models.BSDCallAssignment, {as: 'callAssignment'})
+        BSDAssignedCall.belongsTo(models.BSDCallAssignment, {as: 'callAssignment'})
       }
     }
   })
-  return BSDCall;
+  return BSDAssignedCall;
 }

@@ -25,6 +25,7 @@ import {
   BSDPerson,
   BSDGroup,
   BSDCallAssignment,
+  BSDAssignedCall,
   BSDSurvey,
   BSDEvent,
   User
@@ -127,9 +128,23 @@ const GraphQLUser = new GraphQLObjectType({
     callAssignments: {
       type: GraphQLCallAssignmentConnection,
       args: connectionArgs,
-      resolve: async (person, {first}) => {
+      resolve: async (user, {first}) => {
         let assignments = await BSDCallAssignment.all()
         return connectionFromArray(assignments, {first});
+      }
+    },
+    intervieweeForCallAssignment: {
+      type: GraphQLPerson,
+      args: {
+        callAssignmentId: { type: GraphQLString }
+      },
+      resolve: (user, {callAssignmentId}) => {
+        let localId = fromGlobalId(callAssignmentId).id;
+        return user.getAssignedCalls({
+          where: {
+            call_assignment_id: localId
+          }
+        })
       }
     }
   }),
@@ -214,9 +229,9 @@ const GraphQLCallAssignment = new GraphQLObjectType({
       type: GraphQLGroup,
       resolve: (assignment) => assignment.getCallerGroup()
     },
-    targetGroup: {
+    intervieweeGroup: {
       type: GraphQLGroup,
-      resolve: (assignment) => assignment.getTargetGroup()
+      resolve: (assignment) => assignment.getIntervieweeGroup()
     },
     survey: {
       type: GraphQLSurvey,
@@ -254,7 +269,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
   inputFields: {
     name: { type: new GraphQLNonNull(GraphQLString) },
     callerGroupId: { type: new GraphQLNonNull(GraphQLString) },
-    targetGroupId: { type: new GraphQLNonNull(GraphQLString) },
+    intervieweeGroupId: { type: new GraphQLNonNull(GraphQLString) },
     surveyId: { type: new GraphQLNonNull(GraphQLString) },
 //    startDate: new GraphQLNonNull(GraphQLInt),
 //    endDate: GraphQLInt
@@ -265,17 +280,17 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
       resolve: () => SharedListContainer
     }
   },
-  mutateAndGetPayload:async ({name, callerGroupId, targetGroupId, surveyId, startDate, endDate}) => {
-    let [callerGroup, targetGroup, survey] = await Promise.all([
+  mutateAndGetPayload: async ({name, callerGroupId, intervieweeGroupId, surveyId, startDate, endDate}) => {
+    let [callerGroup, intervieweeGroup, survey] = await Promise.all([
       BSDGroup.findById(callerGroupId),
-      BSDGroup.findById(targetGroupId),
+      BSDGroup.findById(intervieweeGroupId),
       BSDSurvey.findById(surveyId)]);
     let BSDFetches = [];
     // Fix this
 //    if (!callerGroup)
 //      BSDFetches.push(BSDClient.getConstituentGroup(callerGroupId))
-//    if (!targetGroup)
-//      BSDFetches.push(BSDClient.getConstituentGroup(targetGroupId))
+//    if (!intervieweeGroup)
+//      BSDFetches.push(BSDClient.getConstituentGroup(intervieweeGroupId))
     if (!survey) {
       try {
         let BSDSurveyResponse = await BSDClient.getForm(surveyId)
@@ -299,9 +314,9 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
         personIdList: []
       })
     }
-    if (!targetGroup) {
-      targetGroup = await Group.save({
-        BSDId: targetGroupId,
+    if (!intervieweeGroup) {
+      intervieweeGroup = await Group.save({
+        BSDId: intervieweeGroupId,
         personIdList: []
       })
     }
@@ -313,7 +328,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
 
     return Promise.all([
       callAssignment.setCallerGroup(callerGroup),
-      callAssignment.setTargetGroup(targetGroup),
+      callAssignment.setIntervieweeGroup(intervieweeGroup),
       callAssignment.setSurvey(survey)
     ])
   }
@@ -322,7 +337,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
 let RootMutation = new GraphQLObjectType({
   name: 'RootMutation',
   fields: () => ({
-    createCallAssignment: GraphQLCreateCallAssignment
+    createCallAssignment: GraphQLCreateCallAssignment,
   })
 });
 

@@ -188,6 +188,7 @@ export class CallAssignment extends React.Component {
 }
 
 export default Relay.createContainer(CallAssignment, {
+  initialVariables: { id: null },
   fragments: {
     callAssignment: () => Relay.QL`
       fragment on CallAssignment {
@@ -196,6 +197,12 @@ export default Relay.createContainer(CallAssignment, {
         survey {
           ${Survey.getFragment('survey')}
         }
+      }
+    `,
+    currentUser: () => Relay.QL`
+      fragment on User {
+        id
+        intervieweeForCallAssignment(callAssignmentId:$id)
       }
     `
   }

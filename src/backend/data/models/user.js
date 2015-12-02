@@ -39,6 +39,16 @@ export default function(sequelize, DataTypes) {
         return compare(password, this.password)
       }
     },
+    classMethods: {
+      associate: (models) => {
+        User.hasMany(models.BSDAssignedCall, {
+          as: 'assignedCalls',
+          foreignKey: {
+            name: 'caller_id'
+          }
+        })
+      }
+    }
   })
   let hashPassword = async (user, options) => {
     return hash(user.password, 8).then((res) => {
