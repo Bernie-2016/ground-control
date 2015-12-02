@@ -2,6 +2,7 @@ import React from 'react';
 import Relay from 'react-relay';
 import {BernieText, BernieColors} from './styles/bernie-css';
 import {Paper, List, ListItem, FlatButton} from 'material-ui';
+import SideBarLayout from './SideBarLayout';
 import Survey from './Survey'
 import moment from 'moment';
 import yup from 'yup'
@@ -25,7 +26,7 @@ export class CallAssignment extends React.Component {
       width: 'auto'
     },
     callAssignmentQuestions: {
-      fontSize: '1.2em',
+      fontSize: '1em',
       marginBottom: 15,
       textAlign: 'center'
     },
@@ -79,17 +80,39 @@ export class CallAssignment extends React.Component {
       lastName: 'Chakrabarti'
     }
     let name = callee.firstName + ' ' + callee.lastName
-    return (
-      <div>
-        <div style={BernieText.secondaryTitle}>
-          {name} - 817-999-4303<br />
-        </div>
-        <div style={BernieText.default}>
-          Email: filler@filler.com<br />
-          Location: New York, NY 10014<br />
-          Local Time: 4:00 PM<br />
-        </div>
+
+    let sideBar = (
+      <div style={{
+        ...BernieText.secondaryTitle,
+        color: BernieColors.blue,
+        fontSize: '1.5em',
+        float: 'right'
+      }}>
+        {name}
+        <br />
+        817-999-4303
       </div>
+    )
+
+    let content = (
+      <div style={BernieText.default}>
+        Email: filler@filler.com<br />
+        Location: New York, NY 10014<br />
+        Local Time: 4:00 PM<br />
+      </div>
+    )
+
+    return (
+      <SideBarLayout
+        content={content}
+        sideBar={sideBar}
+        sideBarStyle={{
+          width: 300,
+        }}
+        contentViewStyle={{
+          marginLeft: 50,
+        }}
+      />
     )
   }
 

@@ -13,7 +13,6 @@ export default class SideBarLayout extends React.Component {
 
     sideBar: {
       width: '12em',
-      minHeight: '800px',
       borderRight: 'solid 1px ' + BernieColors.lightGray
     },
 
@@ -26,7 +25,10 @@ export default class SideBarLayout extends React.Component {
   render() {
     return (
       <div zDepth={1} style={this.styles.container}>
-        <div zDepth={0} style={this.styles.sideBar}>
+        <div zDepth={0} style={{
+          ...this.styles.sideBar,
+          ...this.props.sideBarStyle
+        }}>
           {this.props.sideBar}
         </div>
         <div zDepth={0} style={
