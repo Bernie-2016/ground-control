@@ -44,12 +44,12 @@ export class CallAssignment extends React.Component {
   }
 
   state = {
-    contacted: true,
-    reasonNotContacted: 'NO_PICKUP',
+    completed: true,
+    reasonNotCompleted: 'NO_PICKUP',
     leftVoicemail: null
   }
 
-  notContactedReasons =
+  notCompletedReasons =
   {
     'NO_PICKUP' : 'Did not pick up',
     'CALL_BACK' : 'Busy/call back later',
@@ -60,16 +60,16 @@ export class CallAssignment extends React.Component {
   }
 
   formSchema = yup.object({
-    contacted: yup.boolean().required(),
-    reasonNotContacted: yup.string().oneOf(Object.keys(this.notContactedReasons)).nullable(),
+    completed: yup.boolean().required(),
+    reasonNotCompleted: yup.string().oneOf(Object.keys(this.notCompletedReasons)).nullable(),
     leftVoicemail: yup.boolean().nullable()
-  }).test('not-contacted-reasons-required',
-  'If you did not contact the person, please fill out all the questions',
+  }).test('not-completed-reasons-required',
+  'If you did not complete the call, please fill out why and if you left a voicemail',
     (value) => {
-      if (value.contacted)
+      if (value.completed)
         return true
       else
-        return value.reasonNotContacted !== null && value.leftVoicemail !== null
+        return value.reasonNotCompleted !== null && value.leftVoicemail !== null
   })
 
   renderCalleeInfo() {
@@ -95,28 +95,28 @@ export class CallAssignment extends React.Component {
 
   render() {
     let submitHandler = (formValue) => {
-      if (this.state.contacted)
+      if (this.state.completed)
         this.refs.survey.refs.component.submit()
     }
 
     let survey = (
       <div style={{
         ...this.styles.surveyFrame,
-        display: this.state.contacted ? 'block' : 'none'
+        display: this.state.completed ? 'block' : 'none'
       }}>
         <Survey ref='survey' survey={this.props.callAssignment.survey} initialValues={{'email' : 'saikat@gomockingbird.com'}} />
       </div>
     )
 
-    let notContactedQuestions = <div></div>
-    if (!this.state.contacted)
-      notContactedQuestions = (
+    let notCompletedQuestions = <div></div>
+    if (!this.state.completed)
+      notCompletedQuestions = (
         <div>
           <br />
           <Form.Field
-            name='reasonNotContacted'
+            name='reasonNotCompleted'
             type='select'
-            choices={this.notContactedReasons}
+            choices={this.notCompletedReasons}
             label='Why not?'
             />
           <br />
@@ -148,10 +148,10 @@ export class CallAssignment extends React.Component {
           >
             <div style={this.styles.callAssignmentQuestions}>
               <Form.Field
-                name='contacted'
-                label='Were you able to talk to the person?'
+                name='completed'
+                label='Were you able to complete the call?'
               />
-              {notContactedQuestions}
+              {notCompletedQuestions}
             </div>
             {survey}
             <div style={this.styles.submitButton}>
