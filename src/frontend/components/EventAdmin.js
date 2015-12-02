@@ -27,12 +27,12 @@ class EventAdmin extends React.Component {
   }
 
   renderEvents() {
-    console.log(this.props.listContainer.events);
+    console.log(this.props.listContainer.events[0].node.startDate);
     return this.props.listContainer.events.edges.map((edge) => {
       return (
         <TableRow key={edge.node.id}>
           <TableRowColumn>{edge.node.eventIdObfuscated}</TableRowColumn>
-          <TableRowColumn>{edge.node.creatorConsId}</TableRowColumn>
+          <TableRowColumn>{edge.node.startDate}</TableRowColumn>
           <TableRowColumn>{edge.node.name}</TableRowColumn>
           <TableRowColumn>{edge.node.venueAddr1} {edge.node.venueCity}</TableRowColumn>
           <TableRowColumn>{edge.node.venueZip}</TableRowColumn>
@@ -165,7 +165,6 @@ export default Relay.createContainer(EventAdmin, {
               eventIdObfuscated
               flagApproval
               eventTypeId
-              creatorConsId
               description
               venueName
               venueZip

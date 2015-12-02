@@ -18,16 +18,17 @@ let toTitleCase = (str) => {
   return str.replace(/\w\S*/g, (txt) => {return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 }
 
+// Convert date objects to strings
 let formatDate = (date) => {
-  let addLeadingZero = (val) => {
-    val = val < 10 ? '0'+val : val;
-    return val
-  }
-
   let minutes = addLeadingZero(date.getMinutes());
   let hours = addLeadingZero(date.getHours());
   let strTime = hours + ':' + minutes + ':00';
   return date.getFullYear() + '-' + addLeadingZero(date.getMonth()+1) + '-' + addLeadingZero(date.getDate()) + ' ' + strTime
+}
+
+let addLeadingZero = (val) => {
+  val = val < 10 ? '0'+val : val;
+  return val
 }
 
 models.sequelize.sync({force: true}).then(async () => {

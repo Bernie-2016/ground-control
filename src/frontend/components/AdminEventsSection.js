@@ -3,9 +3,10 @@ import ReactDOM from 'react-dom';
 import Relay from 'react-relay';
 import CallAssignmentList from './CallAssignmentList';
 import SideBarLayout from './SideBarLayout';
-import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle, DropDownMenu, DropDownIcon, RaisedButton, Dialog, TextField, Table, TableBody, TableFooter, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui';
+import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle, DropDownMenu, DropDownIcon, Dialog, RaisedButton, Checkbox, TextField} from 'material-ui';
+import {Table, Column, ColumnGroup, Cell} from 'fixed-data-table';
 import CallAssignment from './CallAssignment';
-import {BernieLayout, BernieColors} from './styles/bernie-css';
+import {BernieColors} from './styles/bernie-css';
 
 class AdminEventSection extends React.Component {
   constructor() {
@@ -16,33 +17,10 @@ class AdminEventSection extends React.Component {
       showDeleteEventDialog: false,
       noEventSelected: true,
       filterOptionsIndex: 1,
-      fixedHeader: true,
-      fixedFooter: true,
-      stripedRows: false,
-      showRowHover: false,
-      selectable: true,
-      multiSelectable: true,
-      enableSelectAll: true,
-      deselectOnClickaway: false,
-      height: '470px',
+      tableWidth: 1280,
+      tableHeight: 600,
+      selectedRows: []
     };
-  }
-
-  renderEvents() {
-    console.log(this.props.listContainer.events);
-    return this.props.listContainer.events.edges.map((edge) => {
-      return (
-        <TableRow key={edge.node.id}>
-          <TableRowColumn>{edge.node.eventIdObfuscated}</TableRowColumn>
-          <TableRowColumn>{edge.node.creatorConsId}</TableRowColumn>
-          <TableRowColumn>{edge.node.name}</TableRowColumn>
-          <TableRowColumn>{edge.node.venueAddr1} {edge.node.venueCity}</TableRowColumn>
-          <TableRowColumn>{edge.node.venueZip}</TableRowColumn>
-          <TableRowColumn>{edge.node.venueState}</TableRowColumn>
-          <TableRowColumn><RaisedButton label="Preview" primary={false} /></TableRowColumn>
-        </TableRow>
-      )
-    })
   }
 
   renderToolbar() {
@@ -66,15 +44,15 @@ class AdminEventSection extends React.Component {
           <DropDownMenu menuItems={filterOptions} selectedIndex={this.state.filterOptionsIndex} />
         </ToolbarGroup>
         <ToolbarGroup key={1} float="right">
-          <RaisedButton label="Refresh" secondary={true} />
+          <RaisedButton label="Refresh" primary={false} />
           <ToolbarSeparator/>
           <RaisedButton
             label="Delete"
-            primary={false}
+            primary={true}
             disabled={this.state.noEventSelected}
             onTouchTap={this._onDeleteClick}
           />
-          <RaisedButton label="Approve Selected" primary={true} disabled={this.state.noEventSelected} />
+          <RaisedButton label="Approve Selected" secondary={true} disabled={this.state.noEventSelected} />
         </ToolbarGroup>
       </Toolbar>
     )
@@ -106,48 +84,163 @@ class AdminEventSection extends React.Component {
     )
   }
 
+  SelectCell = ({rowIndex, data, col, ...props}) => (
+    <Cell {...props}>
+      <Checkbox
+        name="checkboxName1"
+        value="checkboxValue1"
+        checked={this.state.selectedRows.indexOf(rowIndex) > -1}
+      />
+    </Cell>
+  );
+
+  TextCell = ({rowIndex, data, col, ...props}) => (
+    <Cell {...props}>
+      {data[rowIndex]['node'][col]}
+    </Cell>
+  );
+
+  ActionCell = ({rowIndex, data, col, ...props}) => (
+    <Cell {...props}>
+      <RaisedButton label="Preview" primary={false} />
+    </Cell>
+  );
+
   render() {
-    this._onRowSelection = (selectedRows) => {
+
+    this._handleRowClick = (clickEvent, targetRowIndex) => {
+      let currentSelectedRows = this.state.selectedRows;
+      let i = currentSelectedRows.indexOf(targetRowIndex);
+      if ( i > -1){
+        currentSelectedRows.splice(i, 1);
+      }
+      else {
+        currentSelectedRows.push(targetRowIndex);
+      }
       this.setState({
-        noEventSelected: (selectedRows == 'none' || selectedRows.length == 0)
+        selectedRows: currentSelectedRows,
+        noEventSelected: (currentSelectedRows.length == 0)
       });
     }
 
+    this._masterCheckBoxChecked = (checkEvent, checked) => {
+      let currentSelectedRows = [];
+
+      if (checked){
+        for (let i=0; i<events.length; i++){
+          currentSelectedRows.push(i);
+        }
+      }
+      this.setState({
+        selectedRows: currentSelectedRows,
+        noEventSelected: (currentSelectedRows.length == 0)
+      });
+    }
+
+    let events = this.props.listContainer.events.edges;
     return (
     <div>
       {this.renderDeleteModal()}
       {this.renderToolbar()}
       <Table
-        height={this.state.height}
-        fixedHeader={this.state.fixedHeader}
-        fixedFooter={this.state.fixedFooter}
-        selectable={this.state.selectable}
-        multiSelectable={this.state.multiSelectable}
-        onRowSelection={this._onRowSelection}>
-        <TableHeader enableSelectAll={this.state.enableSelectAll}>
-          <TableRow>
-            <TableHeaderColumn tooltip='BSD Obfuscated Event ID'>Obfuscated ID</TableHeaderColumn>
-            <TableHeaderColumn tooltip='Creator Constituent ID'>Event Host</TableHeaderColumn>
-            <TableHeaderColumn tooltip='Event Name'>Name</TableHeaderColumn>
-            <TableHeaderColumn tooltip='Event Address'>Address</TableHeaderColumn>
-            <TableHeaderColumn tooltip='Zip Code'>Zip</TableHeaderColumn>
-            <TableHeaderColumn tooltip='State'>State</TableHeaderColumn>
-            <TableHeaderColumn tooltip='Actions'>Actions</TableHeaderColumn>
-          </TableRow>
-        </TableHeader>
-        <TableBody
-          deselectOnClickaway={this.state.deselectOnClickaway}
-          showRowHover={this.state.showRowHover}
-          stripedRows={this.state.stripedRows}>
-        {this.renderEvents()}
-        </TableBody>
-        <TableFooter>
-            <TableRow>
-              <TableRowColumn colSpan="7" style={{textAlign: 'center'}}>
-                {this.props.listContainer.events.edges[this.props.listContainer.events.edges.length-1].cursor}
-              </TableRowColumn>
-            </TableRow>
-        </TableFooter>
+        rowHeight={50}
+        groupHeaderHeight={30}
+        headerHeight={50}
+        rowsCount={events.length}
+        width={this.state.tableWidth}
+        height={this.state.tableHeight}
+        onRowClick={this._handleRowClick}
+        {...this.props}>
+        <ColumnGroup
+          fixed={true}
+          header={<Cell>Actions</Cell>}>
+          <Column
+            header={
+              <Cell>
+                <Checkbox
+                  name="checkboxName1"
+                  value="checkboxValue1"
+                  onCheck={this._masterCheckBoxChecked}
+                />
+              </Cell>
+            }
+            cell={<this.SelectCell data={events} col="actions" />}
+            fixed={true}
+            width={43}
+          />
+          <Column
+            header={<Cell>Manage</Cell>}
+            cell={<this.ActionCell data={events} col="actions" />}
+            fixed={true}
+            width={120}
+            align='center'
+          />
+        </ColumnGroup>
+        <ColumnGroup
+          header={<Cell>About</Cell>}>
+          <Column
+            flexGrow={1}
+            header={<Cell>Event Name</Cell>}
+            cell={<this.TextCell data={events} col="name" />}
+            width={250}
+          />
+          <Column
+            flexGrow={1}
+            header={<Cell>Description</Cell>}
+            cell={<this.TextCell data={events} col="description" />}
+            width={250}
+          />
+        </ColumnGroup>
+        <ColumnGroup
+          header={<Cell>Time</Cell>}>
+          <Column
+            header={<Cell>DateTime</Cell>}
+            cell={<this.TextCell data={events} col="startDate" />}
+            flexGrow={1}
+            width={190}
+          />
+          <Column
+            header={<Cell>Duration</Cell>}
+            cell={<this.TextCell data={events} col="duration" />}
+            flexGrow={1}
+            width={100}
+          />
+        </ColumnGroup>
+        <ColumnGroup
+          header={<Cell>Event Location</Cell>}>
+          <Column
+            header={<Cell>Venue</Cell>}
+            cell={<this.TextCell data={events} col="venueName" />}
+            flexGrow={1}
+            width={150}
+          />
+          <Column
+            header={<Cell>Address</Cell>}
+            cell={<this.TextCell data={events} col="venueAddr1" />}
+            flexGrow={1}
+            width={150}
+          />
+          <Column
+            header={<Cell>City</Cell>}
+            cell={<this.TextCell data={events} col="venueCity" />}
+            flexGrow={1}
+            width={150}
+          />
+          <Column
+            header={<Cell>State</Cell>}
+            cell={<this.TextCell data={events} col="venueState" />}
+            flexGrow={1}
+            width={60}
+            align='center'
+          />
+          <Column
+            header={<Cell>Zip</Cell>}
+            cell={<this.TextCell data={events} col="venueZip" />}
+            flexGrow={1}
+            width={120}
+            align='center'
+          />
+        </ColumnGroup>
       </Table>
     </div>
     )
@@ -167,7 +260,6 @@ export default Relay.createContainer(AdminEventSection, {
               eventIdObfuscated
               flagApproval
               eventTypeId
-              creatorConsId
               description
               venueName
               venueZip

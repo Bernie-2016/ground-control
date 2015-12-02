@@ -121,7 +121,7 @@ const GraphQLListContainer = new GraphQLObjectType({
 
 const GraphQLUser = new GraphQLObjectType({
   name: 'User',
-  description: "User of ground control",
+  description: 'User of ground control',
   fields: () => ({
     id: globalIdField('User'),
     callAssignments: {
@@ -155,8 +155,6 @@ let {
   nodeType: GraphQLPerson
 });
 
-
-
 const GraphQLEvent = new GraphQLObjectType({
   name: 'Event',
   description: 'An event',
@@ -165,7 +163,6 @@ const GraphQLEvent = new GraphQLObjectType({
     eventIdObfuscated: { type: GraphQLString },
     flagApproval: { type: GraphQLBoolean },
     eventTypeId: { type: GraphQLInt },
-    creatorConsId: { type: GraphQLInt },
     name: { type: GraphQLString },
     description: { type: GraphQLString },
     venueName: { type: GraphQLString },
@@ -187,7 +184,7 @@ const GraphQLEvent = new GraphQLObjectType({
     contactPhone: { type: GraphQLString },
     hostReceiveRsvpEmails: { type: GraphQLBoolean },
     rsvpUseReminderEmail: { type: GraphQLBoolean },
-    rsvpReminderHours: { type: GraphQLInt }
+    rsvpReminderHours: { type: GraphQLInt },
   }),
   interfaces: [nodeInterface]
 })

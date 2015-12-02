@@ -69,7 +69,12 @@ export default function(sequelize, DataTypes) {
     startDate: {
       type: DataTypes.DATE,
       field: 'start_dt',
-      allowNull: true
+      allowNull: true,
+      get: function(){
+            let formattedDate = this.getDataValue('startDate').toISOString();
+            // 'this' allows you to access attributes of the instance
+            return formattedDate;
+          }
     },
     duration: {
       type: DataTypes.FLOAT,
