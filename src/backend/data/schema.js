@@ -348,15 +348,10 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
   },
   mutateAndGetPayload: async ({name, callerGroupId, intervieweeGroupId, surveyId, startDate, endDate}) => {
     let [callerGroup, intervieweeGroup, survey] = await Promise.all([
-      BSDGroup.findById(callerGroupId),
-      BSDGroup.findById(intervieweeGroupId),
-      BSDSurvey.findById(surveyId)]);
+        BSDSurvey.findById(surveyId)
+      ]);
     let BSDFetches = [];
-    // Fix this
-//    if (!callerGroup)
-//      BSDFetches.push(BSDClient.getConstituentGroup(callerGroupId))
-//    if (!intervieweeGroup)
-//      BSDFetches.push(BSDClient.getConstituentGroup(intervieweeGroupId))
+
     if (!survey) {
       try {
         let BSDSurveyResponse = await BSDClient.getForm(surveyId)
@@ -372,21 +367,6 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
           throw err;
       }
     }
-
-    /*
-    if (!callerGroup) {
-      callerGroup = await Group.save({
-        BSDId: callerGroupId,
-        personIdList: []
-      })
-    }
-    if (!intervieweeGroup) {
-      intervieweeGroup = await Group.save({
-        BSDId: intervieweeGroupId,
-        personIdList: []
-      })
-    }
-    */
 
     let callAssignment = await BSDCallAssignment.create({
       name: name,
