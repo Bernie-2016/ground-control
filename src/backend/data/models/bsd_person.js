@@ -54,6 +54,13 @@ export default function(sequelize, DataTypes) {
     createdAt: 'create_dt',
     underscored: true,
     tableName: 'bsd_cons',
+    instanceMethods: {
+      getCached(property) {
+        let functionName = 'get' + property[0].toUpperCase() + property.slice(1);
+        let value = this.getDataValue(property);
+        return value ? value : this[functionName]();
+      }
+    },
     classMethods: {
       associate: (models) => {
         BSDPerson.hasMany(models.BSDEmail, { foreignKey: 'cons_id', as: 'emails'})

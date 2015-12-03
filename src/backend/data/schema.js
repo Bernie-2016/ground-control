@@ -141,7 +141,6 @@ const GraphQLUser = new GraphQLObjectType({
         callAssignmentId: { type: GraphQLString }
       },
       resolve: async (user, {callAssignmentId}) => {
-        try {
         let localId = fromGlobalId(callAssignmentId).id;
         let interviewee = await user.getAssignedCalls({
           where: {
@@ -165,15 +164,9 @@ const GraphQLUser = new GraphQLObjectType({
               as: 'emails'
             }
           ]})
-
-          console.log(person)
           return person
         }
-                  } catch(ex) {
-            console.log(ex)
-          }
       }
-
     }
   }),
   interfaces: [nodeInterface]
@@ -184,10 +177,28 @@ const GraphQLPerson = new GraphQLObjectType({
   description: 'A person.',
   fields: () => ({
     id: globalIdField('Person'),
+    prefix: { type: GraphQLString },
     firstName: { type: GraphQLString },
-    middleName: { type: GraphQLString},
+    middleName: { type: GraphQLString },
     lastName: { type: GraphQLString },
-
+    suffix: { type: GraphQLString },
+    gender: { type: GraphQLString },
+    birthDate: { type: GraphQLString },
+    title: { type: GraphQLString },
+    employer: { type: GraphQLString },
+    occupation: { type: GraphQLString },
+    phone: {
+      type: GraphQLString,
+      resolve: async (person) => {
+        let phones = await person.getCached('phones')
+        let number = phones[0].number
+        phones.forEach((phoneObj) => {
+          if (phoneObj.isPrimary)
+            number = phoneObj.number;
+        })
+        return number;
+      }
+    }
   }),
   interfaces: [nodeInterface]
 })

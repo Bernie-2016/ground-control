@@ -73,13 +73,26 @@ export class CallAssignment extends React.Component {
         return value.reasonNotCompleted !== null && value.leftVoicemail !== null
   })
 
-  renderCalleeInfo() {
-//    let callee = this.props.callAssignment.targetForUser
-    let callee = {
-      firstName: 'Saikat',
-      lastName: 'Chakrabarti'
-    }
-    let name = callee.firstName + ' ' + callee.lastName
+  intervieweeName() {
+    let interviewee = this.props.currentUser.intervieweeForCallAssignment;
+    let name = ''
+    let keys = ['prefix', 'firstName', 'middleName', 'lastName', 'suffix']
+    keys.forEach((key) => {
+      if (interviewee[key])
+        name = name + ' ' + interviewee[key]
+    })
+    name = name.trim();
+    return name === '' ? 'Unknown name' : name
+  }
+
+  formatPhoneNumber(number) {
+    return '(' + number.slice(0, 3) + ') ' + number.slice(3, 6) + '-' + number.slice(7)
+  }
+
+  renderIntervieweeInfo() {
+    let interviewee = this.props.currentUser.intervieweeForCallAssignment;
+    let name = this.intervieweeName();
+    let number = this.formatPhoneNumber(interviewee.phone)
 
     let sideBar = (
       <div style={{
@@ -90,7 +103,7 @@ export class CallAssignment extends React.Component {
       }}>
         {name}
         <br />
-        817-999-4303
+        {number}
       </div>
     )
 
@@ -155,7 +168,7 @@ export class CallAssignment extends React.Component {
         <Paper
           style={this.styles.assignmentBar}
         >
-          <span>{this.renderCalleeInfo()}</span>
+          <span>{this.renderIntervieweeInfo()}</span>
         </Paper>
         <div style={this.styles.questions}>
           <GCForm
@@ -203,7 +216,17 @@ export default Relay.createContainer(CallAssignment, {
       fragment on User {
         id
         intervieweeForCallAssignment(callAssignmentId:$id) {
+          prefix
           firstName
+          middleName
+          lastName
+          suffix
+          gender
+          birthDate
+          title
+          employer
+          occupation
+          phone
         }
       }
     `
