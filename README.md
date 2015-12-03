@@ -42,7 +42,6 @@ To get started with Ground Control, once it's running, go to `http://localhost:3
 2. Make a constituent group that you wish to be the target of your phonebanking assignment in BSD.
 3. Go to `http://localhost:3000/admin/call-assignments`, click Create, and enter the BSD IDs of your survey and target group in the form.
 4. Click create
-5. 
 
 Now, if you go to `http://localhost:3000` and signup/login, you shoul see your assignment on the left side.  Click it to test it out and start making calls!
 
