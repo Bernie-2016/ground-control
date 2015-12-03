@@ -50,6 +50,24 @@ class GraphQLError extends Error {
   }
 }
 
+const authRequired = (session) => {
+  if (!session.user) {
+    throw new GraphQLError({
+      status: 401,
+      message: 'You must login to access that resource.'
+    });
+  }
+}
+
+const adminRequired = (session) => {
+  if (!session.user || !session.user.isAdmin) {
+    throw new GraphQLError({
+      status: 403,
+      message: 'You must be an admin to access that resource.'
+    });
+  }
+}
+
 class ListContainer {
   constructor(identifier) {
     this.id = identifier
@@ -78,8 +96,6 @@ let {nodeInterface, nodeField} = nodeDefinitions(
   (obj) => {
     if (obj instanceof BSDPerson)
       return GraphQLPerson;
-    if (obj instanceof BSDGroup)
-      return GraphQLGroup;
     if (obj instanceof BSDCallAssignment)
       return GraphQLCallAssignment;
     if (obj instanceof BSDCall)
@@ -225,13 +241,6 @@ const GraphQLPerson = new GraphQLObjectType({
   interfaces: [nodeInterface]
 })
 
-let {
-  connectionType: GraphQLPersonConnection,
-} = connectionDefinitions({
-  name: 'Person',
-  nodeType: GraphQLPerson
-});
-
 const GraphQLEvent = new GraphQLObjectType({
   name: 'Event',
   description: 'An event',
@@ -273,28 +282,12 @@ let {
   nodeType: GraphQLEvent
 });
 
-const GraphQLGroup = new GraphQLObjectType({
-  name: 'Group',
-  description: 'A list of people as determined by some criteria',
-  fields: () => ({
-    personList: { type: GraphQLPersonConnection }
-  })
-});
-
 const GraphQLCallAssignment = new GraphQLObjectType({
   name: 'CallAssignment',
   description: 'A mass calling assignment',
   fields: () => ({
     id: globalIdField('CallAssignment'),
     name: { type: GraphQLString },
-    callerGroup: {
-      type: GraphQLGroup,
-      resolve: (assignment) => assignment.getCallerGroup()
-    },
-    intervieweeGroup: {
-      type: GraphQLGroup,
-      resolve: (assignment) => assignment.getIntervieweeGroup()
-    },
     survey: {
       type: GraphQLSurvey,
       resolve: (assignment) => assignment.getSurvey()
@@ -339,7 +332,8 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
       resolve: () => SharedListContainer
     }
   },
-  mutateAndGetPayload: async ({name, intervieweeGroupId, surveyId}) => {
+  mutateAndGetPayload: async ({name, intervieweeGroupId, surveyId}, {rootValue}) => {
+    adminRequired(rootValue);
     let [intervieweeGroup, survey] = await Promise.all([
         BSDGroup.findWithBSDCheck(intervieweeGroupId),
         BSDSurvey.findWithBSDCheck(surveyId)
@@ -381,7 +375,10 @@ let RootQuery = new GraphQLObjectType({
     // This wrapper is necessary because relay does not support handling connection types in the root query currently. See https://github.com/facebook/relay/issues/112
     listContainer: {
       type: GraphQLListContainer,
-      resolve: () => SharedListContainer
+      resolve: (parent, _, {rootValue}) => {
+        adminRequired(rootValue);
+        return SharedListContainer
+      }
     },
     currentUser: {
       type: GraphQLUser,
@@ -394,7 +391,8 @@ let RootQuery = new GraphQLObjectType({
       args: {
         id: { type: new GraphQLNonNull(GraphQLString) }
       },
-      resolve: (root, {id}) => {
+      resolve: (root, {id}, {rootValue}) => {
+        authRequired(rootValue);
         let localId = fromGlobalId(id).id;
         return BSDCallAssignment.findById(localId);
       }

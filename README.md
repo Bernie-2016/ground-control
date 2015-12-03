@@ -25,6 +25,8 @@ If you ever want to re-seed the database, run
 
 `npm run seed`
 
+The seed script will create an admin user with e-mail address `admin@localhost.com` and password `admin`.  Login with those credentials when you first go to `localhost:3000` and then check out `localhost:3000/admin`.
+
 ### Windows
 
 The best way to run everything on Windows is probably to try to get Docker working on Windows and use the Linux installation instructions.
@@ -55,7 +57,7 @@ The grand purpose of Ground Control is to be:
 
 3. Be a repository for data that does not fit neatly into BSD and VAN and give people outside of our system access to this data as well
 
-4. An effort to build out more organizing tools on top of what we already have (which leads to the data in #2). 
+4. An effort to build out more organizing tools on top of what we already have (which leads to the data in #2).
 
 ## What are these "CRMs the campaign uses?"
 

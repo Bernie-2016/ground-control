@@ -30,7 +30,11 @@ export default function(sequelize, DataTypes) {
         isLowercase: true
       }
     },
-    password: DataTypes.STRING
+    password: DataTypes.STRING,
+    isAdmin: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    }
   }, {
     underscored: true,
     tableName: 'users',

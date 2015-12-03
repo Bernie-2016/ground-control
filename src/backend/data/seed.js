@@ -1,8 +1,8 @@
 import models from './models';
 import faker from 'faker';
 
-const NUM_PERSONS=10;
-const NUM_EVENTS=50;
+const NUM_PERSONS=1000;
+const NUM_EVENTS=5000;
 
 // Use this instead of faker because we want it to be just digits
 let randomPhoneNumber = () => {
@@ -153,6 +153,11 @@ models.sequelize.sync({force: true}).then(async () => {
   };
 
   console.log('Creating...')
+  await models.User.create({
+    email: 'admin@localhost.com',
+    password: 'admin',
+    isAdmin: true
+  })
   await models.BSDPerson.bulkCreate(persons);
   let promises = [
     models.BSDEvent.bulkCreate(events),
