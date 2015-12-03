@@ -5,7 +5,7 @@ let configOptions = {
     dialect: 'postgres'
   },
   production: {
-    url: process.env.DB_CONNECTION_STRING,
+    url: process.env.DATABASE_URL,
     migrationStorageTableName: 'sequelize_meta',
     dialect: 'postgres'
   }
