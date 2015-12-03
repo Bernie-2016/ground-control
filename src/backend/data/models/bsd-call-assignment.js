@@ -3,7 +3,7 @@ export default function(sequelize, DataTypes) {
     name: DataTypes.STRING
   }, {
     underscored: true,
-    tableName: 'call_assignments',
+    tableName: 'bsd_call_assignments',
     classMethods: {
       associate: (models) => {
         BSDCallAssignment.belongsTo(models.BSDSurvey, {foreignKey: 'bsd_survey_id', as: 'survey'})
