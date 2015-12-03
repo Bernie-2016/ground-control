@@ -73,24 +73,36 @@ export class CallAssignment extends React.Component {
         return value.reasonNotCompleted !== null && value.leftVoicemail !== null
   })
 
-  renderCalleeInfo() {
-//    let callee = this.props.callAssignment.targetForUser
-    let callee = {
-      firstName: 'Saikat',
-      lastName: 'Chakrabarti'
-    }
-    let name = callee.firstName + ' ' + callee.lastName
+  intervieweeName() {
+    let interviewee = this.props.currentUser.intervieweeForCallAssignment;
+    let name = ''
+    let keys = ['prefix', 'firstName', 'middleName', 'lastName', 'suffix']
+    keys.forEach((key) => {
+      if (interviewee[key])
+        name = name + ' ' + interviewee[key]
+    })
+    name = name.trim();
+    return name === '' ? 'Unknown name' : name
+  }
+
+  formatPhoneNumber(number) {
+    return '(' + number.slice(0, 3) + ') ' + number.slice(3, 6) + '-' + number.slice(7)
+  }
+
+  renderIntervieweeInfo() {
+    let interviewee = this.props.currentUser.intervieweeForCallAssignment;
+    let name = this.intervieweeName();
+    let number = this.formatPhoneNumber(interviewee.phone)
 
     let sideBar = (
       <div style={{
         ...BernieText.secondaryTitle,
         color: BernieColors.blue,
         fontSize: '1.5em',
-        float: 'right'
       }}>
         {name}
         <br />
-        817-999-4303
+        {number}
       </div>
     )
 
@@ -107,7 +119,7 @@ export class CallAssignment extends React.Component {
         content={content}
         sideBar={sideBar}
         sideBarStyle={{
-          width: 300,
+          width: 500,
         }}
         contentViewStyle={{
           marginLeft: 50,
@@ -117,6 +129,20 @@ export class CallAssignment extends React.Component {
   }
 
   render() {
+    if (this.props.currentUser.intervieweeForCallAssignment === null)
+      return (
+        <div style={{
+          marginTop: 40,
+          marginLeft: 40
+        }}>
+          <div style={BernieText.title}>
+            All done!
+          </div>
+          <div style={BernieText.default}>
+            We have no one left for you to call right now, but try again tomorrow.
+          </div>
+        </div>
+      )
     let submitHandler = (formValue) => {
       if (this.state.completed)
         this.refs.survey.refs.component.submit()
@@ -155,7 +181,7 @@ export class CallAssignment extends React.Component {
         <Paper
           style={this.styles.assignmentBar}
         >
-          <span>{this.renderCalleeInfo()}</span>
+          <span>{this.renderIntervieweeInfo()}</span>
         </Paper>
         <div style={this.styles.questions}>
           <GCForm
@@ -202,7 +228,19 @@ export default Relay.createContainer(CallAssignment, {
     currentUser: () => Relay.QL`
       fragment on User {
         id
-        intervieweeForCallAssignment(callAssignmentId:$id)
+        intervieweeForCallAssignment(callAssignmentId:$id) {
+          prefix
+          firstName
+          middleName
+          lastName
+          suffix
+          gender
+          birthDate
+          title
+          employer
+          occupation
+          phone
+        }
       }
     `
   }

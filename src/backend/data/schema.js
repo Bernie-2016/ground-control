@@ -23,12 +23,16 @@ import {
 
 import {
   BSDPerson,
+  BSDPhone,
+  BSDAddress,
+  BSDEmail,
   BSDGroup,
   BSDCallAssignment,
   BSDAssignedCall,
   BSDSurvey,
   BSDEvent,
-  User
+  User,
+  Sequelize
 } from './models';
 
 import moment from 'moment-timezone';
@@ -138,13 +142,56 @@ const GraphQLUser = new GraphQLObjectType({
       args: {
         callAssignmentId: { type: GraphQLString }
       },
-      resolve: (user, {callAssignmentId}) => {
+      resolve: async (user, {callAssignmentId}) => {
         let localId = fromGlobalId(callAssignmentId).id;
-        return user.getAssignedCalls({
+        let interviewee = await user.getAssignedCalls({
           where: {
             call_assignment_id: localId
+          },
+        })[0]
+
+        if (interviewee)
+          return interviewee
+        else {
+          let persons = await BSDPerson.findAll({
+            order: [[Sequelize.fn( 'RANDOM' )]],
+//            limit: 10, // We should limit this but see https://github.com/sequelize/sequelize/issues/3095
+            where: {
+              '$assignedCalls.id$' : null,
+            },
+            include: [
+            {
+              model: BSDPhone,
+              required: true,
+              as: 'phones'
+            },
+            {
+              model: BSDEmail,
+              required: true,
+              as: 'emails'
+            },
+            {
+              model: BSDAddress,
+              required: true,
+              as: 'addresses'
+            },
+            {
+              model: BSDAssignedCall,
+              required: false,
+              as: 'assignedCalls',
+            }
+          ]})
+          let person = persons[0]
+          if (person) {
+            let assignedCall = await BSDAssignedCall.create({
+              caller_id: user.id,
+              interviewee_id: person.id,
+              call_assignment_id: localId
+            })
+            return person
           }
-        })
+          return null;
+        }
       }
     }
   }),
@@ -156,9 +203,28 @@ const GraphQLPerson = new GraphQLObjectType({
   description: 'A person.',
   fields: () => ({
     id: globalIdField('Person'),
+    prefix: { type: GraphQLString },
     firstName: { type: GraphQLString },
-    middleName: { type: GraphQLString},
+    middleName: { type: GraphQLString },
     lastName: { type: GraphQLString },
+    suffix: { type: GraphQLString },
+    gender: { type: GraphQLString },
+    birthDate: { type: GraphQLString },
+    title: { type: GraphQLString },
+    employer: { type: GraphQLString },
+    occupation: { type: GraphQLString },
+    phone: {
+      type: GraphQLString,
+      resolve: async (person) => {
+        let phones = await person.getCached('phones')
+        let number = phones[0].number
+        phones.forEach((phoneObj) => {
+          if (phoneObj.isPrimary)
+            number = phoneObj.number;
+        })
+        return number;
+      }
+    }
   }),
   interfaces: [nodeInterface]
 })
@@ -323,7 +389,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
     */
 
     let callAssignment = await BSDCallAssignment.create({
-      name: name
+      name: name,
     })
 
     return Promise.all([
