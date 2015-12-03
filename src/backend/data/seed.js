@@ -37,6 +37,7 @@ models.sequelize.sync({force: true}).then(async () => {
   let phones = [];
   let personGroups = [];
   let events = [];
+  let addresses = [];
   let groups = [
     {
       id: 1,
@@ -82,9 +83,22 @@ models.sequelize.sync({force: true}).then(async () => {
     phones.push({
       id: index,
       cons_id: index,
-      isPrimary: faker.random.boolean(),
+      isPrimary: true,
       number: randomPhoneNumber(),
       textOptOut: faker.random.boolean()
+    })
+    addresses.push({
+      id: index,
+      cons_id: index,
+      isPrimary: true,
+      line1: faker.address.streetAddress(),
+      line2: faker.address.secondaryAddress(),
+      city: faker.address.city(),
+      state: faker.address.stateAbbr(),
+      zip: faker.address.zipCode(),
+      country: 'US',
+      latitude: faker.address.latitude(),
+      longitude: faker.address.longitude()
     })
 
     // Randomly add each person to a group.
@@ -142,6 +156,7 @@ models.sequelize.sync({force: true}).then(async () => {
   await models.BSDPerson.bulkCreate(persons);
   let promises = [
     models.BSDEvent.bulkCreate(events),
+    models.BSDAddress.bulkCreate(addresses),
     models.BSDPersonGroup.bulkCreate(personGroups),
     models.BSDEmail.bulkCreate(emails),
     models.BSDPhone.bulkCreate(phones)
