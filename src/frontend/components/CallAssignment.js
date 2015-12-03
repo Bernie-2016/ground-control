@@ -99,7 +99,6 @@ export class CallAssignment extends React.Component {
         ...BernieText.secondaryTitle,
         color: BernieColors.blue,
         fontSize: '1.5em',
-        float: 'right'
       }}>
         {name}
         <br />
@@ -120,7 +119,7 @@ export class CallAssignment extends React.Component {
         content={content}
         sideBar={sideBar}
         sideBarStyle={{
-          width: 300,
+          width: 500,
         }}
         contentViewStyle={{
           marginLeft: 50,
