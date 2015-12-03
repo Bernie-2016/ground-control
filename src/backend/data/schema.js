@@ -30,7 +30,8 @@ import {
   BSDAssignedCall,
   BSDSurvey,
   BSDEvent,
-  User
+  User,
+  Sequelize
 } from './models';
 
 import moment from 'moment-timezone';
@@ -152,6 +153,7 @@ const GraphQLUser = new GraphQLObjectType({
           return interviewee
         else {
           let person = await BSDPerson.findOne({
+            order: [[Sequelize.fn( 'RANDOM' )]],
             include: [
             {
               model: BSDPhone,
