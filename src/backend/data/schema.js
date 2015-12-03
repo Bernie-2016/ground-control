@@ -152,21 +152,29 @@ const GraphQLUser = new GraphQLObjectType({
         if (interviewee)
           return interviewee
         else {
-          let person = await BSDPerson.findOne({
+          let persons = await BSDPerson.findAll({
             order: [[Sequelize.fn( 'RANDOM' )]],
+//            limit: 10, // We should limit this but see https://github.com/sequelize/sequelize/issues/3095
+            where: {
+              '$assignedCalls.id$' : null
+            },
             include: [
             {
-              model: BSDPhone,
-              required: true,
-              as: 'phones'
-            },
-            {
-              model: BSDEmail,
-              required: true,
-              as: 'emails'
+              model: BSDAssignedCall,
+              required: false,
+              as: 'assignedCalls',
             }
           ]})
-          return person
+          let person = persons[0]
+          if (person) {
+            let assignedCall = await BSDAssignedCall.create({
+              caller_id: user.id,
+              interviewee_id: person.id,
+              call_assignment_id: localId
+            })
+            return person
+          }
+          return null;
         }
       }
     }

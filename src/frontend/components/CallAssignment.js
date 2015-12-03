@@ -129,6 +129,20 @@ export class CallAssignment extends React.Component {
   }
 
   render() {
+    if (this.props.currentUser.intervieweeForCallAssignment === null)
+      return (
+        <div style={{
+          marginTop: 40,
+          marginLeft: 40
+        }}>
+          <div style={BernieText.title}>
+            All done!
+          </div>
+          <div style={BernieText.default}>
+            We have no one left for you to call right now, but try again tomorrow.
+          </div>
+        </div>
+      )
     let submitHandler = (formValue) => {
       if (this.state.completed)
         this.refs.survey.refs.component.submit()
