@@ -17,6 +17,12 @@ class CallAssignmentsSection extends React.Component {
       paddingRight: 40,
       paddingBottom: 40,
     },
+    paragraph: {
+      paddingTop: '0.5em',
+      paddingBottom: '0.5em',
+      paddingLeft: '0.5em',
+      paddingRight: '0.5em',
+    },
   }
 
   // This logic should probably happen on 401 at the relay network layer
@@ -57,10 +63,24 @@ class CallAssignmentsSection extends React.Component {
     let content = (
       <div>
         <div style={BernieText.title}>
-          Let them hear you loud and clear.
+          Let them hear you loud and clear
         </div>
         <div style={BernieText.default}>
-          Getting Bernie's message out is the single most important action you can take. Here are some instructions to help you get started and words of encouragement.  Click an assignment from the side bar to get started.  Also here are some links to webinars, phonebank codes, and everything else that we have on our website.
+          <p style={this.styles.paragraph}>
+            On the left, you'll find a list of calling assignments that you can start with right away.  Just click one, call the number that gets shown to you, and fill out the survey.
+          </p>
+          <p style={this.styles.paragraph}>
+            Remember that everyone you are calling are people who have signed up to help and feel free to let them know you are a fellow volunteer -- it helps! Also, please be sure to follow our guidelines:
+          </p>
+          <ol>
+            <li>Treat everyone with respect and kindness.</li>
+            <li>Do not make any statements implying that you are speaking officially on behalf of the campaign.</li>
+            <li>Do not give legal advice or advice on fundraising or FEC regulations.</li>
+            <li>Do not speak disparagingly about other candidates, groups or volunteers during the course of these calls.</li>
+          </ol>
+          <p style={this.styles.paragraph}>
+            Thank you and have fun!
+          </p>
         </div>
       </div>
     )

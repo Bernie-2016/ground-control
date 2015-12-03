@@ -142,22 +142,19 @@ export default class Signup extends React.Component {
               Make Calls
             </div>
             <div style={BernieText.title}>
-              Let them hear you loud and clear
+              It takes a nation of millions to move us forward
             </div>
             <div style={BernieText.default}>
               <p style={this.styles.paragraph}>
-                Get riled up get riled up get riled up get riled up.
+                Bernie has said time and time again that the only way to bring about meaningful change in the White House is if millions of us get involved.  We know that making one-on-one calls is the most effective way to mobilize people, and we need your help making it happen.
                 </p>
                 <p style={this.styles.paragraph}>
-                  Are you riled yet?  Get riled up a bit more.
+                  Once you sign up, we'll post assignments regularly.  You will be talking to people who have already signed up to be a part of this campaign - your job is to make sure everyone is able to live up to their potential. With your help, we can grow this into a movement of millions.
                 </p>
+
                 <p style={this.styles.paragraph}>
-                  Ok calm down now.
+                  Will you sign up to make this political revolution a reality?
                 </p>
-                <p style={this.styles.paragraph}>
-                  Thanks for all you do,
-                </p>
-                <img src='https://s.bsd.net/bernie16/main/page/-/Email%20Images/sig-red.png' width='170' alt='Bernie' />
             </div>
           </div>
           <div styles={this.styles.signupFormContainer}>
