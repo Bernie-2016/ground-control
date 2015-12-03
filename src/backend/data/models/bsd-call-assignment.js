@@ -6,7 +6,7 @@ export default function(sequelize, DataTypes) {
     tableName: 'bsd_call_assignments',
     classMethods: {
       associate: (models) => {
-        BSDCallAssignment.belongsTo(models.BSDSurvey, {foreignKey: 'bsd_survey_id', as: 'survey'})
+        BSDCallAssignment.belongsTo(models.BSDSurvey, {foreignKey: 'signup_form_id', as: 'survey'})
         BSDCallAssignment.belongsTo(models.BSDGroup, {as: 'intervieweeGroup'});
         BSDCallAssignment.belongsTo(models.BSDGroup, {as: 'callerGroup'});
         BSDCallAssignment.hasMany(models.BSDAssignedCall, {
