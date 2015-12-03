@@ -69,7 +69,7 @@ app.use(express.static(publicPath))
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
-  secret: 'keyboard cat',
+  secret: process.env.SECRET,
   store: sessionStore,
 }));
 app.use(passport.initialize());
