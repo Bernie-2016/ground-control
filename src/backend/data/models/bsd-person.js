@@ -74,14 +74,6 @@ export default function(sequelize, DataTypes) {
         newPerson.lastName = newPerson.lastname;
         newPerson.middleName = newPerson.middlename;
         newPerson.birthDate = newPerson.birth_dt;
-
-        // Set these
-//        delete newPerson.modified_dt;
-//        delete newPerson.create_dt;
-//        delete newPerson.cons_id;
-//        newPerson.updatedAt = newPerson.modified_dt);
-//        newPerson.createdAt = newPerson.create_dt;
-
         let person = await BSDPerson.findById(newPerson.id)
         if (person) {
           let id = newPerson.id;

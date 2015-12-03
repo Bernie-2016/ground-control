@@ -38,7 +38,6 @@ import {
 import moment from 'moment-timezone';
 import Promise from 'bluebird';
 import Maestro from '../maestro';
-import BSD from '../bsd';
 import url from 'url';
 
 class GraphQLError extends Error {
@@ -57,9 +56,6 @@ class ListContainer {
   }
 }
 const SharedListContainer = new ListContainer(1);
-
-const BSDClient = new BSD(process.env.BSD_HOST, process.env.BSD_API_ID, process.env.BSD_API_SECRET);
-
 let {nodeInterface, nodeField} = nodeDefinitions(
   (globalId) => {
     let {type, id} = fromGlobalId(globalId);
@@ -334,11 +330,8 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
   name: 'CreateCallAssignment',
   inputFields: {
     name: { type: new GraphQLNonNull(GraphQLString) },
-    callerGroupId: { type: new GraphQLNonNull(GraphQLString) },
     intervieweeGroupId: { type: new GraphQLNonNull(GraphQLString) },
     surveyId: { type: new GraphQLNonNull(GraphQLString) },
-//    startDate: new GraphQLNonNull(GraphQLInt),
-//    endDate: GraphQLInt
   },
   outputFields: {
     listContainer: {
@@ -346,34 +339,29 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
       resolve: () => SharedListContainer
     }
   },
-  mutateAndGetPayload: async ({name, callerGroupId, intervieweeGroupId, surveyId, startDate, endDate}) => {
-    let [callerGroup, intervieweeGroup, survey] = await Promise.all([
-        BSDSurvey.findById(surveyId)
+  mutateAndGetPayload: async ({name, intervieweeGroupId, surveyId}) => {
+    let [intervieweeGroup, survey] = await Promise.all([
+        BSDGroup.findWithBSDCheck(intervieweeGroupId),
+        BSDSurvey.findWithBSDCheck(surveyId)
       ]);
-    let BSDFetches = [];
+    if (!intervieweeGroup)
+      throw new GraphQLError({
+        status: 400,
+        message: 'Provided group ID does not exist in BSD.'
+      });
 
-    if (!survey) {
-      try {
-        let BSDSurveyResponse = await BSDClient.getForm(surveyId)
-        survey = await BSDSurvey.createFromBSDObject(BSDSurveyResponse)
-      } catch(err) {
-        if (err && err.response && err.response.statusCode === 409) {
-            throw new GraphQLError({
-            status: 400,
-            message: 'Provided Survey ID does not exist in BSD.'
-          });
-        }
-        else
-          throw err;
-      }
-    }
+    if (!survey)
+      throw new GraphQLError({
+        status: 400,
+        message: 'Provided survey ID does not exist in BSD.'
+      });
+
 
     let callAssignment = await BSDCallAssignment.create({
       name: name,
     })
 
     return Promise.all([
-      callAssignment.setCallerGroup(callerGroup),
       callAssignment.setIntervieweeGroup(intervieweeGroup),
       callAssignment.setSurvey(survey)
     ])

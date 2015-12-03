@@ -1,3 +1,4 @@
+import BSDClient from '../../bsd-instance';
 export default function(sequelize, DataTypes) {
   let BSDSurvey = sequelize.define('BSDSurvey', {
     id: {
@@ -21,6 +22,21 @@ export default function(sequelize, DataTypes) {
         newSurvey.id = newSurvey.signup_form_id;
         newSurvey.slug = newSurvey.signup_form_slug;
         return BSDSurvey.create(newSurvey);
+      },
+      findWithBSDCheck: async (id) => {
+        let survey = await BSDSurvey.findById(id);
+        if (!survey) {
+          try {
+            let BSDSurveyResponse = await BSDClient.getForm(id);
+            survey = await BSDSurvey.createFromBSDObject(BSDSurveyResponse)
+          } catch (err) {
+            if (err && err.response && err.response.statusCode === 409)
+              survey = null;
+            else
+              throw err;
+          }
+        }
+        return survey;
       }
     }
   })

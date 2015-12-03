@@ -1,5 +1,6 @@
+import BSDClient from '../../bsd-instance';
 export default function(sequelize, DataTypes) {
-  return sequelize.define('BSDGroup', {
+  let BSDGroup = sequelize.define('BSDGroup', {
     id: {
       type: DataTypes.BIGINT,
       field: 'cons_group_id',
@@ -13,5 +14,30 @@ export default function(sequelize, DataTypes) {
   }, {
     underscored: true,
     tableName: 'bsd_cons_group',
+    updatedAt: 'modified_dt',
+    createdAt: 'create_dt',
+    classMethods: {
+      createFromBSDObject: (BSDObject) => {
+        let newGroup = {...BSDObject};
+        newGroup.id = newSurvey.cons_group_id;
+        return BSDGroup.create(newGroup);
+      },
+      findWithBSDCheck: async (id) => {
+        let group = await BSDGroup.findById(id);
+        if (!group) {
+          try {
+            let BSDGroupResponse = await BSDClient.getConstituentGroup(id);
+            group = await BSDGroup.createFromBSDObject(BSDGroupResponse)
+          } catch (err) {
+            if (err && err.response && err.response.statusCode === 409)
+              group = null;
+            else
+              throw err;
+          }
+        }
+        return group;
+      }
+    }
   })
+  return BSDGroup;
 }
