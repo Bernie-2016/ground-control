@@ -20,7 +20,7 @@ writeSchema();
 const SequelizeStore = SequelizeStoreFactory(session.Store)
 const Mailgun = new MG(process.env.MAILGUN_KEY, process.env.MAILGUN_DOMAIN);
 const BSDClient = new BSD(process.env.BSD_HOST, process.env.BSD_API_ID, process.env.BSD_API_SECRET);
-const port = process.env.APP_PORT;
+const port = process.env.PORT || process.env.APP_PORT;
 const publicPath = path.resolve(__dirname, '../frontend/public');
 
 passport.use('signup', new LocalStrategy(
