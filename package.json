@@ -6,7 +6,7 @@
   "version": "0.1.0",
   "scripts": {
     "start": "./run ./src/backend/server.js",
-    "dev": "nf start",
+    "dev": "nf start --procfile Procfile.dev",
     "bundle": "mkdir -p ./src/frontend/public/js && webpack --config ./webpack/config.js",
     "lint": "eslint src",
     "seed": "./run ./src/backend/data/seed.js",
