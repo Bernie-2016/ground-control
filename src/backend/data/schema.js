@@ -24,6 +24,7 @@ import {
 import {
   BSDPerson,
   BSDPhone,
+  BSDAddress,
   BSDEmail,
   BSDGroup,
   BSDCallAssignment,
@@ -156,9 +157,24 @@ const GraphQLUser = new GraphQLObjectType({
             order: [[Sequelize.fn( 'RANDOM' )]],
 //            limit: 10, // We should limit this but see https://github.com/sequelize/sequelize/issues/3095
             where: {
-              '$assignedCalls.id$' : null
+              '$assignedCalls.id$' : null,
             },
             include: [
+            {
+              model: BSDPhone,
+              required: true,
+              as: 'phones'
+            },
+            {
+              model: BSDEmail,
+              required: true,
+              as: 'emails'
+            },
+            {
+              model: BSDAddress,
+              required: true,
+              as: 'addresses'
+            },
             {
               model: BSDAssignedCall,
               required: false,

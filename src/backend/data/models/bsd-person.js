@@ -66,6 +66,7 @@ export default function(sequelize, DataTypes) {
         BSDPerson.hasMany(models.BSDEmail, { foreignKey: 'cons_id', as: 'emails'})
         BSDPerson.hasMany(models.BSDPhone, { foreignKey: 'cons_id', as: 'phones'})
         BSDPerson.hasMany(models.BSDAssignedCall, { foreignKey: 'interviewee_id', as: 'assignedCalls'})
+        BSDPerson.hasMany(models.BSDAddress, { foreignKey: 'cons_id', as: 'addresses'})
       },
       createFromBSDObject: async (BSDObject) => {
         let newPerson = {...BSDObject}
