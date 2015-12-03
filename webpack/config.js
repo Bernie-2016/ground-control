@@ -1,3 +1,5 @@
+var SchemaPlugin = require('./schemaPlugin')
+
 module.exports = {
   entry: './src/frontend/app.js',
   module: {
@@ -10,5 +12,8 @@ module.exports = {
       }
     ]
   },
+  plugins: [
+    new SchemaPlugin()
+  ],
   output: {filename: 'app.js', path: './src/frontend/public/js/'}
 }
