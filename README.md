@@ -29,17 +29,34 @@ If you ever want to re-seed the database, run
 
 The best way to run everything on Windows is probably to try to get Docker working on Windows and use the Linux installation instructions.
 
-## What is this?
+## What does this do and how do I get started?
 
-The purposes of Ground Control are:
+Currently, Ground Control is two things:
 
-1. A central portal for volunteers who want to get involved with the campaign and an admin interface to manage volunteers. This is the code that runs http://organize.berniesanders.com.
+* A tool for calling other volunteers of the campaign and integrating that data back into BSD, which is a CRM the campaign uses.  In the near future, it is going to also be used to call voters.
+* A tool to create and manage events.  These include both volunteer-run events and official events.  The goal here is to replace (https://go.berniesanders.com/page/event/create)[https://go.berniesanders.com/page/event/create] and start replacing some of the functionality of the event administration backed.
 
-2. Be the central routing point/API for applications to integrate with the CRMs the campaign uses (BSD and VAN)
+To get started with Ground Control, once it's running, go to `http://localhost:3000/admin`. From there, you can see the events administration section and the call assignment creation section.  To create a call assignment, do the following:
+
+1. Make a survey in Blue State Digital.  If you are developing on Ground Control, ask Saikat for access to the BSD testbed.
+2. Make a constituent group that you wish to be the target of your phonebanking assignment in BSD.
+3. Go to `http://localhost:3000/admin/call-assignments`, click Create, and enter the BSD IDs of your survey and target group in the form.
+4. Click create
+5. 
+
+Now, if you go to `http://localhost:3000` and signup/login, you shoul see your assignment on the left side.  Click it to test it out and start making calls!
+
+## What's the end game?
+
+The grand purpose of Ground Control is to be:
+
+1. A central portal for volunteers who want to get involved with the campaign and an admin interface to manage volunteers. We want this to be the landing page on the homepage as soon as someone wants to volunteer for Bernie.
+
+2. The central routing point/API for applications to integrate with the CRMs the campaign uses (BSD and VAN)
 
 3. Be a repository for data that does not fit neatly into BSD and VAN and give people outside of our system access to this data as well
 
-4. An effort to build out more organizing tools on top of what we already have (which leads to the data in #2). Currently this means a phonebanking tool and a tool for scheduling conference calls with volunteers.
+4. An effort to build out more organizing tools on top of what we already have (which leads to the data in #2). 
 
 ## What are these "CRMs the campaign uses?"
 
