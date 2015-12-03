@@ -1,14 +1,11 @@
+let config = {
+  url: process.env.DATABASE_URL,
+  migrationStorageTableName: 'sequelize_meta',
+  dialect: 'postgres'
+}
 let configOptions = {
-  development: {
-    url: process.env.DB_CONNECTION_STRING,
-    migrationStorageTableName: 'sequelize_meta',
-    dialect: 'postgres'
-  },
-  production: {
-    url: process.env.DATABASE_URL,
-    migrationStorageTableName: 'sequelize_meta',
-    dialect: 'postgres'
-  }
+  development: config,
+  production: config
 }
 
 export default configOptions;
