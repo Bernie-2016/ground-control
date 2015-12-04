@@ -43,7 +43,6 @@ export default class Signup extends React.Component {
             password: formState.password
           })
           .end((err, res) => {
-            console.log(err, res)
             if (!err)
               window.location = '/call-assignments';
               // Ideally this would work with pushState, but it doesn't because relay has already cached the current user and has no idea that things are session-based.
@@ -79,7 +78,6 @@ export default class Signup extends React.Component {
             password: formState.password
           })
           .end((err, res) => {
-            console.log(err, res)
             if (!err)
               window.location = '/call-assignments';
               // Ideally this would work with pushState, but it doesn't because relay has already cached the current user and has no idea that things are session-based.

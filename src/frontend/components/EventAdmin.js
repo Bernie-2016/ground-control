@@ -27,7 +27,6 @@ class EventAdmin extends React.Component {
   }
 
   renderEvents() {
-    console.log(this.props.listContainer.events[0].node.startDate);
     return this.props.listContainer.events.edges.map((edge) => {
       return (
         <TableRow key={edge.node.id}>

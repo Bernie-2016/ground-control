@@ -213,8 +213,6 @@ export default class BSD {
 
     let constituent = await this.getConstituentByEmail(email);
 
-    console.log(constituent);
-
     // generate a 'random' 9-14 character alphanumeric password
     let password = randString(Math.floor(Math.random() * 6) + 9);
     constituent['password'] = password;
@@ -242,7 +240,6 @@ export default class BSD {
   async checkCredentials(email, password) {
     try{
       let response = await this.request('/account/check_credentials', {userid: email, password: password}, 'POST');
-      console.log(response);
     }
     catch(e){
       return 'invalid username or password'
@@ -311,7 +308,6 @@ export default class BSD {
       params['days'][0]['start_datetime_system'] = startTime;
       let response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'POST');
       if (response.validation_errors){
-        console.log(response);
         callback(response.validation_errors);
       }
       else if (response.event_id_obfuscated && index == array.length - 1){
@@ -342,7 +338,6 @@ export default class BSD {
       body: params,
       resolveWithFullResponse: true
     }
-    // console.log(options);
     return requestPromise(options)
   }
 

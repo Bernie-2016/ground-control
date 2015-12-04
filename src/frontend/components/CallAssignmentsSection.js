@@ -25,22 +25,7 @@ class CallAssignmentsSection extends React.Component {
     },
   }
 
-  // This logic should probably happen on 401 at the relay network layer
-  componentWillMount() {
-    if (!this.props.currentUser) {
-      this.props.history.pushState(null, '/signup');
-    }
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (!this.props.currentUser) {
-      this.props.history.pushState(null, '/signup');
-    }
-  }
-
   render() {
-    if (!this.props.currentUser)
-      return <div></div>
     let sideBar = (
       <div>
         <CallAssignmentList

@@ -62,8 +62,8 @@ const authRequired = (session) => {
 const adminRequired = (session) => {
   if (!session.user || !session.user.isAdmin) {
     throw new GraphQLError({
-      status: 403,
-      message: 'You must be an admin to access that resource.'
+      status: 404,
+      message: 'Nothing here.'
     });
   }
 }
@@ -383,6 +383,7 @@ let RootQuery = new GraphQLObjectType({
     currentUser: {
       type: GraphQLUser,
       resolve: (parent, _, {rootValue}) => {
+        authRequired(rootValue);
         return rootValue.user
       }
     },
