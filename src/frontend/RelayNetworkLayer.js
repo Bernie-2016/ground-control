@@ -65,7 +65,7 @@ export default class RelayNetworkLayer extends Relay.DefaultNetworkLayer
           }
         })
         .catch((error) => {
-          log.error(error.toString())
+          log.error(error.message)
           return request.reject(error);
         });
     }));

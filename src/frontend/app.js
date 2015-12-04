@@ -25,6 +25,7 @@ import NotFound from './components/NotFound'
 import Form from 'react-formal';
 import {createHistory} from 'history';
 import RelayNetworkLayer from './RelayNetworkLayer'
+import StackTrace from 'stacktrace-js';
 
 // Necessary to make minilog work
 window.jQuery = jQuery;
@@ -32,9 +33,24 @@ Minilog
   .enable()
   .pipe(new Minilog.backends.jQuery({
     url: 'http://localhost:3000/log',
-    interval: 5000
+    interval: 1000
     }));
 window.log = Minilog('client');
+
+window.onerror = function(msg, file, line, col, error) {
+    StackTrace
+      .fromError(error)
+      .then((stack) => {
+        log.error('Uncaught exception!', stack);
+        setTimeout(function() {
+            alert("Whoops! Something went wrong. We're looking into it, but in the meantime please refresh your browser.");
+            document.location.reload(true);
+        }, 2000);
+      })
+      .catch((stack) => {
+        log.error(stack);
+      });
+};
 
 injectTapEventPlugin();
 Relay.injectNetworkLayer(new RelayNetworkLayer('/graphql'));
