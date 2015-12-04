@@ -19,10 +19,14 @@ import CallAssignment from './components/CallAssignment';
 import CallAssignmentsSection from './components/CallAssignmentsSection';
 import Dashboard from './components/Dashboard';
 import Signup from './components/Signup';
+import NotFound from './components/NotFound'
 import Form from 'react-formal';
 import {createHistory} from 'history';
+import RelayNetworkLayer from './RelayNetworkLayer'
+
 
 injectTapEventPlugin();
+Relay.injectNetworkLayer(new RelayNetworkLayer('/graphql'));
 
 Form.addInputTypes({
   string: GCTextField,
@@ -100,6 +104,7 @@ ReactDOM.render(
         component={Signup}
       />
     </Route>
+    <Route path="*" component={NotFound} />
   </Router>,
   document.getElementById('root')
 );
