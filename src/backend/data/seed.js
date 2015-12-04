@@ -1,5 +1,6 @@
 import models from './models';
 import faker from 'faker';
+import csv from 'csv-load-sync';
 
 const NUM_PERSONS=10;
 const NUM_EVENTS=20;
@@ -152,6 +153,14 @@ models.sequelize.sync({force: true}).then(async () => {
     })
   };
 
+  let zips = csv('./src/backend/data/zip-codes.csv')
+  zips.forEach((datum) => {
+    datum.timezoneOffset = parseInt(datum.timezoneOffset, 10)
+    datum.latitude = parseFloat(datum.latitude)
+    datum.longitude = parseFloat(datum.longitude)
+    datum.hasDST = datum.hasDST == '1' ? true : false
+  })
+
   console.log('Creating...')
   await models.User.create({
     email: 'admin@localhost.com',
@@ -160,6 +169,7 @@ models.sequelize.sync({force: true}).then(async () => {
   })
   await models.BSDPerson.bulkCreate(persons);
   let promises = [
+    models.ZipCode.bulkCreate(zips),
     models.BSDEvent.bulkCreate(events),
     models.BSDAddress.bulkCreate(addresses),
     models.BSDPersonGroup.bulkCreate(personGroups),
