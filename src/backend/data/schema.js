@@ -229,12 +229,11 @@ const GraphQLAddress = new GraphQLObjectType({
     zip: { type: GraphQLString },
     latitude: { type: GraphQLFloat },
     longitude: { type: GraphQLFloat },
-    // Hack, the display should really happen in the client not here
-    currentTime: {
+    localTime: {
       type: GraphQLString,
       resolve: async (address) => {
         let tz = TZLookup(address.latitude, address.longitude)
-        return moment().tz(tz).format('h:mm a');
+        return moment().tz(tz).format();
       }
     }
   }),
