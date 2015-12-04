@@ -10,13 +10,17 @@ import BSD from './bsd';
 import MG from './mail';
 import demoData from './data/demo.json';
 import models from './data/models'
+import log from './log';
 import {fromGlobalId} from 'graphql-relay'
 import passport from 'passport';
 import LocalStrategy  from 'passport-local'
 import SequelizeStoreFactory from 'connect-session-sequelize'
+import url from 'url';
+import Minilog from 'minilog';
 
 writeSchema();
 
+const clientLogger = Minilog('client')
 const SequelizeStore = SequelizeStoreFactory(session.Store)
 const Mailgun = new MG(process.env.MAILGUN_KEY, process.env.MAILGUN_DOMAIN);
 const BSDClient = new BSD(process.env.BSD_HOST, process.env.BSD_API_ID, process.env.BSD_API_SECRET);
@@ -88,7 +92,19 @@ app.get('/events/types.json', async (req, res) => {
 });
 
 app.post('/log', (req, res) => {
-  console.log(req);
+
+  let parsedURL = url.parse(req.url, true);
+  let message = req.body;
+  let app = message[0];
+  let method = message[1];
+  let client = parsedURL.query.client_id ? parsedURL.query.client_id : ''
+  message = message.slice(2);
+  message.forEach((logEntry) => {
+    logEntry.split('\n').forEach((line) => {
+      let logLine = '(' + client + '): ' + line;
+      clientLogger[method](logLine);
+    })
+  })
   res.send('')
 })
 
