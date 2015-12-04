@@ -28,6 +28,7 @@ import {
   BSDAddress,
   BSDEmail,
   BSDGroup,
+  BSDCall,
   BSDCallAssignment,
   BSDAssignedCall,
   BSDSurvey,
@@ -176,29 +177,53 @@ const GraphQLUser = new GraphQLObjectType({
 //            limit: 10, // We should limit this but see https://github.com/sequelize/sequelize/issues/3095
             where: {
               '$assignedCalls.id$' : null,
+              '$calls.id$' : null
             },
             include: [
-            {
-              model: BSDPhone,
-              required: true,
-              as: 'phones'
-            },
-            {
-              model: BSDEmail,
-              required: true,
-              as: 'emails'
-            },
-            {
-              model: BSDAddress,
-              required: true,
-              as: 'addresses'
-            },
-            {
-              model: BSDAssignedCall,
-              required: false,
-              as: 'assignedCalls',
-            }
-          ]})
+              {
+                model: BSDPhone,
+                required: true,
+                as: 'phones'
+              },
+              {
+                model: BSDEmail,
+                required: true,
+                as: 'emails'
+              },
+              {
+                model: BSDAddress,
+                required: true,
+                as: 'addresses',
+                where: {
+                  $and: [
+                    {zip: {$notBetween: ['50001','52809']}}, // Iowa
+                    {zip: {$notBetween: ['68119','68120']}}, // Iowa (Omaha)
+                    {zip: {$notBetween: ['03031','03897']}}, // New Hampshire
+                    {zip: {$notBetween: ['29001','29948']}}, // South Carolina
+                  ]
+                }
+              },
+              {
+                model: BSDAssignedCall,
+                required: false,
+                as: 'assignedCalls',
+              },
+              {
+                model: BSDCall,
+                required: false,
+                where: {
+                  $or: [
+                    { call_assignment_id: localId },
+                    { attemptedAt: {
+                        $gt: new Date(new Date() - 7 * 24 * 60 * 60 * 1000)
+                      }
+                    }
+                  ]
+                },
+                as: 'calls'
+              }
+            ]
+          })
           let person = persons[0]
           if (person) {
             let assignedCall = await BSDAssignedCall.create({

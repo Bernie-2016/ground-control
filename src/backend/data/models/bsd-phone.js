@@ -11,7 +11,6 @@ export default function(sequelize, DataTypes) {
     },
     phone: {
       type: DataTypes.STRING,
-      unique: true,
       validate: {
         isNumeric: true
       }

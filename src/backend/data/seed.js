@@ -1,8 +1,8 @@
 import models from './models';
 import faker from 'faker';
 
-const NUM_PERSONS=1000;
-const NUM_EVENTS=5000;
+const NUM_PERSONS=10;
+const NUM_EVENTS=20;
 
 // Use this instead of faker because we want it to be just digits
 let randomPhoneNumber = () => {
