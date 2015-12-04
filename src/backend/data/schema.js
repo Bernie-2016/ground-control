@@ -383,7 +383,8 @@ let RootQuery = new GraphQLObjectType({
     currentUser: {
       type: GraphQLUser,
       resolve: (parent, _, {rootValue}) => {
-        authRequired(rootValue);
+        throw "Test error"
+        authRequired(rootValue)
         return rootValue.user
       }
     },

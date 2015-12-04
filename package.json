@@ -58,7 +58,7 @@
     "webpack": "^1.10.5",
     "xml2js": "^0.4.15",
     "yup": "^0.11.0",
-    "minilog": "^2.1.0"
+    "minilog": "git://github.com/saikat/minilog.git#ajax-logger-fix"
   },
   "devDependencies": {
     "foreman": "latest",

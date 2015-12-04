@@ -35,6 +35,7 @@ Minilog
     interval: 5000
     }));
 window.log = Minilog('client');
+
 injectTapEventPlugin();
 Relay.injectNetworkLayer(new RelayNetworkLayer('/graphql'));
 

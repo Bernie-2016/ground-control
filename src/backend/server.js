@@ -61,6 +61,7 @@ passport.serializeUser(async (user, done) => {
 passport.deserializeUser(async (id, done) => {
   let user = await models.User.findById(id);
   done(null, user);
+  return user;
 });
 
 const app = express();
@@ -93,17 +94,29 @@ app.get('/events/types.json', async (req, res) => {
 
 app.post('/log', (req, res) => {
   let parsedURL = url.parse(req.url, true);
-  let message = req.body;
-  let app = message[0];
-  let method = message[1];
-  let client = parsedURL.query.client_id ? parsedURL.query.client_id : ''
-  message = message.slice(2);
-  message.forEach((logEntry) => {
-    logEntry.split('\n').forEach((line) => {
+  let logs = req.body.logs;
+  logs.forEach((message) => {
+    let app = message[0];
+    let method = message[1];
+    let client = parsedURL.query.client_id ? parsedURL.query.client_id : ''
+
+    message = message.slice(2);
+    let writeLog = (line) => {
       let logLine = '(' + client + '): ' + line;
       clientLogger[method](logLine);
+    }
+
+    message.forEach((logEntry) => {
+      if (typeof logEntry === 'object')
+        writeLog(JSON.stringify(logEntry))
+      else {
+        logEntry.split('\n').forEach((line) => {
+          writeLog(line)
+        })
+      }
     })
   })
+
   res.send('')
 })
 
