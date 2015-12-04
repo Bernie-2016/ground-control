@@ -3,14 +3,12 @@ export default class RelayNetworkLayer extends Relay.DefaultNetworkLayer
 {
   handleStructuredError(error) {
     let parsedError = null;
-    console.log(error.message)
+    log.debug(error.message)
     try {
       parsedError = JSON.parse(error.message)
-    } catch (ex) {
-      console.log(ex)
-    }
+    } catch (ex) { }
     if (parsedError) {
-      console.log(parsedError)
+      log.debug(parsedError)
       if (parsedError.status === 401)
         window.location = '/signup'
       else if (parsedError.status === 404)

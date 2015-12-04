@@ -1,4 +1,5 @@
 import requestPromise from 'request-promise';
+import log from './log';
 
 export default class Maestro {
   constructor(customerUID, secretToken, host, fakeCall) {
@@ -33,7 +34,7 @@ export default class Maestro {
     }
 
     if (this.fakeCall) {
-      console.log('Would have made request: ' + JSON.stringify(options))
+      log.debug('Would have made request: ' + JSON.stringify(options))
       return { value: { UID: 'test-uid' } }
     }
     return requestPromise(options);

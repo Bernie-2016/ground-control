@@ -92,7 +92,6 @@ app.get('/events/types.json', async (req, res) => {
 });
 
 app.post('/log', (req, res) => {
-
   let parsedURL = url.parse(req.url, true);
   let message = req.body;
   let app = message[0];
@@ -112,16 +111,6 @@ app.post('/signup',
   passport.authenticate('signup'),
   (req, res) => {
   res.send('Success!')
-})
-
-app.post('/login', async (req, res) => {
-  // Implement
-/*  let person = fromGlobalId(req.body.id);
-  req.session.regenerate(() => {
-    req.session.personId = person.id
-    res.send('Success!')
-  })
-*/
 })
 
 // this endpoint is for testing email rendering/sending
@@ -160,7 +149,7 @@ app.post('/events/create', async (req, res) => {
 
 app.use(fallback('index.html', { root: publicPath }))
 
-app.listen(port, () => console.log(
+app.listen(port, () => log.info(
 `Server is now running on http://localhost:${port}`
 ))
 
