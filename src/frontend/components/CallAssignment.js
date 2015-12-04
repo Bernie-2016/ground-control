@@ -14,33 +14,37 @@ export class CallAssignment extends React.Component {
     assignmentBar: {
       backgroundColor: BernieColors.lightGray,
       marginTop: 15,
+      marginLeft: 'auto',
+      marginRight: 'auto',
       marginBottom: 15,
-      marginRight: 15,
-      marginLeft: 15,
       paddingTop: 15,
       paddingLeft: 15,
       paddingRight: 15,
       paddingBottom: 15,
       color: BernieColors.darkGray,
       fontSize: '1em',
-      width: 'auto'
+      width: 'auto',
+      maxWidth: 720
     },
     callAssignmentQuestions: {
       fontSize: '1em',
       marginBottom: 15,
-      textAlign: 'center'
+//      textAlign: 'center'
     },
     surveyFrame: {
       borderTop: 'solid 1px ' + BernieColors.lightGray,
     },
     questions: {
       paddingTop: 15,
+      maxWidth: 720,
+      marginLeft: 'auto',
+      marginRight: 'auto'
     },
     submitButton: {
-      textAlign: 'center',
-      width: '50%',
-      marginRight: 'auto',
-      marginLeft: 'auto'
+//      textAlign: 'center',
+//      width: '50%',
+//      marginRight: 'auto',
+//      marginLeft: 'auto'
     }
   }
 
@@ -96,9 +100,10 @@ export class CallAssignment extends React.Component {
 
     let sideBar = (
       <div style={{
-        ...BernieText.secondaryTitle,
+        ...BernieText.default,
         color: BernieColors.blue,
         fontSize: '1.5em',
+        fontWeight: 600
       }}>
         {name}
         <br />
@@ -119,7 +124,7 @@ export class CallAssignment extends React.Component {
         content={content}
         sideBar={sideBar}
         sideBarStyle={{
-          width: 500,
+          width: 300,
         }}
         contentViewStyle={{
           marginLeft: 50,
