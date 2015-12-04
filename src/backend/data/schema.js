@@ -33,6 +33,7 @@ import {
   BSDAssignedCall,
   BSDSurvey,
   BSDEvent,
+  ZipCode,
   User,
   Sequelize
 } from './models';
@@ -172,6 +173,13 @@ const GraphQLUser = new GraphQLObjectType({
         if (interviewee)
           return interviewee
         else {
+          let allOffsets = [-10, -9, -8, -7, -6, -5, -4]
+          let validOffsets = []
+          allOffsets.forEach((offset) => {
+            let time = moment().utcOffset(offset)
+            if (time.hours() > 10 && time.hours() < 21)
+              validOffsets.push(offset)
+          })
           let persons = await BSDPerson.findAll({
             order: [[Sequelize.fn( 'RANDOM' )]],
 //            limit: 10, // We should limit this but see https://github.com/sequelize/sequelize/issues/3095
@@ -201,7 +209,17 @@ const GraphQLUser = new GraphQLObjectType({
                     {zip: {$notBetween: ['03031','03897']}}, // New Hampshire
                     {zip: {$notBetween: ['29001','29948']}}, // South Carolina
                   ]
-                }
+                },
+                include: [{
+                  model: ZipCode,
+                  required: true,
+                  as: 'zipInfo',
+                  where: {
+                    timezoneOffset: {
+                      $in: validOffsets
+                    }
+                  }
+                }]
               },
               {
                 model: BSDAssignedCall,

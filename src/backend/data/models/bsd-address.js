@@ -1,5 +1,5 @@
 export default function(sequelize, DataTypes) {
-  return sequelize.define('BSDAddress', {
+  let BSDAddress = sequelize.define('BSDAddress', {
     id: {
       type: DataTypes.BIGINT,
       field: 'cons_addr_id',
@@ -53,5 +53,11 @@ export default function(sequelize, DataTypes) {
     createdAt: 'create_dt',
     underscored: true,
     tableName: 'bsd_cons_addr',
+    classMethods: {
+      associate: (models) => {
+        BSDAddress.belongsTo(models.ZipCode, { foreignKey: 'zip', as: 'zipInfo' })
+      }
+    }
   })
+  return BSDAddress;
 }

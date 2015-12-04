@@ -93,7 +93,7 @@ export default class AdminCallAssignmentCreationForm extends React.Component {
           /><br />
           <Form.Field
             name='intervieweeGroupId'
-            label='Interviewee Group'
+            label='Interviewee Group (Not yet implemented)'
           /><br />
           <Form.Button type='submit' label='Create!' fullWidth={true} />
         </GCForm>
