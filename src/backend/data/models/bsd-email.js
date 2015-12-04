@@ -9,7 +9,7 @@ export default function(sequelize, DataTypes) {
       type: DataTypes.BOOLEAN,
       field: 'is_primary'
     },
-    address: {
+    email: {
       type: DataTypes.STRING,
       unique: true,
       validate: {

@@ -8,7 +8,8 @@ import {
   GraphQLSchema,
   GraphQLString,
   GraphQLID,
-  GraphQLEnumType
+  GraphQLEnumType,
+  GraphQLFloat
 } from 'graphql';
 
 import {
@@ -39,6 +40,7 @@ import moment from 'moment-timezone';
 import Promise from 'bluebird';
 import Maestro from '../maestro';
 import url from 'url';
+import TZLookup from 'tz-lookup';
 
 class GraphQLError extends Error {
   constructor(errorObject) {
@@ -89,6 +91,8 @@ let {nodeInterface, nodeField} = nodeDefinitions(
       return BSDEvent.findById(id);
     if (type === 'User')
       return User.findById(id);
+    if (type === 'Address')
+      return BSDAddress.findById(id);
     if (type === 'ListContainer')
       return SharedListContainer;
     return null;
@@ -106,6 +110,8 @@ let {nodeInterface, nodeField} = nodeDefinitions(
       return GraphQLListContainer;
     if (obj instanceof BSDEvent)
       return GraphQLEvent;
+    if (obj instanceof BSDAddress)
+      return GraphQLAddress;
     if (obj instanceof User)
       return GraphQLUser;
     return null;
@@ -210,6 +216,31 @@ const GraphQLUser = new GraphQLObjectType({
   interfaces: [nodeInterface]
 })
 
+const GraphQLAddress = new GraphQLObjectType({
+  name: 'Address',
+  description: 'An address',
+  fields: () => ({
+    id: globalIdField('Address'),
+    line1: { type: GraphQLString },
+    line2: { type: GraphQLString },
+    line3: { type: GraphQLString },
+    city: { type: GraphQLString },
+    state: { type: GraphQLString },
+    zip: { type: GraphQLString },
+    latitude: { type: GraphQLFloat },
+    longitude: { type: GraphQLFloat },
+    // Hack, the display should really happen in the client not here
+    currentTime: {
+      type: GraphQLString,
+      resolve: async (address) => {
+        let tz = TZLookup(address.latitude, address.longitude)
+        return moment().tz(tz).format('h:mm a');
+      }
+    }
+  }),
+  interfaces: [nodeInterface]
+})
+
 const GraphQLPerson = new GraphQLObjectType({
   name: 'Person',
   description: 'A person.',
@@ -229,12 +260,36 @@ const GraphQLPerson = new GraphQLObjectType({
       type: GraphQLString,
       resolve: async (person) => {
         let phones = await person.getCached('phones')
-        let number = phones[0].number
+        let phone = phones[0].phone
         phones.forEach((phoneObj) => {
           if (phoneObj.isPrimary)
-            number = phoneObj.number;
+            phone = phoneObj.phone;
         })
-        return number;
+        return phone;
+      }
+    },
+    email: {
+      type: GraphQLString,
+      resolve: async (person) => {
+        let emails = await person.getCached('emails')
+        let email = emails[0].email
+        emails.forEach((emailObj) => {
+          if (emailObj.isPrimary)
+            email = emailObj.email;
+        })
+        return email;
+      }
+    },
+    address: {
+      type: GraphQLAddress,
+      resolve: async (person) => {
+        let addresses = await person.getCached('addresses')
+        let address = addresses[0].address
+        addresses.forEach((addressObj) => {
+          if (addressObj.isPrimary)
+            address = addressObj;
+        })
+        return address;
       }
     }
   }),

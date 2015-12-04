@@ -29,7 +29,6 @@ export class CallAssignment extends React.Component {
     callAssignmentQuestions: {
       fontSize: '1em',
       marginBottom: 15,
-//      textAlign: 'center'
     },
     surveyFrame: {
       borderTop: 'solid 1px ' + BernieColors.lightGray,
@@ -41,10 +40,7 @@ export class CallAssignment extends React.Component {
       marginRight: 'auto'
     },
     submitButton: {
-//      textAlign: 'center',
-//      width: '50%',
-//      marginRight: 'auto',
-//      marginLeft: 'auto'
+
     }
   }
 
@@ -111,11 +107,13 @@ export class CallAssignment extends React.Component {
       </div>
     )
 
+    let location = interviewee.address.city + ', ' + interviewee.address.state + ' ' + interviewee.address.zip
+
+    console.log(interviewee.address.currentTime)
     let content = (
       <div style={BernieText.default}>
-        Email: filler@filler.com<br />
-        Location: New York, NY 10014<br />
-        Local Time: 4:00 PM<br />
+        Location: {location}<br />
+        Local Time: {interviewee.address.currentTime}<br />
       </div>
     )
 
@@ -158,7 +156,7 @@ export class CallAssignment extends React.Component {
         ...this.styles.surveyFrame,
         display: this.state.completed ? 'block' : 'none'
       }}>
-        <Survey ref='survey' survey={this.props.callAssignment.survey} initialValues={{'email' : 'saikat@gomockingbird.com'}} />
+        <Survey ref='survey' survey={this.props.callAssignment.survey} initialValues={{'email' : this.props.currentUser.intervieweeForCallAssignment.email}} />
       </div>
     )
 
@@ -209,7 +207,7 @@ export class CallAssignment extends React.Component {
             </div>
             {survey}
             <div style={this.styles.submitButton}>
-              <Form.Button type='submit' label='Submit and on to the next volunteer!' fullWidth={true} style={this.styles.submitButton}/>
+              <Form.Button type='submit' label='Submit and on to the person!' fullWidth={true} style={this.styles.submitButton}/>
             </div>
           </GCForm>
         </div>
@@ -245,6 +243,13 @@ export default Relay.createContainer(CallAssignment, {
           employer
           occupation
           phone
+          email
+          address {
+            city
+            state
+            zip
+            currentTime
+          }
         }
       }
     `

@@ -78,13 +78,13 @@ models.sequelize.sync({force: true}).then(async () => {
       id: index,
       cons_id: index,
       isPrimary: faker.random.boolean(),
-      address: faker.internet.email().toLowerCase(),
+      email: faker.internet.email().toLowerCase(),
     })
     phones.push({
       id: index,
       cons_id: index,
       isPrimary: true,
-      number: randomPhoneNumber(),
+      phone: randomPhoneNumber(),
       textOptOut: faker.random.boolean()
     })
     addresses.push({

@@ -37,6 +37,7 @@
     "jquery": "^2.1.4",
     "mailgun-js": "0.7.6",
     "material-ui": "^0.13.0",
+    "minilog": "git://github.com/saikat/minilog.git#ajax-logger-fix",
     "moment": "^2.10.6",
     "moment-timezone": "^0.4.1",
     "passport": "^0.3.2",
@@ -54,12 +55,12 @@
     "retry": "^0.8.0",
     "sequelize": "^3.14.1",
     "sequelize-cli": "^2.2.1",
+    "stacktrace-js": "^1.0.1",
     "superagent": "^1.4.0",
+    "tz-lookup": "^6.0.1",
     "webpack": "^1.10.5",
     "xml2js": "^0.4.15",
-    "yup": "^0.11.0",
-    "minilog": "git://github.com/saikat/minilog.git#ajax-logger-fix",
-    "stacktrace-js": "^1.0.1"
+    "yup": "^0.11.0"
   },
   "devDependencies": {
     "foreman": "latest",

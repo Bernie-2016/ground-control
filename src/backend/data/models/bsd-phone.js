@@ -9,9 +9,8 @@ export default function(sequelize, DataTypes) {
       type: DataTypes.BOOLEAN,
       field: 'is_primary'
     },
-    number: {
+    phone: {
       type: DataTypes.STRING,
-      field: 'phone',
       unique: true,
       validate: {
         isNumeric: true
