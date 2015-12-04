@@ -22,6 +22,7 @@
     "bluebird": "^2.10.2",
     "body-parser": "1.14.1",
     "connect-session-sequelize": "^2.3.1",
+    "csv": "^0.4.6",
     "dotenv": "^1.2.0",
     "email-templates": "2.0.1",
     "express": "^4.13.1",
