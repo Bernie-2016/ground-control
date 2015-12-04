@@ -1,4 +1,6 @@
 import 'babel/polyfill';
+import jQuery from 'jquery';
+import Minilog from 'minilog';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Relay from 'react-relay';
@@ -24,7 +26,16 @@ import Form from 'react-formal';
 import {createHistory} from 'history';
 import RelayNetworkLayer from './RelayNetworkLayer'
 
-
+// Necessary to make minilog work
+window.jQuery = jQuery;
+Minilog
+  .enable()
+  .pipe(new Minilog.backends.jQuery({
+    url: 'http://localhost:3000/log',
+    interval: 5000
+    }));
+window.log = Minilog('client');
+log.error('test');
 injectTapEventPlugin();
 Relay.injectNetworkLayer(new RelayNetworkLayer('/graphql'));
 

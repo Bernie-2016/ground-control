@@ -87,6 +87,11 @@ app.get('/events/types.json', async (req, res) => {
   res.json(result);
 });
 
+app.post('/log', (req, res) => {
+  console.log(req);
+  res.send('')
+})
+
 app.post('/signup',
   passport.authenticate('signup'),
   (req, res) => {
