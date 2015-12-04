@@ -7,7 +7,7 @@
   "scripts": {
     "start": "./run ./src/backend/server.js",
     "dev": "nf start --procfile Procfile.dev",
-    "bundle": "mkdir -p ./src/frontend/public/js && webpack --config ./webpack/config.js",
+    "bundle": "mkdir -p ./src/frontend/public/js && ./run webpack --config ./webpack/config.js",
     "lint": "eslint src",
     "seed": "./run ./src/backend/data/seed.js",
     "postinstall": "npm run bundle"
@@ -57,7 +57,8 @@
     "superagent": "^1.4.0",
     "webpack": "^1.10.5",
     "xml2js": "^0.4.15",
-    "yup": "^0.11.0"
+    "yup": "^0.11.0",
+    "minilog": "^2.1.0"
   },
   "devDependencies": {
     "foreman": "latest",
