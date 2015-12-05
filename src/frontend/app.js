@@ -12,6 +12,7 @@ import AdminEventsSection from './components/AdminEventsSection';
 import AdminCallAssignmentsSection from './components/AdminCallAssignmentsSection';
 import AdminCallAssignmentCreationForm from './components/AdminCallAssignmentCreationForm';
 import GCTextField from './components/forms/GCTextField';
+import GCPasswordField from './components/forms/GCPasswordField';
 import GCRadioButtonsField from './components/forms/GCRadioButtonsField';
 import GCSelectField from './components/forms/GCSelectField';
 import GCBooleanField from './components/forms/GCBooleanField';
@@ -59,7 +60,8 @@ Form.addInputTypes({
   string: GCTextField,
   boolean: GCBooleanField,
   radio: GCRadioButtonsField,
-  select: GCSelectField
+  select: GCSelectField,
+  password: GCPasswordField
 })
 
 const ListContainerQueries = {
