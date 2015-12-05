@@ -84,7 +84,9 @@ ReactDOM.render(
     createElement={ReactRouterRelay.createElement}>
     <Route
       path='/admin'
-      component={AdminDashboard}>
+      component={AdminDashboard}
+      queries={ListContainerQueries}
+    >
       <Route
         path='call-assignments'
         component={AdminCallAssignmentsSection}
