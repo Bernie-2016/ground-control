@@ -121,7 +121,7 @@ export default function(sequelize, DataTypes) {
     }
   }, {
     underscored: true,
-    tableName: 'bsd_event',
+    tableName: 'bsd_events',
     classMethods: {
       associate: (models) => {
         Event.belongsTo(models.BSDPerson, {foreignKey: 'creator_cons_id', as: 'host'})

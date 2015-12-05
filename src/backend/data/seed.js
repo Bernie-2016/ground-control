@@ -178,7 +178,7 @@ models.sequelize.sync({force: true}).then(async () => {
     models.ZipCode.bulkCreate(zips),
     models.BSDEvent.bulkCreate(events),
     models.BSDAddress.bulkCreate(addresses),
-    models.BSDPersonGroup.bulkCreate(personGroups),
+    models.BSDPersonBSDGroup.bulkCreate(personGroups),
     models.BSDEmail.bulkCreate(emails),
     models.BSDPhone.bulkCreate(phones)
   ]

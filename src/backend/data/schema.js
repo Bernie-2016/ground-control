@@ -401,6 +401,21 @@ const GraphQLSurvey = new GraphQLObjectType({
   interfaces: [nodeInterface]
 })
 
+const GraphQLSurveyInput = new GraphQLInputObjectType({
+  name: 'SurveyInput',
+  fields: () => ({
+    id: globalIdField('Survey'),
+    fieldValues: { type: GraphQLString }
+  })
+})
+
+const GraphQLSubmitCallResponses = mutationWithClientMutationId({
+  name: 'SubmitCallResponses',
+  inputFields: {
+    survey: { type: GraphQLSurveyInput }
+  }
+})
+
 const GraphQLCreateCallAssignment = mutationWithClientMutationId({
   name: 'CreateCallAssignment',
   inputFields: {
@@ -447,6 +462,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
 let RootMutation = new GraphQLObjectType({
   name: 'RootMutation',
   fields: () => ({
+    submitCallResponses: GraphQLSubmitCallResponses,
     createCallAssignment: GraphQLCreateCallAssignment,
   })
 });

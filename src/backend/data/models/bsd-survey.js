@@ -15,7 +15,7 @@ export default function(sequelize, DataTypes) {
     updatedAt: 'modified_dt',
     createdAt: 'create_dt',
     underscored: true,
-    tableName: 'bsd_signup_form',
+    tableName: 'bsd_surveys',
     classMethods: {
       createFromBSDObject: (BSDObject) => {
         let newSurvey = {...BSDObject};

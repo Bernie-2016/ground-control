@@ -53,7 +53,7 @@ export default function(sequelize, DataTypes) {
     updatedAt: 'modified_dt',
     createdAt: 'create_dt',
     underscored: true,
-    tableName: 'bsd_cons',
+    tableName: 'bsd_people',
     instanceMethods: {
       getCached(property) {
         let functionName = 'get' + property[0].toUpperCase() + property.slice(1);

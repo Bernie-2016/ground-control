@@ -13,7 +13,7 @@ export default function(sequelize, DataTypes) {
     }
   }, {
     underscored: true,
-    tableName: 'bsd_cons_group',
+    tableName: 'bsd_groups',
     updatedAt: 'modified_dt',
     createdAt: 'create_dt',
     classMethods: {
