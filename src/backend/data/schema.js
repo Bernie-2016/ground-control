@@ -35,7 +35,7 @@ import {
   BSDEvent,
   ZipCode,
   User,
-  Sequelize
+  sequelize
 } from './models';
 
 import moment from 'moment-timezone';
@@ -180,70 +180,56 @@ const GraphQLUser = new GraphQLObjectType({
             if (time.hours() > 10 && time.hours() < 21)
               validOffsets.push(offset)
           })
-          let persons = await BSDPerson.findAll({
-            order: [[Sequelize.fn( 'RANDOM' )]],
-//            limit: 10, // We should limit this but see https://github.com/sequelize/sequelize/issues/3095
-            where: {
-              '$assignedCalls.id$' : null,
-              '$calls.id$' : null
+          // This is maybe the worst thing of all time. Switch to knex when we can.
+          let persons = await sequelize.query(`
+            SELECT *
+            FROM bsd_cons AS persons
+            INNER JOIN bsd_cons_email AS emails
+              ON persons.cons_id=emails.cons_id
+            INNER JOIN bsd_cons_phone AS phones
+              ON persons.cons_id=phones.cons_id
+            INNER JOIN (
+              SELECT id, cons_id
+              FROM bsd_cons_addr AS addresses
+              INNER JOIN zip_codes AS zip_codes
+              ON zip_codes.zip=addresses.zip
+              WHERE
+                addresses.zip NOT BETWEEN '50001' AND '52809' AND
+                addresses.zip NOT BETWEEN '68119' AND '68120' AND
+                addresses.zip NOT BETWEEN '03031' AND '03897' AND
+                addresses.zip NOT BETWEEN '29001' AND '29948' AND
+                zip_codes.timezone_offset IN (${validOffsets.join(',')})
+              ) AS addresses
+              ON persons.cons_id=addresses.cons_id
+            LEFT OUTER JOIN bsd_assigned_calls AS assigned_calls
+              ON persons.cons_id=assigned_calls.interviewee_id
+            LEFT OUTER JOIN (
+              SELECT id, interviewee_id
+              FROM bsd_calls
+              WHERE
+                call_assignment_id = :assignmentId AND
+                attempted_at > :lastCalledDate
+              ) AS calls
+              ON persons.cons_id=calls.interviewee_id
+            WHERE
+              calls.id IS NULL AND
+              assigned_calls.id IS NULL
+            ORDER BY RANDOM()
+            LIMIT 1
+          `, {
+            replacements: {
+              assignmentId: localId,
+              lastCalledDate: new Date(new Date() - 7 * 24 * 60 * 60 * 1000)
             },
-            include: [
-              {
-                model: BSDPhone,
-                required: true,
-                as: 'phones'
-              },
-              {
-                model: BSDEmail,
-                required: true,
-                as: 'emails'
-              },
-              {
-                model: BSDAddress,
-                required: true,
-                as: 'addresses',
-                where: {
-                  $and: [
-                    {zip: {$notBetween: ['50001','52809']}}, // Iowa
-                    {zip: {$notBetween: ['68119','68120']}}, // Iowa (Omaha)
-                    {zip: {$notBetween: ['03031','03897']}}, // New Hampshire
-                    {zip: {$notBetween: ['29001','29948']}}, // South Carolina
-                  ]
-                },
-                include: [{
-                  model: ZipCode,
-                  required: true,
-                  as: 'zipInfo',
-                  where: {
-                    timezoneOffset: {
-                      $in: validOffsets
-                    }
-                  }
-                }]
-              },
-              {
-                model: BSDAssignedCall,
-                required: false,
-                as: 'assignedCalls',
-              },
-              {
-                model: BSDCall,
-                required: false,
-                where: {
-                  $or: [
-                    { call_assignment_id: localId },
-                    { attemptedAt: {
-                        $gt: new Date(new Date() - 7 * 24 * 60 * 60 * 1000)
-                      }
-                    }
-                  ]
-                },
-                as: 'calls'
-              }
-            ]
           })
-          let person = persons[0]
-          if (person) {
+          if (persons && persons.length > 0 && persons[0].length > 0) {
+            let person = persons[0][0]
+            person = BSDPerson.build({
+              ...person,
+              id: person.cons_id,
+              created_at: person.create_dt,
+              updated_at: person.modified_dt,
+            })
             let assignedCall = await BSDAssignedCall.create({
               caller_id: user.id,
               interviewee_id: person.id,
@@ -251,7 +237,6 @@ const GraphQLUser = new GraphQLObjectType({
             })
             return person
           }
-          return null;
         }
       }
     }
