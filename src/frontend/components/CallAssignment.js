@@ -175,7 +175,13 @@ export class CallAssignment extends React.Component {
         ...this.styles.surveyFrame,
         display: this.state.completed ? 'block' : 'none'
       }}>
-        <Survey ref='survey' survey={this.props.callAssignment.survey} initialValues={{'email' : this.props.currentUser.intervieweeForCallAssignment.email}} />
+        <Survey
+          ref='survey'
+          survey={this.props.callAssignment.survey}
+          initialValues={{'email' : this.props.currentUser.intervieweeForCallAssignment.email}}
+          onSubmit={() => {
+            window.location.reload()
+          } } />
       </div>
     )
 
