@@ -11,7 +11,9 @@
     "predev": "mustache ./src/frontend/index/development.json ./src/frontend/index/index.mustache > ./src/frontend/public/index.html",
     "dev": "nf start --procfile Procfile.dev",
     "lint": "eslint src",
-    "seed": "./run ./src/backend/data/seed.js"
+    "seed": "./run ./src/backend/data/seed.js",
+    "sequelize": "cd ./src/backend/data && sequelize",
+    "sync": "./run ./src/backend/data/sync.js"
   },
   "dependencies": {
     "babel": "^5.8.21",
