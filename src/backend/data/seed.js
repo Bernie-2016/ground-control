@@ -1,6 +1,12 @@
 import models from './models';
 import faker from 'faker';
 import csv from 'csv-load-sync';
+import log from '../log';
+
+if (process.env.NODE_ENV !== 'development') {
+  log.error('Can only run this is development!')
+  process.exit(1)
+}
 
 const NUM_PERSONS=10;
 const NUM_EVENTS=20;
@@ -161,7 +167,7 @@ models.sequelize.sync({force: true}).then(async () => {
     datum.hasDST = datum.hasDST == '1' ? true : false
   })
 
-  console.log('Creating...')
+  log.info('Creating...')
   await models.User.create({
     email: 'admin@localhost.com',
     password: 'admin',
@@ -177,5 +183,5 @@ models.sequelize.sync({force: true}).then(async () => {
     models.BSDPhone.bulkCreate(phones)
   ]
   await Promise.all(promises);
-  console.log('Done!');
+  log.info('Done!');
 })
