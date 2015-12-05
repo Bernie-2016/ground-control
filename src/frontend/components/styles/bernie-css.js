@@ -42,12 +42,18 @@ export const BernieText = {
   },
 
   inputLabel: {
-    colors: BernieColors.darkGray,
+    color: BernieColors.darkGray,
     fontFamily: 'freight-sans-pro',
     fontWeight: 600,
     textTransform: 'uppercase',
     fontSize: '0.95em',
     letterSpacing: '0.1em',
+  },
+
+  inputError: {
+    color: BernieColors.red,
+    fontFamily: 'freight-sans-pro',
+    fontSize: '0.8em'
   }
 }
 

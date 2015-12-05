@@ -46,7 +46,7 @@ export class CallAssignment extends React.Component {
 
   state = {
     completed: true,
-    reasonNotCompleted: 'NO_PICKUP',
+    reasonNotCompleted: null,
     leftVoicemail: null
   }
 
@@ -60,18 +60,38 @@ export class CallAssignment extends React.Component {
     'DISCONNECTED_NUMBER' : 'Disconnected number'
   }
 
-  formSchema = yup.object({
-    completed: yup.boolean().required(),
-    reasonNotCompleted: yup.string().oneOf(Object.keys(this.notCompletedReasons)).nullable(),
-    leftVoicemail: yup.boolean().nullable()
-  }).test('not-completed-reasons-required',
-  'If you did not complete the call, please fill out why and if you left a voicemail',
-    (value) => {
-      if (value.completed)
-        return true
-      else
-        return value.reasonNotCompleted !== null && value.leftVoicemail !== null
-  })
+  formSchema = yup
+    .object({
+      completed: yup
+        .boolean()
+        .required(),
+      reasonNotCompleted: yup
+        .string()
+        .nullable()
+        .test(
+          'not-completed-reasons-required',
+          'Fill out why you were unable to complete the call',
+          function(value) {
+            if (this.parent.completed)
+              return true;
+            else
+              return value !== null
+          }
+        ),
+      leftVoicemail: yup
+        .boolean()
+        .nullable()
+        .test(
+          'left-voicemail-required',
+          'Let us know if you left a voicemail',
+          function(value) {
+            if (this.parent.completed)
+              return true
+            else
+              return value !== null
+          }
+        )
+    })
 
   intervieweeName() {
     let interviewee = this.props.currentUser.intervieweeForCallAssignment;
@@ -192,9 +212,6 @@ export class CallAssignment extends React.Component {
             value={this.state}
             onChange={(formValue) => {
               this.setState(formValue)
-            }}
-            onError={(errors) => {
-              // Implement
             }}
           >
             <div style={this.styles.callAssignmentQuestions}>

@@ -8,8 +8,8 @@ if (process.env.NODE_ENV !== 'development') {
   process.exit(1)
 }
 
-const NUM_PERSONS=10;
-const NUM_EVENTS=20;
+const NUM_PERSONS=10000;
+const NUM_EVENTS=5000;
 
 // Use this instead of faker because we want it to be just digits
 let randomPhoneNumber = () => {
