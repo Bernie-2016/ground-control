@@ -10,12 +10,14 @@ export default function(sequelize, DataTypes) {
         models.BSDPerson.belongsToMany(models.BSDGroup, {
           through: BSDPersonBSDGroup,
           foreignKey: 'cons_id',
-          as: 'people'
+          as: 'people',
+          constraints: false
         });
         models.BSDGroup.belongsToMany(models.BSDPerson, {
           through: BSDPersonBSDGroup,
           foreignKey: 'cons_group_id',
-          as: 'groups'
+          as: 'groups',
+          constraints: false
         });
       }
     }

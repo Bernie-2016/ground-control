@@ -1,5 +1,5 @@
 export default function(sequelize, DataTypes) {
-  let Event = sequelize.define('BSDEvent', {
+  let BSDEvent = sequelize.define('BSDEvent', {
     id: {
       type: DataTypes.BIGINT,
       field: 'event_id',
@@ -124,9 +124,13 @@ export default function(sequelize, DataTypes) {
     tableName: 'bsd_events',
     classMethods: {
       associate: (models) => {
-        Event.belongsTo(models.BSDPerson, {foreignKey: 'creator_cons_id', as: 'host'})
+        BSDEvent.belongsTo(models.BSDPerson, {
+          foreignKey: 'creator_cons_id',
+          as: 'host',
+          constraints: false
+        })
       }
     }
   })
-  return Event;
+  return BSDEvent;
 }

@@ -63,11 +63,31 @@ export default function(sequelize, DataTypes) {
     },
     classMethods: {
       associate: (models) => {
-        BSDPerson.hasMany(models.BSDEmail, { foreignKey: 'cons_id', as: 'emails'})
-        BSDPerson.hasMany(models.BSDPhone, { foreignKey: 'cons_id', as: 'phones'})
-        BSDPerson.hasMany(models.BSDAssignedCall, { foreignKey: 'interviewee_id', as: 'assignedCalls'})
-        BSDPerson.hasMany(models.BSDCall, { foreignKey: 'interviewee_id', as: 'calls'})
-        BSDPerson.hasMany(models.BSDAddress, { foreignKey: 'cons_id', as: 'addresses'})
+        BSDPerson.hasMany(models.BSDEmail, {
+          foreignKey: 'cons_id',
+          as: 'emails',
+          constraints: false
+        })
+        BSDPerson.hasMany(models.BSDPhone, {
+          foreignKey: 'cons_id',
+          as: 'phones',
+          constraints: false
+        })
+        BSDPerson.hasMany(models.BSDAssignedCall, {
+          foreignKey: 'interviewee_id',
+          as: 'assignedCalls',
+          constraints: false
+        })
+        BSDPerson.hasMany(models.BSDCall, {
+          foreignKey: 'interviewee_id',
+          as: 'calls',
+          constraints: false
+        })
+        BSDPerson.hasMany(models.BSDAddress, {
+          foreignKey: 'cons_id',
+          as: 'addresses',
+          constraints: false
+        })
       },
       createFromBSDObject: async (BSDObject) => {
         let newPerson = {...BSDObject}

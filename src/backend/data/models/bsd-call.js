@@ -24,7 +24,10 @@ export default function(sequelize, DataTypes) {
     classMethods: {
       associate: (models) => {
         BSDCall.belongsTo(models.User, {as: 'caller'})
-        BSDCall.belongsTo(models.BSDPerson, {as: 'interviewee'})
+        BSDCall.belongsTo(models.BSDPerson, {
+          as: 'interviewee',
+          constraints: false
+        })
         BSDCall.belongsTo(models.BSDCallAssignment, {as: 'callAssignment'})
       }
     }
