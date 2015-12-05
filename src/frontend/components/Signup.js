@@ -21,7 +21,7 @@ export default class Signup extends React.Component {
     signup: {
       formTitle: 'Login or sign up make calls',
       formSchema: yup.object({
-        email: yup.string().required(),
+        email: yup.string().email().required(),
         password: yup.string().required(),
       }),
       formElement: (

@@ -15,13 +15,16 @@ export default class GCForm extends React.Component {
       if (child.type === Form.Field) {
         let name = child.props.name;
         let error = this.state.formErrors ? this.state.formErrors[name] : null;
+        let clonedElement = child
         if (error) {
           error = error[0] ? error[0].message.replace(name, child.props.label) : null;
-          return React.cloneElement(child, {
+          clonedElement = React.cloneElement(child, {
             errorText: error
           })
         }
-        return child;
+        return React.cloneElement(clonedElement, {
+          events: ['onBlur']
+        })
       }
       else if (child.type === Form.Button) {
         return React.cloneElement(child, {
