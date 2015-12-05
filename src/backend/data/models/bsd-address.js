@@ -35,7 +35,7 @@ export default function(sequelize, DataTypes) {
     },
     zip: {
       type: DataTypes.STRING,
-      allowNull: true
+      allowNull: true,
     },
     zip4: {
       type: DataTypes.STRING,
@@ -53,11 +53,6 @@ export default function(sequelize, DataTypes) {
     createdAt: 'create_dt',
     underscored: true,
     tableName: 'bsd_cons_addr',
-    classMethods: {
-      associate: (models) => {
-        BSDAddress.belongsTo(models.ZipCode, { foreignKey: 'zip', as: 'zipInfo' })
-      }
-    }
   })
   return BSDAddress;
 }

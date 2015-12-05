@@ -1,6 +1,9 @@
 export default function(sequelize, DataTypes) {
   return sequelize.define('ZipCode', {
-    zip: DataTypes.STRING,
+    zip: {
+      type: DataTypes.STRING,
+      unique: true
+    },
     city: DataTypes.STRING,
     state: DataTypes.STRING,
     latitude: DataTypes.DOUBLE,
