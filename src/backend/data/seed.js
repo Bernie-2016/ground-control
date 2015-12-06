@@ -9,7 +9,7 @@ if (process.env.NODE_ENV !== 'development') {
 }
 
 const NUM_PERSONS=100;
-const NUM_EVENTS=500;
+const NUM_EVENTS=50;
 
 // Use this instead of faker because we want it to be just digits
 let randomPhoneNumber = () => {
@@ -133,15 +133,32 @@ models.sequelize.sync({force: true}).then(async () => {
     })
   }
 
+  let eventTypes = [
+    {
+      id: 1,
+      name: 'Test event 1',
+    },
+    {
+      id: 2,
+      name: 'Test event 2'
+    }
+  ]
+
+  await models.BSDEventType.bulkCreate(eventTypes);
+
+  let eventAttendees = []
+
   for (let index = 1; index <= NUM_EVENTS; index++) {
     let rsvp_use_reminder_boolean = faker.random.boolean();
     let rsvp_use_reminder_email = rsvp_use_reminder_boolean;
     let rsvp_reminder_hours = rsvp_use_reminder_boolean ? null : faker.random.number({min:0, max:30});
+    let capacity = faker.random.arrayElement([0, faker.random.number({min:0, max:100})]);
+
     events.push({
       id: index,
       eventIdObfuscated: faker.internet.password(5),
       flagApproval: true,
-      eventTypeId: faker.random.arrayElement([1,2]),
+      event_type_id: faker.random.arrayElement([1,2]),
       creator_cons_id: faker.random.number({min: 1, max: NUM_PERSONS}),
       name: toTitleCase(faker.lorem.sentence(3,5)),
       description: faker.lorem.paragraph(),
@@ -155,7 +172,7 @@ models.sequelize.sync({force: true}).then(async () => {
       venueDirections: nully(faker.lorem.paragraph()),
       startDate: formatDate(faker.date.future()),
       duration: faker.random.number({min:1, max:1600}),
-      capacity: faker.random.arrayElement([0, faker.random.number({min:0, max:500})]),
+      capacity: capacity,
       localTimezone: faker.random.arrayElement(['US/Eastern', 'US/Pacific', 'Africa/Cairo']),
       attendeeVolunteerShow: faker.random.arrayElement([0, 1]),
       attendeeVolunteerMessage: faker.lorem.sentence(),
@@ -166,6 +183,15 @@ models.sequelize.sync({force: true}).then(async () => {
       rsvpUseReminderEmail: rsvp_use_reminder_email,
       rsvpReminderHours: rsvp_reminder_hours
     })
+
+    let numAttendees = faker.random.number({min:0, max:capacity})
+    for (let attendeeIndex = 0; attendeeIndex < numAttendees; attendeeIndex++) {
+      eventAttendees.push({
+        id: faker.random.number({min: 0, max: 100000}),
+        event_id: index,
+        attendee_cons_id: faker.random.number({min: 1, max: NUM_PERSONS})
+      })
+    }
   };
 
   log.info('Creating...')
@@ -176,6 +202,7 @@ models.sequelize.sync({force: true}).then(async () => {
   })
   await models.BSDPerson.bulkCreate(persons);
   let promises = [
+    models.BSDEventAttendee.bulkCreate(eventAttendees),
     models.ZipCode.bulkCreate(zips),
     models.BSDEvent.bulkCreate(events),
     models.BSDAddress.bulkCreate(addresses),

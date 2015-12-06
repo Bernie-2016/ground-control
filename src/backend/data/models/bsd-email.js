@@ -9,13 +9,7 @@ export default function(sequelize, DataTypes) {
       type: DataTypes.BOOLEAN,
       field: 'is_primary'
     },
-    email: {
-      type: DataTypes.STRING,
-      validate: {
-        isEmail: true,
-        isLowercase: true
-      }
-    },
+    email: DataTypes.STRING,
   }, {
     updatedAt: 'modified_dt',
     createdAt: 'create_dt',

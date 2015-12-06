@@ -9,12 +9,7 @@ export default function(sequelize, DataTypes) {
       type: DataTypes.BOOLEAN,
       field: 'is_primary'
     },
-    phone: {
-      type: DataTypes.STRING,
-      validate: {
-        isNumeric: true
-      }
-    },
+    phone: DataTypes.STRING,
     textOptOut: {
       type: DataTypes.BOOLEAN,
       allowNull: true,

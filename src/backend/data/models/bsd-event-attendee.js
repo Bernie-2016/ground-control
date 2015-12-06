@@ -18,6 +18,7 @@ export default function(sequelize, DataTypes) {
           constraints: false
         })
       }
+    }
   })
   return BSDEventAttendee
 }
