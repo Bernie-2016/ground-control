@@ -12,7 +12,9 @@ export class AdminCallAssignment extends React.Component {
           {this.props.callAssignment.name}
         </div>
         <div>
-          <div>Test
+          <div>
+            Using survey: {this.props.callAssignment.survey.fullURL}<br/>
+            Using query: {this.props.callAssignment.query}
           </div>
         </div>
       </div>
@@ -26,6 +28,10 @@ export default Relay.createContainer(AdminCallAssignment, {
       fragment on CallAssignment {
         id
         name
+        survey {
+          fullURL
+        }
+        query
       }
     `
   }

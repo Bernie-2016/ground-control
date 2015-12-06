@@ -404,6 +404,17 @@ const GraphQLCallAssignment = new GraphQLObjectType({
       type: GraphQLSurvey,
       resolve: (assignment) => assignment.getSurvey()
     },
+    query: {
+      type: GraphQLString,
+      resolve: async (assignment) => {
+        let group = await assignment.getIntervieweeGroup();
+        if (group.cons_group_id) {
+          return 'BSD Constituent Group: ' + group.cons_group_id
+        }
+        else
+          return group.query
+      }
+    }
   }),
   interfaces: [nodeInterface]
 });
