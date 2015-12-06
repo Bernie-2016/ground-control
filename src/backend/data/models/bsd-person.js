@@ -88,6 +88,11 @@ export default function(sequelize, DataTypes) {
           as: 'addresses',
           constraints: false
         })
+        BSDPerson.hasMany(models.BSDEventAttendee, {
+          foreignKey: 'attendee_cons_id',
+          as: 'eventAttendances',
+          constraints: false
+        })
       },
       createFromBSDObject: async (BSDObject) => {
         let newPerson = {...BSDObject}

@@ -14,10 +14,6 @@ export default function(sequelize, DataTypes) {
       type: DataTypes.BOOLEAN,
       field: 'flag_approval',
     },
-    eventTypeId: {
-      type: DataTypes.INTEGER,
-      field: 'event_type_id',
-    },
     name: {
       type: DataTypes.STRING,
       field: 'name',
@@ -127,6 +123,16 @@ export default function(sequelize, DataTypes) {
         BSDEvent.belongsTo(models.BSDPerson, {
           foreignKey: 'creator_cons_id',
           as: 'host',
+          constraints: false
+        })
+        BSDEvent.belongsTo(models.BSDEventType, {
+          foreignKey: 'event_type_id',
+          as: 'eventType',
+          constraints: false
+        })
+        BSDEvent.hasMany(models.BSDEventAttendee, {
+          foreignKey: 'event_id',
+          as: 'eventAttendees',
           constraints: false
         })
       }
