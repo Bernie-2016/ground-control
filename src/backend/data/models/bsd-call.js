@@ -26,6 +26,11 @@ export default function(sequelize, DataTypes) {
   }, {
     underscored: true,
     tableName: 'bsd_calls',
+    indexes: [
+      { fields: ['caller_id'] },
+      { fields: ['interviewee_id'] },
+      { fields: ['call_assignment_id'] },
+    ],
     classMethods: {
       associate: (models) => {
         BSDCall.belongsTo(models.User, {as: 'caller'})

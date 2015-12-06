@@ -4,6 +4,11 @@ export default function(sequelize, DataTypes) {
   }, {
     underscored: true,
     tableName: 'bsd_assigned_calls',
+    indexes: [
+      { fields: ['caller_id'] },
+      { fields: ['interviewee_id'] },
+      { fields: ['call_assignment_id'] },
+    ],
     classMethods: {
       associate: (models) => {
         BSDAssignedCall.belongsTo(models.User,
