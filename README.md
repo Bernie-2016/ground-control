@@ -40,7 +40,7 @@ Currently, Ground Control is two things:
 
 To get started with Ground Control, once it's running, go to `http://localhost:3000/admin`. From there, you can see the events administration section and the call assignment creation section.  To create a call assignment, do the following:
 
-1. Make a survey in Blue State Digital.  If you are developing on Ground Control, ask Saikat for access to the BSD testbed. Make sure to use the "GROUND CONTROL - Phone survey" wrapper.
+1. Make a survey in Blue State Digital.  If you are developing on Ground Control, ask Saikat for access to the BSD testbed. Make sure to use the "GROUND CONTROL - Survey" wrapper.
 2. Make a constituent group that you wish to be the target of your phonebanking assignment in BSD (or figure out a SQL query to use).
 3. Go to `http://localhost:3000/admin/call-assignments`, click Create, and enter the BSD IDs of your survey and target interviewee group in the form.
 4. Click create
