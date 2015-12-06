@@ -171,6 +171,7 @@ const GraphQLUser = new GraphQLObjectType({
           },
         })
         let assignedCall = assignedCalls[0]
+        let callAssignment = await BSDCallAssignment.findById(localId);
         if (assignedCall) {
           let interviewee = await assignedCall.getInterviewee()
           return interviewee
@@ -184,7 +185,25 @@ const GraphQLUser = new GraphQLObjectType({
               validOffsets.push(offset)
           })
           // This is maybe the worst thing of all time. Switch to knex when we can.
-          let persons = await sequelize.query(`
+          let group = await callAssignment.getIntervieweeGroup();
+          let filterQuery = '';
+          if (group.cons_group_id)
+            filterQuery = `
+              INNER JOIN (
+                  SELECT id, cons_id
+                  FROM bsd_person_bsd_groups
+                  WHERE cons_group_id=${group.cons_group_id}
+                ) AS cons_groups
+                ON persons.cons_id=cons_groups.cons_id'
+            `
+          else if (group.query && group.query !== 'EVERYONE')
+            filterQuery = `
+              INNER JOIN (
+                  ${group.query}
+                ) AS inner_query
+                ON persons.cons_id=inner_query.cons_id
+            `
+          let query = `
             SELECT *
             FROM bsd_people AS persons
             INNER JOIN bsd_emails AS emails
@@ -204,6 +223,7 @@ const GraphQLUser = new GraphQLObjectType({
                 zip_codes.timezone_offset IN (${validOffsets.join(',')})
               ) AS addresses
               ON persons.cons_id=addresses.cons_id
+            ${filterQuery}
             LEFT OUTER JOIN bsd_assigned_calls AS assigned_calls
               ON persons.cons_id=assigned_calls.interviewee_id
             LEFT OUTER JOIN (
@@ -219,7 +239,9 @@ const GraphQLUser = new GraphQLObjectType({
               assigned_calls.id IS NULL
             ORDER BY RANDOM()
             LIMIT 1
-          `, {
+          `
+
+          let persons = await sequelize.query(query, {
             replacements: {
               assignmentId: localId,
               lastCalledDate: new Date(new Date() - 7 * 24 * 60 * 60 * 1000)
@@ -556,7 +578,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
       return BSDCallAssignment.create({
         name: name,
         gc_bsd_group_id: group.id,
-        survey_id: survey.id
+        signup_form_id: survey.id
       })
     })
   }
