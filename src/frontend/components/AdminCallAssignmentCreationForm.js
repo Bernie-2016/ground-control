@@ -22,7 +22,7 @@ export default class AdminCallAssignmentCreationForm extends React.Component {
 
   formSchema = yup.object({
     surveyId: yup.string().required(),
-    intervieweeGroupId: yup.string().required(),
+    intervieweeGroup: yup.string().required(),
     name: yup.string().required(),
   })
 
@@ -92,8 +92,10 @@ export default class AdminCallAssignmentCreationForm extends React.Component {
             label='Survey ID'
           /><br />
           <Form.Field
-            name='intervieweeGroupId'
-            label='Interviewee Group (Not yet implemented)'
+            name='intervieweeGroup'
+            multiLine={true}
+            rows={5}
+            label="Target group of interviewees.  Enter a SQL query, BSD cons_group_id, or the word 'everyone'"
           /><br />
           <Form.Button type='submit' label='Create!' fullWidth={true} />
         </GCForm>

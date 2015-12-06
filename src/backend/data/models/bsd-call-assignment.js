@@ -11,10 +11,9 @@ export default function(sequelize, DataTypes) {
           constraints: false,
           as: 'survey'
         })
-        BSDCallAssignment.belongsTo(models.BSDGroup, {
+        BSDCallAssignment.belongsTo(models.GCBSDGroup, {
           as: 'intervieweeGroup',
-          foreignKey: 'cons_group_id',
-          constraints: false,
+          foreignKey: 'gc_bsd_group_id',
         });
         BSDCallAssignment.hasMany(models.BSDAssignedCall, {
           as: 'assignedCalls',

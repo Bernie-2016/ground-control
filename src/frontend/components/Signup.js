@@ -6,7 +6,10 @@ import GCForm from './forms/GCForm';
 import Form from 'react-formal';
 import yup from 'yup';
 import superagent from 'superagent';
+import {Styles} from 'material-ui';
+import {BernieTheme} from './styles/bernie-theme';
 
+@Styles.ThemeDecorator(Styles.ThemeManager.getMuiTheme(BernieTheme))
 export default class Signup extends React.Component {
   state = {
     formState : 'signup',

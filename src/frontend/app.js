@@ -110,8 +110,14 @@ ReactDOM.render(
       />
     </Route>
     <Route
+      path='/signup'
+      component={Signup}
+    />
+    <Route
       path='/'
-      component={Dashboard}>
+      component={Dashboard}
+      queries={CurrentUserQueries}
+      >
       <IndexRedirect to='/call-assignments' />
       <Route
         path='call-assignments'
@@ -130,10 +136,6 @@ ReactDOM.render(
           }}
         />
       </Route>
-      <Route
-        path='/signup'
-        component={Signup}
-      />
     </Route>
     <Route path="*" component={NotFound} />
   </Router>,

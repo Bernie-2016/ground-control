@@ -33,6 +33,7 @@ import {
   BSDAssignedCall,
   BSDSurvey,
   BSDEvent,
+  GCBSDGroup,
   ZipCode,
   User,
   sequelize
@@ -485,7 +486,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
   name: 'CreateCallAssignment',
   inputFields: {
     name: { type: new GraphQLNonNull(GraphQLString) },
-    intervieweeGroupId: { type: new GraphQLNonNull(GraphQLString) },
+    intervieweeGroup: { type: new GraphQLNonNull(GraphQLString) },
     surveyId: { type: new GraphQLNonNull(GraphQLString) },
   },
   outputFields: {
@@ -494,33 +495,69 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
       resolve: () => SharedListContainer
     }
   },
-  mutateAndGetPayload: async ({name, intervieweeGroupId, surveyId}, {rootValue}) => {
+  mutateAndGetPayload: async ({name, intervieweeGroup, surveyId}, {rootValue}) => {
     adminRequired(rootValue);
-    let [intervieweeGroup, survey] = await Promise.all([
-        BSDGroup.findWithBSDCheck(intervieweeGroupId),
-        BSDSurvey.findWithBSDCheck(surveyId)
-      ]);
-    if (!intervieweeGroup)
-      throw new GraphQLError({
-        status: 400,
-        message: 'Provided group ID does not exist in BSD.'
-      });
-
-    if (!survey)
-      throw new GraphQLError({
-        status: 400,
-        message: 'Provided survey ID does not exist in BSD.'
-      });
-
-    let callAssignment = await BSDCallAssignment.create({
-      name: name,
-    })
-
+    let groupText = intervieweeGroup;
+    let group = null;
     return sequelize.transaction(async (t) => {
-      return Promise.all([
-        callAssignment.setIntervieweeGroup(intervieweeGroup),
-        callAssignment.setSurvey(survey)
-      ])
+      if (/^\d+$/.test(groupText)) {
+        let underlyingGroup = await BSDGroup.findWithBSDCheck(groupText)
+        if (!underlyingGroup)
+          throw new GraphQLError({
+            status: 400,
+            message: 'Provided group ID does not exist in BSD.'
+          });
+        group = await GCBSDGroup.create({
+          cons_group_id: parseInt(groupText, 10)
+        })
+      }
+      else {
+        let query = groupText;
+        if (query.toLowerCase().indexOf('drop') !== -1)
+          throw new GraphQLError({
+            status: 400,
+            message: 'Cannot use DROP in your SQL'
+          })
+        if (query.toUpperCase() === 'EVERYONE')
+          query = query.toUpperCase()
+
+        if (query !== 'EVERYONE') {
+          let results = await sequelize.query(query)
+          if (!results || !results.length)
+            throw new GraphQLError({
+              status: 400,
+              message: 'Invalid SQL query'
+            })
+          if (results[0].length === 0)
+            throw new GraphQLError({
+              status: 400,
+              message: 'SQL query returns no results'
+            })
+          let firstResult = results[0][0];
+          if (!firstResult.cons_id)
+            throw new GraphQLError({
+              status: 400,
+              message: 'SQL query needs to return a list of cons_ids'
+            })
+        }
+        group = await GCBSDGroup.create({
+          query: query
+        })
+      }
+
+      let survey = await BSDSurvey.findWithBSDCheck(surveyId)
+
+      if (!survey)
+        throw new GraphQLError({
+          status: 400,
+          message: 'Provided survey ID does not exist in BSD.'
+        });
+
+      return BSDCallAssignment.create({
+        name: name,
+        gc_bsd_group_id: group.id,
+        survey_id: survey.id
+      })
     })
   }
 });
