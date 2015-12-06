@@ -10,7 +10,7 @@ import superagent from 'superagent';
 export default class Signup extends React.Component {
   state = {
     formState : 'signup',
-    errorMessage: null
+    errorMessage: null,
   }
 
   clearError() {
@@ -38,6 +38,7 @@ export default class Signup extends React.Component {
         </div>
       ),
       onSubmit: (formState) => {
+        this.clearError();
         superagent
           .post('/signup')
           .send({
@@ -47,8 +48,6 @@ export default class Signup extends React.Component {
           .end((err, res) => {
             if (!err)
               window.location = '/call-assignments';
-              // Ideally this would work with pushState, but it doesn't because relay has already cached the current user and has no idea that things are session-based.
-              //this.props.history.pushState(null, '/call-assignments')
             else
               this.setState({errorMessage: 'Incorrect e-mail or password'});
           })
