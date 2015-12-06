@@ -47,9 +47,7 @@ export default function(sequelize, DataTypes) {
       associate: (models) => {
         User.hasMany(models.BSDAssignedCall, {
           as: 'assignedCalls',
-          foreignKey: {
-            name: 'caller_id'
-          }
+          foreignKey: 'caller_id'
         })
       }
     }

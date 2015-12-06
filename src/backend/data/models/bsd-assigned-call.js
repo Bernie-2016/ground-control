@@ -14,10 +14,8 @@ export default function(sequelize, DataTypes) {
         BSDAssignedCall.belongsTo(models.BSDPerson,
           {
             as: 'interviewee',
-            foreignKey: {
-              name: 'interviewee_id',
-              constraints: false
-            }
+            constraints: false,
+            foreignKey: 'interviewee_id',
           })
         BSDAssignedCall.belongsTo(models.BSDCallAssignment, {as: 'callAssignment'})
       }

@@ -19,9 +19,5 @@ export default function(sequelize, DataTypes) {
   }, {
     underscored: true,
     tableName: 'zip_codes',
-    indexes: [
-      { fields: ['zip'] },
-      { fields: ['timezone_offset']}
-    ]
   })
 }
