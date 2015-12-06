@@ -54,6 +54,7 @@ export class CallAssignment extends React.Component {
   state = {
     completed: true,
     reasonNotCompleted: null,
+    sentText: null,
     leftVoicemail: null,
     globalErrorMessage: null,
   }
@@ -92,6 +93,19 @@ export class CallAssignment extends React.Component {
         .test(
           'left-voicemail-required',
           'Let us know if you left a voicemail',
+          function(value) {
+            if (this.parent.completed)
+              return true
+            else
+              return value !== null
+          }
+        ),
+      sentText: yup
+        .boolean()
+        .nullable()
+        .test(
+          'sent-text-required',
+          'Let us know if you sent a text',
           function(value) {
             if (this.parent.completed)
               return true
@@ -176,7 +190,9 @@ export class CallAssignment extends React.Component {
       callAssignmentId: this.props.callAssignment.id,
       intervieweeId: this.props.currentUser.intervieweeForCallAssignment.id,
       leftVoicemail: this.state.leftVoicemail,
+      sentText: this.state.sentText,
       reasonNotCompleted: this.state.reasonNotCompleted,
+      sentText: this.state.sentText,
       survey: null
     });
     Relay.Store.update(callSurveyMutation, {onFailure, onSuccess})
@@ -234,6 +250,11 @@ export class CallAssignment extends React.Component {
           <Form.Field
             name='leftVoicemail'
             label='Did you leave a voicemail?'
+          />
+          <br />
+          <Form.Field
+            name='sentText'
+            label='Did you send a text message?'
           />
         </div>
       )

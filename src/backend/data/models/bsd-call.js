@@ -10,6 +10,11 @@ export default function(sequelize, DataTypes) {
       allowNull: true,
       field: 'left_voicemail'
     },
+    sentText: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      field: 'sent_text'
+    },
     reasonNotCompleted: {
       type: DataTypes.STRING,
       field: 'reason_not_completed',

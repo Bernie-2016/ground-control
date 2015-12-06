@@ -423,6 +423,7 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
     intervieweeId: { type: new GraphQLNonNull(GraphQLString) },
     completed: { type: new GraphQLNonNull(GraphQLBoolean) },
     leftVoicemail: { type: GraphQLBoolean },
+    sentText: { type: GraphQLBoolean },
     reasonNotCompleted: { type: GraphQLString }
   },
   outputFields: {
@@ -430,7 +431,7 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
       type: GraphQLUser,
     }
   },
-  mutateAndGetPayload: async ({callAssignmentId, intervieweeId, completed, leftVoicemail, reasonNotCompleted}, {rootValue}) => {
+  mutateAndGetPayload: async ({callAssignmentId, intervieweeId, completed, leftVoicemail, sentText, reasonNotCompleted}, {rootValue}) => {
     authRequired(rootValue);
     let caller = rootValue.user;
     let localIntervieweeId = parseInt(fromGlobalId(intervieweeId).id, 10);
@@ -467,6 +468,7 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
           completed: completed,
           attemptedAt: new Date(),
           leftVoicemail: leftVoicemail,
+          sentText: sentText,
           reasonNotCompleted: reasonNotCompleted,
           caller_id: caller.id,
           interviewee_id: assignedCall.interviewee_id,

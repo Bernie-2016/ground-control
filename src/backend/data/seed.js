@@ -8,8 +8,8 @@ if (process.env.NODE_ENV !== 'development') {
   process.exit(1)
 }
 
-const NUM_PERSONS=10000;
-const NUM_EVENTS=5000;
+const NUM_PERSONS=100;
+const NUM_EVENTS=500;
 
 // Use this instead of faker because we want it to be just digits
 let randomPhoneNumber = () => {
@@ -39,6 +39,13 @@ let addLeadingZero = (val) => {
 }
 
 models.sequelize.sync({force: true}).then(async () => {
+  let zips = csv('./src/backend/data/zip-codes.csv')
+  zips.forEach((datum) => {
+    datum.timezoneOffset = parseInt(datum.timezoneOffset, 10)
+    datum.latitude = parseFloat(datum.latitude)
+    datum.longitude = parseFloat(datum.longitude)
+    datum.hasDST = datum.hasDST == '1' ? true : false
+  })
   let persons = [];
   let emails = [];
   let phones = [];
@@ -93,19 +100,21 @@ models.sequelize.sync({force: true}).then(async () => {
       isPrimary: true,
       phone: randomPhoneNumber(),
       textOptOut: faker.random.boolean()
-    })
+    });
+
+    let zip = faker.random.arrayElement(zips);
     addresses.push({
       id: index,
       cons_id: index,
       isPrimary: true,
       line1: faker.address.streetAddress(),
       line2: faker.address.secondaryAddress(),
-      city: faker.address.city(),
-      state: faker.address.stateAbbr(),
-      zip: faker.address.zipCode(),
+      city: zip.city,
+      state: zip.state,
+      zip: zip.zip,
       country: 'US',
-      latitude: faker.address.latitude(),
-      longitude: faker.address.longitude()
+      latitude: zip.latitude,
+      longitude: zip.longitude
     })
 
     // Randomly add each person to a group.
@@ -158,14 +167,6 @@ models.sequelize.sync({force: true}).then(async () => {
       rsvpReminderHours: rsvp_reminder_hours
     })
   };
-
-  let zips = csv('./src/backend/data/zip-codes.csv')
-  zips.forEach((datum) => {
-    datum.timezoneOffset = parseInt(datum.timezoneOffset, 10)
-    datum.latitude = parseFloat(datum.latitude)
-    datum.longitude = parseFloat(datum.longitude)
-    datum.hasDST = datum.hasDST == '1' ? true : false
-  })
 
   log.info('Creating...')
   await models.User.create({

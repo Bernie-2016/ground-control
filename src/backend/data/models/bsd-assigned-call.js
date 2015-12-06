@@ -9,10 +9,7 @@ export default function(sequelize, DataTypes) {
         BSDAssignedCall.belongsTo(models.User,
           {
             as: 'caller',
-            foreignKey: {
-              name: 'caller_id',
-              uniqe: true
-            }
+            foreignKey: 'caller_id',
           })
         BSDAssignedCall.belongsTo(models.BSDPerson,
           {
