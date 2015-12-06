@@ -8,7 +8,7 @@ export default function(sequelize, DataTypes) {
   }, {
     underscored: true,
     tableName: 'gc_bsd_groups',
-    indexes:[
+    indexes: [
       { fields: ['cons_group_id'] },
     ],
     classMethods: {
