@@ -2,7 +2,7 @@ import BSDClient from '../../bsd-instance';
 export default function(sequelize, DataTypes) {
   let BSDSurvey = sequelize.define('BSDSurvey', {
     id: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.INTEGER,
       field: 'signup_form_id',
       primaryKey: true
     },

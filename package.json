@@ -9,7 +9,7 @@
     "prestart": "npm run bundle",
     "start": "./run ./src/backend/server.js",
     "predev": "mustache ./src/frontend/index/development.json ./src/frontend/index/index.mustache > ./src/frontend/public/index.html",
-    "dev": "nf start --procfile Procfile.dev",
+    "dev": "nf start -w --procfile Procfile.dev",
     "lint": "eslint src",
     "seed": "./run ./src/backend/data/seed.js",
     "sequelize": "cd ./src/backend/data && sequelize",

@@ -164,14 +164,16 @@ const GraphQLUser = new GraphQLObjectType({
       },
       resolve: async (user, {callAssignmentId}) => {
         let localId = fromGlobalId(callAssignmentId).id;
-        let interviewee = await user.getAssignedCalls({
+        let assignedCalls = await user.getAssignedCalls({
           where: {
             call_assignment_id: localId
           },
-        })[0]
-
-        if (interviewee)
+        })
+        let assignedCall = assignedCalls[0]
+        if (assignedCall) {
+          let interviewee = await assignedCall.getInterviewee()
           return interviewee
+        }
         else {
           let allOffsets = [-10, -9, -8, -7, -6, -5, -4]
           let validOffsets = []
@@ -183,14 +185,14 @@ const GraphQLUser = new GraphQLObjectType({
           // This is maybe the worst thing of all time. Switch to knex when we can.
           let persons = await sequelize.query(`
             SELECT *
-            FROM bsd_cons AS persons
-            INNER JOIN bsd_cons_email AS emails
+            FROM bsd_people AS persons
+            INNER JOIN bsd_emails AS emails
               ON persons.cons_id=emails.cons_id
-            INNER JOIN bsd_cons_phone AS phones
+            INNER JOIN bsd_phones AS phones
               ON persons.cons_id=phones.cons_id
             INNER JOIN (
               SELECT id, cons_id
-              FROM bsd_cons_addr AS addresses
+              FROM bsd_addresses AS addresses
               INNER JOIN zip_codes AS zip_codes
               ON zip_codes.zip=addresses.zip
               WHERE
@@ -409,10 +411,66 @@ const GraphQLSurveyInput = new GraphQLInputObjectType({
   })
 })
 
-const GraphQLSubmitCallResponses = mutationWithClientMutationId({
-  name: 'SubmitCallResponses',
+const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
+  name: 'SubmitCallSurvey',
   inputFields: {
-    survey: { type: GraphQLSurveyInput }
+    callAssignmentId: { type: new GraphQLNonNull(GraphQLString) },
+    intervieweeId: { type: new GraphQLNonNull(GraphQLString) },
+    completed: { type: new GraphQLNonNull(GraphQLBoolean) },
+    leftVoicemail: { type: GraphQLBoolean },
+    reasonNotCompleted: { type: GraphQLString }
+  },
+  outputFields: {
+    currentUser: {
+      type: GraphQLUser,
+    }
+  },
+  mutateAndGetPayload: async ({callAssignmentId, intervieweeId, completed, leftVoicemail, reasonNotCompleted}, {rootValue}) => {
+    authRequired(rootValue);
+    let caller = rootValue.user;
+    let localIntervieweeId = parseInt(fromGlobalId(intervieweeId).id, 10);
+    let localCallAssignmentId = parseInt(fromGlobalId(callAssignmentId).id, 10);
+    return sequelize.transaction(async (t) => {
+      // To ensure that the assigned call exists
+      let assignedCall = await BSDAssignedCall.findOne({
+        where: {
+          caller_id: caller.id
+        }
+      })
+
+      let assignedCallInfo = {
+        callerId: assignedCall.caller_id,
+        intervieweeId: assignedCall.interviewee_id,
+        callAssignmentId: assignedCall.call_assignment_id
+      }
+
+      let submittedCallInfo = {
+        callerId: caller.id,
+        intervieweeId: localIntervieweeId,
+        callAssignmentId: localCallAssignmentId
+      }
+
+      Object.keys(assignedCallInfo).forEach((key) => {
+        if (assignedCallInfo[key] !== submittedCallInfo[key]) {
+          throw new Error('Assigned call does not match submitted call info.\n assignedCallInfo:' + JSON.stringify(assignedCallInfo) + '\nsubmittedCallInfo:' + JSON.stringify(submittedCallInfo))
+        }
+      });
+
+      let promises = [
+        assignedCall.destroy(),
+        BSDCall.create({
+          completed: completed,
+          attemptedAt: new Date(),
+          leftVoicemail: leftVoicemail,
+          reasonNotCompleted: reasonNotCompleted,
+          caller_id: caller.id,
+          interviewee_id: assignedCall.interviewee_id,
+          call_assignment_id: assignedCall.call_assignment_id
+        })
+      ]
+      await Promise.all(promises);
+      return caller;
+    })
   }
 })
 
@@ -447,22 +505,23 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
         message: 'Provided survey ID does not exist in BSD.'
       });
 
-
     let callAssignment = await BSDCallAssignment.create({
       name: name,
     })
 
-    return Promise.all([
-      callAssignment.setIntervieweeGroup(intervieweeGroup),
-      callAssignment.setSurvey(survey)
-    ])
+    return sequelize.transaction(async (t) => {
+      return Promise.all([
+        callAssignment.setIntervieweeGroup(intervieweeGroup),
+        callAssignment.setSurvey(survey)
+      ])
+    })
   }
 });
 
 let RootMutation = new GraphQLObjectType({
   name: 'RootMutation',
   fields: () => ({
-    submitCallResponses: GraphQLSubmitCallResponses,
+    submitCallSurvey: GraphQLSubmitCallSurvey,
     createCallAssignment: GraphQLCreateCallAssignment,
   })
 });

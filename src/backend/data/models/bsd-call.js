@@ -29,7 +29,7 @@ export default function(sequelize, DataTypes) {
           constraints: false
         })
         BSDCall.belongsTo(models.BSDCallAssignment, {as: 'callAssignment'})
-      }
+      },
     }
   })
   return BSDCall;

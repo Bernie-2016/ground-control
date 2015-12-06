@@ -1,7 +1,7 @@
 export default function(sequelize, DataTypes) {
   return sequelize.define('BSDEmail', {
     id: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.INTEGER,
       field: 'cons_email_id',
       primaryKey: true
     },

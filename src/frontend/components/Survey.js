@@ -32,11 +32,11 @@ class Survey extends React.Component {
   }
 
   static propTypes = {
-    onSubmit : React.PropTypes.func
+    onSubmitted : React.PropTypes.func
   }
 
   static defaultProps = {
-    onSubmit : () => { }
+    onSubmitted : () => { }
   }
 
   state = {
@@ -64,7 +64,7 @@ class Survey extends React.Component {
         this.sendFrameMessage({message: 'getHeight'});
       }
       else {
-        this.props.onSubmit();
+        this.props.onSubmitted();
       }
     }
 

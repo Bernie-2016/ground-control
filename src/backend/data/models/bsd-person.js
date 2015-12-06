@@ -1,7 +1,7 @@
 export default function(sequelize, DataTypes) {
   let BSDPerson = sequelize.define('BSDPerson', {
     id: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.INTEGER,
       field: 'cons_id',
       primaryKey: true
     },

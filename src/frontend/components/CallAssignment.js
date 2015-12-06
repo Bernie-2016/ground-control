@@ -8,6 +8,7 @@ import moment from 'moment';
 import yup from 'yup'
 import GCForm from './forms/GCForm';
 import Form from 'react-formal';
+import SubmitCallSurvey from '../mutations/SubmitCallSurvey'
 
 export class CallAssignment extends React.Component {
   styles = {
@@ -150,6 +151,37 @@ export class CallAssignment extends React.Component {
     )
   }
 
+  submitCallSurvey() {
+    let onSuccess = () => {
+     window.location.reload()
+    }
+
+    let onFailure = (transaction) => {
+      // Implement
+      console.log(transaction.getError())
+    }
+
+    let callSurveyMutation = new SubmitCallSurvey({
+      currentUser: this.props.currentUser,
+      completed: this.state.completed,
+      callAssignmentId: this.props.callAssignment.id,
+      intervieweeId: this.props.currentUser.intervieweeForCallAssignment.id,
+      leftVoicemail: this.state.leftVoicemail,
+      reasonNotCompleted: this.state.reasonNotCompleted,
+      survey: null
+    });
+    console.log(callSurveyMutation);
+    Relay.Store.update(callSurveyMutation, {onFailure, onSuccess})
+      ;
+  }
+
+  submitHandler(formValue) {
+    if (this.state.completed)
+      this.refs.survey.refs.component.submit()
+    else
+      this.submitCallSurvey();
+  }
+
   render() {
     if (this.props.currentUser.intervieweeForCallAssignment === null)
       return (
@@ -165,10 +197,6 @@ export class CallAssignment extends React.Component {
           </div>
         </div>
       )
-    let submitHandler = (formValue) => {
-      if (this.state.completed)
-        this.refs.survey.refs.component.submit()
-    }
 
     let survey = (
       <div style={{
@@ -179,9 +207,7 @@ export class CallAssignment extends React.Component {
           ref='survey'
           survey={this.props.callAssignment.survey}
           initialValues={{'email' : this.props.currentUser.intervieweeForCallAssignment.email}}
-          onSubmit={() => {
-            window.location.reload()
-          } } />
+          onSubmitted={() => this.submitCallSurvey()} />
       </div>
     )
 
@@ -203,7 +229,6 @@ export class CallAssignment extends React.Component {
           />
         </div>
       )
-    submitHandler = submitHandler.bind(this)
     return (
       <div style={this.styles.container}>
         <Paper
@@ -214,7 +239,7 @@ export class CallAssignment extends React.Component {
         <div style={this.styles.questions}>
           <GCForm
             schema={this.formSchema}
-            onSubmit={submitHandler}
+            onSubmit={() => this.submitHandler()}
             value={this.state}
             onChange={(formValue) => {
               this.setState(formValue)
@@ -239,7 +264,7 @@ export class CallAssignment extends React.Component {
 }
 
 export default Relay.createContainer(CallAssignment, {
-  initialVariables: { id: null },
+  initialVariables: { id: '' },
   fragments: {
     callAssignment: () => Relay.QL`
       fragment on CallAssignment {
@@ -254,6 +279,7 @@ export default Relay.createContainer(CallAssignment, {
       fragment on User {
         id
         intervieweeForCallAssignment(callAssignmentId:$id) {
+          id
           prefix
           firstName
           middleName

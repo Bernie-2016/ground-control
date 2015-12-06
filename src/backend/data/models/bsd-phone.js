@@ -1,7 +1,7 @@
 export default function(sequelize, DataTypes) {
   return sequelize.define('BSDPhone', {
     id: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.INTEGER,
       field: 'cons_phone_id',
       primaryKey: true
     },

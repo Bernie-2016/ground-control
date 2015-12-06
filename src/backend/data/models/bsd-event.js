@@ -1,7 +1,7 @@
 export default function(sequelize, DataTypes) {
   let BSDEvent = sequelize.define('BSDEvent', {
     id: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.INTEGER,
       field: 'event_id',
       primaryKey: true
     },
@@ -94,7 +94,7 @@ export default function(sequelize, DataTypes) {
       field: 'attendee_volunteer_message',
     },
     isSearchable: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.INTEGER,
       field: 'is_searchable',
     },
     publicPhone: {

@@ -19,7 +19,6 @@ export default function(sequelize, DataTypes) {
             as: 'interviewee',
             foreignKey: {
               name: 'interviewee_id',
-              unique: true,
               constraints: false
             }
           })

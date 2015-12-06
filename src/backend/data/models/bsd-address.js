@@ -1,7 +1,7 @@
 export default function(sequelize, DataTypes) {
   let BSDAddress = sequelize.define('BSDAddress', {
     id: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.INTEGER,
       field: 'cons_addr_id',
       primaryKey: true
     },
