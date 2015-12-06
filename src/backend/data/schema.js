@@ -226,9 +226,14 @@ const GraphQLUser = new GraphQLObjectType({
           })
           if (persons && persons.length > 0 && persons[0].length > 0) {
             let person = persons[0][0]
+            // Also a big hack - not sure how to convert fieldnames to model attributes without doing it explicitly.  We should maybe just switch to using snake case model attributes and get rid of all the manual conversion code.
             person = BSDPerson.build({
               ...person,
               id: person.cons_id,
+              firstName: person.firstname,
+              middleName: person.middlename,
+              lastName: person.lastname,
+              birthDate: person.birth_dt,
               created_at: person.create_dt,
               updated_at: person.modified_dt,
             })
