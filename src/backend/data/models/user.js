@@ -33,7 +33,8 @@ export default function(sequelize, DataTypes) {
     password: DataTypes.STRING,
     isAdmin: {
       type: DataTypes.BOOLEAN,
-      defaultValue: false
+      defaultValue: false,
+      field: 'is_admin'
     }
   }, {
     underscored: true,
