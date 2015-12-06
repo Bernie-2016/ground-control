@@ -45,10 +45,17 @@ export class CallAssignment extends React.Component {
     }
   }
 
+  clearState() {
+    this.setState({
+      globalErrorMessage: null,
+    })
+  }
+
   state = {
     completed: true,
     reasonNotCompleted: null,
-    leftVoicemail: null
+    leftVoicemail: null,
+    globalErrorMessage: null,
   }
 
   notCompletedReasons =
@@ -152,13 +159,15 @@ export class CallAssignment extends React.Component {
   }
 
   submitCallSurvey() {
+    this.clearState();
     let onSuccess = () => {
      window.location.reload()
     }
 
     let onFailure = (transaction) => {
-      // Implement
-      console.log(transaction.getError())
+      this.clearState();
+      this.setState({globalErrorMessage: 'Something went wrong trying to submit your survey. Try again in a bit.'})
+      log.error(transaction.getError());
     }
 
     let callSurveyMutation = new SubmitCallSurvey({
@@ -170,7 +179,6 @@ export class CallAssignment extends React.Component {
       reasonNotCompleted: this.state.reasonNotCompleted,
       survey: null
     });
-    console.log(callSurveyMutation);
     Relay.Store.update(callSurveyMutation, {onFailure, onSuccess})
       ;
   }
@@ -239,6 +247,7 @@ export class CallAssignment extends React.Component {
         <div style={this.styles.questions}>
           <GCForm
             schema={this.formSchema}
+            globalError={this.state.globalErrorMessage}
             onSubmit={() => this.submitHandler()}
             value={this.state}
             onChange={(formValue) => {
