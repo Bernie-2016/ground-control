@@ -1,3 +1,4 @@
+require('dotenv').load();
 var config = {
   url: process.env.DATABASE_URL,
   migrationStorageTableName: 'sequelize_meta',
