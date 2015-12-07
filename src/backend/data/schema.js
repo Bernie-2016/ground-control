@@ -237,7 +237,6 @@ const GraphQLUser = new GraphQLObjectType({
             WHERE
               calls.id IS NULL AND
               assigned_calls.id IS NULL
-            RANDOM() < 0.01
             LIMIT 1
           `
 
