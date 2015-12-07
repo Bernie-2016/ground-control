@@ -33,7 +33,7 @@ window.jQuery = jQuery;
 Minilog
   .enable()
   .pipe(new Minilog.backends.jQuery({
-    url: 'http://localhost:3000/log',
+    url: '/log',
     interval: 1000
     }));
 window.log = Minilog('client');
