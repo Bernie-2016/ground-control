@@ -3,7 +3,7 @@ import Relay from 'react-relay';
 import {BernieText, BernieColors} from './styles/bernie-css';
 import {Paper, List, ListItem, FlatButton} from 'material-ui';
 import SideBarLayout from './SideBarLayout';
-import Survey from './Survey'
+import BSDEventSurvey from './survey-templates/BSDSurvey'
 import moment from 'moment';
 import yup from 'yup'
 import GCForm from './forms/GCForm';
@@ -227,7 +227,7 @@ export class CallAssignment extends React.Component {
         ...this.styles.surveyFrame,
         display: this.state.completed ? 'block' : 'none'
       }}>
-        <Survey
+        <BSDEventSurvey
           ref='survey'
           survey={this.props.callAssignment.survey}
           initialValues={{'email' : this.props.currentUser.intervieweeForCallAssignment.email}}
@@ -301,7 +301,7 @@ export default Relay.createContainer(CallAssignment, {
         id
         name
         survey {
-          ${Survey.getFragment('survey')}
+          ${BSDEventSurvey.getFragment('survey')}
         }
       }
     `,

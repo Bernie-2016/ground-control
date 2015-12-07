@@ -1,3 +1,6 @@
+<!--
+  This is not used within Ground Control.  This is meant to be the wrapper around a survey within the Blue State Digital admin interface.
+-->
 <script>
   jQuery(document).ready(function(event) {
     window.addEventListener('message', function(event) {
