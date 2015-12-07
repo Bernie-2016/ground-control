@@ -85,12 +85,10 @@ let {nodeInterface, nodeField} = nodeDefinitions(
     let {type, id} = fromGlobalId(globalId);
     if (type === 'Person')
       return BSDPerson.findById(id);
-    if (type === 'Group')
-      return BSDGroup.findById(id);
     if (type === 'CallAssignment')
       return BSDCallAssignment.findById(id);
     if (type === 'Survey')
-      return BSDSurvey.findById(id);
+      return GCBSDSurvey.findById(id);
     if (type === 'Event')
       return BSDEvent.findById(id);
     if (type === 'User')
@@ -108,7 +106,7 @@ let {nodeInterface, nodeField} = nodeDefinitions(
       return GraphQLCallAssignment;
     if (obj instanceof BSDCall)
       return GraphQLCall;
-    if (obj instanceof BSDSurvey)
+    if (obj instanceof GCBSDSurvey)
       return GraphQLSurvey;
     if (obj instanceof ListContainer)
       return GraphQLListContainer;
@@ -431,11 +429,13 @@ const GraphQLSurvey = new GraphQLObjectType({
   description: 'A survey to be filled out by a person',
   fields: () => ({
     id: globalIdField('Survey'),
-    slug: { type: GraphQLString },
     fullURL: {
       type: GraphQLString,
-      resolve: (survey) => {
-        return url.resolve('https://' + process.env.BSD_HOST, '/page/s/' + survey.slug)
+      resolve: async (survey) => {
+        console.log(survey);
+        let underlyingSurvey = await survey.getBSDSurvey();
+        let slug = underlyingSurvey.slug;
+        return url.resolve('https://' + process.env.BSD_HOST, '/page/s/' + slug)
       }
     }
   }),
