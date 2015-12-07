@@ -26,8 +26,10 @@ export default function(sequelize, DataTypes) {
       type: DataTypes.STRING,
       unique: true,
       validate: {
-        isEmail: true,
-        isLowercase: true
+        isEmail: true
+      },
+      set: function(val) {
+        this.setDataValue('email', val.toLowerCase());
       }
     },
     password: DataTypes.STRING,

@@ -46,13 +46,13 @@ passport.use('signup', new LocalStrategy(
   wrap(async (req, email, password, done) => {
     let user = await models.User.findOne({
       where: {
-        email: email
+        email: email.toLowerCase()
       }
     });
 
     if (!user) {
       let newUser = await models.User.create({
-        email: email,
+        email: email.toLowerCase(),
         password: password,
       });
       return done(null, newUser);
