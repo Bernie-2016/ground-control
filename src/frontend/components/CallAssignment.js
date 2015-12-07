@@ -3,7 +3,7 @@ import Relay from 'react-relay';
 import {BernieText, BernieColors} from './styles/bernie-css';
 import {Paper, List, ListItem, FlatButton} from 'material-ui';
 import SideBarLayout from './SideBarLayout';
-import BSDEventSurvey from './survey-templates/BSDSurvey'
+import BSDEventSurvey from './survey-renderers/BSDSurvey'
 import moment from 'moment';
 import yup from 'yup'
 import GCForm from './forms/GCForm';
