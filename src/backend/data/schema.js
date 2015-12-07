@@ -34,6 +34,7 @@ import {
   BSDSurvey,
   BSDEvent,
   GCBSDGroup,
+  GCBSDSurvey,
   ZipCode,
   User,
   sequelize
@@ -519,7 +520,9 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
   inputFields: {
     name: { type: new GraphQLNonNull(GraphQLString) },
     intervieweeGroup: { type: new GraphQLNonNull(GraphQLString) },
-    surveyId: { type: new GraphQLNonNull(GraphQLString) },
+    surveyId: { type: new GraphQLNonNull(GraphQLInt) },
+    renderer: { type: new GraphQLNonNull(GraphQLString) },
+    processors: { type: new GraphQLList(GraphQLString) },
   },
   outputFields: {
     listContainer: {
@@ -527,10 +530,12 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
       resolve: () => SharedListContainer
     }
   },
-  mutateAndGetPayload: async ({name, intervieweeGroup, surveyId}, {rootValue}) => {
+  mutateAndGetPayload: async ({name, intervieweeGroup, surveyId, renderer, processors}, {rootValue}) => {
+    authRequired(rootValue);
     adminRequired(rootValue);
     let groupText = intervieweeGroup;
     let group = null;
+    let survey = null;
     return sequelize.transaction(async (t) => {
       if (/^\d+$/.test(groupText)) {
         let underlyingGroup = await BSDGroup.findWithBSDCheck(groupText)
@@ -554,22 +559,28 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
           query = query.toUpperCase()
 
         if (query !== 'EVERYONE') {
-          let results = await sequelize.query(query)
-          if (!results || !results.length)
+          let error = null;
+          let results = null;
+          try {
+            results = await sequelize.query(query)
+            if (!results || !results.length)
+              error = 'Invalid SQL query'
+          } catch (ex) {
+            error = 'Invalid SQL query'
+          }
+          if (!error) {
+            console.log('here?')
+            if (results[0].length === 0)
+                error = 'SQL query returns no results'
+
+            let firstResult = results[0][0];
+            if (!firstResult.cons_id)
+              error = 'SQL query needs to return a list of cons_ids'
+          }
+          if (error)
             throw new GraphQLError({
               status: 400,
-              message: 'Invalid SQL query'
-            })
-          if (results[0].length === 0)
-            throw new GraphQLError({
-              status: 400,
-              message: 'SQL query returns no results'
-            })
-          let firstResult = results[0][0];
-          if (!firstResult.cons_id)
-            throw new GraphQLError({
-              status: 400,
-              message: 'SQL query needs to return a list of cons_ids'
+              message: error
             })
         }
         group = await GCBSDGroup.create({
@@ -577,18 +588,22 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
         })
       }
 
-      let survey = await BSDSurvey.findWithBSDCheck(surveyId)
+      let underlyingSurvey = await BSDSurvey.findWithBSDCheck(surveyId)
 
-      if (!survey)
+      if (!underlyingSurvey)
         throw new GraphQLError({
           status: 400,
           message: 'Provided survey ID does not exist in BSD.'
         });
-
+      survey = await GCBSDSurvey.create({
+        signup_form_id: surveyId,
+        renderer: renderer,
+        processors: processors
+      })
       return BSDCallAssignment.create({
         name: name,
         gc_bsd_group_id: group.id,
-        signup_form_id: survey.id
+        gc_bsd_survey_id: survey.id
       })
     })
   }

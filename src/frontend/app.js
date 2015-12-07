@@ -15,6 +15,7 @@ import GCTextField from './components/forms/GCTextField';
 import GCPasswordField from './components/forms/GCPasswordField';
 import GCRadioButtonsField from './components/forms/GCRadioButtonsField';
 import GCSelectField from './components/forms/GCSelectField';
+import GCCheckboxesField from './components/forms/GCCheckboxesField';
 import GCBooleanField from './components/forms/GCBooleanField';
 import CallAssignmentsDashboard from './components/CallAssignmentsDashboard';
 import AdminCallAssignment from './components/AdminCallAssignment';
@@ -58,9 +59,11 @@ Relay.injectNetworkLayer(new RelayNetworkLayer('/graphql'));
 
 Form.addInputTypes({
   string: GCTextField,
+  number: GCTextField,
   boolean: GCBooleanField,
   radio: GCRadioButtonsField,
   select: GCSelectField,
+  array: GCCheckboxesField,
   password: GCPasswordField
 })
 

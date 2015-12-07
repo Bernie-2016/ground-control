@@ -40,7 +40,9 @@ export default class CreateCallAssignment extends Relay.Mutation {
       name: this.props.name,
       callerGroupId: this.props.callerGroupId,
       intervieweeGroup: this.props.intervieweeGroup,
-      surveyId: this.props.surveyId
+      surveyId: this.props.surveyId,
+      renderer: this.props.renderer,
+      processors: this.props.processors
     }
   }
 }

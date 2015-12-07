@@ -8,6 +8,16 @@ import CreateCallAssignment from '../mutations/CreateCallAssignment';
 import yup from 'yup';
 
 export default class AdminCallAssignmentCreationForm extends React.Component {
+  surveyRenderers =
+  {
+    'BSDSurvey' : 'Simple BSD survey renderer',
+    'BSDEventSurvey' : 'BSD survey + events',
+  }
+
+  surveyProcessors = {
+    'bsd-event-rsvper' : 'Create event RSVPs'
+  }
+
   styles = {
     formContainer: {
       width: 280,
@@ -21,9 +31,11 @@ export default class AdminCallAssignmentCreationForm extends React.Component {
   }
 
   formSchema = yup.object({
-    surveyId: yup.string().required(),
+    surveyId: yup.number().required(),
     intervieweeGroup: yup.string().required(),
     name: yup.string().required(),
+    renderer: yup.string().required(),
+    processors: yup.array().of(yup.string()).required()
   })
 
   state = {
@@ -73,6 +85,7 @@ export default class AdminCallAssignmentCreationForm extends React.Component {
               this.clearState()
               this.setState({globalStatusMessage: 'Call assignment created successfully!'})
             };
+            console.log(formValue)
 
             Relay.Store.update(
               new CreateCallAssignment({
@@ -89,7 +102,7 @@ export default class AdminCallAssignmentCreationForm extends React.Component {
           <br />
           <Form.Field
             name='surveyId'
-            label='Survey ID'
+            label='BSD signup form ID'
           /><br />
           <Form.Field
             name='intervieweeGroup'
@@ -97,6 +110,18 @@ export default class AdminCallAssignmentCreationForm extends React.Component {
             rows={5}
             label="Target group of interviewees.  Enter a SQL query, BSD cons_group_id, or the word 'everyone'"
           /><br />
+          <Form.Field
+            name='renderer'
+            type='select'
+            choices={this.surveyRenderers}
+            label='How to render the survey?'
+          /><br />
+          <Form.Field
+            name='processors'
+            choices={this.surveyProcessors}
+            label='Post-submit survey processors'
+          /><br />
+
           <Form.Button type='submit' label='Create!' fullWidth={true} />
         </GCForm>
       </Paper>
