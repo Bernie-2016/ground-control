@@ -22,7 +22,8 @@ export default class CallAssignmentsDashboard extends React.Component {
             primary: BernieColors.blue,
             swoosh: BernieColors.red
           }}
-          tabs={[{
+          tabs={[
+/*          {
             value: '/call-assignments/stats',
             label: 'Stats'
           },
@@ -30,6 +31,7 @@ export default class CallAssignmentsDashboard extends React.Component {
             value: '/call-assignments/invite',
             label: 'Invite'
           },
+          */
           {
             value: '/call-assignments',
             label: 'All Assignments'
