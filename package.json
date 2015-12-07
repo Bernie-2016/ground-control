@@ -12,6 +12,7 @@
     "dev": "nf start -w --procfile Procfile.dev",
     "lint": "eslint src",
     "seed": "./run ./src/backend/data/seed.js",
+    "seed-zips": "./run ./src/backend/data/seed-zips.js",
     "sequelize": "cd ./src/backend/data && sequelize",
     "sync": "./run ./src/backend/data/sync.js"
   },
