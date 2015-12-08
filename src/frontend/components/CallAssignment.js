@@ -173,7 +173,6 @@ export class CallAssignment extends React.Component {
   }
 
   submitCallSurvey(surveyFields) {
-    console.log('SURVEY FIELDS', surveyFields)
     this.clearState();
     let onSuccess = () => {
      window.location.reload()
@@ -194,7 +193,7 @@ export class CallAssignment extends React.Component {
       sentText: this.state.sentText,
       reasonNotCompleted: this.state.reasonNotCompleted,
       sentText: this.state.sentText,
-      survey: null
+      surveyFieldValues: JSON.stringify(surveyFields)
     });
     Relay.Store.update(callSurveyMutation, {onFailure, onSuccess})
       ;

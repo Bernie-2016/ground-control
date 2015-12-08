@@ -180,9 +180,11 @@ const GraphQLUser = new GraphQLObjectType({
           let validOffsets = []
           allOffsets.forEach((offset) => {
             let time = moment().utcOffset(offset)
-            if (time.hours() > 10 && time.hours() < 21)
+            if (time.hours() > 9 && time.hours() < 21)
               validOffsets.push(offset)
           })
+          if (validOffsets.length === 0)
+            return null;
           // This is maybe the worst thing of all time. Switch to knex when we can.
           let group = await callAssignment.getIntervieweeGroup();
           let filterQuery = '';
@@ -314,37 +316,19 @@ const GraphQLPerson = new GraphQLObjectType({
     phone: {
       type: GraphQLString,
       resolve: async (person) => {
-        let phones = await person.getCached('phones')
-        let phone = phones[0].phone
-        phones.forEach((phoneObj) => {
-          if (phoneObj.isPrimary)
-            phone = phoneObj.phone;
-        })
-        return phone;
+        return person.getPrimaryPhone()
       }
     },
     email: {
       type: GraphQLString,
       resolve: async (person) => {
-        let emails = await person.getCached('emails')
-        let email = emails[0].email
-        emails.forEach((emailObj) => {
-          if (emailObj.isPrimary)
-            email = emailObj.email;
-        })
-        return email;
+        return person.getPrimaryEmail();
       }
     },
     address: {
       type: GraphQLAddress,
       resolve: async (person) => {
-        let addresses = await person.getCached('addresses')
-        let address = addresses[0].address
-        addresses.forEach((addressObj) => {
-          if (addressObj.isPrimary)
-            address = addressObj;
-        })
-        return address;
+        return person.getPrimaryAddress();
       }
     }
   }),
@@ -441,14 +425,6 @@ const GraphQLSurvey = new GraphQLObjectType({
   interfaces: [nodeInterface]
 })
 
-const GraphQLSurveyInput = new GraphQLInputObjectType({
-  name: 'SurveyInput',
-  fields: () => ({
-    id: globalIdField('Survey'),
-    fieldValues: { type: GraphQLString }
-  })
-})
-
 const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
   name: 'SubmitCallSurvey',
   inputFields: {
@@ -457,14 +433,15 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
     completed: { type: new GraphQLNonNull(GraphQLBoolean) },
     leftVoicemail: { type: GraphQLBoolean },
     sentText: { type: GraphQLBoolean },
-    reasonNotCompleted: { type: GraphQLString }
+    reasonNotCompleted: { type: GraphQLString },
+    surveyFieldValues: { type: new GraphQLNonNull(GraphQLString) }
   },
   outputFields: {
     currentUser: {
       type: GraphQLUser,
     }
   },
-  mutateAndGetPayload: async ({callAssignmentId, intervieweeId, completed, leftVoicemail, sentText, reasonNotCompleted}, {rootValue}) => {
+  mutateAndGetPayload: async ({callAssignmentId, intervieweeId, completed, leftVoicemail, sentText, reasonNotCompleted, surveyFieldValues}, {rootValue}) => {
     authRequired(rootValue);
     let caller = rootValue.user;
     let localIntervieweeId = parseInt(fromGlobalId(intervieweeId).id, 10);
@@ -495,6 +472,12 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
         }
       });
 
+      let callAssignment = await BSDCallAssignment.findById(localCallAssignmentId)
+      let survey = await callAssignment.getSurvey()
+      let fieldValues = JSON.parse(surveyFieldValues)
+      fieldValues['person'] = await BSDPerson.findById(localIntervieweeId);
+      await survey.process(fieldValues)
+
       let promises = [
         assignedCall.destroy(),
         BSDCall.create({
@@ -521,7 +504,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
     intervieweeGroup: { type: new GraphQLNonNull(GraphQLString) },
     surveyId: { type: new GraphQLNonNull(GraphQLInt) },
     renderer: { type: new GraphQLNonNull(GraphQLString) },
-    processors: { type: new GraphQLList(GraphQLString) },
+    processors: { type: new GraphQLList(GraphQLString) }
   },
   outputFields: {
     listContainer: {
@@ -568,7 +551,6 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
             error = 'Invalid SQL query'
           }
           if (!error) {
-            console.log('here?')
             if (results[0].length === 0)
                 error = 'SQL query returns no results'
 

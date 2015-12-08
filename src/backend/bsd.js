@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import querystring from 'querystring';
 import {parseString} from 'xml2js';
 import Promise from 'bluebird';
+import qs from 'querystring';
 
 const parseStringPromise = Promise.promisify(parseString);
 
@@ -245,6 +246,30 @@ export default class BSD {
       return 'invalid username or password'
     }
     let response = await parseStringPromise(response);
+    return response
+  }
+
+  async addRSVPToEvent(email, zip, event_id) {
+    let params = {
+      'email' : email,
+      'zip' : zip,
+      'will_attend' : 1
+    }
+    if (/\d+$/.test(event_id))
+      params['event_id'] = event_id
+    else
+      params['event_id_obfuscated'] = event_id
+    let host = this.baseURL.protocol + '//' + this.baseURL.host
+    let URL = host + '/page/graph/addrsvp' + '?' + qs.stringify(params)
+
+    console.log(URL)
+    let options = {
+      uri: URL,
+      method: 'GET',
+      resolveWithFullResponse: true,
+    }
+    let response = await requestPromise(options)
+    console.log(response);
     return response
   }
 

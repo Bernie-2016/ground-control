@@ -42,6 +42,7 @@ export default class SubmitCallSurvey extends Relay.Mutation {
       leftVoicemail: this.props.leftVoicemail,
       sentText: this.props.sentText,
       reasonNotCompleted: this.props.reasonNotCompleted,
+      surveyFieldValues: this.props.surveyFieldValues
     }
   }
 }
