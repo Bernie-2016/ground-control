@@ -1,7 +1,10 @@
 import React from 'react';
 import Relay from 'react-relay'
 import BSDSurvey from './BSDSurvey'
-import {GoogleMapLoader, GoogleMap, Marker} from 'react-google-maps';
+import {BernieColors, BernieText} from '../styles/bernie-css'
+import {GoogleMapLoader, GoogleMap, Marker, InfoWindow} from 'react-google-maps';
+import {FlatButton} from 'material-ui';
+import moment from 'moment';
 
 class BSDEventSurvey extends React.Component {
   static propTypes = {
@@ -14,18 +17,64 @@ class BSDEventSurvey extends React.Component {
     this.refs.survey.refs.component.submit()
   }
 
+  state = {
+    clickedMarker: null
+  }
+
+  handleMarkerClick(marker) {
+    this.setState({clickedMarker: marker.key})
+  }
+
+  renderMarkerDescription(marker) {
+    return (
+      <div style={{fontSize: '0.8em'}}>
+        <div>{marker.venueName}</div>
+        <div>{marker.addr1}</div>
+        <div>{marker.addr2}</div>
+      </div>
+    )
+  }
+
+  getEventAddr2(event) {
+    let desc = ''
+    if (event.venueAddr2)
+      desc = desc + ' ' + event.venueAddr2;
+    if (event.venueCity)
+      desc = desc + ' ' + event.venueCity;
+    if (event.venueState)
+      desc = desc + ', ' + event.venueState
+    return desc.trim();
+  }
+
   renderMap() {
     let center = {
       lat: this.props.interviewee.address.latitude,
       lng: this.props.interviewee.address.longitude
     }
-    let events = [
+    let markers = [
       {
-        ...center,
-        key: 'center'
+        position: center,
+        key: 'center',
+        title: 'home',
+        name: 'Interviewee home'
       }
     ];
 
+    this.props.interviewee.nearbyEvents.forEach((event) => {
+      markers.push({
+        position: {
+          lat: event.latitude,
+          lng: event.longitude
+        },
+        key: event.id,
+        title: event.name,
+        name: event.name,
+        startDate: event.startDate,
+        venueName: event.venueName,
+        addr1: event.addr1,
+        addr2: this.getEventAddr2(event),
+      })
+    })
     return (
       <div style={{height: '100%', width: '100%'}}>
       <GoogleMapLoader
@@ -33,19 +82,59 @@ class BSDEventSurvey extends React.Component {
           <div
             style={{
               height: '100%',
+              width: '100%'
             }}
           />
         }
         googleMapElement={
           <GoogleMap
-            ref={(map) => console.log(map)}
-            defaultZoom={10}
+            ref='map'
+            defaultZoom={9}
             defaultCenter={center}>
-            {events.map((event, index) => {
+            {markers.map((marker, index) => {
+              let infoWindow = <div></div>
+              if (this.state.clickedMarker === marker.key)
+                infoWindow = (
+                  <InfoWindow title={marker.title}>
+                    <div style={{
+                      maxWidth: 200,
+                      height: 150
+                    }}>
+                      <div>
+                        <div style={{
+                          ...BernieText.secondaryTitle,
+                          fontSize: '0.8em',
+                          color: BernieColors.gray
+                        }}>{moment(marker.startDate).format('h:mm A  MMM D')}
+                        </div>
+                        <div style={{
+                          ...BernieText.default,
+                          fontSize: '0.8em',
+                          fontWeight: 600
+                        }}>
+                        {marker.name}
+                        </div>
+                        <div style={{
+                          fontSize: '0.8em',
+                          ...BernieText.default
+                        }}>
+                        {this.renderMarkerDescription(marker)}
+                        </div>
+                        <FlatButton label='RSVP' style={{
+                          backgroundColor: BernieColors.red,
+                          marginTop: 10
+                        }}/>
+                      </div>
+                    </div>
+                  </InfoWindow>
+                )
               return (
                 <Marker
-                  {...event}
-                />
+                  {...marker}
+                  onClick={this.handleMarkerClick.bind(this, marker)}
+                >
+                  {infoWindow}
+                </Marker>
               );
             })}
           </GoogleMap>
@@ -88,7 +177,15 @@ export default Relay.createContainer(BSDEventSurvey, {
           longitude
         }
         nearbyEvents(within:20) {
+          id
           name
+          startDate
+          venueName
+          venueAddr1
+          venueAddr2
+          venueCity
+          venueState
+          description
           latitude
           longitude
         }
