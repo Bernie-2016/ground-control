@@ -37,15 +37,16 @@ class BSDSurvey extends React.Component {
   }
 
   static defaultProps = {
-    onSubmitted : () => { }
+    onSubmitted : (surveyFields) => { log.info(surveyFields) }
   }
 
   state = {
     frameStyle : {height: 0},
+    surveyFields: {}
   }
 
   submit = () => {
-    this.sendFrameMessage({message: 'submit'})
+    this.sendFrameMessage({message: 'getFieldValues'})
   }
 
   frameMessageHandler = (event) => {
@@ -65,8 +66,14 @@ class BSDSurvey extends React.Component {
         this.sendFrameMessage({message: 'getHeight'});
       }
       else {
-        this.props.onSubmitted();
+        this.props.onSubmitted(this.state.surveyFields);
       }
+    }
+
+    else if (event.data.message === 'fieldValues') {
+      this.setState({surveyFields: event.data.details})
+      console.log(this.state)
+      this.sendFrameMessage({message: 'submit'})
     }
 
     else if (event.data.message == 'documentHeight')
