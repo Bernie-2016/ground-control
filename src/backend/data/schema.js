@@ -432,7 +432,6 @@ const GraphQLSurvey = new GraphQLObjectType({
     fullURL: {
       type: GraphQLString,
       resolve: async (survey) => {
-        console.log(survey);
         let underlyingSurvey = await survey.getBSDSurvey();
         let slug = underlyingSurvey.slug;
         return url.resolve('https://' + process.env.BSD_HOST, '/page/s/' + slug)
