@@ -10,7 +10,7 @@ The easiest way to get started in Linux is with [Docker](https://docs.docker.com
 
 ### OS X
 
-In OS X, we currently run everything locally using a Procfile and node-foreman. To get started, install [Node.js](https://nodejs.org/en/download/) and [Homebrew](http://brew.sh/). Then do the following:
+In OS X, we currently run everything locally using a Procfile and node-foreman. To get started, install [Node.js](https://nodejs.org/en/download/) and [Homebrew](http://brew.sh/). Then clone this repository and cd into ground-control. Then do the following:
 
 ```
 npm install
