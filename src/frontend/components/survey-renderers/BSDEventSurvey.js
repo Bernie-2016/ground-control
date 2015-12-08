@@ -14,9 +14,9 @@ class BSDEventSurvey extends React.Component {
   }
 
   render() {
-    <BSDSurvey
+    return <BSDSurvey
       survey={this.props.survey}
-      initialValues={this.props.initialValues}
+      interviewee={this.props.interviewee}
       onSubmitted={this.props.onSubmitted}
     />
   }
@@ -27,6 +27,16 @@ export default Relay.createContainer(BSDEventSurvey, {
     survey: () => Relay.QL`
       fragment on Survey {
         ${BSDSurvey.getFragment('survey')}
+      }
+    `,
+    interviewee: () => Relay.QL`
+      fragment on Person {
+        ${BSDSurvey.getFragment('interviewee')}
+        nearbyEvents(within:20) {
+          name
+          latitude
+          longitude
+        }
       }
     `
   }

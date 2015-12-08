@@ -33,7 +33,6 @@ class BSDSurvey extends React.Component {
 
   static propTypes = {
     onSubmitted : React.PropTypes.func,
-    initialValues: React.PropTypes.object
   }
 
   static defaultProps = {
@@ -55,14 +54,12 @@ class BSDSurvey extends React.Component {
 
     if (event.data.message == 'documentLoaded') {
       if (event.data.details.location === this.props.survey.fullURL) {
-        Object.keys(this.props.initialValues).forEach((fieldId) => {
-          this.sendFrameMessage({
-            message: 'setInputValue',
-            details: {
-              inputId: fieldId,
-              value: this.props.initialValues[fieldId]
-            }})
-        })
+        this.sendFrameMessage({
+          message: 'setInputValue',
+          details: {
+            inputId: 'email',
+            value: this.props.interviewee.email
+          }})
         this.sendFrameMessage({message: 'getHeight'});
       }
       else {
@@ -140,6 +137,11 @@ export default Relay.createContainer(BSDSurvey, {
     survey: () => Relay.QL`
       fragment on Survey {
         fullURL
+      }
+    `,
+    interviewee: () => Relay.QL`
+      fragment on Person {
+        email
       }
     `
   }
