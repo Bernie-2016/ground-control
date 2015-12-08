@@ -442,7 +442,8 @@ const GraphQLSurvey = new GraphQLObjectType({
         let slug = underlyingSurvey.slug;
         return url.resolve('https://' + process.env.BSD_HOST, '/page/s/' + slug)
       }
-    }
+    },
+    renderer: { type: GraphQLString }
   }),
   interfaces: [nodeInterface]
 })

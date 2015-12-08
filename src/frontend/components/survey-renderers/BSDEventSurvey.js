@@ -9,10 +9,6 @@ class BSDEventSurvey extends React.Component {
     survey: React.PropTypes.object
   }
 
-  static defaultProps = {
-    onSubmitted : (fieldValues) => { }
-  }
-
   submit() {
     this.refs.survey.refs.component.submit()
   }

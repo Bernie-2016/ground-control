@@ -35,10 +35,6 @@ class BSDSurvey extends React.Component {
     onSubmitted : React.PropTypes.func,
   }
 
-  static defaultProps = {
-    onSubmitted : (surveyFields) => { log.info(surveyFields) }
-  }
-
   state = {
     frameStyle : {height: 0},
     surveyFields: {}
