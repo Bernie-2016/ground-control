@@ -10,11 +10,16 @@ class BSDEventSurvey extends React.Component {
   }
 
   static defaultProps = {
-    onSubmitted : () => { }
+    onSubmitted : (fieldValues) => { }
+  }
+
+  submit() {
+    this.refs.survey.refs.component.submit()
   }
 
   render() {
     return <BSDSurvey
+      ref='survey'
       survey={this.props.survey}
       interviewee={this.props.interviewee}
       onSubmitted={this.props.onSubmitted}
