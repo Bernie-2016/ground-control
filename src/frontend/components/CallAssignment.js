@@ -172,7 +172,8 @@ export class CallAssignment extends React.Component {
     )
   }
 
-  submitCallSurvey() {
+  submitCallSurvey(surveyFields) {
+    console.log('SURVEY FIELDS', surveyFields)
     this.clearState();
     let onSuccess = () => {
      window.location.reload()
@@ -203,7 +204,7 @@ export class CallAssignment extends React.Component {
     if (this.state.completed)
       this.refs.survey.refs.component.submit()
     else
-      this.submitCallSurvey();
+      this.submitCallSurvey({});
   }
 
   render() {
@@ -231,7 +232,7 @@ export class CallAssignment extends React.Component {
           ref='survey'
           survey={this.props.callAssignment.survey}
           initialValues={{'email' : this.props.currentUser.intervieweeForCallAssignment.email}}
-          onSubmitted={() => this.submitCallSurvey()} />
+          onSubmitted={(surveyFields) => this.submitCallSurvey(surveyFields)} />
       </div>
     )
 

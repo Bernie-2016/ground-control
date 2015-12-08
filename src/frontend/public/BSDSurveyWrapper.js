@@ -15,7 +15,7 @@
           var value = input.val()
           fieldValues[key] = value
         })
-        event.source.postMessage({message: 'fieldValues', details: fieldValues});
+        event.source.postMessage({message: 'fieldValues', details: fieldValues}, event.origin);
       }
     })
 
