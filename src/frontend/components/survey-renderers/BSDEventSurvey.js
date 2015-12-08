@@ -27,7 +27,7 @@ class BSDEventSurvey extends React.Component {
 
   renderMarkerDescription(marker) {
     return (
-      <div style={{fontSize: '0.8em'}}>
+      <div>
         <div>{marker.venueName}</div>
         <div>{marker.addr1}</div>
         <div>{marker.addr2}</div>
@@ -93,13 +93,21 @@ class BSDEventSurvey extends React.Component {
             defaultCenter={center}>
             {markers.map((marker, index) => {
               let infoWindow = <div></div>
+              let button = <div></div>
+              if (marker.key !== 'home')
+                button = (
+                  <FlatButton label='RSVP' style={{
+                    ...BernieText.inputLabel,
+                    backgroundColor: BernieColors.red,
+                    marginTop: 10
+                  }}/>
+                )
               if (this.state.clickedMarker === marker.key)
                 infoWindow = (
-                  <InfoWindow title={marker.title}>
-                    <div style={{
-                      maxWidth: 200,
-                      height: 150
-                    }}>
+                  <InfoWindow title={marker.title} style={{
+                    height: '150'
+                  }} maxWidth='200' onCloseClick={(event) => console.log(event)}>
+                    <div >
                       <div>
                         <div style={{
                           ...BernieText.secondaryTitle,
@@ -115,15 +123,12 @@ class BSDEventSurvey extends React.Component {
                         {marker.name}
                         </div>
                         <div style={{
-                          fontSize: '0.8em',
-                          ...BernieText.default
+                          ...BernieText.default,
+                          fontSize: '0.8em'
                         }}>
                         {this.renderMarkerDescription(marker)}
                         </div>
-                        <FlatButton label='RSVP' style={{
-                          backgroundColor: BernieColors.red,
-                          marginTop: 10
-                        }}/>
+                        {button}
                       </div>
                     </div>
                   </InfoWindow>
