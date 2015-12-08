@@ -253,7 +253,8 @@ export default class BSD {
     let params = {
       'email' : email,
       'zip' : zip,
-      'will_attend' : 1
+      'will_attend' : 1,
+      'guests': 0
     }
     if (/\d+$/.test(event_id))
       params['event_id'] = event_id
@@ -262,14 +263,12 @@ export default class BSD {
     let host = this.baseURL.protocol + '//' + this.baseURL.host
     let URL = host + '/page/graph/addrsvp' + '?' + qs.stringify(params)
 
-    console.log(URL)
     let options = {
       uri: URL,
       method: 'GET',
       resolveWithFullResponse: true,
     }
     let response = await requestPromise(options)
-    console.log(response);
     return response
   }
 

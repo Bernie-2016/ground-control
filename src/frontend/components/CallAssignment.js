@@ -327,6 +327,13 @@ export default Relay.createContainer(CallAssignment, {
             state
             zip
             localTime
+            latitude
+            longitude
+          }
+          nearbyEvents(within:20) {
+            name
+            latitude
+            longitude
           }
         }
       }

@@ -330,6 +330,26 @@ const GraphQLPerson = new GraphQLObjectType({
       resolve: async (person) => {
         return person.getPrimaryAddress();
       }
+    },
+    nearbyEvents: {
+      type: new GraphQLList(GraphQLEvent),
+      args: {
+        within: { type: GraphQLInt }
+      },
+      resolve: async (person, {within}) => {
+        let address = await person.getPrimaryAddress()
+        let boundingDistance = within / 69
+        return BSDEvent.findAll({
+          where: {
+            latitude: {
+              $between: [address.latitude - boundingDistance, address.latitude + boundingDistance]
+            },
+            longitude: {
+              $between: [address.longitude - boundingDistance, address.longitude + boundingDistance]
+            }
+          }
+        })
+      }
     }
   }),
   interfaces: [nodeInterface]
@@ -357,6 +377,8 @@ const GraphQLEvent = new GraphQLObjectType({
     startDate: { type: GraphQLString },
     duration: { type: GraphQLInt },
     capacity: { type: GraphQLInt },
+    latitude: { type: GraphQLFloat },
+    longitude: { type: GraphQLFloat },
     attendeeVolunteerShow: { type: GraphQLBoolean },
     attendeeVolunteerMessage: { type: GraphQLString },
     isSearchable: { type: GraphQLInt },

@@ -114,7 +114,9 @@ export default function(sequelize, DataTypes) {
       type: DataTypes.FLOAT,
       field: 'rsvp_reminder_hours',
       allowNull: true
-    }
+    },
+    latitude: DataTypes.DOUBLE,
+    longitude: DataTypes.DOUBLE
   }, {
     underscored: true,
     tableName: 'bsd_events',
