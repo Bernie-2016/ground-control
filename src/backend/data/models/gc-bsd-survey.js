@@ -3,7 +3,7 @@ export default function(sequelize, DataTypes) {
   let GCBSDSurvey = sequelize.define('GCBSDSurvey', {
     renderer: {
       type: DataTypes.STRING,
-      isIn: [['BSDSurvey', 'BSDEventSurvey']]
+      isIn: [['BSDSurvey', 'BSDPhonebankRSVPSurvey']]
     },
     processors: {
       type: DataTypes.ARRAY(DataTypes.STRING),

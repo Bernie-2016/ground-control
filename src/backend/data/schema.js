@@ -222,10 +222,7 @@ const GraphQLUser = new GraphQLObjectType({
               INNER JOIN zip_codes AS zip_codes
               ON zip_codes.zip=addresses.zip
               WHERE
-                addresses.zip NOT BETWEEN '50001' AND '52809' AND
-                addresses.zip NOT BETWEEN '68119' AND '68120' AND
-                addresses.zip NOT BETWEEN '03031' AND '03897' AND
-                addresses.zip NOT BETWEEN '29001' AND '29948' AND
+                addresses.state_cd NOT IN ('IA','NH','NV','SC') AND
                 zip_codes.timezone_offset IN (${validOffsets.join(',')})
               ) AS addresses
               ON persons.cons_id=addresses.cons_id
@@ -351,6 +348,10 @@ const GraphQLPerson = new GraphQLObjectType({
             },
             longitude: {
               $between: [address.longitude - boundingDistance, address.longitude + boundingDistance]
+            },
+            event_type_id: 31,
+            startDate: {
+              $gt: new Date()
             }
           }
         })
@@ -505,7 +506,8 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
       let survey = await callAssignment.getSurvey()
       let fieldValues = JSON.parse(surveyFieldValues)
       fieldValues['person'] = await BSDPerson.findById(localIntervieweeId);
-      await survey.process(fieldValues)
+      if (completed)
+        await survey.process(fieldValues)
 
       let promises = [
         assignedCall.destroy(),
