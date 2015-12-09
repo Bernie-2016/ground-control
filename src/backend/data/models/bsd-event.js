@@ -118,6 +118,8 @@ export default function(sequelize, DataTypes) {
     latitude: DataTypes.DOUBLE,
     longitude: DataTypes.DOUBLE
   }, {
+    updatedAt: 'modified_dt',
+    createdAt: 'create_dt',
     underscored: true,
     tableName: 'bsd_events',
     classMethods: {
