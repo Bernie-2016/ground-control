@@ -59,6 +59,33 @@ export default function(sequelize, DataTypes) {
         let functionName = 'get' + property[0].toUpperCase() + property.slice(1);
         let value = this.getDataValue(property);
         return value ? value : this[functionName]();
+      },
+      async getPrimaryEmail() {
+        let emails = await this.getCached('emails')
+        let email = emails[0].email
+        emails.forEach((emailObj) => {
+          if (emailObj.isPrimary)
+            email = emailObj.email;
+        })
+        return email;
+      },
+      async getPrimaryAddress() {
+        let addresses = await this.getCached('addresses')
+        let address = addresses[0].address
+        addresses.forEach((addressObj) => {
+          if (addressObj.isPrimary)
+            address = addressObj;
+        })
+        return address;
+      },
+      async getPrimaryPhone() {
+        let phones = await this.getCached('phones')
+        let phone = phones[0].phone
+        phones.forEach((phoneObj) => {
+          if (phoneObj.isPrimary)
+            phone = phoneObj.phone;
+        })
+        return phone;
       }
     },
     classMethods: {

@@ -3,7 +3,7 @@ import Relay from 'react-relay';
 import {BernieText, BernieColors} from './styles/bernie-css';
 import {Paper, List, ListItem, FlatButton} from 'material-ui';
 import SideBarLayout from './SideBarLayout';
-import Survey from './Survey'
+import SurveyRenderer from './SurveyRenderer';
 import moment from 'moment';
 import yup from 'yup'
 import GCForm from './forms/GCForm';
@@ -172,7 +172,7 @@ export class CallAssignment extends React.Component {
     )
   }
 
-  submitCallSurvey() {
+  submitCallSurvey(surveyFields) {
     this.clearState();
     let onSuccess = () => {
      window.location.reload()
@@ -193,7 +193,7 @@ export class CallAssignment extends React.Component {
       sentText: this.state.sentText,
       reasonNotCompleted: this.state.reasonNotCompleted,
       sentText: this.state.sentText,
-      survey: null
+      surveyFieldValues: JSON.stringify(surveyFields)
     });
     Relay.Store.update(callSurveyMutation, {onFailure, onSuccess})
       ;
@@ -203,7 +203,7 @@ export class CallAssignment extends React.Component {
     if (this.state.completed)
       this.refs.survey.refs.component.submit()
     else
-      this.submitCallSurvey();
+      this.submitCallSurvey({});
   }
 
   render() {
@@ -227,11 +227,11 @@ export class CallAssignment extends React.Component {
         ...this.styles.surveyFrame,
         display: this.state.completed ? 'block' : 'none'
       }}>
-        <Survey
+        <SurveyRenderer
           ref='survey'
           survey={this.props.callAssignment.survey}
-          initialValues={{'email' : this.props.currentUser.intervieweeForCallAssignment.email}}
-          onSubmitted={() => this.submitCallSurvey()} />
+          interviewee={this.props.currentUser.intervieweeForCallAssignment}
+          onSubmitted={(surveyFields) => this.submitCallSurvey(surveyFields)} />
       </div>
     )
 
@@ -301,7 +301,7 @@ export default Relay.createContainer(CallAssignment, {
         id
         name
         survey {
-          ${Survey.getFragment('survey')}
+          ${SurveyRenderer.getFragment('survey')}
         }
       }
     `,
@@ -327,7 +327,10 @@ export default Relay.createContainer(CallAssignment, {
             state
             zip
             localTime
+            latitude
+            longitude
           }
+          ${SurveyRenderer.getFragment('interviewee')}
         }
       }
     `

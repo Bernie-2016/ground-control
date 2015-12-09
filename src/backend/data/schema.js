@@ -34,6 +34,7 @@ import {
   BSDSurvey,
   BSDEvent,
   GCBSDGroup,
+  GCBSDSurvey,
   ZipCode,
   User,
   sequelize
@@ -84,12 +85,10 @@ let {nodeInterface, nodeField} = nodeDefinitions(
     let {type, id} = fromGlobalId(globalId);
     if (type === 'Person')
       return BSDPerson.findById(id);
-    if (type === 'Group')
-      return BSDGroup.findById(id);
     if (type === 'CallAssignment')
       return BSDCallAssignment.findById(id);
     if (type === 'Survey')
-      return BSDSurvey.findById(id);
+      return GCBSDSurvey.findById(id);
     if (type === 'Event')
       return BSDEvent.findById(id);
     if (type === 'User')
@@ -107,7 +106,7 @@ let {nodeInterface, nodeField} = nodeDefinitions(
       return GraphQLCallAssignment;
     if (obj instanceof BSDCall)
       return GraphQLCall;
-    if (obj instanceof BSDSurvey)
+    if (obj instanceof GCBSDSurvey)
       return GraphQLSurvey;
     if (obj instanceof ListContainer)
       return GraphQLListContainer;
@@ -181,9 +180,11 @@ const GraphQLUser = new GraphQLObjectType({
           let validOffsets = []
           allOffsets.forEach((offset) => {
             let time = moment().utcOffset(offset)
-            if (time.hours() > 10 && time.hours() < 21)
+            if (time.hours() > 9 && time.hours() < 21)
               validOffsets.push(offset)
           })
+          if (validOffsets.length === 0)
+            return null;
           // This is maybe the worst thing of all time. Switch to knex when we can.
           let group = await callAssignment.getIntervieweeGroup();
           let filterQuery = '';
@@ -315,37 +316,39 @@ const GraphQLPerson = new GraphQLObjectType({
     phone: {
       type: GraphQLString,
       resolve: async (person) => {
-        let phones = await person.getCached('phones')
-        let phone = phones[0].phone
-        phones.forEach((phoneObj) => {
-          if (phoneObj.isPrimary)
-            phone = phoneObj.phone;
-        })
-        return phone;
+        return person.getPrimaryPhone()
       }
     },
     email: {
       type: GraphQLString,
       resolve: async (person) => {
-        let emails = await person.getCached('emails')
-        let email = emails[0].email
-        emails.forEach((emailObj) => {
-          if (emailObj.isPrimary)
-            email = emailObj.email;
-        })
-        return email;
+        return person.getPrimaryEmail();
       }
     },
     address: {
       type: GraphQLAddress,
       resolve: async (person) => {
-        let addresses = await person.getCached('addresses')
-        let address = addresses[0].address
-        addresses.forEach((addressObj) => {
-          if (addressObj.isPrimary)
-            address = addressObj;
+        return person.getPrimaryAddress();
+      }
+    },
+    nearbyEvents: {
+      type: new GraphQLList(GraphQLEvent),
+      args: {
+        within: { type: GraphQLInt }
+      },
+      resolve: async (person, {within}) => {
+        let address = await person.getPrimaryAddress()
+        let boundingDistance = within / 69
+        return BSDEvent.findAll({
+          where: {
+            latitude: {
+              $between: [address.latitude - boundingDistance, address.latitude + boundingDistance]
+            },
+            longitude: {
+              $between: [address.longitude - boundingDistance, address.longitude + boundingDistance]
+            }
+          }
         })
-        return address;
       }
     }
   }),
@@ -374,6 +377,8 @@ const GraphQLEvent = new GraphQLObjectType({
     startDate: { type: GraphQLString },
     duration: { type: GraphQLInt },
     capacity: { type: GraphQLInt },
+    latitude: { type: GraphQLFloat },
+    longitude: { type: GraphQLFloat },
     attendeeVolunteerShow: { type: GraphQLBoolean },
     attendeeVolunteerMessage: { type: GraphQLString },
     isSearchable: { type: GraphQLInt },
@@ -430,23 +435,17 @@ const GraphQLSurvey = new GraphQLObjectType({
   description: 'A survey to be filled out by a person',
   fields: () => ({
     id: globalIdField('Survey'),
-    slug: { type: GraphQLString },
     fullURL: {
       type: GraphQLString,
-      resolve: (survey) => {
-        return url.resolve('https://' + process.env.BSD_HOST, '/page/s/' + survey.slug)
+      resolve: async (survey) => {
+        let underlyingSurvey = await survey.getBSDSurvey();
+        let slug = underlyingSurvey.slug;
+        return url.resolve('https://' + process.env.BSD_HOST, '/page/s/' + slug)
       }
-    }
+    },
+    renderer: { type: GraphQLString }
   }),
   interfaces: [nodeInterface]
-})
-
-const GraphQLSurveyInput = new GraphQLInputObjectType({
-  name: 'SurveyInput',
-  fields: () => ({
-    id: globalIdField('Survey'),
-    fieldValues: { type: GraphQLString }
-  })
 })
 
 const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
@@ -457,14 +456,15 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
     completed: { type: new GraphQLNonNull(GraphQLBoolean) },
     leftVoicemail: { type: GraphQLBoolean },
     sentText: { type: GraphQLBoolean },
-    reasonNotCompleted: { type: GraphQLString }
+    reasonNotCompleted: { type: GraphQLString },
+    surveyFieldValues: { type: new GraphQLNonNull(GraphQLString) }
   },
   outputFields: {
     currentUser: {
       type: GraphQLUser,
     }
   },
-  mutateAndGetPayload: async ({callAssignmentId, intervieweeId, completed, leftVoicemail, sentText, reasonNotCompleted}, {rootValue}) => {
+  mutateAndGetPayload: async ({callAssignmentId, intervieweeId, completed, leftVoicemail, sentText, reasonNotCompleted, surveyFieldValues}, {rootValue}) => {
     authRequired(rootValue);
     let caller = rootValue.user;
     let localIntervieweeId = parseInt(fromGlobalId(intervieweeId).id, 10);
@@ -495,6 +495,12 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
         }
       });
 
+      let callAssignment = await BSDCallAssignment.findById(localCallAssignmentId)
+      let survey = await callAssignment.getSurvey()
+      let fieldValues = JSON.parse(surveyFieldValues)
+      fieldValues['person'] = await BSDPerson.findById(localIntervieweeId);
+      await survey.process(fieldValues)
+
       let promises = [
         assignedCall.destroy(),
         BSDCall.create({
@@ -519,7 +525,9 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
   inputFields: {
     name: { type: new GraphQLNonNull(GraphQLString) },
     intervieweeGroup: { type: new GraphQLNonNull(GraphQLString) },
-    surveyId: { type: new GraphQLNonNull(GraphQLString) },
+    surveyId: { type: new GraphQLNonNull(GraphQLInt) },
+    renderer: { type: new GraphQLNonNull(GraphQLString) },
+    processors: { type: new GraphQLList(GraphQLString) }
   },
   outputFields: {
     listContainer: {
@@ -527,10 +535,12 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
       resolve: () => SharedListContainer
     }
   },
-  mutateAndGetPayload: async ({name, intervieweeGroup, surveyId}, {rootValue}) => {
+  mutateAndGetPayload: async ({name, intervieweeGroup, surveyId, renderer, processors}, {rootValue}) => {
+    authRequired(rootValue);
     adminRequired(rootValue);
     let groupText = intervieweeGroup;
     let group = null;
+    let survey = null;
     return sequelize.transaction(async (t) => {
       if (/^\d+$/.test(groupText)) {
         let underlyingGroup = await BSDGroup.findWithBSDCheck(groupText)
@@ -554,22 +564,27 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
           query = query.toUpperCase()
 
         if (query !== 'EVERYONE') {
-          let results = await sequelize.query(query)
-          if (!results || !results.length)
+          let error = null;
+          let results = null;
+          try {
+            results = await sequelize.query(query)
+            if (!results || !results.length)
+              error = 'Invalid SQL query'
+          } catch (ex) {
+            error = 'Invalid SQL query'
+          }
+          if (!error) {
+            if (results[0].length === 0)
+                error = 'SQL query returns no results'
+
+            let firstResult = results[0][0];
+            if (!firstResult.cons_id)
+              error = 'SQL query needs to return a list of cons_ids'
+          }
+          if (error)
             throw new GraphQLError({
               status: 400,
-              message: 'Invalid SQL query'
-            })
-          if (results[0].length === 0)
-            throw new GraphQLError({
-              status: 400,
-              message: 'SQL query returns no results'
-            })
-          let firstResult = results[0][0];
-          if (!firstResult.cons_id)
-            throw new GraphQLError({
-              status: 400,
-              message: 'SQL query needs to return a list of cons_ids'
+              message: error
             })
         }
         group = await GCBSDGroup.create({
@@ -577,18 +592,22 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
         })
       }
 
-      let survey = await BSDSurvey.findWithBSDCheck(surveyId)
+      let underlyingSurvey = await BSDSurvey.findWithBSDCheck(surveyId)
 
-      if (!survey)
+      if (!underlyingSurvey)
         throw new GraphQLError({
           status: 400,
           message: 'Provided survey ID does not exist in BSD.'
         });
-
+      survey = await GCBSDSurvey.create({
+        signup_form_id: surveyId,
+        renderer: renderer,
+        processors: processors
+      })
       return BSDCallAssignment.create({
         name: name,
         gc_bsd_group_id: group.id,
-        signup_form_id: survey.id
+        gc_bsd_survey_id: survey.id
       })
     })
   }

@@ -5,7 +5,7 @@ import {LinearProgress} from 'material-ui';
 
 // This just handles rendering and interacting with a BSD survey in an iFrame
 @Radium
-class Survey extends React.Component {
+class BSDSurvey extends React.Component {
   styles = {
     container: {
 //      width: '100%',
@@ -32,19 +32,25 @@ class Survey extends React.Component {
   }
 
   static propTypes = {
-    onSubmitted : React.PropTypes.func
-  }
-
-  static defaultProps = {
-    onSubmitted : () => { }
+    onSubmitted : React.PropTypes.func,
   }
 
   state = {
     frameStyle : {height: 0},
+    surveyFields: {}
   }
 
   submit = () => {
-    this.sendFrameMessage({message: 'submit'})
+    this.sendFrameMessage({message: 'getFieldValues'})
+  }
+
+  setFieldValue(fieldId, value) {
+    this.sendFrameMessage({
+    message: 'setInputValue',
+    details: {
+      inputId: fieldId,
+      value: value
+    }})
   }
 
   frameMessageHandler = (event) => {
@@ -53,19 +59,23 @@ class Survey extends React.Component {
 
     if (event.data.message == 'documentLoaded') {
       if (event.data.details.location === this.props.survey.fullURL) {
-        Object.keys(this.props.initialValues).forEach((fieldId) => {
-          this.sendFrameMessage({
-            message: 'setInputValue',
-            details: {
-              inputId: fieldId,
-              value: this.props.initialValues[fieldId]
-            }})
-        })
+        this.sendFrameMessage({
+          message: 'setInputValue',
+          details: {
+            inputId: 'email',
+            value: this.props.interviewee.email
+          }})
         this.sendFrameMessage({message: 'getHeight'});
       }
       else {
-        this.props.onSubmitted();
+        this.props.onSubmitted(this.state.surveyFields);
       }
+    }
+
+    else if (event.data.message === 'fieldValues') {
+      this.setState({surveyFields: event.data.details})
+      console.log(this.state)
+      this.sendFrameMessage({message: 'submit'})
     }
 
     else if (event.data.message == 'documentHeight')
@@ -127,11 +137,16 @@ class Survey extends React.Component {
   }
 }
 
-export default Relay.createContainer(Survey, {
+export default Relay.createContainer(BSDSurvey, {
   fragments: {
     survey: () => Relay.QL`
       fragment on Survey {
         fullURL
+      }
+    `,
+    interviewee: () => Relay.QL`
+      fragment on Person {
+        email
       }
     `
   }

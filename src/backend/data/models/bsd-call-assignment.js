@@ -5,13 +5,13 @@ export default function(sequelize, DataTypes) {
     underscored: true,
     tableName: 'bsd_call_assignments',
     indexes: [
-      { fields: ['signup_form_id'] },
+      { fields: ['gc_bsd_survey_id'] },
       { fields: ['gc_bsd_group_id'] },
     ],
     classMethods: {
       associate: (models) => {
-        BSDCallAssignment.belongsTo(models.BSDSurvey, {
-          foreignKey: 'signup_form_id',
+        BSDCallAssignment.belongsTo(models.GCBSDSurvey, {
+          foreignKey: 'gc_bsd_survey_id',
           constraints: false,
           as: 'survey'
         })

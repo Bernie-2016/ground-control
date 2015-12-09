@@ -1,4 +1,5 @@
 import BSDClient from '../../bsd-instance';
+
 export default function(sequelize, DataTypes) {
   let GCBSDGroup = sequelize.define('GCBSDGroup', {
     query: {
