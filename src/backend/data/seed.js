@@ -9,7 +9,7 @@ if (process.env.NODE_ENV !== 'development') {
 }
 
 const NUM_PERSONS=15000;
-const NUM_EVENTS=5000;
+const NUM_EVENTS=10000;
 
 // Use this instead of faker because we want it to be just digits
 let randomPhoneNumber = () => {
@@ -54,7 +54,7 @@ models.sequelize.sync({force: true}).then(async () => {
   let persons = [];
   let emails = [];
   let phones = [];
-  let personGroups = [];
+  let personGroups = {};
   let events = [];
   let addresses = [];
   let groups = [
@@ -131,10 +131,8 @@ models.sequelize.sync({force: true}).then(async () => {
     }
 
     Object.keys(groups).forEach((key) => {
-      personGroups.push({
-        cons_id: index,
-        cons_group_id: key
-      })
+      let hash = index.toString() + ':' + key
+      personGroups[hash] = true
     })
   }
 
@@ -157,16 +155,18 @@ models.sequelize.sync({force: true}).then(async () => {
     let rsvp_use_reminder_boolean = faker.random.boolean();
     let rsvp_use_reminder_email = rsvp_use_reminder_boolean;
     let rsvp_reminder_hours = rsvp_use_reminder_boolean ? null : faker.random.number({min:0, max:30});
-    let capacity = faker.random.arrayElement([0, faker.random.number({min:1, max:100})]);
+    let capacity = faker.random.arrayElement([0, faker.random.number({min:0, max:100})]);
 
     let zip = faker.random.arrayElement(zips);
     events.push({
       id: index,
       eventIdObfuscated: faker.internet.password(5),
       flagApproval: true,
-      name: toTitleCase(faker.lorem.sentence(3,5)).slice(0, -1),
+      event_type_id: faker.random.arrayElement([1,2]),
+      creator_cons_id: faker.random.number({min: 1, max: NUM_PERSONS}),
+      name: toTitleCase(faker.lorem.sentence(3,5)),
       description: faker.lorem.paragraph(),
-      venueName: toTitleCase(faker.lorem.sentence(1,4)).slice(0, -1),
+      venueName: toTitleCase(faker.lorem.sentence(1,4)),
       venueZip: zip.zip,
       venueCity: zip.city,
       venueState: zip.state,
@@ -180,12 +180,12 @@ models.sequelize.sync({force: true}).then(async () => {
       duration: faker.random.number({min:1, max:1600}),
       capacity: capacity,
       localTimezone: faker.random.arrayElement(['US/Eastern', 'US/Pacific', 'Africa/Cairo']),
-      attendeeVolunteerShow: faker.random.boolean(),
-      attendeeVolunteerMessage: nully(faker.lorem.sentence()),
+      attendeeVolunteerShow: faker.random.arrayElement([0, 1]),
+      attendeeVolunteerMessage: faker.lorem.sentence(),
       isSearchable: -2,
       publicPhone: faker.random.boolean(),
       contactPhone: randomPhoneNumber(),
-      hostReceiveRsvpEmails: faker.random.boolean(),
+      hostReceiveRsvpEmails: 1,
       rsvpUseReminderEmail: rsvp_use_reminder_email,
       rsvpReminderHours: rsvp_reminder_hours
     })
@@ -201,28 +201,33 @@ models.sequelize.sync({force: true}).then(async () => {
   };
 
   log.info('Creating...')
-  let adminUser = await models.User.findOne({
-    where: {
-      email: 'admin@localhost.com'
-    }
-  })
-  console.log(adminUser);
-  if (!adminUser)
-    await models.User.create({
-      email: 'admin@localhost.com',
-      password: 'admin',
-      isAdmin: true
-    })
+
+  await models.User.create({
+    email: 'admin@localhost.com',
+    password: 'admin',
+    isAdmin: true
+  });
+
   await models.BSDPerson.bulkCreate(persons);
+  let personGroupsArr = []
+  Object.keys(personGroups).forEach((hash) => {
+    let ids = hash.split(':')
+    personGroupsArr.push({
+      cons_id: ids[0],
+      cons_group_id: ids[1]
+    })
+  })
+
   let promises = [
     models.BSDEventAttendee.bulkCreate(eventAttendees),
     models.ZipCode.bulkCreate(zips),
     models.BSDEvent.bulkCreate(events),
     models.BSDAddress.bulkCreate(addresses),
-    models.BSDPersonBSDGroup.bulkCreate(personGroups),
+    models.BSDPersonBSDGroup.bulkCreate(personGroupsArr),
     models.BSDEmail.bulkCreate(emails),
     models.BSDPhone.bulkCreate(phones)
   ]
   await Promise.all(promises);
+
   log.info('Done!');
 })
