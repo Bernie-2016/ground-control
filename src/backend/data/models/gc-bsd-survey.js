@@ -7,6 +7,7 @@ export default function(sequelize, DataTypes) {
     },
     processors: {
       type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: true,
       validate: {
         elementIsIn: function(val) {
           let validProcessors = ['bsd-event-rsvper']
