@@ -12,8 +12,10 @@ import AdminEventsSection from './components/AdminEventsSection';
 import AdminCallAssignmentsSection from './components/AdminCallAssignmentsSection';
 import AdminCallAssignmentCreationForm from './components/AdminCallAssignmentCreationForm';
 import GCTextField from './components/forms/GCTextField';
+import GCPasswordField from './components/forms/GCPasswordField';
 import GCRadioButtonsField from './components/forms/GCRadioButtonsField';
 import GCSelectField from './components/forms/GCSelectField';
+import GCCheckboxesField from './components/forms/GCCheckboxesField';
 import GCBooleanField from './components/forms/GCBooleanField';
 import CallAssignmentsDashboard from './components/CallAssignmentsDashboard';
 import AdminCallAssignment from './components/AdminCallAssignment';
@@ -32,7 +34,7 @@ window.jQuery = jQuery;
 Minilog
   .enable()
   .pipe(new Minilog.backends.jQuery({
-    url: 'http://localhost:3000/log',
+    url: '/log',
     interval: 1000
     }));
 window.log = Minilog('client');
@@ -57,9 +59,12 @@ Relay.injectNetworkLayer(new RelayNetworkLayer('/graphql'));
 
 Form.addInputTypes({
   string: GCTextField,
+  number: GCTextField,
   boolean: GCBooleanField,
   radio: GCRadioButtonsField,
-  select: GCSelectField
+  select: GCSelectField,
+  array: GCCheckboxesField,
+  password: GCPasswordField
 })
 
 const ListContainerQueries = {
@@ -82,7 +87,9 @@ ReactDOM.render(
     createElement={ReactRouterRelay.createElement}>
     <Route
       path='/admin'
-      component={AdminDashboard}>
+      component={AdminDashboard}
+      queries={ListContainerQueries}
+    >
       <Route
         path='call-assignments'
         component={AdminCallAssignmentsSection}
@@ -106,8 +113,14 @@ ReactDOM.render(
       />
     </Route>
     <Route
+      path='/signup'
+      component={Signup}
+    />
+    <Route
       path='/'
-      component={Dashboard}>
+      component={Dashboard}
+      queries={CurrentUserQueries}
+      >
       <IndexRedirect to='/call-assignments' />
       <Route
         path='call-assignments'
@@ -126,10 +139,6 @@ ReactDOM.render(
           }}
         />
       </Route>
-      <Route
-        path='/signup'
-        component={Signup}
-      />
     </Route>
     <Route path="*" component={NotFound} />
   </Router>,

@@ -26,14 +26,17 @@ export default function(sequelize, DataTypes) {
       type: DataTypes.STRING,
       unique: true,
       validate: {
-        isEmail: true,
-        isLowercase: true
+        isEmail: true
+      },
+      set: function(val) {
+        this.setDataValue('email', val.toLowerCase());
       }
     },
     password: DataTypes.STRING,
     isAdmin: {
       type: DataTypes.BOOLEAN,
-      defaultValue: false
+      defaultValue: false,
+      field: 'is_admin'
     }
   }, {
     underscored: true,
@@ -47,9 +50,7 @@ export default function(sequelize, DataTypes) {
       associate: (models) => {
         User.hasMany(models.BSDAssignedCall, {
           as: 'assignedCalls',
-          foreignKey: {
-            name: 'caller_id'
-          }
+          foreignKey: 'caller_id'
         })
       }
     }

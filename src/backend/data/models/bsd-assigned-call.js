@@ -4,23 +4,23 @@ export default function(sequelize, DataTypes) {
   }, {
     underscored: true,
     tableName: 'bsd_assigned_calls',
+    indexes: [
+      { fields: ['caller_id'] },
+      { fields: ['interviewee_id'] },
+      { fields: ['call_assignment_id'] },
+    ],
     classMethods: {
       associate: (models) => {
         BSDAssignedCall.belongsTo(models.User,
           {
             as: 'caller',
-            foreignKey: {
-              name: 'caller_id',
-              uniqe: true
-            }
+            foreignKey: 'caller_id',
           })
         BSDAssignedCall.belongsTo(models.BSDPerson,
           {
             as: 'interviewee',
-            foreignKey: {
-              name: 'interviewee_id',
-              unique: true
-            }
+            constraints: false,
+            foreignKey: 'interviewee_id',
           })
         BSDAssignedCall.belongsTo(models.BSDCallAssignment, {as: 'callAssignment'})
       }

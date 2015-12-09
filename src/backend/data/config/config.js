@@ -1,11 +1,12 @@
-let config = {
+require('dotenv').load();
+var config = {
   url: process.env.DATABASE_URL,
   migrationStorageTableName: 'sequelize_meta',
   dialect: 'postgres'
 }
-let configOptions = {
+var configOptions = {
   development: config,
   production: config
 }
 
-export default configOptions;
+module.exports=configOptions;

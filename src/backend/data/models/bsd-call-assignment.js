@@ -4,15 +4,24 @@ export default function(sequelize, DataTypes) {
   }, {
     underscored: true,
     tableName: 'bsd_call_assignments',
+    indexes: [
+      { fields: ['gc_bsd_survey_id'] },
+      { fields: ['gc_bsd_group_id'] },
+    ],
     classMethods: {
       associate: (models) => {
-        BSDCallAssignment.belongsTo(models.BSDSurvey, {foreignKey: 'signup_form_id', as: 'survey'})
-        BSDCallAssignment.belongsTo(models.BSDGroup, {as: 'intervieweeGroup'});
+        BSDCallAssignment.belongsTo(models.GCBSDSurvey, {
+          foreignKey: 'gc_bsd_survey_id',
+          constraints: false,
+          as: 'survey'
+        })
+        BSDCallAssignment.belongsTo(models.GCBSDGroup, {
+          as: 'intervieweeGroup',
+          foreignKey: 'gc_bsd_group_id',
+        });
         BSDCallAssignment.hasMany(models.BSDAssignedCall, {
           as: 'assignedCalls',
-          foreignKey: {
-            name: 'call_assignment_id'
-          }
+          foreignKey: 'call_assignment_id'
         })
       }
     }

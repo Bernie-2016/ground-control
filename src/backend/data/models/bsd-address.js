@@ -1,7 +1,7 @@
 export default function(sequelize, DataTypes) {
-  return sequelize.define('BSDAddress', {
+  let BSDAddress = sequelize.define('BSDAddress', {
     id: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.INTEGER,
       field: 'cons_addr_id',
       primaryKey: true
     },
@@ -35,7 +35,7 @@ export default function(sequelize, DataTypes) {
     },
     zip: {
       type: DataTypes.STRING,
-      allowNull: true
+      allowNull: true,
     },
     zip4: {
       type: DataTypes.STRING,
@@ -52,6 +52,7 @@ export default function(sequelize, DataTypes) {
     updatedAt: 'modified_dt',
     createdAt: 'create_dt',
     underscored: true,
-    tableName: 'bsd_cons_addr',
+    tableName: 'bsd_addresses',
   })
+  return BSDAddress;
 }

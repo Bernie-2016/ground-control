@@ -2,7 +2,7 @@ import BSDClient from '../../bsd-instance';
 export default function(sequelize, DataTypes) {
   let BSDGroup = sequelize.define('BSDGroup', {
     id: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.INTEGER,
       field: 'cons_group_id',
       primaryKey: true
     },
@@ -13,7 +13,7 @@ export default function(sequelize, DataTypes) {
     }
   }, {
     underscored: true,
-    tableName: 'bsd_cons_group',
+    tableName: 'bsd_groups',
     updatedAt: 'modified_dt',
     createdAt: 'create_dt',
     classMethods: {

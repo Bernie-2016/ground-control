@@ -6,11 +6,14 @@ import GCForm from './forms/GCForm';
 import Form from 'react-formal';
 import yup from 'yup';
 import superagent from 'superagent';
+import {Styles} from 'material-ui';
+import {BernieTheme} from './styles/bernie-theme';
 
+@Styles.ThemeDecorator(Styles.ThemeManager.getMuiTheme(BernieTheme))
 export default class Signup extends React.Component {
   state = {
     formState : 'signup',
-    errorMessage: null
+    errorMessage: null,
   }
 
   clearError() {
@@ -18,44 +21,10 @@ export default class Signup extends React.Component {
   }
 
   formStates = {
-    login: {
-      formTitle: 'Login to get started',
-      formSchema: yup.object({
-        email: yup.string().email().required(),
-      }),
-      formElement: (
-        <div>
-          <Form.Field
-            name='email'
-            label='E-mail Address'
-          />
-          <Form.Field
-            name='password'
-            label='Password'
-          />
-        </div>
-      ),
-      onSubmit: (formState) => {
-        superagent
-          .post('/login')
-          .send({
-            email: formState.email,
-            password: formState.password
-          })
-          .end((err, res) => {
-            if (!err)
-              window.location = '/call-assignments';
-              // Ideally this would work with pushState, but it doesn't because relay has already cached the current user and has no idea that things are session-based.
-              //this.props.history.pushState(null, '/call-assignments')
-            else
-              this.setState({errorMessage: 'Incorrect login or password'});
-          })
-      }
-    },
     signup: {
       formTitle: 'Login or sign up make calls',
       formSchema: yup.object({
-        email: yup.string().required(),
+        email: yup.string().email().required(),
         password: yup.string().required(),
       }),
       formElement: (
@@ -66,11 +35,13 @@ export default class Signup extends React.Component {
           /><br />
           <Form.Field
             name='password'
+            type='password'
             label='Password'
           /><br />
         </div>
       ),
       onSubmit: (formState) => {
+        this.clearError();
         superagent
           .post('/signup')
           .send({
@@ -80,8 +51,6 @@ export default class Signup extends React.Component {
           .end((err, res) => {
             if (!err)
               window.location = '/call-assignments';
-              // Ideally this would work with pushState, but it doesn't because relay has already cached the current user and has no idea that things are session-based.
-              //this.props.history.pushState(null, '/call-assignments')
             else
               this.setState({errorMessage: 'Incorrect e-mail or password'});
           })

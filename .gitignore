@@ -5,3 +5,4 @@ src/backend/data/schema.graphql
 src/backend/data/schema.json
 rethinkdb_data
 src/frontend/public/js
+src/frontend/public/index.html

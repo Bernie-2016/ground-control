@@ -1,24 +1,26 @@
 export default function(sequelize, DataTypes) {
-  let BSDPersonGroup = sequelize.define('BSDPersonGroup', {
+  let BSDPersonBSDGroup = sequelize.define('BSDPersonBSDGroup', {
   }, {
     underscored: true,
     updatedAt: 'modified_dt',
     createdAt: 'create_dt',
-    tableName: 'bsd_cons__cons_group',
+    tableName: 'bsd_person_bsd_groups',
     classMethods: {
       associate: (models) => {
         models.BSDPerson.belongsToMany(models.BSDGroup, {
-          through: BSDPersonGroup,
+          through: BSDPersonBSDGroup,
           foreignKey: 'cons_id',
-          as: 'people'
+          as: 'people',
+          constraints: false
         });
         models.BSDGroup.belongsToMany(models.BSDPerson, {
-          through: BSDPersonGroup,
+          through: BSDPersonBSDGroup,
           foreignKey: 'cons_group_id',
-          as: 'groups'
+          as: 'groups',
+          constraints: false
         });
       }
     }
   })
-  return BSDPersonGroup;
+  return BSDPersonBSDGroup;
 }

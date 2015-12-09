@@ -3,51 +3,60 @@ import Relay from 'react-relay';
 import {BernieText, BernieColors} from './styles/bernie-css';
 import {Paper, List, ListItem, FlatButton} from 'material-ui';
 import SideBarLayout from './SideBarLayout';
-import Survey from './Survey'
+import SurveyRenderer from './SurveyRenderer';
 import moment from 'moment';
 import yup from 'yup'
 import GCForm from './forms/GCForm';
 import Form from 'react-formal';
+import SubmitCallSurvey from '../mutations/SubmitCallSurvey'
 
 export class CallAssignment extends React.Component {
   styles = {
     assignmentBar: {
       backgroundColor: BernieColors.lightGray,
       marginTop: 15,
+      marginLeft: 'auto',
+      marginRight: 'auto',
       marginBottom: 15,
-      marginRight: 15,
-      marginLeft: 15,
       paddingTop: 15,
       paddingLeft: 15,
       paddingRight: 15,
       paddingBottom: 15,
       color: BernieColors.darkGray,
       fontSize: '1em',
-      width: 'auto'
+      width: 'auto',
+      maxWidth: 720
     },
     callAssignmentQuestions: {
       fontSize: '1em',
       marginBottom: 15,
-      textAlign: 'center'
     },
     surveyFrame: {
       borderTop: 'solid 1px ' + BernieColors.lightGray,
     },
     questions: {
       paddingTop: 15,
+      maxWidth: 720,
+      marginLeft: 'auto',
+      marginRight: 'auto'
     },
     submitButton: {
-      textAlign: 'center',
-      width: '50%',
-      marginRight: 'auto',
-      marginLeft: 'auto'
+
     }
+  }
+
+  clearState() {
+    this.setState({
+      globalErrorMessage: null,
+    })
   }
 
   state = {
     completed: true,
-    reasonNotCompleted: 'NO_PICKUP',
-    leftVoicemail: null
+    reasonNotCompleted: null,
+    sentText: null,
+    leftVoicemail: null,
+    globalErrorMessage: null,
   }
 
   notCompletedReasons =
@@ -60,18 +69,51 @@ export class CallAssignment extends React.Component {
     'DISCONNECTED_NUMBER' : 'Disconnected number'
   }
 
-  formSchema = yup.object({
-    completed: yup.boolean().required(),
-    reasonNotCompleted: yup.string().oneOf(Object.keys(this.notCompletedReasons)).nullable(),
-    leftVoicemail: yup.boolean().nullable()
-  }).test('not-completed-reasons-required',
-  'If you did not complete the call, please fill out why and if you left a voicemail',
-    (value) => {
-      if (value.completed)
-        return true
-      else
-        return value.reasonNotCompleted !== null && value.leftVoicemail !== null
-  })
+  formSchema = yup
+    .object({
+      completed: yup
+        .boolean()
+        .required(),
+      reasonNotCompleted: yup
+        .string()
+        .nullable()
+        .test(
+          'not-completed-reasons-required',
+          'Fill out why you were unable to complete the call',
+          function(value) {
+            if (this.parent.completed)
+              return true;
+            else
+              return value !== null
+          }
+        ),
+      leftVoicemail: yup
+        .boolean()
+        .nullable()
+        .test(
+          'left-voicemail-required',
+          'Let us know if you left a voicemail',
+          function(value) {
+            if (this.parent.completed)
+              return true
+            else
+              return value !== null
+          }
+        ),
+      sentText: yup
+        .boolean()
+        .nullable()
+        .test(
+          'sent-text-required',
+          'Let us know if you sent a text',
+          function(value) {
+            if (this.parent.completed)
+              return true
+            else
+              return value !== null
+          }
+        )
+    })
 
   intervieweeName() {
     let interviewee = this.props.currentUser.intervieweeForCallAssignment;
@@ -96,9 +138,10 @@ export class CallAssignment extends React.Component {
 
     let sideBar = (
       <div style={{
-        ...BernieText.secondaryTitle,
+        ...BernieText.default,
         color: BernieColors.blue,
         fontSize: '1.5em',
+        fontWeight: 600
       }}>
         {name}
         <br />
@@ -106,11 +149,12 @@ export class CallAssignment extends React.Component {
       </div>
     )
 
+    let location = interviewee.address.city + ', ' + interviewee.address.state + ' ' + interviewee.address.zip
+
     let content = (
       <div style={BernieText.default}>
-        Email: filler@filler.com<br />
-        Location: New York, NY 10014<br />
-        Local Time: 4:00 PM<br />
+        Location: {location}<br />
+        Local Time: {moment().utcOffset(interviewee.address.localTime).format('h:mm a')}<br />
       </div>
     )
 
@@ -119,13 +163,47 @@ export class CallAssignment extends React.Component {
         content={content}
         sideBar={sideBar}
         sideBarStyle={{
-          width: 500,
+          width: 300,
         }}
         contentViewStyle={{
           marginLeft: 50,
         }}
       />
     )
+  }
+
+  submitCallSurvey(surveyFields) {
+    this.clearState();
+    let onSuccess = () => {
+     window.location.reload()
+    }
+
+    let onFailure = (transaction) => {
+      this.clearState();
+      this.setState({globalErrorMessage: 'Something went wrong trying to submit your survey. Try again in a bit.'})
+      log.error(transaction.getError());
+    }
+
+    let callSurveyMutation = new SubmitCallSurvey({
+      currentUser: this.props.currentUser,
+      completed: this.state.completed,
+      callAssignmentId: this.props.callAssignment.id,
+      intervieweeId: this.props.currentUser.intervieweeForCallAssignment.id,
+      leftVoicemail: this.state.leftVoicemail,
+      sentText: this.state.sentText,
+      reasonNotCompleted: this.state.reasonNotCompleted,
+      sentText: this.state.sentText,
+      surveyFieldValues: JSON.stringify(surveyFields)
+    });
+    Relay.Store.update(callSurveyMutation, {onFailure, onSuccess})
+      ;
+  }
+
+  submitHandler(formValue) {
+    if (this.state.completed)
+      this.refs.survey.refs.component.submit()
+    else
+      this.submitCallSurvey({});
   }
 
   render() {
@@ -143,17 +221,17 @@ export class CallAssignment extends React.Component {
           </div>
         </div>
       )
-    let submitHandler = (formValue) => {
-      if (this.state.completed)
-        this.refs.survey.refs.component.submit()
-    }
 
     let survey = (
       <div style={{
         ...this.styles.surveyFrame,
         display: this.state.completed ? 'block' : 'none'
       }}>
-        <Survey ref='survey' survey={this.props.callAssignment.survey} initialValues={{'email' : 'saikat@gomockingbird.com'}} />
+        <SurveyRenderer
+          ref='survey'
+          survey={this.props.callAssignment.survey}
+          interviewee={this.props.currentUser.intervieweeForCallAssignment}
+          onSubmitted={(surveyFields) => this.submitCallSurvey(surveyFields)} />
       </div>
     )
 
@@ -173,9 +251,13 @@ export class CallAssignment extends React.Component {
             name='leftVoicemail'
             label='Did you leave a voicemail?'
           />
+          <br />
+          <Form.Field
+            name='sentText'
+            label='Did you send a text message?'
+          />
         </div>
       )
-    submitHandler = submitHandler.bind(this)
     return (
       <div style={this.styles.container}>
         <Paper
@@ -186,13 +268,11 @@ export class CallAssignment extends React.Component {
         <div style={this.styles.questions}>
           <GCForm
             schema={this.formSchema}
-            onSubmit={submitHandler}
+            globalError={this.state.globalErrorMessage}
+            onSubmit={() => this.submitHandler()}
             value={this.state}
             onChange={(formValue) => {
               this.setState(formValue)
-            }}
-            onError={(errors) => {
-              // Implement
             }}
           >
             <div style={this.styles.callAssignmentQuestions}>
@@ -204,7 +284,7 @@ export class CallAssignment extends React.Component {
             </div>
             {survey}
             <div style={this.styles.submitButton}>
-              <Form.Button type='submit' label='Submit and on to the next volunteer!' fullWidth={true} style={this.styles.submitButton}/>
+              <Form.Button type='submit' label='Submit and on to the person!' fullWidth={true} style={this.styles.submitButton}/>
             </div>
           </GCForm>
         </div>
@@ -214,14 +294,14 @@ export class CallAssignment extends React.Component {
 }
 
 export default Relay.createContainer(CallAssignment, {
-  initialVariables: { id: null },
+  initialVariables: { id: '' },
   fragments: {
     callAssignment: () => Relay.QL`
       fragment on CallAssignment {
         id
         name
         survey {
-          ${Survey.getFragment('survey')}
+          ${SurveyRenderer.getFragment('survey')}
         }
       }
     `,
@@ -229,6 +309,7 @@ export default Relay.createContainer(CallAssignment, {
       fragment on User {
         id
         intervieweeForCallAssignment(callAssignmentId:$id) {
+          id
           prefix
           firstName
           middleName
@@ -240,6 +321,16 @@ export default Relay.createContainer(CallAssignment, {
           employer
           occupation
           phone
+          email
+          address {
+            city
+            state
+            zip
+            localTime
+            latitude
+            longitude
+          }
+          ${SurveyRenderer.getFragment('interviewee')}
         }
       }
     `

@@ -1,19 +1,19 @@
 export default function(sequelize, DataTypes) {
-  return sequelize.define('BSDEmail', {
+  return sequelize.define('BSDEventType', {
     id: {
       type: DataTypes.INTEGER,
-      field: 'cons_email_id',
+      field: 'event_type_id',
       primaryKey: true
     },
-    isPrimary: {
-      type: DataTypes.BOOLEAN,
-      field: 'is_primary'
-    },
-    email: DataTypes.STRING,
+    name: DataTypes.STRING,
+    description: {
+      type: DataTypes.STRING,
+      allowNull: true
+    }
   }, {
     updatedAt: 'modified_dt',
     createdAt: 'create_dt',
     underscored: true,
-    tableName: 'bsd_emails',
+    tableName: 'bsd_event_types',
   })
 }

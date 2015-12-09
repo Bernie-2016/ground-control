@@ -20,11 +20,21 @@ import Minilog from 'minilog';
 
 writeSchema();
 
+const wrap = (fn) => {
+  return (...args) =>
+  {
+    return fn(...args)
+      .catch((ex) => {
+        process.nextTick(() => { throw ex; });
+      })
+  }
+}
+
 const clientLogger = Minilog('client')
 const SequelizeStore = SequelizeStoreFactory(session.Store)
 const Mailgun = new MG(process.env.MAILGUN_KEY, process.env.MAILGUN_DOMAIN);
 const BSDClient = new BSD(process.env.BSD_HOST, process.env.BSD_API_ID, process.env.BSD_API_SECRET);
-const port = process.env.APP_PORT || process.env.PORT;
+const port = process.env.PORT;
 const publicPath = path.resolve(__dirname, '../frontend/public');
 
 passport.use('signup', new LocalStrategy(
@@ -33,16 +43,16 @@ passport.use('signup', new LocalStrategy(
     passwordField: 'password',
     passReqToCallback: true
   },
-  async (req, email, password, done) => {
+  wrap(async (req, email, password, done) => {
     let user = await models.User.findOne({
       where: {
-        email: email
+        email: email.toLowerCase()
       }
     });
 
     if (!user) {
       let newUser = await models.User.create({
-        email: email,
+        email: email.toLowerCase(),
         password: password,
       });
       return done(null, newUser);
@@ -52,17 +62,16 @@ passport.use('signup', new LocalStrategy(
     }
     return done(null, user);
   }
-));
+)));
 
-passport.serializeUser(async (user, done) => {
+passport.serializeUser(wrap(async (user, done) => {
   done(null, user.id);
-});
+}));
 
-passport.deserializeUser(async (id, done) => {
+passport.deserializeUser(wrap(async (id, done) => {
   let user = await models.User.findById(id);
   done(null, user);
-  return user;
-});
+}));
 
 const app = express();
 const sessionStore = new SequelizeStore({
@@ -87,12 +96,12 @@ app.use('/graphql', graphQLHTTP((request) => {
 }));
 
 // this endpoint may be used for caching and serving available event types and their attributes to the event creation form
-app.get('/events/types.json', async (req, res) => {
+app.get('/events/types.json', wrap(async (req, res) => {
   let result = await BSDClient.getEventTypes();
   res.json(result);
-});
+}));
 
-app.post('/log', (req, res) => {
+app.post('/log', wrap(async (req, res) => {
   let parsedURL = url.parse(req.url, true);
   let logs = req.body.logs;
   logs.forEach((message) => {
@@ -118,26 +127,26 @@ app.post('/log', (req, res) => {
   })
 
   res.send('')
-})
+}))
 
 app.post('/signup',
   passport.authenticate('signup'),
-  (req, res) => {
+  wrap(async (req, res) => {
   res.send('Success!')
-})
+}))
 
 // this endpoint is for testing email rendering/sending
-app.get('/events/confirmation-email', async (req, res) => {
+app.get('/events/confirmation-email', wrap(async (req, res) => {
   let event_types = await BSDClient.getEventTypes();
   let result = await Mailgun.sendEventConfirmation(demoData.EventCreationForm, demoData.EventCreationConstituent, event_types, true);
   res.send(result.html)
-});
+}));
 
-app.get('/events/create', (req, res) => {
+app.get('/events/create', wrap(async (req, res) => {
   res.sendFile(publicPath + '/events/create_event.html');
-});
+}));
 
-app.post('/events/create', async (req, res) => {
+app.post('/events/create', wrap(async (req, res) => {
   let form = req.body;
 
   // constituent object not being returned right now
@@ -158,7 +167,7 @@ app.post('/events/create', async (req, res) => {
   		Mailgun.sendEventConfirmation(form, constituent, event_types);
   	}
   }
-});
+}));
 
 app.use(fallback('index.html', { root: publicPath }))
 

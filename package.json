@@ -5,12 +5,16 @@
   "repository": "Bernie-2016/ground-control",
   "version": "0.1.0",
   "scripts": {
+    "bundle": "mustache ./src/frontend/index/production.json ./src/frontend/index/index.mustache > ./src/frontend/public/index.html && mkdir -p ./src/frontend/public/js && webpack --config ./webpack/config.js",
+    "prestart": "npm run bundle",
     "start": "./run ./src/backend/server.js",
-    "dev": "nf start --procfile Procfile.dev",
-    "bundle": "mkdir -p ./src/frontend/public/js && ./run webpack --config ./webpack/config.js",
+    "predev": "mustache ./src/frontend/index/development.json ./src/frontend/index/index.mustache > ./src/frontend/public/index.html",
+    "dev": "nf start -w --procfile Procfile.dev",
     "lint": "eslint src",
     "seed": "./run ./src/backend/data/seed.js",
-    "postinstall": "npm run bundle"
+    "seed-zips": "./run ./src/backend/data/seed-zips.js",
+    "sequelize": "cd ./src/backend/data && sequelize",
+    "sync": "./run ./src/backend/data/sync.js"
   },
   "dependencies": {
     "babel": "^5.8.21",
@@ -22,6 +26,7 @@
     "bluebird": "^2.10.2",
     "body-parser": "1.14.1",
     "connect-session-sequelize": "^2.3.1",
+    "csv-load-sync": "0.0.3",
     "dotenv": "^1.2.0",
     "email-templates": "2.0.1",
     "express": "^4.13.1",
@@ -37,8 +42,10 @@
     "jquery": "^2.1.4",
     "mailgun-js": "0.7.6",
     "material-ui": "^0.14.0-rc1",
+    "minilog": "git://github.com/saikat/minilog.git#ajax-logger-fix",
     "moment": "^2.10.6",
     "moment-timezone": "^0.4.1",
+    "mustache": "^2.2.0",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
     "pg": "^4.4.3",
@@ -46,6 +53,7 @@
     "react": "^0.14.2",
     "react-dom": "^0.14.0",
     "react-formal": "^0.14.2",
+    "react-google-maps": "^4.7.0",
     "react-relay": "^0.4.0",
     "react-router": "^1.0.0-rc3",
     "react-router-relay": "^0.7.0",
@@ -54,12 +62,12 @@
     "retry": "^0.8.0",
     "sequelize": "^3.14.1",
     "sequelize-cli": "^2.2.1",
+    "stacktrace-js": "^1.0.1",
     "superagent": "^1.4.0",
+    "tz-lookup": "^6.0.1",
     "webpack": "^1.10.5",
     "xml2js": "^0.4.15",
-    "yup": "^0.11.0",
-    "minilog": "git://github.com/saikat/minilog.git#ajax-logger-fix",
-    "stacktrace-js": "^1.0.1"
+    "yup": "^0.11.0"
   },
   "devDependencies": {
     "foreman": "latest",

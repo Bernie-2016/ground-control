@@ -2,7 +2,7 @@ import BSDClient from '../../bsd-instance';
 export default function(sequelize, DataTypes) {
   let BSDSurvey = sequelize.define('BSDSurvey', {
     id: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.INTEGER,
       field: 'signup_form_id',
       primaryKey: true
     },
@@ -15,7 +15,7 @@ export default function(sequelize, DataTypes) {
     updatedAt: 'modified_dt',
     createdAt: 'create_dt',
     underscored: true,
-    tableName: 'bsd_signup_form',
+    tableName: 'bsd_surveys',
     classMethods: {
       createFromBSDObject: (BSDObject) => {
         let newSurvey = {...BSDObject};

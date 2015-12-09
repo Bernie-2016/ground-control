@@ -6,7 +6,7 @@ import {BernieTheme} from './styles/bernie-theme';
 import {BernieColors} from './styles/bernie-css';
 
 @Styles.ThemeDecorator(Styles.ThemeManager.getMuiTheme(BernieTheme))
-export default class AdminDashboard extends React.Component {
+class AdminDashboard extends React.Component {
   tabs = [
     {
       value: '/admin/call-assignments',
@@ -39,3 +39,14 @@ export default class AdminDashboard extends React.Component {
     )
   }
 }
+
+// We only do this to auth protect this component.  Otherwise it is unnecessary.
+export default Relay.createContainer(AdminDashboard, {
+  fragments: {
+    listContainer: () => Relay.QL`
+      fragment on ListContainer {
+        id
+      }
+    `
+  }
+})

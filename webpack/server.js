@@ -11,16 +11,16 @@ config['output'] = {
 }
 let compiler = webpack(config);
 
-let connstring = `http://${process.env.APP_HOST||"localhost"}:${process.env.APP_PORT}`
+let connstring = `http://${process.env.APP_HOST||'localhost'}:${process.env.WEBPACK_PROXY_PORT}`
 
-console.log("Proxying requests to:",connstring)
+console.log('Proxying requests to:',connstring)
 
 let app = new WebpackDevServer(compiler, {
   contentBase: '/js/',
   publicPath: '/js/',
   headers: { 'Access-Control-Allow-Origin': '*' },
   proxy: {
-    '*': `http://${process.env.APP_HOST}:${process.env.APP_PORT}`
+    '*': `http://${process.env.APP_HOST}:${process.env.WEBPACK_PROXY_PORT}`
   },
   stats: {colors: true},
 });

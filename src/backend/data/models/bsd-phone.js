@@ -1,7 +1,7 @@
 export default function(sequelize, DataTypes) {
   return sequelize.define('BSDPhone', {
     id: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.INTEGER,
       field: 'cons_phone_id',
       primaryKey: true
     },
@@ -9,14 +9,7 @@ export default function(sequelize, DataTypes) {
       type: DataTypes.BOOLEAN,
       field: 'is_primary'
     },
-    number: {
-      type: DataTypes.STRING,
-      field: 'phone',
-      unique: true,
-      validate: {
-        isNumeric: true
-      }
-    },
+    phone: DataTypes.STRING,
     textOptOut: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
@@ -26,6 +19,6 @@ export default function(sequelize, DataTypes) {
     updatedAt: 'modified_dt',
     createdAt: 'create_dt',
     underscored: true,
-    tableName: 'bsd_cons_phone',
+    tableName: 'bsd_phones',
   })
 }

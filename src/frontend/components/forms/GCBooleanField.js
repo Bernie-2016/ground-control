@@ -13,11 +13,19 @@ export default class GCBooleanField extends React.Component {
     },
   }
   render() {
+    let error = <div></div>
     let labelStyle = this.styles.label;
     let value = this.props.value;
 
     if (this.props.labelStyle)
       labelStyle = this.props.labelStyle;
+    if (this.props.errorText) {
+      labelStyle = {
+        ...labelStyle,
+        color: BernieColors.red
+      }
+      error = <div style={BernieText.inputError}>{this.props.errorText}</div>
+    }
 
     let yesButton = (
       <FlatButton
@@ -53,6 +61,8 @@ export default class GCBooleanField extends React.Component {
         <br />
         {yesButton}
         {noButton}
+        <br />
+        {error}
       </div>
     )
   }

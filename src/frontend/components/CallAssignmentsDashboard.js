@@ -1,6 +1,5 @@
 import React from 'react';
 import Relay from 'react-relay';
-import Survey from './Survey'
 import {BernieText, BernieColors} from './styles/bernie-css'
 import Radium from 'radium'
 import SideBarLayout from './SideBarLayout';
@@ -22,7 +21,8 @@ export default class CallAssignmentsDashboard extends React.Component {
             primary: BernieColors.blue,
             swoosh: BernieColors.red
           }}
-          tabs={[{
+          tabs={[
+/*          {
             value: '/call-assignments/stats',
             label: 'Stats'
           },
@@ -30,6 +30,7 @@ export default class CallAssignmentsDashboard extends React.Component {
             value: '/call-assignments/invite',
             label: 'Invite'
           },
+          */
           {
             value: '/call-assignments',
             label: 'All Assignments'

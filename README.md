@@ -10,7 +10,7 @@ The easiest way to get started in Linux is with [Docker](https://docs.docker.com
 
 ### OS X
 
-In OS X, we currently run everything locally using a Procfile and node-foreman. To get started, install [Node.js](https://nodejs.org/en/download/) and [Homebrew](http://brew.sh/). Then do the following:
+In OS X, we currently run everything locally using a Procfile and node-foreman. To get started, install [Node.js](https://nodejs.org/en/download/) and [Homebrew](http://brew.sh/). Then clone this repository and cd into ground-control. Then do the following:
 
 ```
 npm install
@@ -40,10 +40,11 @@ Currently, Ground Control is two things:
 
 To get started with Ground Control, once it's running, go to `http://localhost:3000/admin`. From there, you can see the events administration section and the call assignment creation section.  To create a call assignment, do the following:
 
-1. Make a survey in Blue State Digital.  If you are developing on Ground Control, ask Saikat for access to the BSD testbed.
-2. Make a constituent group that you wish to be the target of your phonebanking assignment in BSD.
-3. Go to `http://localhost:3000/admin/call-assignments`, click Create, and enter the BSD IDs of your survey and target group in the form.
-4. Click create
+1. Make a survey in Blue State Digital.  If you are developing on Ground Control, ask Saikat for access to the BSD testbed. Make sure to use the "GROUND CONTROL - Survey" wrapper.
+2. If you wish Ground Control to be able to do dynamic stuff with the Blue State Digital fields, tag the fields with something within square brackets at the beginning.  E.g. [event_id]Here's a field label.
+3. Make a constituent group that you wish to be the target of your phonebanking assignment in BSD (or figure out a SQL query to use).
+4. Go to `http://localhost:3000/admin/call-assignments`, click Create, and enter the BSD IDs of your survey and target interviewee group in the form.
+5. Click create
 
 Now, if you go to `http://localhost:3000` and signup/login, you shoul see your assignment on the left side.  Click it to test it out and start making calls!
 

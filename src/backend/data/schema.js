@@ -8,7 +8,8 @@ import {
   GraphQLSchema,
   GraphQLString,
   GraphQLID,
-  GraphQLEnumType
+  GraphQLEnumType,
+  GraphQLFloat
 } from 'graphql';
 
 import {
@@ -27,18 +28,23 @@ import {
   BSDAddress,
   BSDEmail,
   BSDGroup,
+  BSDCall,
   BSDCallAssignment,
   BSDAssignedCall,
   BSDSurvey,
   BSDEvent,
+  GCBSDGroup,
+  GCBSDSurvey,
+  ZipCode,
   User,
-  Sequelize
+  sequelize
 } from './models';
 
 import moment from 'moment-timezone';
 import Promise from 'bluebird';
 import Maestro from '../maestro';
 import url from 'url';
+import TZLookup from 'tz-lookup';
 
 class GraphQLError extends Error {
   constructor(errorObject) {
@@ -79,16 +85,16 @@ let {nodeInterface, nodeField} = nodeDefinitions(
     let {type, id} = fromGlobalId(globalId);
     if (type === 'Person')
       return BSDPerson.findById(id);
-    if (type === 'Group')
-      return BSDGroup.findById(id);
     if (type === 'CallAssignment')
       return BSDCallAssignment.findById(id);
     if (type === 'Survey')
-      return BSDSurvey.findById(id);
+      return GCBSDSurvey.findById(id);
     if (type === 'Event')
       return BSDEvent.findById(id);
     if (type === 'User')
       return User.findById(id);
+    if (type === 'Address')
+      return BSDAddress.findById(id);
     if (type === 'ListContainer')
       return SharedListContainer;
     return null;
@@ -100,12 +106,14 @@ let {nodeInterface, nodeField} = nodeDefinitions(
       return GraphQLCallAssignment;
     if (obj instanceof BSDCall)
       return GraphQLCall;
-    if (obj instanceof BSDSurvey)
+    if (obj instanceof GCBSDSurvey)
       return GraphQLSurvey;
     if (obj instanceof ListContainer)
       return GraphQLListContainer;
     if (obj instanceof BSDEvent)
       return GraphQLEvent;
+    if (obj instanceof BSDAddress)
+      return GraphQLAddress;
     if (obj instanceof User)
       return GraphQLUser;
     return null;
@@ -161,45 +169,102 @@ const GraphQLUser = new GraphQLObjectType({
       },
       resolve: async (user, {callAssignmentId}) => {
         let localId = fromGlobalId(callAssignmentId).id;
-        let interviewee = await user.getAssignedCalls({
+        let assignedCalls = await user.getAssignedCalls({
           where: {
             call_assignment_id: localId
           },
-        })[0]
-
-        if (interviewee)
+        })
+        let assignedCall = assignedCalls[0]
+        let callAssignment = await BSDCallAssignment.findById(localId);
+        if (assignedCall) {
+          let interviewee = await assignedCall.getInterviewee()
           return interviewee
+        }
         else {
-          let persons = await BSDPerson.findAll({
-            order: [[Sequelize.fn( 'RANDOM' )]],
-//            limit: 10, // We should limit this but see https://github.com/sequelize/sequelize/issues/3095
-            where: {
-              '$assignedCalls.id$' : null,
+          let allOffsets = [-10, -9, -8, -7, -6, -5, -4]
+          let validOffsets = []
+          allOffsets.forEach((offset) => {
+            let time = moment().utcOffset(offset)
+            if (time.hours() > 9 && time.hours() < 21)
+              validOffsets.push(offset)
+          })
+          if (validOffsets.length === 0)
+            return null;
+          // This is maybe the worst thing of all time. Switch to knex when we can.
+          let group = await callAssignment.getIntervieweeGroup();
+          let filterQuery = '';
+          if (group.cons_group_id)
+            filterQuery = `
+              INNER JOIN (
+                  SELECT id, cons_id
+                  FROM bsd_person_bsd_groups
+                  WHERE cons_group_id=${group.cons_group_id}
+                ) AS cons_groups
+                ON persons.cons_id=cons_groups.cons_id'
+            `
+          else if (group.query && group.query !== 'EVERYONE')
+            filterQuery = `
+              INNER JOIN (
+                  ${group.query}
+                ) AS inner_query
+                ON persons.cons_id=inner_query.cons_id
+            `
+          let query = `
+            SELECT *
+            FROM bsd_people AS persons
+            INNER JOIN bsd_emails AS emails
+              ON persons.cons_id=emails.cons_id
+            INNER JOIN bsd_phones AS phones
+              ON persons.cons_id=phones.cons_id
+            INNER JOIN (
+              SELECT id, cons_id
+              FROM bsd_addresses AS addresses
+              INNER JOIN zip_codes AS zip_codes
+              ON zip_codes.zip=addresses.zip
+              WHERE
+                addresses.zip NOT BETWEEN '50001' AND '52809' AND
+                addresses.zip NOT BETWEEN '68119' AND '68120' AND
+                addresses.zip NOT BETWEEN '03031' AND '03897' AND
+                addresses.zip NOT BETWEEN '29001' AND '29948' AND
+                zip_codes.timezone_offset IN (${validOffsets.join(',')})
+              ) AS addresses
+              ON persons.cons_id=addresses.cons_id
+            ${filterQuery}
+            LEFT OUTER JOIN bsd_assigned_calls AS assigned_calls
+              ON persons.cons_id=assigned_calls.interviewee_id
+            LEFT OUTER JOIN (
+              SELECT id, interviewee_id
+              FROM bsd_calls
+              WHERE
+                call_assignment_id = :assignmentId AND
+                attempted_at > :lastCalledDate
+              ) AS calls
+              ON persons.cons_id=calls.interviewee_id
+            WHERE
+              calls.id IS NULL AND
+              assigned_calls.id IS NULL
+            LIMIT 1
+          `
+
+          let persons = await sequelize.query(query, {
+            replacements: {
+              assignmentId: localId,
+              lastCalledDate: new Date(new Date() - 7 * 24 * 60 * 60 * 1000)
             },
-            include: [
-            {
-              model: BSDPhone,
-              required: true,
-              as: 'phones'
-            },
-            {
-              model: BSDEmail,
-              required: true,
-              as: 'emails'
-            },
-            {
-              model: BSDAddress,
-              required: true,
-              as: 'addresses'
-            },
-            {
-              model: BSDAssignedCall,
-              required: false,
-              as: 'assignedCalls',
-            }
-          ]})
-          let person = persons[0]
-          if (person) {
+          })
+          if (persons && persons.length > 0 && persons[0].length > 0) {
+            let person = persons[0][0]
+            // Also a big hack - not sure how to convert fieldnames to model attributes without doing it explicitly.  We should maybe just switch to using snake case model attributes and get rid of all the manual conversion code.
+            person = BSDPerson.build({
+              ...person,
+              id: person.cons_id,
+              firstName: person.firstname,
+              middleName: person.middlename,
+              lastName: person.lastname,
+              birthDate: person.birth_dt,
+              created_at: person.create_dt,
+              updated_at: person.modified_dt,
+            })
             let assignedCall = await BSDAssignedCall.create({
               caller_id: user.id,
               interviewee_id: person.id,
@@ -207,8 +272,31 @@ const GraphQLUser = new GraphQLObjectType({
             })
             return person
           }
-          return null;
         }
+      }
+    }
+  }),
+  interfaces: [nodeInterface]
+})
+
+const GraphQLAddress = new GraphQLObjectType({
+  name: 'Address',
+  description: 'An address',
+  fields: () => ({
+    id: globalIdField('Address'),
+    line1: { type: GraphQLString },
+    line2: { type: GraphQLString },
+    line3: { type: GraphQLString },
+    city: { type: GraphQLString },
+    state: { type: GraphQLString },
+    zip: { type: GraphQLString },
+    latitude: { type: GraphQLFloat },
+    longitude: { type: GraphQLFloat },
+    localTime: {
+      type: GraphQLString,
+      resolve: async (address) => {
+        let tz = TZLookup(address.latitude, address.longitude)
+        return moment().tz(tz).format();
       }
     }
   }),
@@ -233,13 +321,39 @@ const GraphQLPerson = new GraphQLObjectType({
     phone: {
       type: GraphQLString,
       resolve: async (person) => {
-        let phones = await person.getCached('phones')
-        let number = phones[0].number
-        phones.forEach((phoneObj) => {
-          if (phoneObj.isPrimary)
-            number = phoneObj.number;
+        return person.getPrimaryPhone()
+      }
+    },
+    email: {
+      type: GraphQLString,
+      resolve: async (person) => {
+        return person.getPrimaryEmail();
+      }
+    },
+    address: {
+      type: GraphQLAddress,
+      resolve: async (person) => {
+        return person.getPrimaryAddress();
+      }
+    },
+    nearbyEvents: {
+      type: new GraphQLList(GraphQLEvent),
+      args: {
+        within: { type: GraphQLInt }
+      },
+      resolve: async (person, {within}) => {
+        let address = await person.getPrimaryAddress()
+        let boundingDistance = within / 69
+        return BSDEvent.findAll({
+          where: {
+            latitude: {
+              $between: [address.latitude - boundingDistance, address.latitude + boundingDistance]
+            },
+            longitude: {
+              $between: [address.longitude - boundingDistance, address.longitude + boundingDistance]
+            }
+          }
         })
-        return number;
       }
     }
   }),
@@ -269,6 +383,8 @@ const GraphQLEvent = new GraphQLObjectType({
     startDate: { type: GraphQLString },
     duration: { type: GraphQLInt },
     capacity: { type: GraphQLInt },
+    latitude: { type: GraphQLFloat },
+    longitude: { type: GraphQLFloat },
     attendeeVolunteerShow: { type: GraphQLBoolean },
     attendeeVolunteerMessage: { type: GraphQLString },
     isSearchable: { type: GraphQLInt },
@@ -298,6 +414,17 @@ const GraphQLCallAssignment = new GraphQLObjectType({
       type: GraphQLSurvey,
       resolve: (assignment) => assignment.getSurvey()
     },
+    query: {
+      type: GraphQLString,
+      resolve: async (assignment) => {
+        let group = await assignment.getIntervieweeGroup();
+        if (group.cons_group_id) {
+          return 'BSD Constituent Group: ' + group.cons_group_id
+        }
+        else
+          return group.query
+      }
+    }
   }),
   interfaces: [nodeInterface]
 });
@@ -314,23 +441,99 @@ const GraphQLSurvey = new GraphQLObjectType({
   description: 'A survey to be filled out by a person',
   fields: () => ({
     id: globalIdField('Survey'),
-    slug: { type: GraphQLString },
     fullURL: {
       type: GraphQLString,
-      resolve: (survey) => {
-        return url.resolve('https://' + process.env.BSD_HOST, '/page/s/' + survey.slug)
+      resolve: async (survey) => {
+        let underlyingSurvey = await survey.getBSDSurvey();
+        let slug = underlyingSurvey.slug;
+        return url.resolve('https://' + process.env.BSD_HOST, '/page/s/' + slug)
       }
-    }
+    },
+    renderer: { type: GraphQLString }
   }),
   interfaces: [nodeInterface]
+})
+
+const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
+  name: 'SubmitCallSurvey',
+  inputFields: {
+    callAssignmentId: { type: new GraphQLNonNull(GraphQLString) },
+    intervieweeId: { type: new GraphQLNonNull(GraphQLString) },
+    completed: { type: new GraphQLNonNull(GraphQLBoolean) },
+    leftVoicemail: { type: GraphQLBoolean },
+    sentText: { type: GraphQLBoolean },
+    reasonNotCompleted: { type: GraphQLString },
+    surveyFieldValues: { type: new GraphQLNonNull(GraphQLString) }
+  },
+  outputFields: {
+    currentUser: {
+      type: GraphQLUser,
+    }
+  },
+  mutateAndGetPayload: async ({callAssignmentId, intervieweeId, completed, leftVoicemail, sentText, reasonNotCompleted, surveyFieldValues}, {rootValue}) => {
+    authRequired(rootValue);
+    let caller = rootValue.user;
+    let localIntervieweeId = parseInt(fromGlobalId(intervieweeId).id, 10);
+    let localCallAssignmentId = parseInt(fromGlobalId(callAssignmentId).id, 10);
+    return sequelize.transaction(async (t) => {
+      // To ensure that the assigned call exists
+      let assignedCall = await BSDAssignedCall.findOne({
+        where: {
+          caller_id: caller.id
+        }
+      })
+
+      let assignedCallInfo = {
+        callerId: assignedCall.caller_id,
+        intervieweeId: assignedCall.interviewee_id,
+        callAssignmentId: assignedCall.call_assignment_id
+      }
+
+      let submittedCallInfo = {
+        callerId: caller.id,
+        intervieweeId: localIntervieweeId,
+        callAssignmentId: localCallAssignmentId
+      }
+
+      Object.keys(assignedCallInfo).forEach((key) => {
+        if (assignedCallInfo[key] !== submittedCallInfo[key]) {
+          throw new Error('Assigned call does not match submitted call info.\n assignedCallInfo:' + JSON.stringify(assignedCallInfo) + '\nsubmittedCallInfo:' + JSON.stringify(submittedCallInfo))
+        }
+      });
+
+      let callAssignment = await BSDCallAssignment.findById(localCallAssignmentId)
+      let survey = await callAssignment.getSurvey()
+      let fieldValues = JSON.parse(surveyFieldValues)
+      fieldValues['person'] = await BSDPerson.findById(localIntervieweeId);
+      await survey.process(fieldValues)
+
+      let promises = [
+        assignedCall.destroy(),
+        BSDCall.create({
+          completed: completed,
+          attemptedAt: new Date(),
+          leftVoicemail: leftVoicemail,
+          sentText: sentText,
+          reasonNotCompleted: reasonNotCompleted,
+          caller_id: caller.id,
+          interviewee_id: assignedCall.interviewee_id,
+          call_assignment_id: assignedCall.call_assignment_id
+        })
+      ]
+      await Promise.all(promises);
+      return caller;
+    })
+  }
 })
 
 const GraphQLCreateCallAssignment = mutationWithClientMutationId({
   name: 'CreateCallAssignment',
   inputFields: {
     name: { type: new GraphQLNonNull(GraphQLString) },
-    intervieweeGroupId: { type: new GraphQLNonNull(GraphQLString) },
-    surveyId: { type: new GraphQLNonNull(GraphQLString) },
+    intervieweeGroup: { type: new GraphQLNonNull(GraphQLString) },
+    surveyId: { type: new GraphQLNonNull(GraphQLInt) },
+    renderer: { type: new GraphQLNonNull(GraphQLString) },
+    processors: { type: new GraphQLList(GraphQLString) }
   },
   outputFields: {
     listContainer: {
@@ -338,39 +541,88 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
       resolve: () => SharedListContainer
     }
   },
-  mutateAndGetPayload: async ({name, intervieweeGroupId, surveyId}, {rootValue}) => {
+  mutateAndGetPayload: async ({name, intervieweeGroup, surveyId, renderer, processors}, {rootValue}) => {
+    authRequired(rootValue);
     adminRequired(rootValue);
-    let [intervieweeGroup, survey] = await Promise.all([
-        BSDGroup.findWithBSDCheck(intervieweeGroupId),
-        BSDSurvey.findWithBSDCheck(surveyId)
-      ]);
-    if (!intervieweeGroup)
-      throw new GraphQLError({
-        status: 400,
-        message: 'Provided group ID does not exist in BSD.'
-      });
+    let groupText = intervieweeGroup;
+    let group = null;
+    let survey = null;
+    return sequelize.transaction(async (t) => {
+      if (/^\d+$/.test(groupText)) {
+        let underlyingGroup = await BSDGroup.findWithBSDCheck(groupText)
+        if (!underlyingGroup)
+          throw new GraphQLError({
+            status: 400,
+            message: 'Provided group ID does not exist in BSD.'
+          });
+        group = await GCBSDGroup.create({
+          cons_group_id: parseInt(groupText, 10)
+        })
+      }
+      else {
+        let query = groupText;
+        if (query.toLowerCase().indexOf('drop') !== -1)
+          throw new GraphQLError({
+            status: 400,
+            message: 'Cannot use DROP in your SQL'
+          })
+        if (query.toUpperCase() === 'EVERYONE')
+          query = query.toUpperCase()
 
-    if (!survey)
-      throw new GraphQLError({
-        status: 400,
-        message: 'Provided survey ID does not exist in BSD.'
-      });
+        if (query !== 'EVERYONE') {
+          let error = null;
+          let results = null;
+          try {
+            results = await sequelize.query(query)
+            if (!results || !results.length)
+              error = 'Invalid SQL query'
+          } catch (ex) {
+            error = 'Invalid SQL query'
+          }
+          if (!error) {
+            if (results[0].length === 0)
+                error = 'SQL query returns no results'
 
+            let firstResult = results[0][0];
+            if (!firstResult.cons_id)
+              error = 'SQL query needs to return a list of cons_ids'
+          }
+          if (error)
+            throw new GraphQLError({
+              status: 400,
+              message: error
+            })
+        }
+        group = await GCBSDGroup.create({
+          query: query
+        })
+      }
 
-    let callAssignment = await BSDCallAssignment.create({
-      name: name,
+      let underlyingSurvey = await BSDSurvey.findWithBSDCheck(surveyId)
+
+      if (!underlyingSurvey)
+        throw new GraphQLError({
+          status: 400,
+          message: 'Provided survey ID does not exist in BSD.'
+        });
+      survey = await GCBSDSurvey.create({
+        signup_form_id: surveyId,
+        renderer: renderer,
+        processors: processors
+      })
+      return BSDCallAssignment.create({
+        name: name,
+        gc_bsd_group_id: group.id,
+        gc_bsd_survey_id: survey.id
+      })
     })
-
-    return Promise.all([
-      callAssignment.setIntervieweeGroup(intervieweeGroup),
-      callAssignment.setSurvey(survey)
-    ])
   }
 });
 
 let RootMutation = new GraphQLObjectType({
   name: 'RootMutation',
   fields: () => ({
+    submitCallSurvey: GraphQLSubmitCallSurvey,
     createCallAssignment: GraphQLCreateCallAssignment,
   })
 });

@@ -50,11 +50,6 @@ export const BernieText = {
     letterSpacing: '0.1em',
   },
 
-  small: {
-    color: BernieColors.gray,
-    // fontSize: '0.9em',
-  },
-
   smallHeader: {
     color: BernieColors.blue,
     // fontSize: '1em',
@@ -67,6 +62,12 @@ export const BernieText = {
   menuItem: {
     fontFamily: 'Roboto, sans-serif',
     fontWeight: 400
+  },
+  
+  inputError: {
+    color: BernieColors.red,
+    fontFamily: 'freight-sans-pro',
+    fontSize: '0.8em'
   }
 }
 

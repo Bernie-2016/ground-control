@@ -6,7 +6,7 @@ import {BernieTheme} from './styles/bernie-theme';
 import {BernieColors} from './styles/bernie-css';
 
 @Styles.ThemeDecorator(Styles.ThemeManager.getMuiTheme(BernieTheme))
-export default class Dashboard extends React.Component {
+class Dashboard extends React.Component {
   tabs = [{
       value:'/call-assignments',
       label: 'Make Calls',
@@ -56,3 +56,14 @@ export default class Dashboard extends React.Component {
     )
   }
 }
+
+// We only do this to auth protect this component.  Otherwise it is unnecessary.
+export default Relay.createContainer(Dashboard, {
+  fragments: {
+    currentUser: () => Relay.QL`
+      fragment on User {
+        id
+      }
+    `
+  }
+})

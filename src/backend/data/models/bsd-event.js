@@ -1,7 +1,7 @@
 export default function(sequelize, DataTypes) {
-  let Event = sequelize.define('BSDEvent', {
+  let BSDEvent = sequelize.define('BSDEvent', {
     id: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.INTEGER,
       field: 'event_id',
       primaryKey: true
     },
@@ -21,10 +21,6 @@ export default function(sequelize, DataTypes) {
     flagApproval: {
       type: DataTypes.BOOLEAN,
       field: 'flag_approval',
-    },
-    eventTypeId: {
-      type: DataTypes.INTEGER,
-      field: 'event_type_id',
     },
     name: {
       type: DataTypes.STRING,
@@ -102,7 +98,7 @@ export default function(sequelize, DataTypes) {
       allowNull: true
     },
     isSearchable: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.INTEGER,
       field: 'is_searchable',
     },
     publicPhone: {
@@ -126,15 +122,31 @@ export default function(sequelize, DataTypes) {
       type: DataTypes.FLOAT,
       field: 'rsvp_reminder_hours',
       allowNull: true
-    }
+    },
+    latitude: DataTypes.DOUBLE,
+    longitude: DataTypes.DOUBLE
   }, {
     underscored: true,
-    tableName: 'bsd_event',
+    tableName: 'bsd_events',
     classMethods: {
       associate: (models) => {
-        Event.belongsTo(models.BSDPerson, {foreignKey: 'creator_cons_id', as: 'host'})
+        BSDEvent.belongsTo(models.BSDPerson, {
+          foreignKey: 'creator_cons_id',
+          as: 'host',
+          constraints: false
+        })
+        BSDEvent.belongsTo(models.BSDEventType, {
+          foreignKey: 'event_type_id',
+          as: 'eventType',
+          constraints: false
+        })
+        BSDEvent.hasMany(models.BSDEventAttendee, {
+          foreignKey: 'event_id',
+          as: 'eventAttendees',
+          constraints: false
+        })
       }
     }
   })
-  return Event;
+  return BSDEvent;
 }
