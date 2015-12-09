@@ -549,9 +549,16 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
             status: 400,
             message: 'Provided group ID does not exist in BSD.'
           });
-        group = await GCBSDGroup.create({
-          cons_group_id: parseInt(groupText, 10)
+        let consGroupID = parseInt(groupText, 10);
+        group = await GCBSDGroup.findOne({
+          where: {
+            cons_group_id: consGroupID
+          }
         })
+        if (!group)
+          group = await GCBSDGroup.create({
+            cons_group_id: consGroupID
+          })
       }
       else {
         let query = groupText;
@@ -587,9 +594,15 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
               message: error
             })
         }
-        group = await GCBSDGroup.create({
-          query: query
+        group = await GCBSDGroup.findOne({
+          where: {
+            query: query
+          }
         })
+        if (!group)
+          group = await GCBSDGroup.create({
+            query: query
+          })
       }
 
       let underlyingSurvey = await BSDSurvey.findWithBSDCheck(surveyId)
