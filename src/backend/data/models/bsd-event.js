@@ -112,7 +112,7 @@ export default function(sequelize, DataTypes) {
     },
     rsvpReminderHours: {
       type: DataTypes.FLOAT,
-      field: 'rsvp_reminder_hours',
+      field: 'rsvp_email_reminder_hours',
       allowNull: true
     },
     latitude: DataTypes.DOUBLE,
