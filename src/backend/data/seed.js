@@ -8,8 +8,8 @@ if (process.env.NODE_ENV !== 'development') {
   process.exit(1)
 }
 
-const NUM_PERSONS=15000;
-const NUM_EVENTS=5000;
+const NUM_PERSONS=1000;
+const NUM_EVENTS=15;
 
 // Use this instead of faker because we want it to be just digits
 let randomPhoneNumber = () => {
@@ -54,7 +54,7 @@ models.sequelize.sync({force: true}).then(async () => {
   let persons = [];
   let emails = [];
   let phones = [];
-  let personGroups = [];
+  let personGroups = {};
   let events = [];
   let addresses = [];
   let groups = [
@@ -131,10 +131,8 @@ models.sequelize.sync({force: true}).then(async () => {
     }
 
     Object.keys(groups).forEach((key) => {
-      personGroups.push({
-        cons_id: index,
-        cons_group_id: key
-      })
+      let hash = index.toString() + ':' + key
+      personGroups[hash] = true
     })
   }
 
@@ -203,28 +201,33 @@ models.sequelize.sync({force: true}).then(async () => {
   };
 
   log.info('Creating...')
-  let adminUser = await models.User.findOne({
-    where: {
-      email: 'admin@localhost.com'
-    }
-  })
-  console.log(adminUser);
-  if (!adminUser)
-    await models.User.create({
-      email: 'admin@localhost.com',
-      password: 'admin',
-      isAdmin: true
-    })
+
+  await models.User.create({
+    email: 'admin@localhost.com',
+    password: 'admin',
+    isAdmin: true
+  });
+
   await models.BSDPerson.bulkCreate(persons);
+  let personGroupsArr = []
+  Object.keys(personGroups).forEach((hash) => {
+    let ids = hash.split(':')
+    personGroupsArr.push({
+      cons_id: ids[0],
+      cons_group_id: ids[1]
+    })
+  })
+
   let promises = [
     models.BSDEventAttendee.bulkCreate(eventAttendees),
     models.ZipCode.bulkCreate(zips),
     models.BSDEvent.bulkCreate(events),
     models.BSDAddress.bulkCreate(addresses),
-    models.BSDPersonBSDGroup.bulkCreate(personGroups),
+    models.BSDPersonBSDGroup.bulkCreate(personGroupsArr),
     models.BSDEmail.bulkCreate(emails),
     models.BSDPhone.bulkCreate(phones)
   ]
   await Promise.all(promises);
+
   log.info('Done!');
 })
