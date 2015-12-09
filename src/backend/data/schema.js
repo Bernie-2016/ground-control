@@ -345,7 +345,7 @@ const GraphQLPerson = new GraphQLObjectType({
             longitude: {
               $between: [address.longitude - boundingDistance, address.longitude + boundingDistance]
             },
-            // event_type_id: 31,
+            event_type_id: 31,
             startDate: {
               $gt: new Date()
             }
