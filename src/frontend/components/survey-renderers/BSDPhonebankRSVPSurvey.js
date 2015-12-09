@@ -6,7 +6,7 @@ import {GoogleMapLoader, GoogleMap, Marker} from 'react-google-maps';
 import {FlatButton, Paper} from 'material-ui';
 import moment from 'moment';
 
-class BSDEventSurvey extends React.Component {
+class BSDPhonebankRSVPSurvey extends React.Component {
   static propTypes = {
     onSubmitted : React.PropTypes.func,
     initialValues: React.PropTypes.object,
@@ -166,7 +166,7 @@ class BSDEventSurvey extends React.Component {
   }
 }
 
-export default Relay.createContainer(BSDEventSurvey, {
+export default Relay.createContainer(BSDPhonebankRSVPSurvey, {
   fragments: {
     survey: () => Relay.QL`
       fragment on Survey {

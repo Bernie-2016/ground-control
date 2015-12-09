@@ -11,7 +11,7 @@ export default class AdminCallAssignmentCreationForm extends React.Component {
   surveyRenderers =
   {
     'BSDSurvey' : 'Simple BSD survey renderer',
-    'BSDEventSurvey' : 'BSD survey + events',
+    'BSDPhonebankRSVPSurvey' : 'BSD survey + events',
   }
 
   surveyProcessors = {
