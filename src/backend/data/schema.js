@@ -500,7 +500,8 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
       let survey = await callAssignment.getSurvey()
       let fieldValues = JSON.parse(surveyFieldValues)
       fieldValues['person'] = await BSDPerson.findById(localIntervieweeId);
-      await survey.process(fieldValues)
+      if (completed)
+        await survey.process(fieldValues)
 
       let promises = [
         assignedCall.destroy(),
