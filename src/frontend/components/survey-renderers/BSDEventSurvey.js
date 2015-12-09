@@ -36,8 +36,12 @@ class BSDEventSurvey extends React.Component {
         <FlatButton label='Select' style={{
           ...BernieText.inputLabel,
           backgroundColor: BernieColors.red,
-          marginTop: 10
-        }}/>
+          marginTop: 10,
+        }}
+          onTouchTap={(event) => {
+            this.refs.survey.refs.component.setFieldValue('event_id', marker.eventId)
+          }}
+        />
       )
     return (
       <Paper zDepth={0} style={{
@@ -110,6 +114,7 @@ class BSDEventSurvey extends React.Component {
         venueName: event.venueName,
         addr1: event.addr1,
         addr2: this.getEventAddr2(event),
+        eventId: event.eventIdObfuscated
       })
     })
     return (
@@ -178,6 +183,7 @@ export default Relay.createContainer(BSDEventSurvey, {
         }
         nearbyEvents(within:20) {
           id
+          eventIdObfuscated
           name
           startDate
           venueName

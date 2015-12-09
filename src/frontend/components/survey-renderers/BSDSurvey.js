@@ -44,6 +44,15 @@ class BSDSurvey extends React.Component {
     this.sendFrameMessage({message: 'getFieldValues'})
   }
 
+  setFieldValue(fieldId, value) {
+    this.sendFrameMessage({
+    message: 'setInputValue',
+    details: {
+      inputId: fieldId,
+      value: value
+    }})
+  }
+
   frameMessageHandler = (event) => {
     if (event.origin !== this.frameHost())
       return;

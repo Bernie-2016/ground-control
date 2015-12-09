@@ -26,10 +26,11 @@
       var matches = regex.exec(labelText);
       if (matches && matches[1])
       {
-         var matchedTag = matches[1]
-         label.text(labelText.replace(matchedTag, '').trim())
-         var fieldId = matchedTag.substring(1, matchedTag.length-1)
-         jQuery(this).parents('.fieldset').find('input').attr('gc-field-id', fieldId)
+        var matchedTag = matches[1]
+        label.text(labelText.replace(matchedTag, '').trim())
+        var fieldId = matchedTag.substring(1, matchedTag.length-1)
+        jQuery(this).parents('.fieldset').find('input').attr('gc-field-id', fieldId)
+        jQuery(this).parents('.fieldset').find('input').attr('id', fieldId)
       }
     })
     window.top.postMessage({message: 'documentLoaded', details: {location: window.location.href}}, '*')
