@@ -2,8 +2,8 @@ import React from 'react';
 import Relay from 'react-relay'
 import BSDSurvey from './BSDSurvey'
 import {BernieColors, BernieText} from '../styles/bernie-css'
-import {GoogleMapLoader, GoogleMap, Marker, InfoWindow} from 'react-google-maps';
-import {FlatButton} from 'material-ui';
+import {GoogleMapLoader, GoogleMap, Marker} from 'react-google-maps';
+import {FlatButton, Paper} from 'material-ui';
 import moment from 'moment';
 
 class BSDEventSurvey extends React.Component {
@@ -22,16 +22,53 @@ class BSDEventSurvey extends React.Component {
   }
 
   handleMarkerClick(marker) {
-    this.setState({clickedMarker: marker.key})
+    this.setState({clickedMarker: marker})
   }
 
   renderMarkerDescription(marker) {
+    if (!marker)
+      return <div></div>;
+    if (marker.key === 'home')
+      return <div></div>
+    let button = <div></div>;
+    if (marker.key !== 'home')
+      button = (
+        <FlatButton label='Select' style={{
+          ...BernieText.inputLabel,
+          backgroundColor: BernieColors.red,
+          marginTop: 10
+        }}/>
+      )
     return (
-      <div>
-        <div>{marker.venueName}</div>
-        <div>{marker.addr1}</div>
-        <div>{marker.addr2}</div>
-      </div>
+      <Paper zDepth={0} style={{
+        marginTop: 10,
+        padding: '10px 10px 10px 10px',
+        border: 'solid 1px ' + BernieColors.lightGray
+      }}>
+        <div style={{
+          ...BernieText.secondaryTitle,
+          color: BernieColors.gray,
+          fontSize: '1.0em'
+        }}>
+          {moment(marker.startDate).format('h:mm A  MMM D')}
+        </div>
+        <div style={{
+          ...BernieText.default,
+          fontWeight: 600,
+          fontSize: '1.0em'
+        }}>
+          {marker.name}
+        </div>
+        <div style={{
+          ...BernieText.default,
+          fontSize: '1.0em'
+        }}>
+          <div>{marker.venueName}</div>
+          <div>{marker.addr1}</div>
+          <div>{marker.addr2}</div>
+          {button}
+        </div>
+      </Paper>
     )
   }
 
@@ -54,7 +91,7 @@ class BSDEventSurvey extends React.Component {
     let markers = [
       {
         position: center,
-        key: 'center',
+        key: 'home',
         title: 'home',
         name: 'Interviewee home'
       }
@@ -92,54 +129,11 @@ class BSDEventSurvey extends React.Component {
             defaultZoom={9}
             defaultCenter={center}>
             {markers.map((marker, index) => {
-              let infoWindow = <div></div>
-              let button = <div></div>
-              if (marker.key !== 'home')
-                button = (
-                  <FlatButton label='RSVP' style={{
-                    ...BernieText.inputLabel,
-                    backgroundColor: BernieColors.red,
-                    marginTop: 10
-                  }}/>
-                )
-              if (this.state.clickedMarker === marker.key)
-                infoWindow = (
-                  <InfoWindow title={marker.title} style={{
-                    height: '150'
-                  }} maxWidth='200' onCloseClick={(event) => console.log(event)}>
-                    <div >
-                      <div>
-                        <div style={{
-                          ...BernieText.secondaryTitle,
-                          fontSize: '0.8em',
-                          color: BernieColors.gray
-                        }}>{moment(marker.startDate).format('h:mm A  MMM D')}
-                        </div>
-                        <div style={{
-                          ...BernieText.default,
-                          fontSize: '0.8em',
-                          fontWeight: 600
-                        }}>
-                        {marker.name}
-                        </div>
-                        <div style={{
-                          ...BernieText.default,
-                          fontSize: '0.8em'
-                        }}>
-                        {this.renderMarkerDescription(marker)}
-                        </div>
-                        {button}
-                      </div>
-                    </div>
-                  </InfoWindow>
-                )
               return (
                 <Marker
                   {...marker}
                   onClick={this.handleMarkerClick.bind(this, marker)}
-                >
-                  {infoWindow}
-                </Marker>
+                />
               );
             })}
           </GoogleMap>
@@ -155,6 +149,7 @@ class BSDEventSurvey extends React.Component {
         <div style={{width: '100%', height: 200}}>
           {this.renderMap()}
         </div>
+        {this.renderMarkerDescription(this.state.clickedMarker)}
         <BSDSurvey
           ref='survey'
           survey={this.props.survey}
