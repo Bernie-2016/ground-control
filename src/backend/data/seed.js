@@ -44,6 +44,7 @@ let addLeadingZero = (val) => {
 }
 
 models.sequelize.sync({force: true}).then(async () => {
+  log.info('Reading zips...')
   let zips = csv('./src/backend/data/zip-codes.csv')
   zips.forEach((datum) => {
     datum.timezoneOffset = parseInt(datum.timezoneOffset, 10)
@@ -54,7 +55,7 @@ models.sequelize.sync({force: true}).then(async () => {
   let persons = [];
   let emails = [];
   let phones = [];
-  let personGroups = {};
+  let personGroups = [];
   let events = [];
   let addresses = [];
   let groups = [
@@ -74,6 +75,8 @@ models.sequelize.sync({force: true}).then(async () => {
       description: 'The top 1% of the top 0.1% of the top 1% of the top 0.1%'
     }
   ]
+
+  log.info('Making groups...')
   await models.BSDGroup.bulkCreate(groups);
   let groupIDs = await models.BSDGroup.findAll({
     attributes: ['id']
@@ -131,8 +134,10 @@ models.sequelize.sync({force: true}).then(async () => {
     }
 
     Object.keys(groups).forEach((key) => {
-      let hash = index.toString() + ':' + key
-      personGroups[hash] = true
+      personGroups.push({
+        cons_id: index,
+        cons_group_id: key
+      })
     })
   }
 
@@ -150,6 +155,7 @@ models.sequelize.sync({force: true}).then(async () => {
   await models.BSDEventType.bulkCreate(eventTypes);
 
   let eventAttendees = []
+  let eventAttendeeCount = 0
 
   for (let index = 1; index <= NUM_EVENTS; index++) {
     let rsvp_use_reminder_boolean = faker.random.boolean();
@@ -193,14 +199,15 @@ models.sequelize.sync({force: true}).then(async () => {
     let numAttendees = faker.random.number({min:0, max:capacity})
     for (let attendeeIndex = 0; attendeeIndex < numAttendees; attendeeIndex++) {
       eventAttendees.push({
-        id: faker.random.number({min: 0, max: 100000}),
+        id: eventAttendeeCount,
         event_id: index,
         attendee_cons_id: faker.random.number({min: 1, max: NUM_PERSONS})
       })
+      eventAttendeeCount += 1;
     }
   };
 
-  log.info('Creating...')
+  log.info('Creating admin user...')
 
   await models.User.create({
     email: 'admin@localhost.com',
@@ -208,26 +215,18 @@ models.sequelize.sync({force: true}).then(async () => {
     isAdmin: true
   });
 
+  log.info('Making persons...')
   await models.BSDPerson.bulkCreate(persons);
-  let personGroupsArr = []
-  Object.keys(personGroups).forEach((hash) => {
-    let ids = hash.split(':')
-    personGroupsArr.push({
-      cons_id: ids[0],
-      cons_group_id: ids[1]
-    })
-  })
 
-  let promises = [
-    models.BSDEventAttendee.bulkCreate(eventAttendees),
+  await Promise.all([
     models.ZipCode.bulkCreate(zips),
     models.BSDEvent.bulkCreate(events),
+    models.BSDEventAttendee.bulkCreate(eventAttendees),
     models.BSDAddress.bulkCreate(addresses),
-    models.BSDPersonBSDGroup.bulkCreate(personGroupsArr),
+    models.BSDPersonBSDGroup.bulkCreate(personGroups),
     models.BSDEmail.bulkCreate(emails),
-    models.BSDPhone.bulkCreate(phones)
-  ]
-  await Promise.all(promises);
+    models.BSDPhone.bulkCreate(phones),
+  ])
 
   log.info('Done!');
 })
