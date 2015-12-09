@@ -17,12 +17,6 @@ export default function(sequelize, DataTypes) {
           as: 'person',
           constraints: false
         })
-
-        BSDEventAttendee.belongsTo(models.BSDEvent, {
-          foreignKey: 'event_id',
-          as: 'person',
-          constraints: false
-        })
       }
     }
   })

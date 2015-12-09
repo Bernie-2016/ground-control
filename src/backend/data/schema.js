@@ -345,7 +345,7 @@ const GraphQLPerson = new GraphQLObjectType({
             longitude: {
               $between: [address.longitude - boundingDistance, address.longitude + boundingDistance]
             },
-            event_type_id: 31,
+            // event_type_id: 31,
             startDate: {
               $gt: new Date()
             }
@@ -400,8 +400,7 @@ const GraphQLEvent = new GraphQLObjectType({
     rsvpReminderHours: { type: GraphQLInt },
     attendeesCount: {
       type: GraphQLInt,
-      args: connectionArgs,
-      resolve: async(event, {first}) => {
+      resolve: async(event) => {
         return BSDEventAttendee.count({
           where: {
             event_id: event.id
