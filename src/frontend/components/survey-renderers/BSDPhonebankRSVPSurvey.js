@@ -93,12 +93,12 @@ class BSDPhonebankRSVPSurvey extends React.Component {
       lng: this.props.interviewee.address.longitude
     }
     let markers = [
-      {
-        position: center,
-        key: 'home',
-        title: 'home',
-        name: 'Interviewee home'
-      }
+//      {
+//        position: center,
+//        key: 'home',
+//        title: 'home',
+//        name: 'Interviewee home'
+//      }
     ];
 
     this.props.interviewee.nearbyEvents.forEach((event) => {
