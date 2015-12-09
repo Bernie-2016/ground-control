@@ -5,6 +5,14 @@ export default function(sequelize, DataTypes) {
       field: 'event_id',
       primaryKey: true
     },
+    creatorConsId: {
+      type: DataTypes.BIGINT,
+      field: 'creator_cons_id',
+      allowNull: true,
+      get: function(){
+            return this.getHost().getDataValue('cons_id');
+          }
+    },
     eventIdObfuscated: {
       type: DataTypes.STRING,
       field: 'event_id_obfuscated',
@@ -72,7 +80,6 @@ export default function(sequelize, DataTypes) {
       allowNull: true,
       get: function(){
             let formattedDate = this.getDataValue('startDate').toISOString();
-            // 'this' allows you to access attributes of the instance
             return formattedDate;
           }
     },
@@ -92,6 +99,7 @@ export default function(sequelize, DataTypes) {
     attendeeVolunteerMessage: {
       type: DataTypes.TEXT,
       field: 'attendee_volunteer_message',
+      allowNull: true
     },
     isSearchable: {
       type: DataTypes.BIGINT,

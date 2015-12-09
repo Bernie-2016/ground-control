@@ -36,7 +36,7 @@
     "history": "^1.12.5",
     "jquery": "^2.1.4",
     "mailgun-js": "0.7.6",
-    "material-ui": "^0.13.0",
+    "material-ui": "^0.14.0-rc1",
     "moment": "^2.10.6",
     "moment-timezone": "^0.4.1",
     "passport": "^0.3.2",

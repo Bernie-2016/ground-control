@@ -15,7 +15,7 @@ export const BernieColors = {
 export const BernieText = {
   default: {
     color: BernieColors.darkGray,
-    fontFamily: 'freight-sans-pro',
+    // fontFamily: 'freight-sans-pro',
     fontSize: '1.2em',
     fontWeight: 'normal',
     lineHeight: '1.5'
@@ -42,12 +42,31 @@ export const BernieText = {
   },
 
   inputLabel: {
-    colors: BernieColors.darkGray,
+    color: BernieColors.darkGray,
     fontFamily: 'freight-sans-pro',
     fontWeight: 600,
     textTransform: 'uppercase',
     fontSize: '0.95em',
     letterSpacing: '0.1em',
+  },
+
+  small: {
+    color: BernieColors.gray,
+    // fontSize: '0.9em',
+  },
+
+  smallHeader: {
+    color: BernieColors.blue,
+    // fontSize: '1em',
+    fontWeight: 'normal',
+    lineHeight: 1,
+    marginTop: '2em',
+    marginBottom: '1em'
+  },
+
+  menuItem: {
+    fontFamily: 'Roboto, sans-serif',
+    fontWeight: 400
   }
 }
 

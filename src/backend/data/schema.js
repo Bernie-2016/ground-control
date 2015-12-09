@@ -118,9 +118,14 @@ const GraphQLListContainer = new GraphQLObjectType({
     id: globalIdField('ListContainer'),
     events: {
       type: GraphQLEventConnection,
+      // args: Object.assign({
+      //         orderBy: {
+      //           type: new GraphQLList(GraphQLString),
+      //         },
+      //       }, connectionArgs),
       args: connectionArgs,
-      resolve: async(event, {first}) => {
-        let events = await BSDEvent.all()
+      resolve: async (event, {first}) => {
+        let events = await BSDEvent.all({order: 'start_dt ASC'});
         return connectionFromArray(events, {first});
       }
     },
@@ -247,6 +252,7 @@ const GraphQLEvent = new GraphQLObjectType({
   fields: () => ({
     id: globalIdField('Event'),
     eventIdObfuscated: { type: GraphQLString },
+    creatorConsId: { type: GraphQLInt },
     flagApproval: { type: GraphQLBoolean },
     eventTypeId: { type: GraphQLInt },
     name: { type: GraphQLString },
