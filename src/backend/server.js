@@ -135,10 +135,11 @@ app.post('/signup',
   res.send('Success!')
 }))
 
-app.get('/logout', function(req, res){
+app.post('/logout',
+  wrap(async (req, res) => {
   req.logout();
-  res.redirect('/signup');
-})
+  res.send('Success!')
+}))
 
 // this endpoint is for testing email rendering/sending
 app.get('/events/confirmation-email', wrap(async (req, res) => {

@@ -28,7 +28,6 @@ import Form from 'react-formal';
 import {createHistory} from 'history';
 import RelayNetworkLayer from './RelayNetworkLayer'
 import StackTrace from 'stacktrace-js';
-import Logout from './components/Logout';
 
 // Necessary to make minilog work
 window.jQuery = jQuery;
@@ -116,10 +115,6 @@ ReactDOM.render(
     <Route
       path='/signup'
       component={Signup}
-    />
-    <Route
-      path='/logout'
-      component={Logout}
     />
     <Route
       path='/'

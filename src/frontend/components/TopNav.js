@@ -3,6 +3,7 @@ import BernieLogo from './BernieLogo';
 import {BernieColors, BernieText} from './styles/bernie-css';
 import {BernieTheme} from './styles/bernie-theme';
 import {AppBar, Styles, Tabs, Tab} from 'material-ui';
+import superagent from 'superagent';
 
 @Styles.ThemeDecorator(Styles.ThemeManager.getMuiTheme(BernieTheme))
 export default class TopNav extends React.Component {
@@ -39,6 +40,17 @@ export default class TopNav extends React.Component {
     }
   }
 
+  logoutHandler = (event) => {
+    superagent
+      .post('/logout')
+      .end((err, res) => {
+        if (!err)
+          window.location = '/signup';
+        else
+          this.setState({errorMessage: 'Error logging out'});
+        })
+  }
+
   render() {
     let tabs = []
     let selectedTab = this.props.tabs.filter((tab) => {
@@ -61,12 +73,11 @@ export default class TopNav extends React.Component {
       />)
     })
     tabs.push(<Tab
-        label={'LOGOUT'}
+        label={'Logout'}
+        onActive={this.logoutHandler}
         style={{
           ...this.styles.tab,
         }}
-        value={'/logout'}
-        key={'/logout'}
       />)
 
     return (
