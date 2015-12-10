@@ -26,6 +26,7 @@ import {
   BSDPerson,
   BSDPhone,
   BSDAddress,
+  BSDEventType,
   BSDEmail,
   BSDGroup,
   BSDCall,
@@ -332,12 +333,25 @@ const GraphQLPerson = new GraphQLObjectType({
     nearbyEvents: {
       type: new GraphQLList(GraphQLEvent),
       args: {
-        within: { type: GraphQLInt }
+        within: { type: GraphQLInt },
+        type: { type: GraphQLString }
       },
-      resolve: async (person, {within}) => {
+      resolve: async (person, {within, type}) => {
         let address = await person.getPrimaryAddress()
         let boundingDistance = within / 69
-        return BSDEvent.findAll({
+        let eventTypes = null;
+        if (type) {
+          eventTypes = await BSDEventType.findAll({
+            where: {
+              name: {
+                $iLike: `%${type}%`
+              }
+            }
+          })
+          eventTypes = eventTypes.map((eventType) => eventType.id)
+        }
+
+        let query = {
           where: {
             latitude: {
               $between: [address.latitude - boundingDistance, address.latitude + boundingDistance]
@@ -345,12 +359,16 @@ const GraphQLPerson = new GraphQLObjectType({
             longitude: {
               $between: [address.longitude - boundingDistance, address.longitude + boundingDistance]
             },
-            event_type_id: 31,
             startDate: {
               $gt: new Date()
             }
           }
-        })
+        };
+        console.log(eventTypes);
+        if (eventTypes)
+          query['where']['event_type_id'] = { $in: eventTypes }
+        console.log(query);
+        return BSDEvent.findAll(query)
       }
     }
   }),
