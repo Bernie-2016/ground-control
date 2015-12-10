@@ -77,6 +77,7 @@ export default class TopNav extends React.Component {
         onActive={this.logoutHandler}
         style={{
           ...this.styles.tab,
+          backgroundColor: this.props.barColor
         }}
       />)
 
