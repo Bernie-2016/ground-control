@@ -60,6 +60,14 @@ export default class TopNav extends React.Component {
         key={tab.value}
       />)
     })
+    tabs.push(<Tab
+        label={'LOGOUT'}
+        style={{
+          ...this.styles.tab,
+        }}
+        value={'/logout'}
+        key={'/logout'}
+      />)
 
     return (
       <div>
