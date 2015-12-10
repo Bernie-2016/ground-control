@@ -9,20 +9,6 @@ import {BernieText, BernieColors} from './styles/bernie-css';
 import IconMenu from 'material-ui/lib/menus/icon-menu';
 import MenuItem from 'material-ui/lib/menus/menu-item';
 
-// class InfoHeader extends React.Component {
-//   render() {
-//     return(
-//       <IconButton
-//         onTouchTap={function(){
-//           this._handleEventDeletion([rowIndex]);
-//         }.bind(this)}
-//       >
-//         <FontIcon className="material-icons" hoverColor={BernieColors.blue}>delete</FontIcon>
-//       </IconButton>
-//     )
-//   }
-// }
-
 const keyboardActionStyles = {
   text: {fontSize: '0.9em', top: '-7px', color: BernieColors.gray, cursor: 'default'},
   icon: {cursor: 'default'}
@@ -117,6 +103,30 @@ class AdminEventSection extends React.Component {
     </Cell>
   )
 
+  HostInfoCell = ({rowIndex, data, col, ...props}) => (
+    <Cell {...props}
+    style={{
+      fontFamily: 'Roboto',
+      fontSize: '13px',
+      lineHeight: '18px',
+    }}
+    >
+      {data[rowIndex]['node'][col]['email']}
+    </Cell>
+  )
+
+  EventTypeCell = ({rowIndex, data, col, ...props}) => (
+    <Cell {...props}
+    style={{
+      fontFamily: 'Roboto',
+      fontSize: '13px',
+      lineHeight: '18px',
+    }}
+    >
+      {data[rowIndex]['node'][col]['name']}
+    </Cell>
+  )
+
   ActionCell = ({rowIndex, data, col, ...props}) => (
     <Cell {...props}>
     <div style={{position: 'relative', left: '-5px'}}>
@@ -175,7 +185,7 @@ class AdminEventSection extends React.Component {
       </IconButton>
 
       {/*
-        Iconmenu does not not work inside of fixed-data-table cells because of overflow:hidden;
+        Iconmenu does not not work inside of fixed-data-table cells because of overflow:hidden on parent divs;
         The plan is to use https://github.com/tajo/react-portal to overcome this limitation
       */} 
       {/*  
@@ -221,6 +231,18 @@ class AdminEventSection extends React.Component {
     this._handleEventRequestLengthChange = (event, selectedIndex, menuItem) => {
       this.props.relay.setVariables({
         numEvents: menuItem.payload,
+      });
+
+      // Remove selection of rows that are now beyond the view
+      let currentSelectedRows = this.state.selectedRows;
+      let i = currentSelectedRows.length;
+      while (i--) {
+        if (currentSelectedRows[i] >= menuItem.payload){
+          currentSelectedRows.splice(i, 1);
+        }
+      }
+      this.setState({
+        selectedRows: currentSelectedRows
       });
     }
 
@@ -531,16 +553,24 @@ class AdminEventSection extends React.Component {
           header={<this.HeaderCell content="About" />}>
           <Column
             flexGrow={1}
-            header={<this.HeaderCell content="Creator ID" />}
-            cell={<this.TextCell data={events} col="creatorConsId" />}
-            width={100}
+            header={<this.HeaderCell content="Event Host" />}
+            cell={<this.HostInfoCell data={events} col="host" />}
+            width={220}
+          />
+          <Column
+            flexGrow={1}
+            header={<this.HeaderCell content="Event Type" />}
+            cell={
+              <this.EventTypeCell data={events} col="eventType" />
+            }
+            width={150}
           />
           <Column
             flexGrow={1}
             header={<this.HeaderCell content="Event Name" />}
             cell={<this.TextCell data={events} col="name" />}
             width={250}
-          />
+          />          
           <Column
             flexGrow={1}
             header={<this.HeaderCell content="Description" />}
@@ -619,9 +649,18 @@ export default Relay.createContainer(AdminEventSection, {
             node {
               name
               id
+              host {
+                id
+                firstName
+                lastName
+                email
+              }
+              eventType {
+                id
+                name
+              }
               eventIdObfuscated
               flagApproval
-              eventTypeId
               description
               venueName
               venueZip

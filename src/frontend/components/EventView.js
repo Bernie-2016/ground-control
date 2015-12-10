@@ -45,7 +45,7 @@ export class EventEdit extends React.Component {
         />
 
         <SelectField
-          value={event.node.eventTypeId}
+          value={event.node.eventType.name}
           floatingLabelText="Event Type"
           menuItems={eventTypeOptions}
           fullWidth={true}
@@ -241,7 +241,7 @@ export class EventPreview extends React.Component {
         <h1 style={BernieText.title}>{event.node.name}</h1>
 
         <InfoHeader content='Event Type' />
-        <p>{eventTypeOptions[event.node.eventTypeId - 1].text}</p>
+        <p>{event.node.eventType.name}</p>
 
         <InfoHeader content='Event Description' />
         <p>{event.node.description}</p>

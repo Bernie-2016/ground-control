@@ -32,6 +32,7 @@ import {
   BSDCallAssignment,
   BSDAssignedCall,
   BSDSurvey,
+  BSDEventType,
   BSDEvent,
   GCBSDGroup,
   GCBSDSurvey,
@@ -89,6 +90,8 @@ let {nodeInterface, nodeField} = nodeDefinitions(
       return BSDCallAssignment.findById(id);
     if (type === 'Survey')
       return GCBSDSurvey.findById(id);
+    if (type === 'EventType')
+      return BSDEventType.findById(id);
     if (type === 'Event')
       return BSDEvent.findById(id);
     if (type === 'User')
@@ -110,6 +113,8 @@ let {nodeInterface, nodeField} = nodeDefinitions(
       return GraphQLSurvey;
     if (obj instanceof ListContainer)
       return GraphQLListContainer;
+    if (obj instanceof BSDEventType)
+      return GraphQLEventType;
     if (obj instanceof BSDEvent)
       return GraphQLEvent;
     if (obj instanceof BSDAddress)
@@ -124,6 +129,14 @@ const GraphQLListContainer = new GraphQLObjectType({
   name: 'ListContainer',
   fields: () => ({
     id: globalIdField('ListContainer'),
+    eventTypes: {
+      type: GraphQLEventTypeConnection,
+      args: connectionArgs,
+      resolve: async (eventType, {first}) => {
+        let eventTypes = await BSDEventType.all();
+        return connectionFromArray(eventTypes)
+      }
+    },
     events: {
       type: GraphQLEventConnection,
       // args: Object.assign({
@@ -361,15 +374,39 @@ const GraphQLPerson = new GraphQLObjectType({
   interfaces: [nodeInterface]
 })
 
+const GraphQLEventType = new GraphQLObjectType({
+  name: 'EventType',
+  description: 'An event type',
+  fields: () => ({
+    id: globalIdField('EventType'),
+    name: { type: GraphQLString },
+    description: { type: GraphQLString }
+  }),
+  interfaces: [nodeInterface]
+})
+
+let {
+  connectionType: GraphQLEventTypeConnection,
+} = connectionDefinitions({
+  name: 'EventType',
+  nodeType: GraphQLEventType
+});
+
 const GraphQLEvent = new GraphQLObjectType({
   name: 'Event',
   description: 'An event',
   fields: () => ({
     id: globalIdField('Event'),
     eventIdObfuscated: { type: GraphQLString },
-    creatorConsId: { type: GraphQLInt },
+    host: {
+      type: GraphQLPerson,
+      resolve: (event) => event.getHost()
+    },
+    eventType: {
+      type: GraphQLEventType,
+      resolve: (event) => event.getEventType()
+    },
     flagApproval: { type: GraphQLBoolean },
-    eventTypeId: { type: GraphQLInt },
     name: { type: GraphQLString },
     description: { type: GraphQLString },
     venueName: { type: GraphQLString },

@@ -5,14 +5,6 @@ export default function(sequelize, DataTypes) {
       field: 'event_id',
       primaryKey: true
     },
-    creatorConsId: {
-      type: DataTypes.BIGINT,
-      field: 'creator_cons_id',
-      allowNull: true,
-      get: function(){
-            return this.getHost().getDataValue('cons_id');
-          }
-    },
     eventIdObfuscated: {
       type: DataTypes.STRING,
       field: 'event_id_obfuscated',
