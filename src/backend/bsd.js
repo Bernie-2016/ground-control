@@ -17,6 +17,14 @@ export default class BSD {
     this.apiSecret = secret;
   }
 
+  noFailApiRequest(method, ...args) {
+    try {
+      BSD[method](...args);
+    } catch (e) {
+      console.log('fail');
+    }
+  }
+
   cleanField(field) {
     if (field && field.length) {
       if (field[0] && field[0] != '')
