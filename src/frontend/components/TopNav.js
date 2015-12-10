@@ -47,7 +47,7 @@ export default class TopNav extends React.Component {
         if (!err)
           window.location = '/signup';
         else
-          this.setState({errorMessage: 'Error logging out'});
+          return;
         })
   }
 
@@ -77,6 +77,7 @@ export default class TopNav extends React.Component {
         onActive={this.logoutHandler}
         style={{
           ...this.styles.tab,
+          color: this.props.tabColor,
           backgroundColor: this.props.barColor
         }}
       />)
