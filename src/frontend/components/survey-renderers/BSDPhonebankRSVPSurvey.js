@@ -171,6 +171,9 @@ class BSDPhonebankRSVPSurvey extends React.Component {
 }
 
 export default Relay.createContainer(BSDPhonebankRSVPSurvey, {
+  initialVariables: {
+    type: 'phonebank'
+  },
   fragments: {
     survey: () => Relay.QL`
       fragment on Survey {
@@ -185,7 +188,7 @@ export default Relay.createContainer(BSDPhonebankRSVPSurvey, {
           latitude
           longitude
         }
-        nearbyEvents(within:20) {
+        nearbyEvents(within:20, type:$type) {
           id
           eventIdObfuscated
           name

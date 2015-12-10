@@ -7,6 +7,7 @@ export default function(sequelize, DataTypes) {
     },
     processors: {
       type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: true,
       validate: {
         elementIsIn: function(val) {
           let validProcessors = ['bsd-event-rsvper']
@@ -38,7 +39,7 @@ export default function(sequelize, DataTypes) {
         if (this.processors.length === 0)
           return;
         if (!surveyFields['event_id'])
-          throw new Error('Survey response must contain a field tagged with event_id to create RSVPs')
+          return;
         let person = surveyFields['person']
         let email = await person.getPrimaryEmail();
         let address = await person.getPrimaryAddress();
