@@ -34,6 +34,7 @@ import {
   BSDSurvey,
   BSDEventType,
   BSDEvent,
+  BSDEventAttendee,
   GCBSDGroup,
   GCBSDSurvey,
   ZipCode,
@@ -381,6 +382,14 @@ const GraphQLEventType = new GraphQLObjectType({
     id: globalIdField('EventType'),
     name: { type: GraphQLString },
     description: { type: GraphQLString }
+  })
+})
+
+const GraphQLEventAttendee = new GraphQLObjectType({
+  name: 'EventAttendee',
+  description: 'An event attendee',
+  fields: () => ({
+    id: globalIdField('EventAttendee'),
   }),
   interfaces: [nodeInterface]
 })
@@ -431,6 +440,16 @@ const GraphQLEvent = new GraphQLObjectType({
     hostReceiveRsvpEmails: { type: GraphQLBoolean },
     rsvpUseReminderEmail: { type: GraphQLBoolean },
     rsvpReminderHours: { type: GraphQLInt },
+    attendeesCount: {
+      type: GraphQLInt,
+      resolve: async(event) => {
+        return BSDEventAttendee.count({
+          where: {
+            event_id: event.id
+          }
+        })
+      }
+    },
   }),
   interfaces: [nodeInterface]
 })
