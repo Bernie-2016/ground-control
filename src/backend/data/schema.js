@@ -26,6 +26,7 @@ import {
   BSDPerson,
   BSDPhone,
   BSDAddress,
+  BSDEventType,
   BSDEmail,
   BSDGroup,
   BSDCall,
@@ -33,6 +34,7 @@ import {
   BSDAssignedCall,
   BSDSurvey,
   BSDEvent,
+  BSDEventAttendee,
   GCBSDGroup,
   GCBSDSurvey,
   ZipCode,
@@ -331,12 +333,25 @@ const GraphQLPerson = new GraphQLObjectType({
     nearbyEvents: {
       type: new GraphQLList(GraphQLEvent),
       args: {
-        within: { type: GraphQLInt }
+        within: { type: GraphQLInt },
+        type: { type: GraphQLString }
       },
-      resolve: async (person, {within}) => {
+      resolve: async (person, {within, type}) => {
         let address = await person.getPrimaryAddress()
         let boundingDistance = within / 69
-        return BSDEvent.findAll({
+        let eventTypes = null;
+        if (type) {
+          eventTypes = await BSDEventType.findAll({
+            where: {
+              name: {
+                $iLike: `%${type}%`
+              }
+            }
+          })
+          eventTypes = eventTypes.map((eventType) => eventType.id)
+        }
+
+        let query = {
           where: {
             latitude: {
               $between: [address.latitude - boundingDistance, address.latitude + boundingDistance]
@@ -344,14 +359,26 @@ const GraphQLPerson = new GraphQLObjectType({
             longitude: {
               $between: [address.longitude - boundingDistance, address.longitude + boundingDistance]
             },
-            event_type_id: 31,
             startDate: {
               $gt: new Date()
             }
           }
-        })
+        };
+        if (eventTypes)
+          query['where']['event_type_id'] = { $in: eventTypes }
+
+        return BSDEvent.findAll(query)
       }
     }
+  }),
+  interfaces: [nodeInterface]
+})
+
+const GraphQLEventAttendee = new GraphQLObjectType({
+  name: 'EventAttendee',
+  description: 'An event attendee',
+  fields: () => ({
+    id: globalIdField('EventAttendee'),
   }),
   interfaces: [nodeInterface]
 })
@@ -388,6 +415,16 @@ const GraphQLEvent = new GraphQLObjectType({
     hostReceiveRsvpEmails: { type: GraphQLBoolean },
     rsvpUseReminderEmail: { type: GraphQLBoolean },
     rsvpReminderHours: { type: GraphQLInt },
+    attendeesCount: {
+      type: GraphQLInt,
+      resolve: async(event) => {
+        return BSDEventAttendee.count({
+          where: {
+            event_id: event.id
+          }
+        })
+      }
+    },
   }),
   interfaces: [nodeInterface]
 })
@@ -544,6 +581,13 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
     let group = null;
     let survey = null;
     return sequelize.transaction(async (t) => {
+      let underlyingSurvey = await BSDSurvey.findWithBSDCheck(surveyId)
+
+      if (!underlyingSurvey)
+        throw new GraphQLError({
+          status: 400,
+          message: 'Provided survey ID does not exist in BSD.'
+        });
       if (/^\d+$/.test(groupText)) {
         let underlyingGroup = await BSDGroup.findWithBSDCheck(groupText)
         if (!underlyingGroup)
@@ -551,6 +595,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
             status: 400,
             message: 'Provided group ID does not exist in BSD.'
           });
+
         let consGroupID = parseInt(groupText, 10);
         group = await GCBSDGroup.findOne({
           where: {
@@ -564,56 +609,51 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
       }
       else {
         let query = groupText;
-        if (query.toLowerCase().indexOf('drop') !== -1)
+        query = query.toLowerCase();
+
+        if (query.indexOf('drop') !== -1)
           throw new GraphQLError({
             status: 400,
             message: 'Cannot use DROP in your SQL'
           })
-        if (query.toUpperCase() === 'EVERYONE')
-          query = query.toUpperCase()
 
-        if (query !== 'EVERYONE') {
-          let error = null;
-          let results = null;
-          try {
-            results = await sequelize.query(query)
-            if (!results || !results.length)
-              error = 'Invalid SQL query'
-          } catch (ex) {
-            error = 'Invalid SQL query'
-          }
-          if (!error) {
-            if (results[0].length === 0)
-                error = 'SQL query returns no results'
-
-            let firstResult = results[0][0];
-            if (!firstResult.cons_id)
-              error = 'SQL query needs to return a list of cons_ids'
-          }
-          if (error)
-            throw new GraphQLError({
-              status: 400,
-              message: error
-            })
-        }
         group = await GCBSDGroup.findOne({
           where: {
             query: query
           }
         })
+
         if (!group)
           group = await GCBSDGroup.create({
             query: query
           })
+
+        if (query !== 'everyone') {
+          query = query.replace(/;*$/, '')
+          let results = null;
+          let limit = 1000;
+          let offset = 0;
+          let limitedQuery = null;
+
+          query = query.toLowerCase();
+
+          do {
+            limitedQuery = `${query} order by cons_id limit ${limit} offset ${offset}`
+            try {
+              results = await sequelize.query(limitedQuery)
+              let
+              offset = offset + limit;
+            } catch (ex) {
+              error = `Invalid SQL query: ${ex.message}`
+              throw new GraphQLError({
+                status: 400,
+                message: error
+              })
+            }
+          } while(results && results.length > 0 && results[0].length > 0)
+        }
       }
 
-      let underlyingSurvey = await BSDSurvey.findWithBSDCheck(surveyId)
-
-      if (!underlyingSurvey)
-        throw new GraphQLError({
-          status: 400,
-          message: 'Provided survey ID does not exist in BSD.'
-        });
       survey = await GCBSDSurvey.create({
         signup_form_id: surveyId,
         renderer: renderer,
