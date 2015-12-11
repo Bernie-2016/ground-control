@@ -4,6 +4,7 @@ import Relay from 'react-relay';
 import {BernieText} from './styles/bernie-css';
 import {Paper, List, ListItem, RaisedButton, Dialog, TextField} from 'material-ui';
 import {BernieColors} from './styles/bernie-css';
+import DestroyCallAssignmentMutation from '../mutations/DestroyCallAssignment';
 import moment from 'moment';
 
 export class AdminCallAssignment extends React.Component {
@@ -31,6 +32,22 @@ export class AdminCallAssignment extends React.Component {
       this.setState({
         showDeleteEventDialog: true
       });
+    }
+
+    this._onDialogSubmit = () => {
+      let onSuccess = (transaction) => {
+        this.props.history.pushState(null, '/admin/call-assignments/')
+      };
+
+      let onFailure = (transaction) => {
+        console.log(transaction)
+      };
+
+      Relay.Store.update(
+        new DestroyCallAssignmentMutation({
+          callAssignment: this.props.callAssignment
+        }), {onFailure, onSuccess}
+      );
     }
 
     return (
@@ -74,6 +91,10 @@ export default Relay.createContainer(AdminCallAssignment, {
           fullURL
         }
         query
+        ${DestroyCallAssignmentMutation.getFragment('callAssignment')}
+        listContainer {
+          id
+        }
       }
     `
   }

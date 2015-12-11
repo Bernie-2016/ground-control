@@ -4,7 +4,8 @@ export default class CreateCallAssignment extends Relay.Mutation {
   static fragments = {
     listContainer: () => Relay.QL`
       fragment on ListContainer {
-        id
+        id,
+        callAssignments
       }
     `,
   };

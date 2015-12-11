@@ -39,7 +39,8 @@ Minilog
     }));
 window.log = Minilog('client');
 
-window.onerror = (msg, file, line, col, error) => {
+if(location.href.indexOf('://localhost') == -1) {
+  window.onerror = (msg, file, line, col, error) => {
     StackTrace
       .fromError(error)
       .then((stack) => {
@@ -52,7 +53,8 @@ window.onerror = (msg, file, line, col, error) => {
       .catch((stack) => {
         log.error(stack);
       });
-};
+  };
+}
 
 injectTapEventPlugin();
 Relay.injectNetworkLayer(new RelayNetworkLayer('/graphql'));

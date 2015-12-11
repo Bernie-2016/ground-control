@@ -2,14 +2,25 @@ import Relay from 'react-relay';
 
 export default class DestroyCallAssignment extends Relay.Mutation {
   static fragments = {
-    callAssignment: () => Relay.QL`fragment on CallAssignment { id, listContainer { id } }`,
-  };
+    callAssignment: () => Relay.QL`
+      fragment on CallAssignment {
+        id,
+        listContainer,
+      }
+    `,
+  }
+
+  getMutation() {
+    return Relay.QL`mutation {destroyCallAssignment}`;
+  }
 
   getFatQuery() {
     return Relay.QL`
       fragment on DestroyCallAssignmentPayload {
-        destroyedCallAssignmentID
-        listContainer { callAssignments },
+        deletedCallAssignmentId,
+        listContainer {
+          callAssignments
+        },
       }
     `;
   }
@@ -20,13 +31,13 @@ export default class DestroyCallAssignment extends Relay.Mutation {
       parentName: 'listContainer',
       parentID: this.props.callAssignment.listContainer.id,
       connectionName: 'callAssignments',
-      deletedIDFieldName: 'destroyedCallAssignmentID',
+      deletedIDFieldName: 'deletedCallAssignmentId',
     }];
   }
 
   getVariables() {
     return {
-      callAssignmentIdToDestroy: this.props.callAssignmentId.id,
+      callAssignmentId: this.props.callAssignment.id,
     };
   }
 }
