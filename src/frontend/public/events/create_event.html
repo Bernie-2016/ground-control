@@ -138,7 +138,10 @@
                         	CKEDITOR.on('instanceReady', function (e) {
                         	  $('.cke_top').css('background', '#eee');
 
-                        	  CKEDITOR.instances.description.insertText('Join other volunteers in your area to make phone calls for Bernie. This is a great opportunity to meet other Bernie supporters, make calls to voters, and help make a big impact in our campaign for President.');
+                        	  CKEDITOR.instances.description.setData('Join other volunteers in your area to make phone calls for Bernie. This is a great opportunity to meet other Bernie supporters, make calls to voters, and help make a big impact in our campaign for President.');
+
+                        	  $('#description').val(CKEDITOR.instances.description.getData());
+
                         	});
                         </script>
 
@@ -1358,7 +1361,7 @@ jQuery(document).ready(function() {
 		    data: formdata,
 		    type: 'POST',
 		    success: function(xhr, status){
-		    	if (status == 'success'){
+		    	if (xhr == 'success'){
 		    		// temporary success message, to be replaced with a nice UI update in the future
 		    		alert('Thanks for submitting an event for the Bernie Sanders campaign! You should receive a confirmation email with a link to manage your event in a few minutes.');
 		    		window.location.reload();
