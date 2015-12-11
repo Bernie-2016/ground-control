@@ -125,6 +125,7 @@ ReactDOM.render(
       <Route
         path='call'
         component={CallAssignmentsDashboard}
+        queries={CurrentUserQueries}
       >
         <IndexRoute
           component={CallAssignmentsSection}

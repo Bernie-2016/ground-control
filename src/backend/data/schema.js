@@ -160,6 +160,29 @@ const GraphQLUser = new GraphQLObjectType({
         return connectionFromArray(assignments, {first});
       }
     },
+    callsMade: {
+      type: GraphQLInt,
+      args: {
+        forAssignmentId: { type: GraphQLString }
+      },
+      resolve: (user, {forAssignmentId}) => {
+        if (forAssignmentId) {
+          let localId = fromGlobalId(forAssignmentId)
+          return BSDCall.count({
+            where: {
+              caller_id: user.id,
+              call_assignment_id: localId
+            }
+          })
+        }
+        else
+          return BSDCall.count({
+            where: {
+              caller_id: user.id
+            }
+          })
+      }
+    },
     intervieweeForCallAssignment: {
       type: GraphQLPerson,
       args: {
@@ -463,6 +486,16 @@ const GraphQLCallAssignment = new GraphQLObjectType({
     survey: {
       type: GraphQLSurvey,
       resolve: (assignment) => assignment.getSurvey()
+    },
+    callsMade: {
+      type: GraphQLInt,
+      resolve: (callAssignment) => {
+        return BSDCall.count({
+          where: {
+            call_assignment_id: callAssignment.id
+          }
+        })
+      }
     },
     query: {
       type: GraphQLString,
