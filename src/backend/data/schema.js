@@ -193,26 +193,28 @@ const GraphQLUser = new GraphQLObjectType({
           if (group.cons_group_id)
             filterQuery = `
               INNER JOIN (
-                  SELECT id, cons_id
+                  SELECT cons_id
                   FROM bsd_person_bsd_groups
                   WHERE cons_group_id=${group.cons_group_id}
                 ) AS cons_groups
-                ON persons.cons_id=cons_groups.cons_id'
+                ON people.cons_id=cons_groups.cons_id'
             `
           else if (group.query && group.query !== 'EVERYONE')
             filterQuery = `
               INNER JOIN (
-                  ${group.query}
-                ) AS inner_query
-                ON persons.cons_id=inner_query.cons_id
+                  SELECT cons_id
+                  FROM bsd_person_gc_bsd_groups
+                  WHERE gc_bsd_group_id=${group.id}
+                ) AS groups
+                ON people.cons_id=groups.cons_id
             `
           let query = `
             SELECT *
-            FROM bsd_people AS persons
+            FROM bsd_people AS people
             INNER JOIN bsd_emails AS emails
-              ON persons.cons_id=emails.cons_id
+              ON people.cons_id=emails.cons_id
             INNER JOIN bsd_phones AS phones
-              ON persons.cons_id=phones.cons_id
+              ON people.cons_id=phones.cons_id
             INNER JOIN (
               SELECT id, cons_id
               FROM bsd_addresses AS addresses
@@ -222,10 +224,10 @@ const GraphQLUser = new GraphQLObjectType({
                 addresses.state_cd NOT IN ('IA','NH','NV','SC') AND
                 zip_codes.timezone_offset IN (${validOffsets.join(',')})
               ) AS addresses
-              ON persons.cons_id=addresses.cons_id
+              ON people.cons_id=addresses.cons_id
             ${filterQuery}
             LEFT OUTER JOIN bsd_assigned_calls AS assigned_calls
-              ON persons.cons_id=assigned_calls.interviewee_id
+              ON people.cons_id=assigned_calls.interviewee_id
             LEFT OUTER JOIN (
               SELECT id, interviewee_id
               FROM bsd_calls
@@ -233,21 +235,21 @@ const GraphQLUser = new GraphQLObjectType({
                 call_assignment_id = :assignmentId AND
                 attempted_at > :lastCalledDate
               ) AS calls
-              ON persons.cons_id=calls.interviewee_id
+              ON people.cons_id=calls.interviewee_id
             WHERE
               calls.id IS NULL AND
               assigned_calls.id IS NULL
             LIMIT 1
           `
 
-          let persons = await sequelize.query(query, {
+          let people = await sequelize.query(query, {
             replacements: {
               assignmentId: localId,
               lastCalledDate: new Date(new Date() - 7 * 24 * 60 * 60 * 1000)
             },
           })
-          if (persons && persons.length > 0 && persons[0].length > 0) {
-            let person = persons[0][0]
+          if (people && people.length > 0 && people[0].length > 0) {
+            let person = people[0][0]
             // Also a big hack - not sure how to convert fieldnames to model attributes without doing it explicitly.  We should maybe just switch to using snake case model attributes and get rid of all the manual conversion code.
             person = BSDPerson.build({
               ...person,
