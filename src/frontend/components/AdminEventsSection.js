@@ -263,6 +263,9 @@ class AdminEventsSection extends React.Component {
             title="Refresh Events"
             style={{float: 'left', top: '5px'}}
             tooltipStyles={{zIndex: 10}}
+            onTouchTap={function(){
+              this._handleRequestRefresh();
+            }.bind(this)}
           >refresh</IconButton>
         </ToolbarGroup>
         <ToolbarGroup key={1} float="right">
@@ -443,6 +446,10 @@ class AdminEventsSection extends React.Component {
         </Tabs>
       </Dialog>
     )
+  }
+
+  _handleRequestRefresh() {
+    adminInterface.forceUpdate()
   }
 
   _handleEventPreviewOpen(eventIndex, tabIndex) {
