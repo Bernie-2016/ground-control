@@ -70,6 +70,8 @@ class BSDPhonebankRSVPSurvey extends React.Component {
           <div>{marker.venueName}</div>
           <div>{marker.addr1}</div>
           <div>{marker.addr2}</div>
+          <div>Capacity: {marker.capacity}</div>
+          <div>Attendees: {marker.attendeesCount}</div>
           {button}
         </div>
       </Paper>
@@ -114,7 +116,9 @@ class BSDPhonebankRSVPSurvey extends React.Component {
         venueName: event.venueName,
         addr1: event.addr1,
         addr2: this.getEventAddr2(event),
-        eventId: event.eventIdObfuscated
+        eventId: event.eventIdObfuscated,
+        capacity: event.capacity,
+        attendeesCount: event.attendeesCount
       })
     })
     return (
@@ -167,6 +171,9 @@ class BSDPhonebankRSVPSurvey extends React.Component {
 }
 
 export default Relay.createContainer(BSDPhonebankRSVPSurvey, {
+  initialVariables: {
+    type: 'phonebank'
+  },
   fragments: {
     survey: () => Relay.QL`
       fragment on Survey {
@@ -181,7 +188,7 @@ export default Relay.createContainer(BSDPhonebankRSVPSurvey, {
           latitude
           longitude
         }
-        nearbyEvents(within:20) {
+        nearbyEvents(within:20, type:$type) {
           id
           eventIdObfuscated
           name
@@ -194,6 +201,8 @@ export default Relay.createContainer(BSDPhonebankRSVPSurvey, {
           description
           latitude
           longitude
+          capacity
+          attendeesCount
         }
       }
     `
