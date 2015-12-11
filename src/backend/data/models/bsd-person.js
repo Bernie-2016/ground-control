@@ -120,6 +120,12 @@ export default function(sequelize, DataTypes) {
           as: 'eventAttendances',
           constraints: false
         })
+        BSDPerson.belongsToMany(models.GCBSDGroup, {
+          through: models.BSDPersonGCBSDGroup,
+          foreignKey: 'cons_id',
+          as: 'groups',
+          constraints: false
+        });
       },
       createFromBSDObject: async (BSDObject) => {
         let newPerson = {...BSDObject}

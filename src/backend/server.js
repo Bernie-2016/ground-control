@@ -25,6 +25,7 @@ const wrap = (fn) => {
   {
     return fn(...args)
       .catch((ex) => {
+        log.error(ex)
         process.nextTick(() => { throw ex; });
       })
   }
