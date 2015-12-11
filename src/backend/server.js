@@ -129,13 +129,6 @@ app.post('/signup',
   res.send('Success!')
 }))
 
-// this endpoint is for testing email rendering/sending
-app.get('/events/confirmation-email', wrap(async (req, res) => {
-  let event_types = await BSDClient.getEventTypes();
-  let result = await Mailgun.sendEventConfirmation(demoData.EventCreationForm, demoData.EventCreationConstituent, event_types, true);
-  res.send(result.html)
-}));
-
 app.get('/events/create', wrap(async (req, res) => {
   res.sendFile(publicPath + '/events/create_event.html');
 }));
