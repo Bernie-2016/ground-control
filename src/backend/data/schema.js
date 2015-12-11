@@ -47,6 +47,7 @@ import Promise from 'bluebird';
 import Maestro from '../maestro';
 import url from 'url';
 import TZLookup from 'tz-lookup';
+const EVERYONE_GROUP = 'everyone';
 
 class GraphQLError extends Error {
   constructor(errorObject) {
@@ -200,7 +201,7 @@ const GraphQLUser = new GraphQLObjectType({
                 ) AS cons_groups
                 ON people.cons_id=cons_groups.cons_id'
             `
-          else if (group.query && group.query !== 'EVERYONE')
+          else if (group.query && group.query !== EVERYONE_GROUP)
             filterQuery = `
               INNER JOIN (
                   SELECT cons_id
@@ -238,7 +239,7 @@ const GraphQLUser = new GraphQLObjectType({
                   completed = TRUE
                 ) OR
                 (
-                  reason_not_completed IN ('NO_PICKUP', 'CALL_BACK') AND
+                  reason_not_completed IN ('NO_PICKUP', 'CALL_BACK', 'NOT_INTERESTED') AND
                   attempted_at > :backoffTime
                 ) OR
                 (
@@ -650,7 +651,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
             query: query
           }, {transaction: t})
 
-        if (query !== 'everyone') {
+        if (query !== EVERYONE_GROUP) {
           query = query.replace(/;*$/, '')
           let results = null;
           let limit = 2000;
