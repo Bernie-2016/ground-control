@@ -86,4 +86,38 @@ export default class MG {
       return response;
     }
   }
+
+  async sendPhoneBankConfirmation(form, constituent, debugging) {
+
+    constituent.cons_email.forEach((email) => {
+      if (email.is_primary == '1'){
+        constituent['email'] = email.email;
+      }
+    });
+
+    let data = {
+      event: form,
+      user: constituent
+    }
+
+    let template = new EmailTemplate(templateDir + '/phone-bank-instructions');
+    let content = await template.render(data);
+
+    let message = {
+      from: 'Team Bernie<info@berniesanders.com>',
+      'h:Reply-To': 'help@berniesanders.com',
+      to: form.cons_email,
+      subject: 'Event Creation Confirmation',
+      text: content.text,
+      html: content.html
+    };
+
+    if (debugging){
+      return message;
+    }
+    else{
+      let response = await this.mailgun.messages().send(message);
+      return response;
+    }
+  }
 }

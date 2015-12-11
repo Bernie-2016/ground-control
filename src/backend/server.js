@@ -159,7 +159,14 @@ app.post('/events/create', isAuthenticated, wrap(async (req, res) => {
   function eventCreationCallback(status){
   	res.json(status);
   	if (status == 'success'){
-  		Mailgun.sendEventConfirmation(form, constituent, event_types);
+      if (form['event_type_id'] == 31){
+        // Send phone bank specific email
+        Mailgun.sendPhoneBankConfirmation(form, constituent);
+      }
+  		else {
+        // Send generic email
+        Mailgun.sendEventConfirmation(form, constituent, event_types);
+      }
   	}
   }
 }));
