@@ -34,6 +34,7 @@ class AdminEventsSection extends React.Component {
     this.state = {
       showDeleteEventDialog: false,
       showEventPreview: false,
+      showCreateEventDialog: false,
       filterOptionsIndex: 0,
       tableWidth: window.innerWidth,
       tableHeight: window.innerHeight - 112,
@@ -330,6 +331,33 @@ class AdminEventsSection extends React.Component {
     )
   }
 
+  renderCreateModal() {
+    let standardActions = [
+      { text: 'Cancel' }
+    ];
+
+    this._handleCreateModalRequestClose = () => {
+      this.setState({
+        showCreateEventDialog: false
+      });
+    }
+
+    return (
+      <Dialog
+        title='Create an Event'
+        actions={standardActions}
+        open={this.state.showCreateEventDialog}
+        onRequestClose={this._handleCreateModalRequestClose}
+      >
+        <iframe
+          ref="creationForm"
+          src="../events/create"
+          style={{width: '100%', height: this.state.tableHeight*0.6, border: 'none'}}
+        />  
+      </Dialog>
+    )
+  }
+
   renderEventPreviewModal(events) {
 
     let customActions = [
@@ -440,7 +468,9 @@ class AdminEventsSection extends React.Component {
   }
 
   _handleEventCreation() {
-    console.log('create event');
+    adminInterface.setState({
+      showCreateEventDialog: true
+    });
   }
 
   _handleEventDeletion(eventIndexes) {
@@ -501,6 +531,7 @@ class AdminEventsSection extends React.Component {
     return (
     <div>
       {this.renderDeleteModal()}
+      {this.renderCreateModal()}
       {this.renderEventPreviewModal(events)}
       {this.renderToolbar()}
       <Table
