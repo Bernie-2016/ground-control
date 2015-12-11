@@ -190,6 +190,7 @@ const GraphQLUser = new GraphQLObjectType({
           // This is maybe the worst thing of all time. Switch to knex when we can.
           let group = await callAssignment.getIntervieweeGroup();
           let filterQuery = '';
+
           if (group.cons_group_id)
             filterQuery = `
               INNER JOIN (
@@ -232,8 +233,21 @@ const GraphQLUser = new GraphQLObjectType({
               SELECT id, interviewee_id
               FROM bsd_calls
               WHERE
-                call_assignment_id = :assignmentId AND
-                attempted_at > :lastCalledDate
+                (
+                  call_assignment_id = :assignmentId AND
+                  completed = TRUE
+                ) OR
+                (
+                  reason_not_completed IN ('NO_PICKUP', 'CALL_BACK') AND
+                  attempted_at > :backoffTime
+                ) OR
+                (
+                  reason_not_completed IN ('WRONG_NUMBER', 'DISCONNECTED_NUMBER', 'OTHER_LANGUAGE')
+                ) OR
+                (
+                  call_assignment_id = :assignmentId AND
+                  reason_not_completed = 'NOT_INTERESTED'
+                )
               ) AS calls
               ON people.cons_id=calls.interviewee_id
             WHERE
@@ -245,7 +259,7 @@ const GraphQLUser = new GraphQLObjectType({
           let people = await sequelize.query(query, {
             replacements: {
               assignmentId: localId,
-              lastCalledDate: new Date(new Date() - 7 * 24 * 60 * 60 * 1000)
+              backoffTime: new Date(new Date() - 7 * 24 * 60 * 60 * 1000)
             },
           })
           if (people && people.length > 0 && people[0].length > 0) {

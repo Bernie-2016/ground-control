@@ -32,6 +32,8 @@ export default function(sequelize, DataTypes) {
       { fields: ['caller_id'] },
       { fields: ['interviewee_id'] },
       { fields: ['call_assignment_id'] },
+      { fields: ['reason_not_completed'] },
+      { fields: ['call_assignment_id', 'completed'] }
     ],
     classMethods: {
       associate: (models) => {
