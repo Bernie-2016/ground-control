@@ -50,6 +50,20 @@ export const BernieText = {
     letterSpacing: '0.1em',
   },
 
+  smallHeader: {
+    color: BernieColors.blue,
+    // fontSize: '1em',
+    fontWeight: 'normal',
+    lineHeight: 1,
+    marginTop: '2em',
+    marginBottom: '1em'
+  },
+
+  menuItem: {
+    fontFamily: 'Roboto, sans-serif',
+    fontWeight: 400
+  },
+  
   inputError: {
     color: BernieColors.red,
     fontFamily: 'freight-sans-pro',

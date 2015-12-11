@@ -5,6 +5,7 @@ import querystring from 'querystring';
 import {parseString} from 'xml2js';
 import Promise from 'bluebird';
 import qs from 'querystring';
+import BSDAudit from './data/models/bsd-audit';
 
 const parseStringPromise = Promise.promisify(parseString);
 
@@ -15,6 +16,19 @@ export default class BSD {
     this.apiId = id;
     this.apiVersion = 2;
     this.apiSecret = secret;
+  }
+
+  noFailApiRequest(method, ...args) {
+    try {
+      BSD[method](...args);
+    } catch (e) {
+      BSDAudit.create({
+        class: 'BSDClient',
+        method: method,
+        params: String(args),
+        error: e.message
+      })
+    }
   }
 
   cleanField(field) {
@@ -280,6 +294,11 @@ export default class BSD {
       }
     })
 
+    if (eventType === null){
+      callback('Event type does not exist in BSD');
+      return;
+    }
+
     // validations
     // Remove special characters from phone number
     let contact_phone = form['contact_phone'].replace(/\D/g,'');
@@ -288,7 +307,6 @@ export default class BSD {
         event_type_id: form['event_type_id'],
         creator_cons_id: cons_id,
         name: form['name'],
-        flag_approval: 1,
         description: form['description'],
         venue_name: form['venue_name'],
         venue_zip: form['venue_zip'],
@@ -340,7 +358,7 @@ export default class BSD {
       }
     });
 
-    return null
+    return
   }
 
   async makeRawRequest(callPath, params, method) {

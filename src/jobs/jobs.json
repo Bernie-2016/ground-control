@@ -1,0 +1,8 @@
+{
+  "jobs": [
+    {
+      "cron": "00 * * * * *",
+      "job": "./jobs/bsd_assigned_calls_ttl.js"
+    }
+  ]
+}

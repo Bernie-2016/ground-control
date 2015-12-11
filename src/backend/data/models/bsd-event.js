@@ -68,7 +68,6 @@ export default function(sequelize, DataTypes) {
       allowNull: true,
       get: function(){
             let formattedDate = this.getDataValue('startDate').toISOString();
-            // 'this' allows you to access attributes of the instance
             return formattedDate;
           }
     },
@@ -88,6 +87,7 @@ export default function(sequelize, DataTypes) {
     attendeeVolunteerMessage: {
       type: DataTypes.TEXT,
       field: 'attendee_volunteer_message',
+      allowNull: true
     },
     isSearchable: {
       type: DataTypes.INTEGER,

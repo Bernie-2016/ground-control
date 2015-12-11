@@ -19,6 +19,8 @@ export default function(sequelize, DataTypes) {
   }, {
     underscored: true,
     tableName: 'zip_codes',
+    updatedAt: 'modified_dt',
+    createdAt: 'create_dt',
     indexes: [
       { fields: ['zip'] },
       { fields: ['timezone_offset']}
