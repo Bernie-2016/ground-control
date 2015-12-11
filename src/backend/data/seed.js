@@ -25,6 +25,11 @@ let toTitleCase = (str) => {
   return str.replace(/\w\S*/g, (txt) => {return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 }
 
+// Remove punctuation in names and titles
+let titlify = (str) => {
+  return toTitleCase(str.replace(/[,.]+/g, ''))
+}
+
 let randomOffsetFromCoord = (coord) => {
   let offset = Math.random() * 2 * (5 / 69) - 5/69
   return coord + offset
@@ -174,9 +179,9 @@ models.sequelize.sync({force: true}).then(async () => {
       flagApproval: true,
       event_type_id: faker.random.arrayElement(eventTypes.map((type) => type.id)),
       creator_cons_id: faker.random.number({min: 1, max: NUM_PERSONS}),
-      name: toTitleCase(faker.lorem.sentence(3,5)),
+      name: titlify(faker.lorem.sentence(3,5)),
       description: faker.lorem.paragraph(),
-      venueName: toTitleCase(faker.lorem.sentence(1,4)),
+      venueName: titlify(faker.lorem.sentence(1,4)),
       venueZip: zip.zip,
       venueCity: zip.city,
       venueState: zip.state,

@@ -43,7 +43,7 @@
     "history": "1.13.0",
     "jquery": "^2.1.4",
     "mailgun-js": "0.7.6",
-    "material-ui": "^0.13.0",
+    "material-ui": "^0.14.0-rc1",
     "minilog": "git://github.com/saikat/minilog.git#ajax-logger-fix",
     "moment": "^2.10.6",
     "moment-timezone": "^0.4.1",
