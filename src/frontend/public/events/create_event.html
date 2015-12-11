@@ -1358,13 +1358,18 @@ jQuery(document).ready(function() {
 		    data: formdata,
 		    type: 'POST',
 		    success: function(xhr, status){
-		          console.log(xhr, status);
-
-		          // temporary success message, to be replaced with a nice UI update in the future
-		          alert('Thanks for submitting an event for the Bernie Sanders campaign! You should receive a confirmation email with a link to manage your event in a few minutes.');
+		    	if (status == 'success'){
+		    		// temporary success message, to be replaced with a nice UI update in the future
+		    		alert('Thanks for submitting an event for the Bernie Sanders campaign! You should receive a confirmation email with a link to manage your event in a few minutes.');
+		    		window.location.reload();
+		    	}
+		    	else {
+		    		alert('There was an error processing your submission. Please try again later or contact help@berniesanders.com.');
+		    	}
 		    },
 		    error: function(i){
 		      console.log(i);
+		      alert('There was an error processing your submission. Please try again later or contact help@berniesanders.com.');
 		    }
 		});
 	});
