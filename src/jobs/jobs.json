@@ -1,7 +1,7 @@
 {
   "jobs": [
     {
-      "cron": "00 * * * * *",
+      "cron": "00 */10 * * * *",
       "job": "./jobs/bsd_assigned_calls_ttl.js"
     }
   ]
