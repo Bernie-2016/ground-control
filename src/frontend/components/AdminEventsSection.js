@@ -9,6 +9,8 @@ import {BernieText, BernieColors} from './styles/bernie-css';
 import IconMenu from 'material-ui/lib/menus/icon-menu';
 import MenuItem from 'material-ui/lib/menus/menu-item';
 
+let adminInterface = null;
+let events = [];
 const keyboardActionStyles = {
   text: {fontSize: '0.9em', top: '-7px', color: BernieColors.gray, cursor: 'default'},
   icon: {cursor: 'default'}
@@ -25,16 +27,7 @@ const KeyboardActionsInfo = () => (
   </div>
 );
 
-const UserMessage = ({message, onUndo}) => (
-  <Snackbar
-    message={message}
-    action="undo"
-    autoHideDuration={500}
-    onActionTouchTap={onUndo}
-  />
-)
-
-class AdminEventSection extends React.Component {
+class AdminEventsSection extends React.Component {
   constructor(props) {
     super(props);
     this.setState = this.setState.bind(this);
@@ -51,11 +44,11 @@ class AdminEventSection extends React.Component {
       userMessage: '',
       undoAction: function(){console.log('undo')}
     };
-    this.handleResize = this.handleResize.bind(this);
-    window.addEventListener('resize', this.handleResize);
+    this._handleResize = this._handleResize.bind(this);
+    window.addEventListener('resize', this._handleResize);
   }
 
-  handleResize(e) {
+  _handleResize(e) {
     this.setState({
       tableWidth: window.innerWidth,
       tableHeight: window.innerHeight - 112
@@ -83,7 +76,6 @@ class AdminEventSection extends React.Component {
         checked={selectedRows.indexOf(rowIndex) > -1}
         eventIndex={rowIndex}
         onCheck={function(){
-          console.log(this);
           this._handleEventSelect(rowIndex);
         }.bind(this)}
         style={{marginLeft: '15px'}}
@@ -103,7 +95,7 @@ class AdminEventSection extends React.Component {
     </Cell>
   )
 
-  HostInfoCell = ({rowIndex, data, col, ...props}) => (
+  HostInfoCell = ({rowIndex, data, col, info, ...props}) => (
     <Cell {...props}
     style={{
       fontFamily: 'Roboto',
@@ -111,7 +103,7 @@ class AdminEventSection extends React.Component {
       lineHeight: '18px',
     }}
     >
-      {data[rowIndex]['node'][col]['email']}
+      {(info == 'name') ? data[rowIndex]['node'][col]['firstName'] + ' ' + data[rowIndex]['node'][col]['lastName'] : data[rowIndex]['node'][col][info]}
     </Cell>
   )
 
@@ -424,95 +416,93 @@ class AdminEventSection extends React.Component {
     )
   }
 
+  _handleEventPreviewOpen(eventIndex, tabIndex) {
+    tabIndex = tabIndex ? tabIndex : 0;
+    adminInterface.setState({
+      showEventPreview: true,
+      activeEventIndex: eventIndex,
+      previewTabIndex: tabIndex
+    });
+  }
+
+  _handlePublicEventOpen(eventIndex) {
+    window.open('https://secure.berniesanders.com/page/event/detail/' + events[eventIndex]['node']['eventIdObfuscated']);
+  }
+
+  _iterateActiveEvent(n) {
+    // Do not iterate if there are no more events available before/after current event
+    if (adminInterface.state.activeEventIndex === null || adminInterface.state.activeEventIndex + n < 0 || adminInterface.state.activeEventIndex + n == events.length){
+      return
+    }
+    adminInterface.setState({
+      activeEventIndex: this.state.activeEventIndex + n
+    });
+  }
+
+  _handleEventCreation() {
+    console.log('create event');
+  }
+
+  _handleEventDeletion(eventIndexes) {
+    adminInterface.setState({
+      showEventPreview: false,
+      showDeleteEventDialog: true,
+      indexesMarkedForDeletion: eventIndexes
+    });
+    // this needs to be fixed
+    // ReactDOM.findDOMNode(adminInterface.refs.deleteConfirmationInput).focus();
+  }
+
+  _handleEventConfirmation(eventIndexes) {
+    console.log(eventIndexes.length + ' approved');
+    adminInterface._iterateActiveEvent(1);
+  }
+
+  _handleEventEdit(event) {
+    console.log(event);
+    // adminInterface._iterateActiveEvent(1);
+  }
+
+  _handleEventSelect(eventIndex) {
+    let currentSelectedRows = adminInterface.state.selectedRows;
+    let i = currentSelectedRows.indexOf(eventIndex);
+    if ( i > -1){
+      currentSelectedRows.splice(i, 1);
+    }
+    else {
+      currentSelectedRows.push(eventIndex);
+    }
+    adminInterface.setState({
+      selectedRows: currentSelectedRows
+    });
+  }
+
+  _handleRowClick(clickEvent, targetRowIndex) {
+    adminInterface._handleEventPreviewOpen(targetRowIndex);
+  }
+
+  _masterCheckBoxChecked(checkEvent, checked) {
+    let currentSelectedRows = [];
+
+    if (checked){
+      for (let i=0; i<events.length; i++){
+        currentSelectedRows.push(i);
+      }
+    }
+    adminInterface.setState({
+      selectedRows: currentSelectedRows
+    });
+  }
+
   render() {
-
-    let events = this.props.listContainer.events.edges;
-    let variables = this.props.relay.variables;
-
-    this._handleEventPreviewOpen = (eventIndex, tabIndex) => {
-      tabIndex = tabIndex ? tabIndex : 0;
-      this.setState({
-        showEventPreview: true,
-        activeEventIndex: eventIndex,
-        previewTabIndex: tabIndex
-      });
-    }
-
-    this._handlePublicEventOpen = (eventIndex) => {
-      window.open('https://secure.berniesanders.com/page/event/detail/' + events[eventIndex]['node']['eventIdObfuscated']);
-    }
-
-    this._iterateActiveEvent = (n) => {
-      // Do not iterate if there are no more events available before/after current event
-      if (this.state.activeEventIndex === null || this.state.activeEventIndex + n < 0 || this.state.activeEventIndex + n == events.length){
-        return
-      }
-      this.setState({
-        activeEventIndex: this.state.activeEventIndex + n
-      });
-    }
-
-    this._handleEventCreation = () => {
-      console.log('create event');
-    }
-
-    this._handleEventDeletion = (eventIndexes) => {
-      this.setState({
-        showEventPreview: false,
-        showDeleteEventDialog: true,
-        indexesMarkedForDeletion: eventIndexes
-      });
-      // this needs to be fixed
-      // ReactDOM.findDOMNode(this.refs.deleteConfirmationInput).focus();
-    }
-
-    this._handleEventConfirmation = (eventIndexes) => {
-      console.log(eventIndexes.length + ' approved');
-      this._iterateActiveEvent(1);
-    }
-
-    this._handleEventEdit = (event) => {
-      console.log(event);
-      // this._iterateActiveEvent(1);
-    }
-
-    this._handleEventSelect = (eventIndex) => {
-      let currentSelectedRows = this.state.selectedRows;
-      let i = currentSelectedRows.indexOf(eventIndex);
-      if ( i > -1){
-        currentSelectedRows.splice(i, 1);
-      }
-      else {
-        currentSelectedRows.push(eventIndex);
-      }
-      this.setState({
-        selectedRows: currentSelectedRows
-      });
-    }
-
-    this._handleRowClick = (clickEvent, targetRowIndex) => {
-      this._handleEventPreviewOpen(targetRowIndex);
-    }
-
-    this._masterCheckBoxChecked = (checkEvent, checked) => {
-      let currentSelectedRows = [];
-
-      if (checked){
-        for (let i=0; i<events.length; i++){
-          currentSelectedRows.push(i);
-        }
-      }
-      this.setState({
-        selectedRows: currentSelectedRows
-      });
-    }
+    adminInterface = this;
+    events = this.props.listContainer.events.edges;
 
     return (
     <div>
       {this.renderDeleteModal()}
       {this.renderEventPreviewModal(events)}
       {this.renderToolbar()}
-      <UserMessage message={this.state.userMessage} onUndo={this.state.undoAction} />
       <Table
         rowHeight={83}
         groupHeaderHeight={35}
@@ -553,12 +543,6 @@ class AdminEventSection extends React.Component {
           header={<this.HeaderCell content="About" />}>
           <Column
             flexGrow={1}
-            header={<this.HeaderCell content="Event Host" />}
-            cell={<this.HostInfoCell data={events} col="host" />}
-            width={220}
-          />
-          <Column
-            flexGrow={1}
             header={<this.HeaderCell content="Event Type" />}
             cell={
               <this.EventTypeCell data={events} col="eventType" />
@@ -577,6 +561,27 @@ class AdminEventSection extends React.Component {
             cell={<this.TextCell data={events} col="description" />}
             width={250}
           />
+        </ColumnGroup>
+        <ColumnGroup
+          header={<this.HeaderCell content="Event Host" />}>
+          <Column
+            flexGrow={1}
+            header={<this.HeaderCell content="Name" />}
+            cell={<this.HostInfoCell data={events} col="host" info="name" />}
+            width={150}
+          />
+          <Column
+            flexGrow={1}
+            header={<this.HeaderCell content="Email" />}
+            cell={<this.HostInfoCell data={events} col="host" info="email" />}
+            width={220}
+          />
+          <Column
+            flexGrow={1}
+            header={<this.HeaderCell content="Phone" />}
+            cell={<this.TextCell data={events} col="contactPhone" />}
+            width={150}
+          />         
         </ColumnGroup>
         <ColumnGroup
           header={<this.HeaderCell content="Time" />}>
@@ -634,7 +639,7 @@ class AdminEventSection extends React.Component {
   }
 }
 
-export default Relay.createContainer(AdminEventSection, {
+export default Relay.createContainer(AdminEventsSection, {
   initialVariables: {
     numEvents: 100,
     sortField: 'startDate',
@@ -663,6 +668,8 @@ export default Relay.createContainer(AdminEventSection, {
               flagApproval
               description
               venueName
+              latitude
+              longitude
               venueZip
               venueCity
               venueState

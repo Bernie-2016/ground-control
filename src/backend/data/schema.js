@@ -33,7 +33,6 @@ import {
   BSDCallAssignment,
   BSDAssignedCall,
   BSDSurvey,
-  BSDEventType,
   BSDEvent,
   BSDEventAttendee,
   GCBSDGroup,

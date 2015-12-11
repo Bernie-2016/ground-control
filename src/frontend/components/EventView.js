@@ -22,8 +22,8 @@ class Event {
 
 // Pull in valid event types and titles later
 const eventTypeOptions = [
-   { payload: 1, text: 'Test Event Type' },
-   { payload: 2, text: 'Second Type' },
+   { payload: 1, text: 'Test event 1' },
+   { payload: 2, text: 'Test event 2' },
    { payload: 3, text: 'Really Really Long Event Type That Is Long' }
 ];
 
@@ -34,6 +34,7 @@ export class EventEdit extends React.Component {
 
   render() {
     let event = new Event(this.props.eventsArray[this.props.eventIndex]['node']);
+    console.log(event);
     return (
     <div>
       <CardText>
@@ -47,6 +48,7 @@ export class EventEdit extends React.Component {
         <SelectField
           value={event.node.eventType.name}
           floatingLabelText="Event Type"
+          valueMember="text"
           menuItems={eventTypeOptions}
           fullWidth={true}
         />
