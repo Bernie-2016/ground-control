@@ -80,6 +80,8 @@ export default class TopNav extends React.Component {
           color: this.props.tabColor,
           backgroundColor: this.props.barColor
         }}
+        value='logout'
+        key='logout'
       />)
 
     return (
