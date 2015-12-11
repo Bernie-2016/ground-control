@@ -20,6 +20,8 @@ export default function(sequelize, DataTypes) {
     }
   }, {
     underscored: true,
+    updatedAt: 'modified_dt',
+    createdAt: 'create_dt',
     tableName: 'gc_bsd_surveys',
     indexes: [
       { fields: ['signup_form_id'] },

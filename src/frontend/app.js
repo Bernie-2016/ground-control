@@ -121,9 +121,9 @@ ReactDOM.render(
       component={Dashboard}
       queries={CurrentUserQueries}
       >
-      <IndexRedirect to='/call-assignments' />
+      <IndexRedirect to='/call' />
       <Route
-        path='call-assignments'
+        path='call'
         component={CallAssignmentsDashboard}
       >
         <IndexRoute
