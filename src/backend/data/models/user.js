@@ -41,6 +41,8 @@ export default function(sequelize, DataTypes) {
   }, {
     underscored: true,
     tableName: 'users',
+    updatedAt: 'modified_dt',
+    createdAt: 'create_dt',
     instanceMethods: {
       verifyPassword: function(password) {
         return compare(password, this.password)
