@@ -288,7 +288,6 @@ export default class BSD {
         event_type_id: form['event_type_id'],
         creator_cons_id: cons_id,
         name: form['name'],
-        flag_approval: 1,
         description: form['description'],
         venue_name: form['venue_name'],
         venue_zip: form['venue_zip'],
