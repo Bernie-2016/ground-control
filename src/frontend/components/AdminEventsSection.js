@@ -348,11 +348,12 @@ class AdminEventsSection extends React.Component {
         actions={standardActions}
         open={this.state.showCreateEventDialog}
         onRequestClose={this._handleCreateModalRequestClose}
+        bodyStyle={{paddingBottom: '0'}}
       >
         <iframe
           ref="creationForm"
           src="../events/create"
-          style={{width: '100%', height: this.state.tableHeight*0.6, border: 'none'}}
+          style={{width: '100%', height: this.state.tableHeight*0.7, border: 'none'}}
         />  
       </Dialog>
     )
