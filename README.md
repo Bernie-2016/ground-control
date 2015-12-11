@@ -4,9 +4,9 @@
 
 ### Linux
 
-The easiest way to get started in Linux is with [Docker](https://docs.docker.com/engine/installation/ubuntulinux/).  After installing Docker, just run:
+On Linux, follow the same directions as OSx below, but substitue `./setup-linux` for the equivalent OSx script.
 
-`docker compose up`
+You will also need to have [Docker](docs.docker.com/engine/installation) and [docker-compose](docs.docker.com/compose/install) installed to provide your database.
 
 ### OS X
 
@@ -30,6 +30,27 @@ The seed script will create an admin user with e-mail address `admin@localhost.c
 ### Windows
 
 The best way to run everything on Windows is probably to try to get Docker working on Windows and use the Linux installation instructions.
+
+### Enviornment Variables
+
+Here is a list of Environment Variables and how they are used:
+
+You can find their defaults in `.env`
+
+* `BSD_HOST`: 
+* `BSD_API_ID`: 
+* `BSD_API_SECRET`: 
+* `MAILGUN_DOMAIN`: 
+* `MAILGUN_KEY`: 
+* `MAILGUN_DOMAIN`: 
+* `PORT`: 
+* `SESSION_SECRET`: 
+* `NODE_ENV`: 
+* `DATABASE_URL`: 
+* `config.use_env_variable`: 
+* `process.env.WEBPACK_PORT`: 
+* `APP_HOST`: 
+* `WEBPACK_PROXY_PORT`: 
 
 ## What does this do and how do I get started?
 
