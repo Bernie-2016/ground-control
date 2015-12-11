@@ -280,6 +280,11 @@ export default class BSD {
       }
     })
 
+    if (eventType === null){
+      callback('Event type does not exist in BSD');
+      return;
+    }
+
     // validations
     // Remove special characters from phone number
     let contact_phone = form['contact_phone'].replace(/\D/g,'');
@@ -339,7 +344,7 @@ export default class BSD {
       }
     });
 
-    return null
+    return
   }
 
   async makeRawRequest(callPath, params, method) {

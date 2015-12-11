@@ -174,6 +174,9 @@ app.post('/events/create', isAuthenticated, wrap(async (req, res) => {
         Mailgun.sendEventConfirmation(form, constituent, event_types);
       }
   	}
+    else {
+      clientLogger['error']('Event Creation Error:', status);
+    }
   }
 }));
 
