@@ -32,8 +32,8 @@ export default class CallAssignmentsDashboard extends React.Component {
           },
           */
           {
-            value: '/call-assignments',
-            label: 'All Assignments'
+            value: '/call',
+            label: 'Make Calls'
           }]}
           history={this.props.history}
           location={this.props.location}

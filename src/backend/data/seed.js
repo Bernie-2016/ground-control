@@ -149,6 +149,10 @@ models.sequelize.sync({force: true}).then(async () => {
     {
       id: 2,
       name: 'Test event 2'
+    },
+    {
+      id: 3,
+      name: 'Phonebank'
     }
   ]
 
@@ -168,7 +172,7 @@ models.sequelize.sync({force: true}).then(async () => {
       id: index,
       eventIdObfuscated: faker.internet.password(5),
       flagApproval: true,
-      event_type_id: faker.random.arrayElement([1,2]),
+      event_type_id: faker.random.arrayElement(eventTypes.map((type) => type.id)),
       creator_cons_id: faker.random.number({min: 1, max: NUM_PERSONS}),
       name: toTitleCase(faker.lorem.sentence(3,5)),
       description: faker.lorem.paragraph(),

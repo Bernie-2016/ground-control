@@ -136,6 +136,12 @@ app.post('/signup',
   res.send('Success!')
 }))
 
+app.post('/logout',
+  wrap(async (req, res) => {
+  req.logout();
+  res.send('Success!')
+}))
+
 // this endpoint is for testing email rendering/sending
 app.get('/events/confirmation-email', wrap(async (req, res) => {
   let event_types = await BSDClient.getEventTypes();

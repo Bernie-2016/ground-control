@@ -366,6 +366,7 @@ const GraphQLPerson = new GraphQLObjectType({
             }
           }
         };
+
         if (eventTypes)
           query['where']['event_type_id'] = { $in: eventTypes }
 
