@@ -5,6 +5,7 @@ import querystring from 'querystring';
 import {parseString} from 'xml2js';
 import Promise from 'bluebird';
 import qs from 'querystring';
+import BSDAudit from './data/models/bsd-audit';
 
 const parseStringPromise = Promise.promisify(parseString);
 
@@ -15,6 +16,19 @@ export default class BSD {
     this.apiId = id;
     this.apiVersion = 2;
     this.apiSecret = secret;
+  }
+
+  noFailApiRequest(method, ...args) {
+    try {
+      BSD[method](...args);
+    } catch (e) {
+      BSDAudit.create({
+        class: 'BSDClient',
+        method: method,
+        params: String(args),
+        error: e.message
+      })
+    }
   }
 
   cleanField(field) {
