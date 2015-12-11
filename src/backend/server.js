@@ -37,6 +37,13 @@ const BSDClient = new BSD(process.env.BSD_HOST, process.env.BSD_API_ID, process.
 const port = process.env.PORT;
 const publicPath = path.resolve(__dirname, '../frontend/public');
 
+function isAuthenticated(req, res, next) {
+  if (req.user)
+    return next();
+
+  res.redirect('/signup');
+}
+
 passport.use('signup', new LocalStrategy(
   {
     usernameField: 'email',
@@ -129,11 +136,12 @@ app.post('/signup',
   res.send('Success!')
 }))
 
-app.get('/events/create', wrap(async (req, res) => {
+
+app.get('/events/create', isAuthenticated, wrap(async (req, res) => {
   res.sendFile(publicPath + '/events/create_event.html');
 }));
 
-app.post('/events/create', wrap(async (req, res) => {
+app.post('/events/create', isAuthenticated, wrap(async (req, res) => {
   let form = req.body;
 
   // constituent object not being returned right now
