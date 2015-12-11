@@ -164,6 +164,12 @@ export default class Signup extends React.Component {
               marginBottom: 15
             }}>
               {formElement}
+              <a href="/reset_password" style={{
+                ...BernieText.default,
+                fontSize: ".7em",
+                display: "block",
+                "text-align": "right"
+              }}>Forgot password</a>
             </Paper>
               <Form.Button
                 type='submit'
