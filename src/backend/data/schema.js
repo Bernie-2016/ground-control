@@ -702,7 +702,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
       }
       else {
         let query = groupText;
-        query = query.toLowerCase();
+        query = query.toLowerCase().replace(/;*$/, '');
 
         if (query.indexOf('drop') !== -1)
           throw new GraphQLError({
@@ -710,6 +710,18 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
             message: 'Cannot use DROP in your SQL'
           })
 
+        if (query !== EVERYONE_GROUP) {
+          let limitedQuery = `${query} order by cons_id limit 1 offset 0`
+          try {
+            await sequelize.query(limitedQuery)
+          } catch (ex) {
+            let error = `Invalid SQL query: ${ex.message}`
+            throw new GraphQLError({
+              status: 400,
+              message: error
+            })
+          }
+        }
         group = await GCBSDGroup.findOne({
           where: {
             query: query
@@ -717,37 +729,10 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
         }, {transaction: t})
 
         if (!group)
+          // The group actually gets hydrated in a cron job
           group = await GCBSDGroup.create({
             query: query
           }, {transaction: t})
-
-        if (query !== EVERYONE_GROUP) {
-          query = query.replace(/;*$/, '')
-          let results = null;
-          let limit = 2000;
-          let offset = 0;
-          let limitedQuery = null;
-
-          query = query.toLowerCase();
-
-          do {
-            limitedQuery = `${query} order by cons_id limit ${limit} offset ${offset}`
-            try {
-              results = await sequelize.query(limitedQuery)
-              if (results && results.length > 0) {
-                let persons = results[0].map((result) => result.cons_id)
-                await group.addPeople(persons, {transaction: t})
-              }
-              offset = offset + limit;
-            } catch (ex) {
-              let error = `Invalid SQL query: ${ex.message}`
-              throw new GraphQLError({
-                status: 400,
-                message: error
-              })
-            }
-          } while(results && results.length > 0 && results[0].length > 0)
-        }
       }
 
       return BSDCallAssignment.create({

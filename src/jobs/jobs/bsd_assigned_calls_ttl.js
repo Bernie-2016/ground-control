@@ -1,4 +1,5 @@
 var pg = require('pg');
+var log = require('../../backend/log')
 
 var connString = process.env.DATABASE_URL;
 var client;
@@ -11,7 +12,7 @@ module.exports = {};
 // containing throw statements.
 var default_cb = module.exports.default_callback = function default_cb(e) {
   if(e) {
-    console.error(e.stack);
+    log.error(e.stack);
   }
 };
 
@@ -21,7 +22,7 @@ module.exports.job = function bsd_assigned_calls_ttl_job(cb) {
   cb = cb || default_cb
 
   // Make sure the client exists
-  if(!client) module.exports.init(function fallback_init(e) {
+  if(!client) return module.exports.init(function fallback_init(e) {
 
     if(e) {
       return cb(e); // we have nothing to do.
@@ -60,7 +61,7 @@ module.exports.init = function bsd_assigned_calls_ttl_init(cb) {
 };
 
 // Allow callers to sever connection to database
-module.exports.destroy = function bsd_assgined_calls_ttl_destroy(cb) {
+module.exports.destroy = function bsd_assigned_calls_ttl_destroy(cb) {
   // If this function wasn't supplied a callback, use the default
   cb = cb || default_cb;
 

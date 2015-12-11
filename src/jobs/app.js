@@ -4,6 +4,7 @@ var async = require('async')
 // jobs contains paths to jobs and crons for each job
 var jobs = require('./jobs.json').jobs;
 var crons = []
+var log = require('../backend/log');
 
 // Create a cron for each job
 async.forEach(jobs,init_job,function(e) {
@@ -11,8 +12,8 @@ async.forEach(jobs,init_job,function(e) {
   // the process shouldn't "appear" to be working even if significant jobs
   // are not running. Bring the process down, fix it, and bring it back up.
   if(e) {
-    console.error("Failed to initialize cron jobs");
-    console.error(e.stack);
+    log.error("Failed to initialize cron jobs");
+    log.error(e.stack);
     process.exit(1);
   }
 });
@@ -40,7 +41,7 @@ function init_job(job, cb) {
   // Make sure a cron is specified
   if(!job.cron) {
     // We log the job path for easier debugging
-    console.error(job.job);
+    log.error(job.job);
     return cb(new Error('Job specified without cron'));
   }
 
@@ -51,18 +52,18 @@ function init_job(job, cb) {
   job.module.init(function job_init_complete(e) {
     if(e) {
       // Log the job for easier debugging
-      console.error(job.job);
+      log.error(job.job);
       return cb(e)
     }
 
     // The Cron module thorws if the cron string is invalid
     try {
-      console.log("Initializing:",job.job);
+      log.info("Initializing:",job.job);
       // Create the new job
       crons.push(new CronJob(
         job.cron,
         function execute_job() {
-          console.log("Executing:",job.job);
+          log.info("Executing:",job.job);
           job.module.job();
         },
         function job_finished() {},
@@ -72,7 +73,7 @@ function init_job(job, cb) {
 
     } catch(e) {
       // Log the job for easier debugging
-      console.error(job.job);
+      log.error(job.job);
       return cb(e)
     }
   });
