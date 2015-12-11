@@ -3,6 +3,8 @@ export default function(sequelize, DataTypes) {
     name: DataTypes.STRING
   }, {
     underscored: true,
+    updatedAt: 'modified_dt',
+    createdAt: 'create_dt',
     tableName: 'bsd_call_assignments',
     indexes: [
       { fields: ['gc_bsd_survey_id'] },

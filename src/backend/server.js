@@ -25,6 +25,7 @@ const wrap = (fn) => {
   {
     return fn(...args)
       .catch((ex) => {
+        log.error(ex)
         process.nextTick(() => { throw ex; });
       })
   }
@@ -136,6 +137,11 @@ app.post('/signup',
   res.send('Success!')
 }))
 
+app.post('/logout',
+  wrap(async (req, res) => {
+  req.logout();
+  res.send('Success!')
+}))
 
 app.get('/events/create', isAuthenticated, wrap(async (req, res) => {
   res.sendFile(publicPath + '/events/create_event.html');

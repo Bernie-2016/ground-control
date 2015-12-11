@@ -6,7 +6,7 @@
   "version": "0.1.0",
   "scripts": {
     "bundle": "mustache ./src/frontend/index/production.json ./src/frontend/index/index.mustache > ./src/frontend/public/index.html && mkdir -p ./src/frontend/public/js && webpack --config ./webpack/config.js",
-    "prestart": "npm run bundle",
+    "postinstall": "npm run bundle",
     "start": "./run ./src/backend/server.js",
     "predev": "mustache ./src/frontend/index/development.json ./src/frontend/index/index.mustache > ./src/frontend/public/index.html",
     "dev": "nf start -w --procfile Procfile.dev",
@@ -17,6 +17,7 @@
     "sync": "./run ./src/backend/data/sync.js"
   },
   "dependencies": {
+    "async": "^1.5.0",
     "babel": "^5.8.21",
     "babel-core": "^5.8.25",
     "babel-loader": "^5.3.2",
@@ -26,6 +27,7 @@
     "bluebird": "^2.10.2",
     "body-parser": "1.14.1",
     "connect-session-sequelize": "^2.3.1",
+    "cron": "^1.1.0",
     "csv-load-sync": "0.0.3",
     "dotenv": "^1.2.0",
     "email-templates": "2.0.1",
@@ -38,7 +40,7 @@
     "graphql": "^0.4.2",
     "graphql-relay": "^0.3.5",
     "handlebars": "^3.0.0",
-    "history": "^1.12.5",
+    "history": "1.13.0",
     "jquery": "^2.1.4",
     "mailgun-js": "0.7.6",
     "material-ui": "^0.14.0-rc1",
@@ -55,7 +57,7 @@
     "react-formal": "^0.14.2",
     "react-google-maps": "^4.7.0",
     "react-relay": "^0.4.0",
-    "react-router": "^1.0.0-rc3",
+    "react-router": "^1.0.2",
     "react-router-relay": "^0.7.0",
     "react-tap-event-plugin": "^0.2.1",
     "request-promise": "^1.0.1",

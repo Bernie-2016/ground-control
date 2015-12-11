@@ -10,6 +10,8 @@ export default function(sequelize, DataTypes) {
     },
     data: DataTypes.TEXT
   }, {
+    updatedAt: 'modified_dt',
+    createdAt: 'create_dt',
     underscored: true,
     tableName: 'sessions',
   })

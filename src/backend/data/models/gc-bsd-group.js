@@ -9,6 +9,8 @@ export default function(sequelize, DataTypes) {
   }, {
     underscored: true,
     tableName: 'gc_bsd_groups',
+    updatedAt: 'modified_dt',
+    createdAt: 'create_dt',
     indexes: [
       { fields: ['cons_group_id'] },
     ],
@@ -18,7 +20,12 @@ export default function(sequelize, DataTypes) {
           foreignKey: 'cons_group_id',
           as: 'BSDGroup',
           constraints: false
-        })
+        });
+        GCBSDGroup.belongsToMany(models.BSDPerson, {
+          through: models.BSDPersonGCBSDGroup,
+          foreignKey: 'gc_bsd_group_id',
+          as: 'people',
+        });
       }
     }
   })

@@ -47,6 +47,7 @@ import Promise from 'bluebird';
 import Maestro from '../maestro';
 import url from 'url';
 import TZLookup from 'tz-lookup';
+const EVERYONE_GROUP = 'everyone';
 
 class GraphQLError extends Error {
   constructor(errorObject) {
@@ -176,6 +177,29 @@ const GraphQLUser = new GraphQLObjectType({
         return connectionFromArray(assignments, {first});
       }
     },
+    callsMade: {
+      type: GraphQLInt,
+      args: {
+        forAssignmentId: { type: GraphQLString }
+      },
+      resolve: (user, {forAssignmentId}) => {
+        if (forAssignmentId) {
+          let localId = fromGlobalId(forAssignmentId)
+          return BSDCall.count({
+            where: {
+              caller_id: user.id,
+              call_assignment_id: localId
+            }
+          })
+        }
+        else
+          return BSDCall.count({
+            where: {
+              caller_id: user.id
+            }
+          })
+      }
+    },
     intervieweeForCallAssignment: {
       type: GraphQLPerson,
       args: {
@@ -207,29 +231,32 @@ const GraphQLUser = new GraphQLObjectType({
           // This is maybe the worst thing of all time. Switch to knex when we can.
           let group = await callAssignment.getIntervieweeGroup();
           let filterQuery = '';
+
           if (group.cons_group_id)
             filterQuery = `
               INNER JOIN (
-                  SELECT id, cons_id
+                  SELECT cons_id
                   FROM bsd_person_bsd_groups
                   WHERE cons_group_id=${group.cons_group_id}
                 ) AS cons_groups
-                ON persons.cons_id=cons_groups.cons_id'
+                ON people.cons_id=cons_groups.cons_id'
             `
-          else if (group.query && group.query !== 'EVERYONE')
+          else if (group.query && group.query !== EVERYONE_GROUP)
             filterQuery = `
               INNER JOIN (
-                  ${group.query}
-                ) AS inner_query
-                ON persons.cons_id=inner_query.cons_id
+                  SELECT cons_id
+                  FROM bsd_person_gc_bsd_groups
+                  WHERE gc_bsd_group_id=${group.id}
+                ) AS groups
+                ON people.cons_id=groups.cons_id
             `
           let query = `
             SELECT *
-            FROM bsd_people AS persons
+            FROM bsd_people AS people
             INNER JOIN bsd_emails AS emails
-              ON persons.cons_id=emails.cons_id
+              ON people.cons_id=emails.cons_id
             INNER JOIN bsd_phones AS phones
-              ON persons.cons_id=phones.cons_id
+              ON people.cons_id=phones.cons_id
             INNER JOIN (
               SELECT id, cons_id
               FROM bsd_addresses AS addresses
@@ -239,32 +266,46 @@ const GraphQLUser = new GraphQLObjectType({
                 addresses.state_cd NOT IN ('IA','NH','NV','SC') AND
                 zip_codes.timezone_offset IN (${validOffsets.join(',')})
               ) AS addresses
-              ON persons.cons_id=addresses.cons_id
+              ON people.cons_id=addresses.cons_id
             ${filterQuery}
             LEFT OUTER JOIN bsd_assigned_calls AS assigned_calls
-              ON persons.cons_id=assigned_calls.interviewee_id
+              ON people.cons_id=assigned_calls.interviewee_id
             LEFT OUTER JOIN (
-              SELECT id, interviewee_id
+              SELECT id, interviewee_id, attempted_at
               FROM bsd_calls
               WHERE
-                call_assignment_id = :assignmentId AND
-                attempted_at > :lastCalledDate
+                (
+                  call_assignment_id = :assignmentId AND
+                  completed = TRUE
+                ) OR
+                (
+                  reason_not_completed IN ('NO_PICKUP', 'CALL_BACK', 'NOT_INTERESTED') AND
+                  attempted_at > :backoffTime
+                ) OR
+                (
+                  reason_not_completed IN ('WRONG_NUMBER', 'DISCONNECTED_NUMBER', 'OTHER_LANGUAGE')
+                ) OR
+                (
+                  call_assignment_id = :assignmentId AND
+                  reason_not_completed = 'NOT_INTERESTED'
+                )
               ) AS calls
-              ON persons.cons_id=calls.interviewee_id
+              ON people.cons_id=calls.interviewee_id
             WHERE
               calls.id IS NULL AND
               assigned_calls.id IS NULL
+            ORDER BY calls.attempted_at NULLS FIRST
             LIMIT 1
           `
 
-          let persons = await sequelize.query(query, {
+          let people = await sequelize.query(query, {
             replacements: {
               assignmentId: localId,
-              lastCalledDate: new Date(new Date() - 7 * 24 * 60 * 60 * 1000)
+              backoffTime: new Date(new Date() - 7 * 24 * 60 * 60 * 1000)
             },
           })
-          if (persons && persons.length > 0 && persons[0].length > 0) {
-            let person = persons[0][0]
+          if (people && people.length > 0 && people[0].length > 0) {
+            let person = people[0][0]
             // Also a big hack - not sure how to convert fieldnames to model attributes without doing it explicitly.  We should maybe just switch to using snake case model attributes and get rid of all the manual conversion code.
             person = BSDPerson.build({
               ...person,
@@ -381,10 +422,10 @@ const GraphQLPerson = new GraphQLObjectType({
             }
           }
         };
-        console.log(eventTypes);
+
         if (eventTypes)
           query['where']['event_type_id'] = { $in: eventTypes }
-        console.log(query);
+
         return BSDEvent.findAll(query)
       }
     }
@@ -488,6 +529,16 @@ const GraphQLCallAssignment = new GraphQLObjectType({
       type: GraphQLSurvey,
       resolve: (assignment) => assignment.getSurvey()
     },
+    callsMade: {
+      type: GraphQLInt,
+      resolve: (callAssignment) => {
+        return BSDCall.count({
+          where: {
+            call_assignment_id: callAssignment.id
+          }
+        })
+      }
+    },
     query: {
       type: GraphQLString,
       resolve: async (assignment) => {
@@ -555,7 +606,7 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
         where: {
           caller_id: caller.id
         }
-      })
+      }, {transaction: t})
 
       let assignedCallInfo = {
         callerId: assignedCall.caller_id,
@@ -575,15 +626,15 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
         }
       });
 
-      let callAssignment = await BSDCallAssignment.findById(localCallAssignmentId)
-      let survey = await callAssignment.getSurvey()
+      let callAssignment = await BSDCallAssignment.findById(localCallAssignmentId, {transaction: t})
+      let survey = await callAssignment.getSurvey({transaction: t})
       let fieldValues = JSON.parse(surveyFieldValues)
-      fieldValues['person'] = await BSDPerson.findById(localIntervieweeId);
+      fieldValues['person'] = await BSDPerson.findById(localIntervieweeId, {transaction: t});
       if (completed)
         await survey.process(fieldValues)
 
       let promises = [
-        assignedCall.destroy(),
+        assignedCall.destroy({transaction: t}),
         BSDCall.create({
           completed: completed,
           attemptedAt: new Date(),
@@ -593,7 +644,7 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
           caller_id: caller.id,
           interviewee_id: assignedCall.interviewee_id,
           call_assignment_id: assignedCall.call_assignment_id
-        })
+        }, {transaction: t})
       ]
       await Promise.all(promises);
       return caller;
@@ -623,70 +674,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
     let group = null;
     let survey = null;
     return sequelize.transaction(async (t) => {
-      if (/^\d+$/.test(groupText)) {
-        let underlyingGroup = await BSDGroup.findWithBSDCheck(groupText)
-        if (!underlyingGroup)
-          throw new GraphQLError({
-            status: 400,
-            message: 'Provided group ID does not exist in BSD.'
-          });
-        let consGroupID = parseInt(groupText, 10);
-        group = await GCBSDGroup.findOne({
-          where: {
-            cons_group_id: consGroupID
-          }
-        })
-        if (!group)
-          group = await GCBSDGroup.create({
-            cons_group_id: consGroupID
-          })
-      }
-      else {
-        let query = groupText;
-        if (query.toLowerCase().indexOf('drop') !== -1)
-          throw new GraphQLError({
-            status: 400,
-            message: 'Cannot use DROP in your SQL'
-          })
-        if (query.toUpperCase() === 'EVERYONE')
-          query = query.toUpperCase()
-
-        if (query !== 'EVERYONE') {
-          let error = null;
-          let results = null;
-          try {
-            results = await sequelize.query(query)
-            if (!results || !results.length)
-              error = 'Invalid SQL query'
-          } catch (ex) {
-            error = 'Invalid SQL query'
-          }
-          if (!error) {
-            if (results[0].length === 0)
-                error = 'SQL query returns no results'
-
-            let firstResult = results[0][0];
-            if (!firstResult.cons_id)
-              error = 'SQL query needs to return a list of cons_ids'
-          }
-          if (error)
-            throw new GraphQLError({
-              status: 400,
-              message: error
-            })
-        }
-        group = await GCBSDGroup.findOne({
-          where: {
-            query: query
-          }
-        })
-        if (!group)
-          group = await GCBSDGroup.create({
-            query: query
-          })
-      }
-
-      let underlyingSurvey = await BSDSurvey.findWithBSDCheck(surveyId)
+      let underlyingSurvey = await BSDSurvey.findWithBSDCheck(surveyId, {transaction: t})
 
       if (!underlyingSurvey)
         throw new GraphQLError({
@@ -697,12 +685,81 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
         signup_form_id: surveyId,
         renderer: renderer,
         processors: processors
-      })
+      }, {transaction: t})
+      if (/^\d+$/.test(groupText)) {
+        let underlyingGroup = await BSDGroup.findWithBSDCheck(groupText, {transaction: t})
+        if (!underlyingGroup)
+          throw new GraphQLError({
+            status: 400,
+            message: 'Provided group ID does not exist in BSD.'
+          });
+
+        let consGroupID = parseInt(groupText, 10);
+        group = await GCBSDGroup.findOne({
+          where: {
+            cons_group_id: consGroupID
+          }
+        }, {transaction: t})
+        if (!group)
+          group = await GCBSDGroup.create({
+            cons_group_id: consGroupID
+          }, {transaction: t})
+      }
+      else {
+        let query = groupText;
+        query = query.toLowerCase();
+
+        if (query.indexOf('drop') !== -1)
+          throw new GraphQLError({
+            status: 400,
+            message: 'Cannot use DROP in your SQL'
+          })
+
+        group = await GCBSDGroup.findOne({
+          where: {
+            query: query
+          }
+        }, {transaction: t})
+
+        if (!group)
+          group = await GCBSDGroup.create({
+            query: query
+          }, {transaction: t})
+
+        if (query !== EVERYONE_GROUP) {
+          query = query.replace(/;*$/, '')
+          let results = null;
+          let limit = 2000;
+          let offset = 0;
+          let limitedQuery = null;
+
+          query = query.toLowerCase();
+
+          do {
+            limitedQuery = `${query} order by cons_id limit ${limit} offset ${offset}`
+            try {
+              results = await sequelize.query(limitedQuery)
+              if (results && results.length > 0) {
+                let persons = results[0].map((result) => result.cons_id)
+                await group.addPeople(persons, {transaction: t})
+              }
+              offset = offset + limit;
+            } catch (ex) {
+              let error = `Invalid SQL query: ${ex.message}`
+              throw new GraphQLError({
+                status: 400,
+                message: error
+              })
+            }
+          } while(results && results.length > 0 && results[0].length > 0)
+        }
+      }
+
       return BSDCallAssignment.create({
         name: name,
         gc_bsd_group_id: group.id,
         gc_bsd_survey_id: survey.id
-      })
+      }, {transaction: t})
     })
   }
 });

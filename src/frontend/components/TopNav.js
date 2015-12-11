@@ -3,6 +3,7 @@ import BernieLogo from './BernieLogo';
 import {BernieColors, BernieText} from './styles/bernie-css';
 import {BernieTheme} from './styles/bernie-theme';
 import {AppBar, Styles, Tabs, Tab} from 'material-ui';
+import superagent from 'superagent';
 
 @Styles.ThemeDecorator(Styles.ThemeManager.getMuiTheme(BernieTheme))
 export default class TopNav extends React.Component {
@@ -39,6 +40,17 @@ export default class TopNav extends React.Component {
     }
   }
 
+  logoutHandler = (event) => {
+    superagent
+      .post('/logout')
+      .end((err, res) => {
+        if (!err)
+          window.location = '/signup';
+        else
+          return;
+        })
+  }
+
   render() {
     let tabs = []
     let selectedTab = this.props.tabs.filter((tab) => {
@@ -60,6 +72,15 @@ export default class TopNav extends React.Component {
         key={tab.value}
       />)
     })
+    tabs.push(<Tab
+        label={'Logout'}
+        onActive={this.logoutHandler}
+        style={{
+          ...this.styles.tab,
+          color: this.props.tabColor,
+          backgroundColor: this.props.barColor
+        }}
+      />)
 
     return (
       <div>
@@ -78,14 +99,17 @@ export default class TopNav extends React.Component {
               style={this.styles.logo}
           />}
           iconElementRight={
-            <Tabs valueLink={{
-              value: selectedTab ? selectedTab : 'none',
-              requestChange: (value, event, tab) => {
-                this.props.history.pushState(null, value)
-              }}}
-            >
-              {tabs}
-            </Tabs>
+            <div>
+              {this.props.extraTop}
+              <Tabs valueLink={{
+                value: selectedTab ? selectedTab : 'none',
+                requestChange: (value, event, tab) => {
+                  this.props.history.pushState(null, value)
+                }}}
+              >
+                {tabs}
+              </Tabs>
+            </div>
           }
         />
       </div>

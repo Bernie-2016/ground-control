@@ -8,7 +8,7 @@ import CallAssignment from './CallAssignment';
 import TopNav from './TopNav';
 
 @Radium
-export default class CallAssignmentsDashboard extends React.Component {
+class CallAssignmentsDashboard extends React.Component {
   render() {
     return (
       <div>
@@ -22,18 +22,9 @@ export default class CallAssignmentsDashboard extends React.Component {
             swoosh: BernieColors.red
           }}
           tabs={[
-/*          {
-            value: '/call-assignments/stats',
-            label: 'Stats'
-          },
           {
-            value: '/call-assignments/invite',
-            label: 'Invite'
-          },
-          */
-          {
-            value: '/call-assignments',
-            label: 'All Assignments'
+            value: '/call',
+            label: 'Make Calls'
           }]}
           history={this.props.history}
           location={this.props.location}
@@ -43,3 +34,13 @@ export default class CallAssignmentsDashboard extends React.Component {
     )
   }
 }
+
+export default Relay.createContainer(CallAssignmentsDashboard, {
+  fragments: {
+    currentUser: () => Relay.QL`
+      fragment on User {
+        callsMade
+      }
+    `
+  }
+})

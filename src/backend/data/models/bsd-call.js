@@ -25,11 +25,15 @@ export default function(sequelize, DataTypes) {
     }
   }, {
     underscored: true,
+    updatedAt: 'modified_dt',
+    createdAt: 'create_dt',
     tableName: 'bsd_calls',
     indexes: [
       { fields: ['caller_id'] },
       { fields: ['interviewee_id'] },
       { fields: ['call_assignment_id'] },
+      { fields: ['reason_not_completed'] },
+      { fields: ['call_assignment_id', 'completed'] }
     ],
     classMethods: {
       associate: (models) => {

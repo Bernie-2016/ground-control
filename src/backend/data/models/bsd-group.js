@@ -22,12 +22,12 @@ export default function(sequelize, DataTypes) {
         newGroup.id = newSurvey.cons_group_id;
         return BSDGroup.create(newGroup);
       },
-      findWithBSDCheck: async (id) => {
-        let group = await BSDGroup.findById(id);
+      findWithBSDCheck: async (id, opts) => {
+        let group = await BSDGroup.findById(id, opts);
         if (!group) {
           try {
             let BSDGroupResponse = await BSDClient.getConstituentGroup(id);
-            group = await BSDGroup.createFromBSDObject(BSDGroupResponse)
+            group = await BSDGroup.createFromBSDObject(BSDGroupResponse, opts)
           } catch (err) {
             if (err && err.response && err.response.statusCode === 409)
               group = null;
