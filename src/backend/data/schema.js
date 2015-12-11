@@ -513,7 +513,7 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
         where: {
           caller_id: caller.id
         }
-      })
+      }, {transaction: t})
 
       let assignedCallInfo = {
         callerId: assignedCall.caller_id,
@@ -533,15 +533,15 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
         }
       });
 
-      let callAssignment = await BSDCallAssignment.findById(localCallAssignmentId)
-      let survey = await callAssignment.getSurvey()
+      let callAssignment = await BSDCallAssignment.findById(localCallAssignmentId, {transaction: t})
+      let survey = await callAssignment.getSurvey({transaction: t})
       let fieldValues = JSON.parse(surveyFieldValues)
-      fieldValues['person'] = await BSDPerson.findById(localIntervieweeId);
+      fieldValues['person'] = await BSDPerson.findById(localIntervieweeId, {transaction: t});
       if (completed)
         await survey.process(fieldValues)
 
       let promises = [
-        assignedCall.destroy(),
+        assignedCall.destroy({transaction: t}),
         BSDCall.create({
           completed: completed,
           attemptedAt: new Date(),
@@ -551,7 +551,7 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
           caller_id: caller.id,
           interviewee_id: assignedCall.interviewee_id,
           call_assignment_id: assignedCall.call_assignment_id
-        })
+        }, {transaction: t})
       ]
       await Promise.all(promises);
       return caller;
