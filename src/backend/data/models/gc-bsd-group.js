@@ -24,7 +24,8 @@ export default function(sequelize, DataTypes) {
         GCBSDGroup.belongsToMany(models.BSDPerson, {
           through: models.BSDPersonGCBSDGroup,
           foreignKey: 'gc_bsd_group_id',
-          as: 'people'
+          as: 'people',
+          constraints: false
         });
       }
     }
