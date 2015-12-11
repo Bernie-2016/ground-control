@@ -57,11 +57,14 @@ function init_job(job, cb) {
 
     // The Cron module thorws if the cron string is invalid
     try {
-
+      console.log("Initializing:",job.job);
       // Create the new job
       crons.push(new CronJob(
         job.cron,
-        job.module.job,
+        function execut_job() {
+          console.log("Executing:",job.job);
+          job.module.job();
+        },
         function job_finished() {},
         true, // start immediately,
         "America/Chicago" // this shouldn't really matter

@@ -9,7 +9,7 @@ module.exports = {};
 // function is called syncronously.
 // This is prefered over throwing since compilers don't optimize functions
 // containing throw statements.
-var default_callback = module.exports.default_callback = function default_cb(e) {
+var default_cb = module.exports.default_callback = function default_cb(e) {
   if(e) {
     console.error(e.stack);
   }
@@ -24,7 +24,7 @@ module.exports.job = function bsd_assigned_calls_ttl_job(cb) {
   if(!client) module.exports.init(function fallback_init(e) {
 
     if(e) {
-      return default_cb(e); // we have nothing to do.
+      return cb(e); // we have nothing to do.
     }
 
     // Client created, execute query
