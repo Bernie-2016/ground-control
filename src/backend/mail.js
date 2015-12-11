@@ -32,6 +32,8 @@ Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
 Handlebars.registerPartial('header', headerHTML);
 Handlebars.registerPartial('footer', footerHTML);
 
+const senderAddress = 'Team Bernie<info@berniesanders.com>';
+
 export default class MG {
   constructor(apiKey, domain) {
     this.mailgun = Mailgun({apiKey: apiKey, domain: domain});
@@ -71,7 +73,7 @@ export default class MG {
     let content = await eventConfirmation.render(data);
 
     let message = {
-      from: 'Volunteer Portal<ground-control@' + process.env.MAILGUN_DOMAIN + '>',
+      from: senderAddress,
       to: form.cons_email,
       subject: 'Event Creation Confirmation',
       text: content.text,
@@ -104,7 +106,7 @@ export default class MG {
     let content = await template.render(data);
 
     let message = {
-      from: 'Team Bernie<info@berniesanders.com>',
+      from: senderAddress,
       'h:Reply-To': 'help@berniesanders.com',
       to: form.cons_email,
       subject: 'Event Creation Confirmation',
