@@ -137,7 +137,7 @@
 
                         	CKEDITOR.on('instanceReady', function (e) {
                         	  $('.cke_top').css('background', '#eee');
-                        	  
+
                         	  CKEDITOR.instances.description.insertText('Join other volunteers in your area to make phone calls for Bernie. This is a great opportunity to meet other Bernie supporters, make calls to voters, and help make a big impact in our campaign for President.');
                         	});
                         </script>
@@ -171,10 +171,10 @@
                         
                     </div><div class="inputgroup"><div class="label">
                     <label class="form_label">Send email reminder to attendees?</label></div><div class="field">
-                    <div class="select-wrapper"><select onchange="if (this.value==1) {show(&#39;use_reminder_email&#39;);} else {hide(&#39;use_reminder_email&#39;);}" name="rsvp_use_reminder_email">
+                    <div class="select-wrapper"><select onchange="if (this.value==1) { $('#rsvp_email_reminder_hours_section').show(); }else{ $('#rsvp_email_reminder_hours_section').hide(); }" name="rsvp_use_reminder_email">
 	<option value="0">No</option>
 	<option value="1" selected="selected">Yes</option>
-</select></div></div></div><div class="hideabletable">
+</select></div></div></div><div class="hideabletable" id="rsvp_email_reminder_hours_section">
                 <div class="label">
                     <label class="form_label">Enter # of hours before event to send reminder:</label></div>
                 <div class="field">
