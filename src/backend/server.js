@@ -95,12 +95,6 @@ app.use('/graphql', graphQLHTTP((request) => {
   }
 }));
 
-// this endpoint may be used for caching and serving available event types and their attributes to the event creation form
-app.get('/events/types.json', wrap(async (req, res) => {
-  let result = await BSDClient.getEventTypes();
-  res.json(result);
-}));
-
 app.post('/log', wrap(async (req, res) => {
   let parsedURL = url.parse(req.url, true);
   let logs = req.body.logs;
