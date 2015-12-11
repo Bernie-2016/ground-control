@@ -5,6 +5,7 @@ import querystring from 'querystring';
 import {parseString} from 'xml2js';
 import Promise from 'bluebird';
 import qs from 'querystring';
+import GCAudit from './data/models/gc-audit';
 
 const parseStringPromise = Promise.promisify(parseString);
 
@@ -21,7 +22,12 @@ export default class BSD {
     try {
       BSD[method](...args);
     } catch (e) {
-      console.log('fail');
+      GCAudit.create({
+        class: 'BSDClient',
+        method: method,
+        params: String(args),
+        error: e.message
+      })
     }
   }
 
