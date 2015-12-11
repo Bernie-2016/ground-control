@@ -44,10 +44,10 @@ window.onerror = (msg, file, line, col, error) => {
       .fromError(error)
       .then((stack) => {
         log.error('Uncaught exception!', stack);
-        // setTimeout(() => {
-        //     alert('Whoops! Something went wrong. We\'re looking into it, but in the meantime please refresh your browser.');
-        //     document.location.reload(true);
-        // }, 2000);
+        setTimeout(() => {
+            alert('Whoops! Something went wrong. We\'re looking into it, but in the meantime please refresh your browser.');
+            document.location.reload(true);
+        }, 2000);
       })
       .catch((stack) => {
         log.error(stack);

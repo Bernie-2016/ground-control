@@ -141,11 +141,6 @@ const GraphQLListContainer = new GraphQLObjectType({
     },
     events: {
       type: GraphQLEventConnection,
-      // args: Object.assign({
-      //         orderBy: {
-      //           type: new GraphQLList(GraphQLString),
-      //         },
-      //       }, connectionArgs),
       args: connectionArgs,
       resolve: async (event, {first}) => {
         let events = await BSDEvent.all({order: 'start_dt ASC'});
