@@ -581,15 +581,20 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
     let group = null;
     let survey = null;
     return sequelize.transaction(async (t) => {
-      let underlyingSurvey = await BSDSurvey.findWithBSDCheck(surveyId)
+      let underlyingSurvey = await BSDSurvey.findWithBSDCheck(surveyId, {transaction: t})
 
       if (!underlyingSurvey)
         throw new GraphQLError({
           status: 400,
           message: 'Provided survey ID does not exist in BSD.'
         });
+      survey = await GCBSDSurvey.create({
+        signup_form_id: surveyId,
+        renderer: renderer,
+        processors: processors
+      }, {transaction: t})
       if (/^\d+$/.test(groupText)) {
-        let underlyingGroup = await BSDGroup.findWithBSDCheck(groupText)
+        let underlyingGroup = await BSDGroup.findWithBSDCheck(groupText, {transaction: t})
         if (!underlyingGroup)
           throw new GraphQLError({
             status: 400,
@@ -601,11 +606,11 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
           where: {
             cons_group_id: consGroupID
           }
-        })
+        }, {transaction: t})
         if (!group)
           group = await GCBSDGroup.create({
             cons_group_id: consGroupID
-          })
+          }, {transaction: t})
       }
       else {
         let query = groupText;
@@ -621,17 +626,17 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
           where: {
             query: query
           }
-        })
+        }, {transaction: t})
 
         if (!group)
           group = await GCBSDGroup.create({
             query: query
-          })
+          }, {transaction: t})
 
         if (query !== 'everyone') {
           query = query.replace(/;*$/, '')
           let results = null;
-          let limit = 1000;
+          let limit = 2000;
           let offset = 0;
           let limitedQuery = null;
 
@@ -641,10 +646,13 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
             limitedQuery = `${query} order by cons_id limit ${limit} offset ${offset}`
             try {
               results = await sequelize.query(limitedQuery)
-              let
+              if (results && results.length > 0) {
+                let persons = results[0].map((result) => result.cons_id)
+                await group.addPeople(persons, {transaction: t})
+              }
               offset = offset + limit;
             } catch (ex) {
-              error = `Invalid SQL query: ${ex.message}`
+              let error = `Invalid SQL query: ${ex.message}`
               throw new GraphQLError({
                 status: 400,
                 message: error
@@ -654,16 +662,11 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
         }
       }
 
-      survey = await GCBSDSurvey.create({
-        signup_form_id: surveyId,
-        renderer: renderer,
-        processors: processors
-      })
       return BSDCallAssignment.create({
         name: name,
         gc_bsd_group_id: group.id,
         gc_bsd_survey_id: survey.id
-      })
+      }, {transaction: t})
     })
   }
 });

@@ -3,6 +3,8 @@ export default function(sequelize, DataTypes) {
 
   }, {
     underscored: true,
+    updatedAt: 'modified_dt',
+    createdAt: 'create_dt',
     tableName: 'bsd_assigned_calls',
     indexes: [
       { fields: ['caller_id'] },

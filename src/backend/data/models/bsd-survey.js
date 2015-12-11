@@ -23,12 +23,12 @@ export default function(sequelize, DataTypes) {
         newSurvey.slug = newSurvey.signup_form_slug;
         return BSDSurvey.create(newSurvey);
       },
-      findWithBSDCheck: async (id) => {
-        let survey = await BSDSurvey.findById(id);
+      findWithBSDCheck: async (id, opts) => {
+        let survey = await BSDSurvey.findById(id, opts);
         if (!survey) {
           try {
             let BSDSurveyResponse = await BSDClient.getForm(id);
-            survey = await BSDSurvey.createFromBSDObject(BSDSurveyResponse)
+            survey = await BSDSurvey.createFromBSDObject(BSDSurveyResponse, opts)
           } catch (err) {
             if (err && err.response && err.response.statusCode === 409)
               survey = null;
