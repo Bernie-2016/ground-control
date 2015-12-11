@@ -61,7 +61,7 @@ function init_job(job, cb) {
       // Create the new job
       crons.push(new CronJob(
         job.cron,
-        function execut_job() {
+        function execute_job() {
           console.log("Executing:",job.job);
           job.module.job();
         },
