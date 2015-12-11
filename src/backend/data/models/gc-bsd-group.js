@@ -25,6 +25,7 @@ export default function(sequelize, DataTypes) {
           through: models.BSDPersonGCBSDGroup,
           foreignKey: 'gc_bsd_group_id',
           as: 'people',
+          constraints: false
         });
       }
     }
