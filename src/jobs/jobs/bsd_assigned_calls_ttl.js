@@ -42,7 +42,7 @@ function bsd_assigned_calls_ttl_query(cb) {
 
 
   // Delete all calls that haven't been updated in the last hour
-  client.query("DELETE FROM bsd_assigned_calls Where updated_at < NOW() - INTERVAL '1 hour'",function(e) {
+  client.query("DELETE FROM bsd_assigned_calls Where modified_dt < NOW() - INTERVAL '1 hour'",function(e) {
     cb(e);
   });
 };
