@@ -1,2 +1,2 @@
-web: npm start
+web: bin/proximo npm start
 worker: ./run ./src/jobs/app.js
