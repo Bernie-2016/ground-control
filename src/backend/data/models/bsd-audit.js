@@ -1,10 +1,5 @@
 export default function(sequelize, DataTypes) {
-  let GCAudit = sequelize.define('GCAudit', {
-    id: {
-      type: DataTypes.INTEGER,
-      field: 'id',
-      primaryKey: true
-    },
+  let BSDAudit = sequelize.define('BSDAudit', {
     class: {
       type: DataTypes.STRING
     },
@@ -18,11 +13,13 @@ export default function(sequelize, DataTypes) {
       type: DataTypes.STRING
     }
   }, {
+    updatedAt: 'modified_dt',
+    createdAt: 'create_dt',
     underscored: true,
-    tableName: 'gc_audits',
+    tableName: 'bsd_audits',
     indexes: [
       { fields: ['id'] }
     ]
   })
-  return GCAudit;
+  return BSDAudit;
 }
