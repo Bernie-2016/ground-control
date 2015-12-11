@@ -254,7 +254,7 @@ const GraphQLUser = new GraphQLObjectType({
             LEFT OUTER JOIN bsd_assigned_calls AS assigned_calls
               ON people.cons_id=assigned_calls.interviewee_id
             LEFT OUTER JOIN (
-              SELECT id, interviewee_id
+              SELECT id, interviewee_id, attempted_at
               FROM bsd_calls
               WHERE
                 (
@@ -277,6 +277,7 @@ const GraphQLUser = new GraphQLObjectType({
             WHERE
               calls.id IS NULL AND
               assigned_calls.id IS NULL
+            ORDER BY calls.attempted_at NULLS FIRST
             LIMIT 1
           `
 
