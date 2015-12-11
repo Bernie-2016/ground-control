@@ -2,12 +2,6 @@
 
 ## Getting started
 
-### Linux
-
-On Linux, follow the same directions as OSx below, but substitue `./setup-linux` for the equivalent OSx script.
-
-You will also need to have [Docker](docs.docker.com/engine/installation) and [docker-compose](docs.docker.com/compose/install) installed to provide your database.
-
 ### OS X
 
 In OS X, we currently run everything locally using a Procfile and node-foreman. To get started, install [Node.js](https://nodejs.org/en/download/) and [Homebrew](http://brew.sh/). Then clone this repository and cd into ground-control. Then do the following:
@@ -26,6 +20,12 @@ If you ever want to re-seed the database, run
 `npm run seed`
 
 The seed script will create an admin user with e-mail address `admin@localhost.com` and password `admin`.  Login with those credentials when you first go to `localhost:3000` and then check out `localhost:3000/admin`.
+
+### Linux
+
+On Linux, follow the same directions as OS X above, but substitue `./setup-linux` for the equivalent OSx script.
+
+You will also need to have [Docker](docs.docker.com/engine/installation) and [docker-compose](docs.docker.com/compose/install) installed to provide your database.
 
 ### Windows
 
