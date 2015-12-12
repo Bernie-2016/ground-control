@@ -66,6 +66,12 @@
 	    margin-top: 2px;
 	}
 
+	.in-progress {
+		cursor: default;
+		pointer-events: none;
+		opacity: 0.7;
+	}
+
 	@media (min-width: 768px){
 		.event-central.edit-event #SKIN #secondform, .event-central.step2 #SKIN #secondform {
 	    	width: 100% !important;
@@ -1145,9 +1151,13 @@
     <div class="label">
     <label class="form_label">Host Email:</label><span style="color: red;">*</span> 
 </div><div class="field">
-    <input size="30" name="cons_email" type="email" required></div><div class="phone-instruct"><span style="color: red;">*</span><div class="explain"> The event host's email will not be publicly visible.</div></div>
+    <input size="30" name="cons_email" type="email" required></div>
+    <div class="phone-instruct">
+    <span style="color: red;">*</span>
+    <div class="explain"> This email will not be publicly visible.</div>
+    </div>
 
-<input class="ui-state-default" name="submit_button" value="Create Event" type="submit"><div class="required"><span class="error">*</span> denotes required field</div></div>
+<input class="ui-state-default" id="submit_button" name="submit_button" value="Create Event" type="submit"><div class="required"><span class="error">*</span> denotes required field</div></div>
 
 </div>
 </form>
@@ -1341,15 +1351,16 @@ jQuery(document).ready(function() {
 
 	$('#secondform').submit(function(e){
 		e.preventDefault();
-		var formdata = $(this).serializeArray();
 
 		current_events = $.merge( $.merge( [], user_created_events ), generated_events );
-
 		if (current_events.length < 1){
 			alert('Please select a date for your event from the calendar.');
 			return
 		}
 
+		$('#submit_button').blur().addClass('in-progress');
+
+		var formdata = $(this).serializeArray();
 		formdata.push({ 
 			name: "event_dates",
 			value: JSON.stringify(current_events)
@@ -1368,11 +1379,13 @@ jQuery(document).ready(function() {
 		    	}
 		    	else {
 		    		alert('There was an error processing your submission. Please try again later or contact help@berniesanders.com.');
+		    		$('#submit_button').removeClass('in-progress');
 		    	}
 		    },
 		    error: function(i){
 		      console.log(i);
 		      alert('There was an error processing your submission. Please try again later or contact help@berniesanders.com.');
+		      $('#submit_button').removeClass('in-progress');
 		    }
 		});
 	});
