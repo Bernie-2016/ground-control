@@ -143,11 +143,11 @@ app.post('/logout',
   res.send('Success!')
 }))
 
-app.get('/events/create', isAuthenticated, wrap(async (req, res) => {
-  res.sendFile(publicPath + '/events/create_event.html');
+app.get('/admin/events/create', isAuthenticated, wrap(async (req, res) => {
+  res.sendFile(publicPath + '/admin/events/create_event.html');
 }));
 
-app.post('/events/create', isAuthenticated, wrap(async (req, res) => {
+app.post('/admin/events/create', isAuthenticated, wrap(async (req, res) => {
   let form = req.body;
 
   // constituent object not being returned right now
