@@ -6,6 +6,7 @@ import Promise from 'bluebird';
 
 export let job = async () => {
   try {
+    log.info('Starting group refresh job...')
     // This first transaction marks these groups as having been picked up.
     let groups = []
     await models.sequelize.transaction(async (trans) => {
