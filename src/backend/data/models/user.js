@@ -37,6 +37,12 @@ export default function(sequelize, DataTypes) {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
       field: 'is_admin'
+    },
+    resetToken: {
+      type: DataTypes.CHAR,
+      length: 36,
+      field: 'reset_token',
+      allowNull: true
     }
   }, {
     underscored: true,
