@@ -289,7 +289,6 @@ const GraphQLUser = new GraphQLObjectType({
             WHERE
               calls.id IS NULL AND
               assigned_calls.id IS NULL
-            ORDER BY calls.attempted_at NULLS FIRST
             LIMIT 1
           `
 
