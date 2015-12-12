@@ -33,16 +33,18 @@ export let job = async () => {
             transaction: t
           })
           let results = null;
-          let limit = 2000;
+          let limit = 100000;
           let offset = 0;
           let limitedQuery = null;
 
           do {
             limitedQuery = `${group.query} order by cons_id limit ${limit} offset ${offset}`
+            log.info('Running query: ' + limitedQuery)
             results = await models.sequelize.query(limitedQuery, {transaction: t})
             if (results && results.length > 0) {
               let persons = results[0].map((result) => result.cons_id)
               await group.addPeople(persons, {transaction: t})
+              log.info('Done inserting ' + persons.length + ' rows for group ' + group.id)
             }
             offset = offset + limit;
           } while(results && results.length > 0 && results[0].length > 0)
@@ -56,6 +58,7 @@ export let job = async () => {
         })
       })
       await Promise.all(promises);
+      log.info('Done refreshing groups')
     })
   }
   catch (ex) {

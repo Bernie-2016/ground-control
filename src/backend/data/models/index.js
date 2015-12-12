@@ -2,17 +2,19 @@ import fs from 'fs';
 import path from 'path';
 import Sequelize from 'sequelize';
 import configOpts from '../config/config';
+import log from '../../log'
 
 let basename  = path.basename(module.filename);
 let env       = process.env.NODE_ENV || 'development';
 let db        = {};
 let sequelize = null;
 let config = configOpts[env];
+let logging = log.debug;
 
 if (config.use_env_variable) {
-  sequelize = new Sequelize(process.env[config.use_env_variable]);
+  sequelize = new Sequelize(process.env[config.use_env_variable], {logging: logging});
 } else {
-  sequelize = new Sequelize(config.url);
+  sequelize = new Sequelize(config.url, {logging: logging});
 }
 
 sequelize.beforeDefine('defaultAttributes', (attrs) => {
