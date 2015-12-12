@@ -702,7 +702,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
       }
       else {
         let query = groupText;
-        query = query.toLowerCase().replace(/;*$/, '');
+        query = query.toLowerCase().trim().replace(/;*$/, '');
 
         if (query.indexOf('drop') !== -1)
           throw new GraphQLError({

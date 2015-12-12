@@ -6,24 +6,39 @@ import Promise from 'bluebird';
 
 export let job = async () => {
   try {
-    await models.sequelize.transaction(async (t) => {
-      let groups = await models.GCBSDGroup.findAll({
-        where: {
-          $or : [
-            {
-              modified_dt: {
-                $lt: new Date(new Date() - 24 * 60 * 60 * 1000)
+    // This first transaction marks these groups as having been picked up.
+    let groups = []
+    await models.sequelize.transaction(async (trans) => {
+        groups = await models.GCBSDGroup.findAll({
+          where: {
+            $or : [
+              {
+                modified_dt: {
+                  $lt: new Date(new Date() - 24 * 60 * 60 * 1000)
+                }
+              },
+              {
+                modified_dt: {
+                  $eq: models.sequelize.col('create_dt')
+                }
               }
-            },
-            {
-              modified_dt: {
-                $eq: models.sequelize.col('create_dt')
-              }
+            ],
+          },
+          transaction: trans
+        })
+
+        let promises = groups.map(async (group) => {
+          await models.GCBSDGroup.update({
+            modified_dt: new Date()
+          }, {
+            where: {
+              id: group.id
             }
-          ],
-        },
-        transaction: t
-      })
+          }, { transaction: trans})
+        })
+        return await Promise.all(promises);
+    });
+    await models.sequelize.transaction(async (t) => {
       let promises = groups.map(async (group) => {
         if (group.query !== 'everyone') {
           await models.BSDPersonGCBSDGroup.destroy({
@@ -49,13 +64,6 @@ export let job = async () => {
             offset = offset + limit;
           } while(results && results.length > 0 && results[0].length > 0)
         }
-        await models.GCBSDGroup.update({
-          modified_dt: new Date()
-        }, {
-          where: {
-            id: group.id
-          }
-        })
       })
       await Promise.all(promises);
       log.info('Done refreshing groups')
