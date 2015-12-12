@@ -15,7 +15,7 @@ Call assignments in Ground Control are, conceptually, the mapping between a surv
     a) **Name**: What you want callers to see.
     b) **BSD Signup Form ID**: The numeric ID for the BSD form you created.
     c) **How to render the survey?**: Different renderers display the survey in different ways. If you want a new one, let Saikat know and he can implement it.
-    d) Target group of interviewees.  Either enter your cons_id or, for something fancier, a SQL query that returns a list of cons_ids.  **If you used a cons_id, let Saikat know or it won't actually get synced.**
+    d) **Target group of interviewees**:  Either enter your cons_id or, for something fancier, a SQL query that returns a list of cons_ids.  **If you used a cons_id, let Saikat know or it won't actually get synced.**
     e) **Post-submit survey processors**: This is how we do different dynamic actions based on survey responses.  These work off of tags on survey form field names.  The only one supported right now is "Create event RSVPs" and this will only work if you have a form field on your survey that starts with [event_id].
 
 Once you hit create, the call assignment will be created but you will need to wait for the target group of interviewees to exist.  In the case of using a cons_id, it will happen within an hour of you telling Saikat.  In the case of using a SQL query, it should happen within 5 minutes to an hour, depending on how big the target group is.
