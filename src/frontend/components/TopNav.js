@@ -106,7 +106,7 @@ export default class TopNav extends React.Component {
               <Tabs valueLink={{
                 value: selectedTab ? selectedTab : 'none',
                 requestChange: (value, event, tab) => {
-                  this.props.history.pushState(null, value)
+                  this.props.history.push(value)
                 }}}
               >
                 {tabs}

@@ -37,7 +37,7 @@ class CallAssignmentsSection extends React.Component {
               })
             )
     */
-            this.props.history.pushState(null, '/call/' + id)
+            this.props.history.push('/call/' + id)
           }}
         />
       </div>
