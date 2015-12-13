@@ -288,6 +288,8 @@ const GraphQLUser = new GraphQLObjectType({
               ) AS calls
               ON people.cons_id=calls.interviewee_id
             WHERE
+              phones.is_primary=TRUE AND
+              emails.is_primary=TRUE AND
               calls.id IS NULL AND
               assigned_calls.id IS NULL
             LIMIT 1
