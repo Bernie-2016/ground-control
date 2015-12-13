@@ -258,6 +258,7 @@ const GraphQLUser = new GraphQLObjectType({
               INNER JOIN zip_codes AS zip_codes
               ON zip_codes.zip=addresses.zip
               WHERE
+                addresses.is_primary=TRUE AND
                 addresses.state_cd NOT IN ('IA','NH','NV','SC') AND
                 zip_codes.timezone_offset IN (${validOffsets.join(',')})
               ) AS addresses
