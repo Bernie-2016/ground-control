@@ -111,7 +111,8 @@ class BSDSurvey extends React.Component {
   }
 
   render() {
-    let source = this.props.survey.fullURL;
+    let cacheBreak = '?cacheBreak=' + Math.random().toString(36).substring(6);
+    let source = this.props.survey.fullURL + cacheBreak;
     let loading = (
       <div style={[this.styles.progress, this.state.loadingStyle]}>
         <h3 style={this.styles.progressHeader}>Loading survey...</h3>
