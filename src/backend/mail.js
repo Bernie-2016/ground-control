@@ -3,6 +3,8 @@ import {EmailTemplate} from 'email-templates';
 import Handlebars from 'handlebars';
 import path from 'path';
 import fs from 'fs';
+import log from './log';
+
 const templateDir = path.resolve(__dirname, './email-templates');
 const headerHTML = fs.readFileSync(templateDir + '/header.hbs', {encoding: 'utf-8'});
 const footerHTML = fs.readFileSync(templateDir + '/footer.hbs', {encoding: 'utf-8'});
@@ -79,6 +81,7 @@ export default class MG {
       text: content.text,
       html: content.html
     };
+    log.debug(message)
 
     if (debugging){
       return message;
