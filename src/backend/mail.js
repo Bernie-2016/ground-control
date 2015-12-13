@@ -42,7 +42,7 @@ export default class MG {
   async sendEventConfirmation(form, constituent, event_types, debugging) {
 
     if (form.capacity=='0'){form.capacity = 'unlimited'};
-    
+
     // Sort event dates by date
     if (typeof form.event_dates == 'string'){
       form.event_dates = JSON.parse(form.event_dates);
@@ -102,7 +102,7 @@ export default class MG {
       user: constituent
     }
 
-    let template = new EmailTemplate(templateDir + '/phone-bank-instructions');
+    let template = new EmailTemplate(templateDir + '/event-create-confirmation');
     let content = await template.render(data);
 
     let message = {
