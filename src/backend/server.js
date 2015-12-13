@@ -158,7 +158,6 @@ app.post('/admin/events/create', isAuthenticated, wrap(async (req, res) => {
   }
 
   let event_types = await BSDClient.getEventTypes();
-  form.event_type_id = 1
 
   let result = await BSDClient.createEvents(constituent.id, form, event_types, eventCreationCallback);
 
