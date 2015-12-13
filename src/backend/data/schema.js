@@ -546,6 +546,12 @@ const GraphQLCallAssignment = new GraphQLObjectType({
         else
           return group.query
       }
+    },
+    listContainer: {
+      type: GraphQLListContainer,
+      resolve: () => {
+        return SharedListContainer;
+      }
     }
   }),
   interfaces: [nodeInterface]
@@ -746,11 +752,38 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
   }
 });
 
+const GraphQLDestroyCallAssignment = mutationWithClientMutationId({
+  name: 'DestroyCallAssignment',
+  inputFields: {
+    callAssignmentId: { type: new GraphQLNonNull(GraphQLString) }
+  },
+  outputFields: {
+    deletedCallAssignmentId: {
+      type: GraphQLID,
+      resolve: ({id}) => id
+    },
+    listContainer: {
+      type: GraphQLListContainer,
+      resolve: () => SharedListContainer
+    }
+  },
+  mutateAndGetPayload: async ({callAssignmentId}, {rootValue}) => {
+    authRequired(rootValue);
+    adminRequired(rootValue);
+    return sequelize.transaction(async (t) => {
+      let localId = fromGlobalId(callAssignmentId).id;
+      let callAssignment = await BSDCallAssignment.findById(localId);
+      return callAssignment.destroy();
+    })
+  }
+});
+
 let RootMutation = new GraphQLObjectType({
   name: 'RootMutation',
   fields: () => ({
     submitCallSurvey: GraphQLSubmitCallSurvey,
     createCallAssignment: GraphQLCreateCallAssignment,
+    destroyCallAssignment: GraphQLDestroyCallAssignment,
   })
 });
 
