@@ -159,7 +159,12 @@ app.post('/password_reset', wrap(async (req, res) => {
   // Debugging for now. TODO: Do not commit this, actually send the email
   let email = await Mailgun.sendPasswordReset(user, true);
   console.log(email)
+}))
 
+app.post('/password_reset/:token', wrap(async (req, res) => {
+  console.log(req.params.token);
+  console.log(req.body);
+  res.status(200).end("Hello World!")
 }))
 
 app.post('/signup',
