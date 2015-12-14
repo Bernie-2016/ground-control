@@ -19,7 +19,7 @@ export default function(sequelize, DataTypes) {
     classMethods: {
       createFromBSDObject: (BSDObject) => {
         let newGroup = {...BSDObject};
-        newGroup.id = newSurvey.cons_group_id;
+        newGroup.id = newGroup.cons_group_id;
         return BSDGroup.create(newGroup);
       },
       findWithBSDCheck: async (id, opts) => {
