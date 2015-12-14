@@ -72,7 +72,7 @@ const authRequired = (session) => {
 const adminRequired = (session) => {
   if (!session.user || !session.user.isAdmin) {
     throw new GraphQLError({
-      status: 401,
+      status: 403,
       message: 'You are not authorized to access that resource.'
     });
   }
