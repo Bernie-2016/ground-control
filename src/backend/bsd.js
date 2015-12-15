@@ -6,6 +6,7 @@ import {parseString} from 'xml2js';
 import Promise from 'bluebird';
 import qs from 'querystring';
 import BSDAudit from './data/models/bsd-audit';
+import log from './log';
 
 const parseStringPromise = Promise.promisify(parseString);
 
