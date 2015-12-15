@@ -51,8 +51,9 @@ const EVERYONE_GROUP = 'everyone';
 
 class GraphQLError extends Error {
   constructor(errorObject) {
-    let message = JSON.stringify(errorObject)
-    super(message)
+    let message = JSON.stringify(errorObject);
+    super(message);
+
     this.name = 'MyError',
     this.message = message,
     Error.captureStackTrace(this, this.constructor.name)
@@ -66,23 +67,25 @@ const authRequired = (session) => {
       message: 'You must login to access that resource.'
     });
   }
-}
+};
 
 const adminRequired = (session) => {
   if (!session.user || !session.user.isAdmin) {
     throw new GraphQLError({
-      status: 404,
-      message: 'Nothing here.'
+      status: 403,
+      message: 'You are not authorized to access that resource.'
     });
   }
-}
+};
 
 class ListContainer {
   constructor(identifier) {
     this.id = identifier
   }
 }
+
 const SharedListContainer = new ListContainer(1);
+
 let {nodeInterface, nodeField} = nodeDefinitions(
   (globalId) => {
     let {type, id} = fromGlobalId(globalId);
