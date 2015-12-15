@@ -3,6 +3,8 @@ import {EmailTemplate} from 'email-templates';
 import Handlebars from 'handlebars';
 import path from 'path';
 import fs from 'fs';
+import log from './log';
+
 const templateDir = path.resolve(__dirname, './email-templates');
 const headerHTML = fs.readFileSync(templateDir + '/header.hbs', {encoding: 'utf-8'});
 const footerHTML = fs.readFileSync(templateDir + '/footer.hbs', {encoding: 'utf-8'});
@@ -32,6 +34,8 @@ Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
 Handlebars.registerPartial('header', headerHTML);
 Handlebars.registerPartial('footer', footerHTML);
 
+const senderAddress = 'Team Bernie<info@berniesanders.com>';
+
 export default class MG {
   constructor(apiKey, domain) {
     this.mailgun = Mailgun({apiKey: apiKey, domain: domain});
@@ -40,7 +44,7 @@ export default class MG {
   async sendEventConfirmation(form, constituent, event_types, debugging) {
 
     if (form.capacity=='0'){form.capacity = 'unlimited'};
-    
+
     // Sort event dates by date
     if (typeof form.event_dates == 'string'){
       form.event_dates = JSON.parse(form.event_dates);
@@ -71,7 +75,42 @@ export default class MG {
     let content = await eventConfirmation.render(data);
 
     let message = {
-      from: 'Volunteer Portal<ground-control@' + process.env.MAILGUN_DOMAIN + '>',
+      from: senderAddress,
+      to: form.cons_email,
+      subject: 'Event Creation Confirmation',
+      text: content.text,
+      html: content.html
+    };
+    log.debug(message)
+
+    if (debugging){
+      return message;
+    }
+    else{
+      let response = await this.mailgun.messages().send(message);
+      return response;
+    }
+  }
+
+  async sendPhoneBankConfirmation(form, constituent, debugging) {
+
+    constituent.cons_email.forEach((email) => {
+      if (email.is_primary == '1'){
+        constituent['email'] = email.email;
+      }
+    });
+
+    let data = {
+      event: form,
+      user: constituent
+    }
+
+    let template = new EmailTemplate(templateDir + '/event-create-confirmation');
+    let content = await template.render(data);
+
+    let message = {
+      from: senderAddress,
+      'h:Reply-To': 'help@berniesanders.com',
       to: form.cons_email,
       subject: 'Event Creation Confirmation',
       text: content.text,

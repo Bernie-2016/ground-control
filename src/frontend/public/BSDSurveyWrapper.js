@@ -5,6 +5,8 @@
         event.source.postMessage({message: "documentHeight", details: {height: document.body.scrollHeight}}, event.origin);
       else if (event.data.message === "setInputValue")
         jQuery('#' + event.data.details.inputId).val(event.data.details.value)
+      else if (event.data.message === "disableField")
+        jQuery('#' + event.data.details.inputId).prop('disabled', true)
       else if (event.data.message === 'submit')
         jQuery('#signup').submit()
       else if (event.data.message === 'getFieldValues') {

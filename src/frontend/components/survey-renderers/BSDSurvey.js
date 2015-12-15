@@ -37,7 +37,8 @@ class BSDSurvey extends React.Component {
 
   state = {
     frameStyle : {height: 0},
-    surveyFields: {}
+    surveyFields: {},
+    cacheBreakValue: Math.random().toString(36).substring(7)
   }
 
   submit = () => {
@@ -58,7 +59,7 @@ class BSDSurvey extends React.Component {
       return;
 
     if (event.data.message == 'documentLoaded') {
-      if (event.data.details.location === this.props.survey.fullURL) {
+      if (event.data.details.location.indexOf(this.props.survey.fullURL) !== -1) {
         this.sendFrameMessage({
           message: 'setInputValue',
           details: {
@@ -73,12 +74,13 @@ class BSDSurvey extends React.Component {
     }
 
     else if (event.data.message === 'fieldValues') {
+      console.log('got field values')
       this.setState({surveyFields: event.data.details})
-      console.log(this.state)
       this.sendFrameMessage({message: 'submit'})
     }
 
-    else if (event.data.message == 'documentHeight')
+    else if (event.data.message == 'documentHeight') {
+      console.log('got height', event.data.details.height)
       this.setState({
         frameStyle: {
           height: event.data.details.height,
@@ -88,6 +90,7 @@ class BSDSurvey extends React.Component {
           display: 'none',
         }
       })
+    }
   }
 
   sendFrameMessage(message) {
@@ -111,7 +114,8 @@ class BSDSurvey extends React.Component {
   }
 
   render() {
-    let source = this.props.survey.fullURL;
+    let cacheBreak = '?cacheBreak=' + this.state.cacheBreakValue;
+    let source = this.props.survey.fullURL + cacheBreak;
     let loading = (
       <div style={[this.styles.progress, this.state.loadingStyle]}>
         <h3 style={this.styles.progressHeader}>Loading survey...</h3>

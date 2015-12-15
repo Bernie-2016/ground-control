@@ -5,6 +5,8 @@ import querystring from 'querystring';
 import {parseString} from 'xml2js';
 import Promise from 'bluebird';
 import qs from 'querystring';
+import BSDAudit from './data/models/bsd-audit';
+import log from './log';
 
 const parseStringPromise = Promise.promisify(parseString);
 
@@ -17,6 +19,20 @@ export default class BSD {
     this.apiSecret = secret;
   }
 
+  noFailApiRequest(method, ...args) {
+    try {
+      BSD[method](...args);
+    } catch (e) {
+      log.error(e);
+      BSDAudit.create({
+        class: 'BSDClient',
+        method: method,
+        params: String(args),
+        error: e.message
+      })
+    }
+  }
+
   cleanField(field) {
     if (field && field.length) {
       if (field[0] && field[0] != '')
@@ -26,6 +42,17 @@ export default class BSD {
     }
     else
       return null
+  }
+
+  createGroupObject(group) {
+    let groupObj = {};
+    groupObj['id'] = group['$']['id'];
+    groupObj['modified_dt'] = group['$']['modified_dt'];
+
+    Object.keys(group).forEach((key) => {
+      groupObj[key] = this.cleanField(group[key]);
+    })
+    return groupObj;
   }
 
   createSurveyObject(survey) {
@@ -126,7 +153,13 @@ export default class BSD {
   async getConstituentGroup(groupId) {
     let response = await this.request('cons_group/get_constituent_group', {cons_group_id: groupId}, 'GET');
     response = await parseStringPromise(response);
-    return response;
+    let group = response.api.cons_group;
+    if (!group)
+      return null;
+    if (group.length && group.length > 0)
+      group = group[0];
+
+    return this.createGroupObject(group);
   }
 
   async getForm(formId) {
@@ -280,6 +313,11 @@ export default class BSD {
       }
     })
 
+    if (eventType === null){
+      callback('Event type does not exist in BSD');
+      return;
+    }
+
     // validations
     // Remove special characters from phone number
     let contact_phone = form['contact_phone'].replace(/\D/g,'');
@@ -288,7 +326,6 @@ export default class BSD {
         event_type_id: form['event_type_id'],
         creator_cons_id: cons_id,
         name: form['name'],
-        flag_approval: 1,
         description: form['description'],
         venue_name: form['venue_name'],
         venue_zip: form['venue_zip'],
@@ -340,7 +377,7 @@ export default class BSD {
       }
     });
 
-    return null
+    return
   }
 
   async makeRawRequest(callPath, params, method) {

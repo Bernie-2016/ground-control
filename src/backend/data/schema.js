@@ -47,11 +47,13 @@ import Promise from 'bluebird';
 import Maestro from '../maestro';
 import url from 'url';
 import TZLookup from 'tz-lookup';
+const EVERYONE_GROUP = 'everyone';
 
 class GraphQLError extends Error {
   constructor(errorObject) {
-    let message = JSON.stringify(errorObject)
-    super(message)
+    let message = JSON.stringify(errorObject);
+    super(message);
+
     this.name = 'MyError',
     this.message = message,
     Error.captureStackTrace(this, this.constructor.name)
@@ -65,23 +67,25 @@ const authRequired = (session) => {
       message: 'You must login to access that resource.'
     });
   }
-}
+};
 
 const adminRequired = (session) => {
   if (!session.user || !session.user.isAdmin) {
     throw new GraphQLError({
-      status: 404,
-      message: 'Nothing here.'
+      status: 403,
+      message: 'You are not authorized to access that resource.'
     });
   }
-}
+};
 
 class ListContainer {
   constructor(identifier) {
     this.id = identifier
   }
 }
+
 const SharedListContainer = new ListContainer(1);
+
 let {nodeInterface, nodeField} = nodeDefinitions(
   (globalId) => {
     let {type, id} = fromGlobalId(globalId);
@@ -91,6 +95,8 @@ let {nodeInterface, nodeField} = nodeDefinitions(
       return BSDCallAssignment.findById(id);
     if (type === 'Survey')
       return GCBSDSurvey.findById(id);
+    if (type === 'EventType')
+      return BSDEventType.findById(id);
     if (type === 'Event')
       return BSDEvent.findById(id);
     if (type === 'User')
@@ -112,6 +118,8 @@ let {nodeInterface, nodeField} = nodeDefinitions(
       return GraphQLSurvey;
     if (obj instanceof ListContainer)
       return GraphQLListContainer;
+    if (obj instanceof BSDEventType)
+      return GraphQLEventType;
     if (obj instanceof BSDEvent)
       return GraphQLEvent;
     if (obj instanceof BSDAddress)
@@ -126,11 +134,19 @@ const GraphQLListContainer = new GraphQLObjectType({
   name: 'ListContainer',
   fields: () => ({
     id: globalIdField('ListContainer'),
+    eventTypes: {
+      type: GraphQLEventTypeConnection,
+      args: connectionArgs,
+      resolve: async (eventType, {first}) => {
+        let eventTypes = await BSDEventType.all();
+        return connectionFromArray(eventTypes)
+      }
+    },
     events: {
       type: GraphQLEventConnection,
       args: connectionArgs,
-      resolve: async(event, {first}) => {
-        let events = await BSDEvent.all()
+      resolve: async (event, {first}) => {
+        let events = await BSDEvent.all({order: 'start_dt ASC'});
         return connectionFromArray(events, {first});
       }
     },
@@ -157,6 +173,29 @@ const GraphQLUser = new GraphQLObjectType({
       resolve: async (user, {first}) => {
         let assignments = await BSDCallAssignment.all()
         return connectionFromArray(assignments, {first});
+      }
+    },
+    callsMade: {
+      type: GraphQLInt,
+      args: {
+        forAssignmentId: { type: GraphQLString }
+      },
+      resolve: (user, {forAssignmentId}) => {
+        if (forAssignmentId) {
+          let localId = fromGlobalId(forAssignmentId)
+          return BSDCall.count({
+            where: {
+              caller_id: user.id,
+              call_assignment_id: localId
+            }
+          })
+        }
+        else
+          return BSDCall.count({
+            where: {
+              caller_id: user.id
+            }
+          })
       }
     },
     intervieweeForCallAssignment: {
@@ -190,6 +229,7 @@ const GraphQLUser = new GraphQLObjectType({
           // This is maybe the worst thing of all time. Switch to knex when we can.
           let group = await callAssignment.getIntervieweeGroup();
           let filterQuery = '';
+
           if (group.cons_group_id)
             filterQuery = `
               INNER JOIN (
@@ -199,7 +239,7 @@ const GraphQLUser = new GraphQLObjectType({
                 ) AS cons_groups
                 ON people.cons_id=cons_groups.cons_id'
             `
-          else if (group.query && group.query !== 'EVERYONE')
+          else if (group.query && group.query !== EVERYONE_GROUP)
             filterQuery = `
               INNER JOIN (
                   SELECT cons_id
@@ -221,6 +261,7 @@ const GraphQLUser = new GraphQLObjectType({
               INNER JOIN zip_codes AS zip_codes
               ON zip_codes.zip=addresses.zip
               WHERE
+                addresses.is_primary=TRUE AND
                 addresses.state_cd NOT IN ('IA','NH','NV','SC') AND
                 zip_codes.timezone_offset IN (${validOffsets.join(',')})
               ) AS addresses
@@ -229,14 +270,29 @@ const GraphQLUser = new GraphQLObjectType({
             LEFT OUTER JOIN bsd_assigned_calls AS assigned_calls
               ON people.cons_id=assigned_calls.interviewee_id
             LEFT OUTER JOIN (
-              SELECT id, interviewee_id
+              SELECT id, interviewee_id, attempted_at
               FROM bsd_calls
               WHERE
-                call_assignment_id = :assignmentId AND
-                attempted_at > :lastCalledDate
+                (
+                  call_assignment_id = :assignmentId AND
+                  completed = TRUE
+                ) OR
+                (
+                  reason_not_completed IN ('NO_PICKUP', 'CALL_BACK', 'NOT_INTERESTED') AND
+                  attempted_at > :backoffTime
+                ) OR
+                (
+                  reason_not_completed IN ('WRONG_NUMBER', 'DISCONNECTED_NUMBER', 'OTHER_LANGUAGE')
+                ) OR
+                (
+                  call_assignment_id = :assignmentId AND
+                  reason_not_completed = 'NOT_INTERESTED'
+                )
               ) AS calls
               ON people.cons_id=calls.interviewee_id
             WHERE
+              phones.is_primary=TRUE AND
+              emails.is_primary=TRUE AND
               calls.id IS NULL AND
               assigned_calls.id IS NULL
             LIMIT 1
@@ -245,7 +301,7 @@ const GraphQLUser = new GraphQLObjectType({
           let people = await sequelize.query(query, {
             replacements: {
               assignmentId: localId,
-              lastCalledDate: new Date(new Date() - 7 * 24 * 60 * 60 * 1000)
+              backoffTime: new Date(new Date() - 7 * 24 * 60 * 60 * 1000)
             },
           })
           if (people && people.length > 0 && people[0].length > 0) {
@@ -377,6 +433,16 @@ const GraphQLPerson = new GraphQLObjectType({
   interfaces: [nodeInterface]
 })
 
+const GraphQLEventType = new GraphQLObjectType({
+  name: 'EventType',
+  description: 'An event type',
+  fields: () => ({
+    id: globalIdField('EventType'),
+    name: { type: GraphQLString },
+    description: { type: GraphQLString }
+  })
+})
+
 const GraphQLEventAttendee = new GraphQLObjectType({
   name: 'EventAttendee',
   description: 'An event attendee',
@@ -386,14 +452,28 @@ const GraphQLEventAttendee = new GraphQLObjectType({
   interfaces: [nodeInterface]
 })
 
+let {
+  connectionType: GraphQLEventTypeConnection,
+} = connectionDefinitions({
+  name: 'EventType',
+  nodeType: GraphQLEventType
+});
+
 const GraphQLEvent = new GraphQLObjectType({
   name: 'Event',
   description: 'An event',
   fields: () => ({
     id: globalIdField('Event'),
     eventIdObfuscated: { type: GraphQLString },
+    host: {
+      type: GraphQLPerson,
+      resolve: (event) => event.getHost()
+    },
+    eventType: {
+      type: GraphQLEventType,
+      resolve: (event) => event.getEventType()
+    },
     flagApproval: { type: GraphQLBoolean },
-    eventTypeId: { type: GraphQLInt },
     name: { type: GraphQLString },
     description: { type: GraphQLString },
     venueName: { type: GraphQLString },
@@ -448,6 +528,16 @@ const GraphQLCallAssignment = new GraphQLObjectType({
     survey: {
       type: GraphQLSurvey,
       resolve: (assignment) => assignment.getSurvey()
+    },
+    callsMade: {
+      type: GraphQLInt,
+      resolve: (callAssignment) => {
+        return BSDCall.count({
+          where: {
+            call_assignment_id: callAssignment.id
+          }
+        })
+      }
     },
     query: {
       type: GraphQLString,
@@ -617,7 +707,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
       }
       else {
         let query = groupText;
-        query = query.toLowerCase();
+        query = query.toLowerCase().trim().replace(/;*$/, '');
 
         if (query.indexOf('drop') !== -1)
           throw new GraphQLError({
@@ -625,6 +715,18 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
             message: 'Cannot use DROP in your SQL'
           })
 
+        if (query !== EVERYONE_GROUP) {
+          let limitedQuery = `${query} order by cons_id limit 1 offset 0`
+          try {
+            await sequelize.query(limitedQuery)
+          } catch (ex) {
+            let error = `Invalid SQL query: ${ex.message}`
+            throw new GraphQLError({
+              status: 400,
+              message: error
+            })
+          }
+        }
         group = await GCBSDGroup.findOne({
           where: {
             query: query
@@ -632,37 +734,10 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
         }, {transaction: t})
 
         if (!group)
+          // The group actually gets hydrated in a cron job
           group = await GCBSDGroup.create({
             query: query
           }, {transaction: t})
-
-        if (query !== 'everyone') {
-          query = query.replace(/;*$/, '')
-          let results = null;
-          let limit = 2000;
-          let offset = 0;
-          let limitedQuery = null;
-
-          query = query.toLowerCase();
-
-          do {
-            limitedQuery = `${query} order by cons_id limit ${limit} offset ${offset}`
-            try {
-              results = await sequelize.query(limitedQuery)
-              if (results && results.length > 0) {
-                let persons = results[0].map((result) => result.cons_id)
-                await group.addPeople(persons, {transaction: t})
-              }
-              offset = offset + limit;
-            } catch (ex) {
-              let error = `Invalid SQL query: ${ex.message}`
-              throw new GraphQLError({
-                status: 400,
-                message: error
-              })
-            }
-          } while(results && results.length > 0 && results[0].length > 0)
-        }
       }
 
       return BSDCallAssignment.create({

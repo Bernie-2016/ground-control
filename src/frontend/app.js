@@ -40,18 +40,18 @@ Minilog
 window.log = Minilog('client');
 
 window.onerror = (msg, file, line, col, error) => {
-    StackTrace
-      .fromError(error)
-      .then((stack) => {
-        log.error('Uncaught exception!', stack);
-        setTimeout(() => {
-            alert('Whoops! Something went wrong. We\'re looking into it, but in the meantime please refresh your browser.');
-            document.location.reload(true);
-        }, 2000);
-      })
-      .catch((stack) => {
-        log.error(stack);
-      });
+  StackTrace
+  .fromError(error)
+  .then((stack) => {
+    log.error('Uncaught exception!', stack);
+    setTimeout(() => {
+        alert('Whoops! Something went wrong. We\'re looking into it, but in the meantime please refresh your browser.');
+        document.location.reload(true);
+    }, 2000);
+  })
+  .catch((stack) => {
+    log.error(stack);
+  });
 };
 
 injectTapEventPlugin();
@@ -65,7 +65,7 @@ Form.addInputTypes({
   select: GCSelectField,
   array: GCCheckboxesField,
   password: GCPasswordField
-})
+});
 
 const ListContainerQueries = {
   listContainer: () => Relay.QL`query { listContainer }`
@@ -73,13 +73,13 @@ const ListContainerQueries = {
 
 const CallAssignmentQueries = {
   callAssignment: () => Relay.QL`query { callAssignment(id: $id) }`
-}
+};
 
 const CurrentUserQueries = {
   currentUser: () => Relay.QL`query { currentUser}`
-}
+};
 
-let history = createHistory()
+let history = createHistory();
 
 ReactDOM.render(
   <Router
@@ -125,6 +125,7 @@ ReactDOM.render(
       <Route
         path='call'
         component={CallAssignmentsDashboard}
+        queries={CurrentUserQueries}
       >
         <IndexRoute
           component={CallAssignmentsSection}

@@ -12,8 +12,9 @@ export class CallAssignmentList extends React.Component {
   renderCallAssignments() {
     return this.props.callAssignments.edges.map(assignment => {
         let node = assignment.node;
+        let s = node.callsMade === 1 ? '' : 's'
         let primaryText = node.name
-        let secondaryText = '670 calls made, 30 callers'
+        let secondaryText = `${node.callsMade} call${s} made by everyone`
         return (
           <ListItem
             key={node.id}
@@ -42,6 +43,7 @@ export default Relay.createContainer(CallAssignmentList, {
           node {
             id
             name
+            callsMade
           }
         }
       }

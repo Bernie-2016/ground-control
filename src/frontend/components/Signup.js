@@ -50,7 +50,7 @@ export default class Signup extends React.Component {
           })
           .end((err, res) => {
             if (!err)
-              window.location = '/call-assignments';
+              window.location = '/call';
             else
               this.setState({errorMessage: 'Incorrect e-mail or password'});
           })

@@ -80,6 +80,8 @@ export default class TopNav extends React.Component {
           color: this.props.tabColor,
           backgroundColor: this.props.barColor
         }}
+        value='logout'
+        key='logout'
       />)
 
     return (
@@ -99,14 +101,17 @@ export default class TopNav extends React.Component {
               style={this.styles.logo}
           />}
           iconElementRight={
-            <Tabs valueLink={{
-              value: selectedTab ? selectedTab : 'none',
-              requestChange: (value, event, tab) => {
-                this.props.history.pushState(null, value)
-              }}}
-            >
-              {tabs}
-            </Tabs>
+            <div>
+              {this.props.extraTop}
+              <Tabs valueLink={{
+                value: selectedTab ? selectedTab : 'none',
+                requestChange: (value, event, tab) => {
+                  this.props.history.push(value)
+                }}}
+              >
+                {tabs}
+              </Tabs>
+            </div>
           }
         />
       </div>

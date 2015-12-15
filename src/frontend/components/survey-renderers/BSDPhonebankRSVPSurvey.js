@@ -114,7 +114,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
         name: event.name,
         startDate: event.startDate,
         venueName: event.venueName,
-        addr1: event.addr1,
+        addr1: event.venueAddr1,
         addr2: this.getEventAddr2(event),
         eventId: event.eventIdObfuscated,
         capacity: event.capacity,

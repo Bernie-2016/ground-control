@@ -5,7 +5,6 @@ import Radium from 'radium'
 import SideBarLayout from './SideBarLayout';
 import CallAssignmentList from './CallAssignmentList';
 import CallAssignment from './CallAssignment';
-import TopNav from './TopNav';
 import Signup from './Signup';
 
 class CallAssignmentsSection extends React.Component {
@@ -38,7 +37,7 @@ class CallAssignmentsSection extends React.Component {
               })
             )
     */
-            this.props.history.pushState(null, '/call-assignments/' + id)
+            this.props.history.push('/call/' + id)
           }}
         />
       </div>
@@ -54,7 +53,7 @@ class CallAssignmentsSection extends React.Component {
             On the left, you'll find a list of calling assignments that you can start with right away.  Just click one, call the number that gets shown to you, and fill out the survey.
           </p>
           <p style={this.styles.paragraph}>
-            Remember that everyone you are calling are people who have signed up to help and feel free to let them know you are a fellow volunteer -- it helps! Also, please be sure to follow our guidelines:
+            Remember that everyone you are calling are people who have signed up to help. Feel free to let them know you are a fellow volunteer -- it helps! And please be sure to follow our guidelines:
           </p>
           <ol>
             <li>Treat everyone with respect and kindness.</li>

@@ -2,12 +2,6 @@
 
 ## Getting started
 
-### Linux
-
-The easiest way to get started in Linux is with [Docker](https://docs.docker.com/engine/installation/ubuntulinux/).  After installing Docker, just run:
-
-`docker compose up`
-
 ### OS X
 
 In OS X, we currently run everything locally using a Procfile and node-foreman. To get started, install [Node.js](https://nodejs.org/en/download/) and [Homebrew](http://brew.sh/). Then clone this repository and cd into ground-control. Then do the following:
@@ -27,9 +21,36 @@ If you ever want to re-seed the database, run
 
 The seed script will create an admin user with e-mail address `admin@localhost.com` and password `admin`.  Login with those credentials when you first go to `localhost:3000` and then check out `localhost:3000/admin`.
 
+### Linux
+
+On Linux, follow the same directions as OS X above, but substitue `./setup-linux` for the equivalent OSx script.
+
+You will also need to have [Docker](docs.docker.com/engine/installation) and [docker-compose](docs.docker.com/compose/install) installed to provide your database.
+
 ### Windows
 
 The best way to run everything on Windows is probably to try to get Docker working on Windows and use the Linux installation instructions.
+
+### Enviornment Variables
+
+Here is a list of Environment Variables and how they are used:
+
+You can find their defaults in `.env`
+
+* `BSD_HOST`: 
+* `BSD_API_ID`: 
+* `BSD_API_SECRET`: 
+* `MAILGUN_DOMAIN`: 
+* `MAILGUN_KEY`: 
+* `MAILGUN_DOMAIN`: 
+* `PORT`: 
+* `SESSION_SECRET`: 
+* `NODE_ENV`: 
+* `DATABASE_URL`: 
+* `config.use_env_variable`: 
+* `process.env.WEBPACK_PORT`: 
+* `APP_HOST`: 
+* `WEBPACK_PROXY_PORT`: 
 
 ## What does this do and how do I get started?
 

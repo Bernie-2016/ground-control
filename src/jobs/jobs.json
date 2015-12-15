@@ -1,0 +1,12 @@
+{
+  "jobs": [
+    {
+      "cron": "00 */10 * * * *",
+      "job": "./jobs/bsd_assigned_calls_ttl.js"
+    },
+    {
+      "cron": "00 */5 * * * *",
+      "job": "./jobs/refresh_group_memberships.js"
+    }
+  ]
+}

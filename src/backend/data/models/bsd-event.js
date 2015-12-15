@@ -1,3 +1,4 @@
+import moment from 'moment-timezone'
 export default function(sequelize, DataTypes) {
   let BSDEvent = sequelize.define('BSDEvent', {
     id: {
@@ -66,11 +67,10 @@ export default function(sequelize, DataTypes) {
       type: DataTypes.DATE,
       field: 'start_dt',
       allowNull: true,
-      get: function(){
-            let formattedDate = this.getDataValue('startDate').toISOString();
-            // 'this' allows you to access attributes of the instance
-            return formattedDate;
-          }
+      // This is because in production we have timestamp without timezone columns
+      get: function() {
+        return moment(this.getDataValue('startDate').format('YYYY-MM-DD HH:mm:ss'), this.getDataValue('localTimezone')).toDate()
+      },
     },
     duration: {
       type: DataTypes.FLOAT,
@@ -88,6 +88,7 @@ export default function(sequelize, DataTypes) {
     attendeeVolunteerMessage: {
       type: DataTypes.TEXT,
       field: 'attendee_volunteer_message',
+      allowNull: true
     },
     isSearchable: {
       type: DataTypes.INTEGER,
