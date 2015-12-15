@@ -132,6 +132,7 @@ class AdminEventsSection extends React.Component {
         <FontIcon className="material-icons" hoverColor={BernieColors.blue}>search</FontIcon>
       </IconButton>
 
+      {/*
       <IconButton
         title="view public event"
         onTouchTap={function(){
@@ -159,6 +160,8 @@ class AdminEventsSection extends React.Component {
         <FontIcon className="material-icons" hoverColor={BernieColors.blue}>content_copy</FontIcon>
       </IconButton>
 
+      */}
+
       <IconButton
         title="delete"
         onTouchTap={function(){
@@ -178,10 +181,10 @@ class AdminEventsSection extends React.Component {
       </IconButton>
 
       {/*
-        Iconmenu does not not work inside of fixed-data-table cells because of overflow:hidden on parent divs;
+        IconMenu does not not work inside of fixed-data-table cells because of overflow:hidden on parent divs;
         The plan is to use https://github.com/tajo/react-portal to overcome this limitation
-      */} 
-      {/*  
+      */}
+      {/*
       <IconMenu
         iconButtonElement={<FontIcon className="material-icons" hoverColor={BernieColors.blue}>more_vert</FontIcon>}
         desktop={true}
@@ -574,7 +577,7 @@ class AdminEventsSection extends React.Component {
             header={<this.HeaderCell content="Manage" />}
             cell={<this.ActionCell data={events} col="actions" />}
             fixed={true}
-            width={310}
+            width={170}
             align='center'
           />
         </ColumnGroup>
