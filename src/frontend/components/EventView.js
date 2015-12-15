@@ -34,7 +34,6 @@ export class EventEdit extends React.Component {
 
   render() {
     let event = new Event(this.props.eventsArray[this.props.eventIndex]['node']);
-    console.log(event);
     return (
     <div>
       <CardText>
@@ -192,8 +191,8 @@ export class EventEdit extends React.Component {
 export class EventPreview extends React.Component {
   constructor(props) {
     super(props);
-    this.handleKeyDown = this.handleKeyDown.bind(this);
-    document.addEventListener('keydown', this.handleKeyDown);
+    // this.handleKeyDown = this.handleKeyDown.bind(this);
+    // document.addEventListener('keydown', this.handleKeyDown);
   }
 
   handleKeyDown(event){

@@ -368,7 +368,7 @@ class AdminEventsSection extends React.Component {
   renderEventPreviewModal(events) {
 
     let customActions = [
-      <KeyboardActionsInfo key="0" />,
+      // <KeyboardActionsInfo key="0" />,
       <FlatButton
         label="Close"
         key="1"
