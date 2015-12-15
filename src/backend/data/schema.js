@@ -764,6 +764,7 @@ let RootQuery = new GraphQLObjectType({
     listContainer: {
       type: GraphQLListContainer,
       resolve: (parent, _, {rootValue}) => {
+        authRequired(rootValue);
         adminRequired(rootValue);
         return SharedListContainer
       }
