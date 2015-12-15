@@ -70,6 +70,7 @@ const authRequired = (session) => {
 };
 
 const adminRequired = (session) => {
+  authRequired(session);
   if (!session.user || !session.user.isAdmin) {
     throw new GraphQLError({
       status: 403,
@@ -668,7 +669,6 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
     }
   },
   mutateAndGetPayload: async ({name, intervieweeGroup, surveyId, renderer, processors}, {rootValue}) => {
-    authRequired(rootValue);
     adminRequired(rootValue);
     let groupText = intervieweeGroup;
     let group = null;
@@ -764,7 +764,6 @@ let RootQuery = new GraphQLObjectType({
     listContainer: {
       type: GraphQLListContainer,
       resolve: (parent, _, {rootValue}) => {
-        authRequired(rootValue);
         adminRequired(rootValue);
         return SharedListContainer
       }

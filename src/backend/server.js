@@ -103,9 +103,9 @@ let rateLimitRoutes = [
 ];
 
 // Rate limit the routes
-rateLimitRoutes.forEach((route) => {
-  app.use(route,limiter);
-});
+//rateLimitRoutes.forEach((route) => {
+//  app.use(route,limiter);
+//});
 
 app.use(express.static(publicPath))
 app.use(bodyParser.json());
@@ -117,6 +117,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 app.use('/graphql', graphQLHTTP((request) => {
+  console.log('request HIHI', request.user)
   return {
     rootValue: { user: request.user },
     schema: Schema
