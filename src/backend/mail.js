@@ -92,6 +92,34 @@ export default class MG {
     }
   }
 
+  async sendPasswordReset(user, debugging) {
+
+    let data = {
+      user: user
+    }
+
+    let template = new EmailTemplate(templateDir + '/password-reset');
+    let content = await template.render(data);
+
+    let message = {
+      from: senderAddress,
+      'h:Reply-To': 'help@berniesanders.com',
+      to: user.email,
+      subject: 'Password Reset Request',
+      text: content.text,
+      html: content.html
+    };
+
+    if (debugging){
+      return message;
+    }
+
+    else{
+      let response = await this.mailgun.messages().send(message);
+      return response;
+    }
+  }
+
   async sendPhoneBankConfirmation(form, constituent, debugging) {
 
     constituent.cons_email.forEach((email) => {

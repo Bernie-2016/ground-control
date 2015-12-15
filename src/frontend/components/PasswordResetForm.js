@@ -1,5 +1,4 @@
 import React from 'react';
-import Relay from 'react-relay';
 import {Paper, TextField} from 'material-ui';
 import {BernieText, BernieColors} from './styles/bernie-css';
 import GCForm from './forms/GCForm';
@@ -12,7 +11,7 @@ import {BernieTheme} from './styles/bernie-theme';
 @Styles.ThemeDecorator(Styles.ThemeManager.getMuiTheme(BernieTheme))
 export default class Signup extends React.Component {
   state = {
-    formState : 'signup',
+    formState : 'reset',
     errorMessage: null,
   }
 
@@ -20,56 +19,17 @@ export default class Signup extends React.Component {
     this.setState({errorMessage: null})
   }
 
-  formStates = {
-    signup: {
-      formTitle: 'Login or sign up make calls',
-      formSchema: yup.object({
-        email: yup.string().email().required(),
-        password: yup.string().required(),
-      }),
-      formElement: (
-        <div>
-          <Form.Field
-            name='email'
-            label='E-mail Address'
-          /><br />
-          <Form.Field
-            name='password'
-            type='password'
-            label='Password'
-          /><br />
-        </div>
-      ),
-      onSubmit: (formState) => {
-        this.clearError();
-        superagent
-          .post('/signup')
-          .send({
-            email: formState.email,
-            password: formState.password
-          })
-          .end((err, res) => {
-            if (!err)
-              window.location = '/call';
-            else
-              this.setState({errorMessage: 'Incorrect e-mail or password'});
-          })
-      }
-    }
-  }
+  self = this
 
   styles = {
+    formHidden: {
+      display: 'none'
+    },
     signupForm: {
       width: '100%',
       backgroundColor: BernieColors.blue,
       color: BernieColors.white,
       padding: '15px 15px 15px 15px'
-    },
-    paragraph: {
-      paddingTop: '0.5em',
-      paddingBottom: '0.5em',
-      paddingLeft: '0.5em',
-      paddingRight: '0.5em',
     },
     introContainer: {
       display: 'flex',
@@ -80,8 +40,7 @@ export default class Signup extends React.Component {
       marginRight: 40
     },
     signupFormContainer: {
-      flex: 'auto',
-      width: '12em'
+      margin: 'auto',
     },
     container: {
       padding: 40,
@@ -97,34 +56,50 @@ export default class Signup extends React.Component {
     }
   }
 
+  formStates = {
+    reset: {
+      formTitle: 'Reset Lost Password',
+      formSchema: yup.object({
+        email: yup.string().email().required(),
+        token: yup.string(),
+        password: yup.string().required()
+      }),
+      formElement: (
+        <div>
+          <Form.Field
+            name='email'
+            label='E-mail Address'
+          /><br />
+          <Form.Field
+            name='password'
+            type='password'
+            label="Password"
+          /><br />
+        </div>
+      ),
+      onSubmit: (formState) => {
+        this.clearError();
+        superagent
+          .post('/password_reset/'+this.props.params.token)
+          .send({
+            email: formState.email,
+            password: formState.password
+          })
+          .end((err, res) => {
+            if (!err)
+              window.location = '/';
+            else
+              this.setState({errorMessage: 'Server Error'});
+          })
+      }
+    }
+  }
+
   renderSplash() {
     return (
       <div style={this.styles.container} >
         <div style={this.styles.introContainer}>
-          <div style={this.styles.introTextContainer}>
-            <div style={{
-              ...BernieText.secondaryTitle,
-              display: 'block'
-            }}>
-              Make Calls
-            </div>
-            <div style={BernieText.title}>
-              It takes a nation of millions to move us forward
-            </div>
-            <div style={BernieText.default}>
-              <p style={this.styles.paragraph}>
-                Bernie has said time and time again that the only way to bring about meaningful change in the White House is if millions of us get involved.  We know that making one-on-one calls is the most effective way to mobilize people, and we need your help making it happen.
-                </p>
-                <p style={this.styles.paragraph}>
-                  Once you sign up, we'll post assignments regularly.  You will be talking to people who have already signed up to be a part of this campaign - your job is to make sure everyone is able to live up to their potential. With your help, we can grow this into a movement of millions.
-                </p>
-
-                <p style={this.styles.paragraph}>
-                  Will you sign up to make this political revolution a reality?
-                </p>
-            </div>
-          </div>
-          <div styles={this.styles.signupFormContainer}>
+          <div id="lol" style={this.styles.signupFormContainer}>
             {this.renderSignupForm()}
           </div>
         </div>
@@ -164,16 +139,10 @@ export default class Signup extends React.Component {
               marginBottom: 15
             }}>
               {formElement}
-              <a href="/password_reset" style={{
-                ...BernieText.default,
-                fontSize: ".7em",
-                display: "block",
-                "text-align": "right"
-              }}>Forgot password</a>
             </Paper>
               <Form.Button
                 type='submit'
-                label='Go!'
+                label='Reset!'
                 fullWidth={true}
               />
               <div style={{

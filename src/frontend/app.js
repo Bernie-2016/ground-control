@@ -22,6 +22,8 @@ import AdminCallAssignment from './components/AdminCallAssignment';
 import CallAssignment from './components/CallAssignment';
 import CallAssignmentsSection from './components/CallAssignmentsSection';
 import Dashboard from './components/Dashboard';
+import ResetPassword from './components/ResetPassword';
+import PasswordResetForm from './components/PasswordResetForm';
 import Signup from './components/Signup';
 import NotFound from './components/NotFound'
 import Form from 'react-formal';
@@ -85,6 +87,14 @@ ReactDOM.render(
   <Router
     history={history}
     createElement={ReactRouterRelay.createElement}>
+    <Route
+      path='/password_reset'
+      component={ResetPassword}
+    />
+    <Route
+      path='/password_reset/:token'
+      component={PasswordResetForm}
+    />
     <Route
       path='/admin'
       component={AdminDashboard}

@@ -17,6 +17,7 @@ import LocalStrategy  from 'passport-local'
 import SequelizeStoreFactory from 'connect-session-sequelize'
 import url from 'url';
 import Minilog from 'minilog';
+import uuid from 'node-uuid';
 
 writeSchema();
 
@@ -129,6 +130,55 @@ app.post('/log', wrap(async (req, res) => {
   })
 
   res.send('')
+}))
+
+app.post('/password_reset', wrap(async (req, res) => {
+  // All errors in this endpoint will result in a 200 response.
+  // This prevents people from mining emails through brute
+  // force.
+  if(!req.body.email) {
+    return res.status(200).end();
+  }
+
+  let user = await models.User.findOne({ where: {email:req.body.email} });
+
+  if(!user) {
+    return res.status(200).end();
+  }
+
+  console.log(req.body.email)
+  console.log(JSON.stringify(user))
+
+  // Generate a globally unique reset token for the user
+  // We create it as a property of the user since we only
+  // issue one at a time, and require that the token
+  // match the email address when updating.
+  await user.set('resetToken',uuid.v4());
+  await user.save();
+
+  let email = await Mailgun.sendPasswordReset(user);
+
+  res.status(200).end();
+}))
+
+app.post('/password_reset/:token', wrap(async (req, res) => {
+  let token = req.params.token;
+  let email = req.body.email;
+  let password = req.body.password;
+
+  if(!token || !email || !password) {
+    // Malformed request
+    return res.status(422).end();
+  }
+
+  let user = await models.User.update({ password: password, resetToken: null },{ where : { email: email, resetToken: token}, individualHooks: true});
+
+  if(user[0]===0) {
+    // Either the email or token were incorrect
+    return res.status(400).end();
+  }
+
+  res.status(200).end();
 }))
 
 app.post('/signup',

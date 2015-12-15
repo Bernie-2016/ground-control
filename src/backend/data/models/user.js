@@ -37,6 +37,12 @@ export default function(sequelize, DataTypes) {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
       field: 'is_admin'
+    },
+    resetToken: {
+      type: DataTypes.CHAR,
+      length: 36,
+      field: 'reset_token',
+      allowNull: true
     }
   }, {
     underscored: true,
@@ -57,11 +63,13 @@ export default function(sequelize, DataTypes) {
       }
     }
   })
+
   let hashPassword = async (user, options) => {
     return hash(user.password, 8).then((res) => {
-      user.password = res;
+      user.setDataValue('password',res);
     })
   }
+
   User.beforeCreate(hashPassword);
   User.beforeUpdate(hashPassword);
 
