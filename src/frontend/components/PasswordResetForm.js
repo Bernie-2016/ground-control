@@ -72,13 +72,13 @@ export default class Signup extends React.Component {
           /><br />
           <Form.Field
             name='password'
+            type='password'
             label="Password"
           /><br />
         </div>
       ),
       onSubmit: (formState) => {
         this.clearError();
-        console.log("Yo!")
         superagent
           .post('/password_reset/'+this.props.params.token)
           .send({
@@ -86,12 +86,10 @@ export default class Signup extends React.Component {
             password: formState.password
           })
           .end((err, res) => {
-            /*
             if (!err)
-              //window.location = '/';
+              window.location = '/';
             else
-              //this.setState({errorMessage: 'Server Error'});
-              */
+              this.setState({errorMessage: 'Server Error'});
           })
       }
     }

@@ -156,15 +156,29 @@ app.post('/password_reset', wrap(async (req, res) => {
   await user.set('resetToken',uuid.v4());
   await user.save();
 
-  // Debugging for now. TODO: Do not commit this, actually send the email
-  let email = await Mailgun.sendPasswordReset(user, true);
-  console.log(email)
+  let email = await Mailgun.sendPasswordReset(user);
+
+  res.status(200).end();
 }))
 
 app.post('/password_reset/:token', wrap(async (req, res) => {
-  console.log(req.params.token);
-  console.log(req.body);
-  res.status(200).end("Hello World!")
+  let token = req.params.token;
+  let email = req.body.email;
+  let password = req.body.password;
+
+  if(!token || !email || !password) {
+    // Malformed request
+    return res.status(422).end();
+  }
+
+  let user = await models.User.update({ password: password, resetToken: null },{ where : { email: email, resetToken: token}, individualHooks: true});
+
+  if(user[0]===0) {
+    // Either the email or token were incorrect
+    return res.status(400).end();
+  }
+
+  res.status(200).end();
 }))
 
 app.post('/signup',

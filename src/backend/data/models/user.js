@@ -63,11 +63,13 @@ export default function(sequelize, DataTypes) {
       }
     }
   })
+
   let hashPassword = async (user, options) => {
     return hash(user.password, 8).then((res) => {
-      user.password = res;
+      user.setDataValue('password',res);
     })
   }
+
   User.beforeCreate(hashPassword);
   User.beforeUpdate(hashPassword);
 

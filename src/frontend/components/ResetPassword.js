@@ -13,10 +13,15 @@ export default class Signup extends React.Component {
   state = {
     formState : 'reset',
     errorMessage: null,
+    infoMessage: null,
   }
 
   clearError() {
-    this.setState({errorMessage: null})
+    this.setState({errorMessage: null});
+  }
+
+  clearInfo() {
+    this.setState({infoMessage: null});
   }
 
   formStates = {
@@ -35,7 +40,7 @@ export default class Signup extends React.Component {
       ),
       onSubmit: (formState) => {
         this.clearError();
-        console.log("WOAH")
+        this.clearInfo();
         superagent
           .post('/password_reset')
           .send({
@@ -43,10 +48,10 @@ export default class Signup extends React.Component {
           })
           .end((err, res) => {
             if (!err)
-              window.location = '/password_reset_sent';
+              this.setState({infoMessage: "Please check email for reset instructions"});
             else
               this.setState({errorMessage: 'Server Error'});
-          })
+          });
       }
     }
   }
@@ -102,8 +107,12 @@ export default class Signup extends React.Component {
     let formSchema = signupState.formSchema;
     let submitHandler = signupState.onSubmit;
     let errorElement = <div></div>
+    let infoElement = <div></div>
     if (this.state.errorMessage) {
       errorElement = <div style={this.styles.errorMessage}>{this.state.errorMessage}</div>
+    }
+    if (this.state.infoMessage) {
+      infoElement = <div style={this.styles.infoMessage}>{this.state.infoMessage}</div>
     }
     return (
       <Paper style={this.styles.signupForm}>
@@ -142,6 +151,7 @@ export default class Signup extends React.Component {
               </div>
           </GCForm>
         </div>
+        {infoElement}
       </Paper>
     )
   }
