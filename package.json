@@ -43,7 +43,7 @@
     "history": "^1.13.1",
     "jquery": "^2.1.4",
     "mailgun-js": "0.7.6",
-    "material-ui": "^0.14.0-rc1",
+    "material-ui": "0.14.0-rc1",
     "minilog": "^3.0.0",
     "moment": "^2.10.6",
     "moment-timezone": "^0.4.1",
@@ -57,7 +57,7 @@
     "react-formal": "^0.14.2",
     "react-google-maps": "^4.7.0",
     "react-relay": "^0.4.0",
-    "react-router": "1.0.1",
+    "react-router": "^1.0.2",
     "react-router-relay": "^0.7.0",
     "react-tap-event-plugin": "^0.2.1",
     "request-promise": "^1.0.1",
@@ -77,6 +77,6 @@
     "eslint": "latest",
     "eslint-plugin-react": "latest",
     "babel-eslint": "latest",
-    "webpack-dev-server": "1.10.1"
+    "webpack-dev-server": "latest"
   }
 }
