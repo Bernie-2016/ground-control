@@ -9,7 +9,7 @@ import {Styles} from 'material-ui';
 import {BernieTheme} from './styles/bernie-theme';
 
 @Styles.ThemeDecorator(Styles.ThemeManager.getMuiTheme(BernieTheme))
-export default class Signup extends React.Component {
+export default class PasswordResetForm extends React.Component {
   state = {
     formState : 'reset',
     errorMessage: null,

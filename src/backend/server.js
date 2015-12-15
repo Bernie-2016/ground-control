@@ -146,9 +146,6 @@ app.post('/password_reset', wrap(async (req, res) => {
     return res.status(200).end();
   }
 
-  console.log(req.body.email)
-  console.log(JSON.stringify(user))
-
   // Generate a globally unique reset token for the user
   // We create it as a property of the user since we only
   // issue one at a time, and require that the token
