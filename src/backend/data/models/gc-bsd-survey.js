@@ -46,7 +46,7 @@ export default function(sequelize, DataTypes) {
         let email = await person.getPrimaryEmail();
         let address = await person.getPrimaryAddress();
         let zip = address.zip
-        return BSDClient.noFailApiRequest('addRSVPToEvent', email, zip, surveyFields['event_id']);
+        return BSDClient.addRSVPToEvent(email, zip, surveyFields['event_id']);
       }
     }
   })
