@@ -22,6 +22,7 @@ export default class BSD {
     try {
       BSD[method](...args);
     } catch (e) {
+      log.error(e);
       BSDAudit.create({
         class: 'BSDClient',
         method: method,
