@@ -17,6 +17,7 @@ import LocalStrategy  from 'passport-local'
 import SequelizeStoreFactory from 'connect-session-sequelize'
 import url from 'url';
 import Minilog from 'minilog';
+import rateLimit from 'express-rate-limit';
 
 writeSchema();
 
@@ -37,6 +38,7 @@ const Mailgun = new MG(process.env.MAILGUN_KEY, process.env.MAILGUN_DOMAIN);
 const BSDClient = new BSD(process.env.BSD_HOST, process.env.BSD_API_ID, process.env.BSD_API_SECRET);
 const port = process.env.PORT;
 const publicPath = path.resolve(__dirname, '../frontend/public');
+const limiter = rateLimit({}); // Default limiter, ip based.
 
 function isAuthenticated(req, res, next) {
   if (req.user)
@@ -84,12 +86,28 @@ passport.deserializeUser(wrap(async (id, done) => {
 }));
 
 const app = express();
+
+app.enable('trust proxy'); // don't rate limit heroku
+
 const sessionStore = new SequelizeStore({
   db: models.sequelize,
   table: 'Session'
 });
 
-app.use(express.static(publicPath));
+// List the routes that need to be rate limited
+let rateLimitRoutes = [
+  "/graphql",
+  "/log",
+  "/signup",
+  "/events"
+];
+
+// Rate limit the routes
+rateLimitRoutes.forEach((route) => {
+  app.use(route,limiter);
+});
+
+app.use(express.static(publicPath))
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({

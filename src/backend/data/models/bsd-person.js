@@ -35,7 +35,7 @@ export default function(sequelize, DataTypes) {
     birthDate: {
       type: DataTypes.DATEONLY,
       field: 'birth_dt',
-      allowNull: true
+      allowNull: true,
     },
     title: {
       type: DataTypes.STRING,
