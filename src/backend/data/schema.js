@@ -70,6 +70,7 @@ const authRequired = (session) => {
 };
 
 const adminRequired = (session) => {
+  authRequired(session);
   if (!session.user || !session.user.isAdmin) {
     throw new GraphQLError({
       status: 403,
@@ -204,7 +205,7 @@ const GraphQLUser = new GraphQLObjectType({
         callAssignmentId: { type: GraphQLString }
       },
       resolve: async (user, {callAssignmentId}) => {
-        let localId = fromGlobalId(callAssignmentId).id;
+        let localId = parseInt(fromGlobalId(callAssignmentId).id, 10);
         let assignedCalls = await user.getAssignedCalls({
           where: {
             call_assignment_id: localId
@@ -237,7 +238,7 @@ const GraphQLUser = new GraphQLObjectType({
                   FROM bsd_person_bsd_groups
                   WHERE cons_group_id=${group.cons_group_id}
                 ) AS cons_groups
-                ON people.cons_id=cons_groups.cons_id'
+                ON people.cons_id=cons_groups.cons_id
             `
           else if (group.query && group.query !== EVERYONE_GROUP)
             filterQuery = `
@@ -485,7 +486,18 @@ const GraphQLEvent = new GraphQLObjectType({
     venueCountry: { type: GraphQLString },
     venueDirections: { type: GraphQLString },
     localTimezone: { type: GraphQLString },
-    startDate: { type: GraphQLString },
+    localUTCOffset: {
+      type: GraphQLString,
+      resolve: (event) => {
+        return moment().tz(event.localTimezone).format('Z');
+      }
+    },
+    startDate: {
+      type: GraphQLString,
+      resolve: (event) => {
+        return moment(event.startDate).format()
+      }
+    },
     duration: { type: GraphQLInt },
     capacity: { type: GraphQLInt },
     latitude: { type: GraphQLFloat },
@@ -668,7 +680,6 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
     }
   },
   mutateAndGetPayload: async ({name, intervieweeGroup, surveyId, renderer, processors}, {rootValue}) => {
-    authRequired(rootValue);
     adminRequired(rootValue);
     let groupText = intervieweeGroup;
     let group = null;

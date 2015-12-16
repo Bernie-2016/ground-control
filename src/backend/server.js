@@ -38,7 +38,7 @@ const Mailgun = new MG(process.env.MAILGUN_KEY, process.env.MAILGUN_DOMAIN);
 const BSDClient = new BSD(process.env.BSD_HOST, process.env.BSD_API_ID, process.env.BSD_API_SECRET);
 const port = process.env.PORT;
 const publicPath = path.resolve(__dirname, '../frontend/public');
-const limiter = rateLimit({}); // Default limiter, ip based.
+const limiter = rateLimit({windowMs: 10000, max: 50});
 
 function isAuthenticated(req, res, next) {
   if (req.user)
@@ -103,9 +103,9 @@ let rateLimitRoutes = [
 ];
 
 // Rate limit the routes
-rateLimitRoutes.forEach((route) => {
-  app.use(route,limiter);
-});
+//rateLimitRoutes.forEach((route) => {
+//  app.use(route,limiter);
+//});
 
 app.use(express.static(publicPath))
 app.use(bodyParser.json());

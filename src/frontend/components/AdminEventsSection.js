@@ -218,7 +218,7 @@ class AdminEventsSection extends React.Component {
         <MenuItem index={1} primaryText="Send feedback" leftIcon={<FontIcon className="material-icons">delete</FontIcon>} />
         <MenuItem index={2} primaryText="Settings" leftIcon={<FontIcon className="material-icons">delete</FontIcon>} />
       </IconMenu>
-      */} 
+      */}
 
     </div>
     </Cell>
@@ -384,7 +384,7 @@ class AdminEventsSection extends React.Component {
           ref="creationForm"
           src="create"
           style={{width: '100%', height: this.state.tableHeight*0.7, border: 'none'}}
-        />  
+        />
       </Dialog>
     )
   }
@@ -443,7 +443,7 @@ class AdminEventsSection extends React.Component {
             }}
         >
           <Tab label="Preview" value={'0'} >
-            <EventPreview 
+            <EventPreview
               eventsArray={events}
               eventIndex={this.state.activeEventIndex}
               onChangeEventIndex={function(n){
@@ -464,7 +464,7 @@ class AdminEventsSection extends React.Component {
             />
           </Tab>
           <Tab label="Edit" value={'1'} >
-            <EventEdit 
+            <EventEdit
               eventsArray={events}
               eventIndex={this.state.activeEventIndex}
               key={this.state.activeEventIndex}
@@ -743,7 +743,6 @@ export default Relay.createContainer(AdminEventsSection, {
               venueAddr2
               venueCountry
               venueDirections
-              localTimezone
               startDate
               duration
               capacity

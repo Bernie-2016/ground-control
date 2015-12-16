@@ -78,6 +78,6 @@
     "eslint": "latest",
     "eslint-plugin-react": "latest",
     "babel-eslint": "latest",
-    "webpack-dev-server": "latest"
+    "webpack-dev-server": "1.10.1"
   }
 }
