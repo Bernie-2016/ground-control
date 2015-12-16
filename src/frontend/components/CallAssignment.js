@@ -134,7 +134,7 @@ export class CallAssignment extends React.Component {
   renderIntervieweeInfo() {
     let interviewee = this.props.currentUser.intervieweeForCallAssignment;
     let name = this.intervieweeName();
-    let number = this.formatPhoneNumber(interviewee.phone)
+    let formattedNumber = this.formatPhoneNumber(interviewee.phone)
 
     let sideBar = (
       <div style={{
@@ -145,7 +145,11 @@ export class CallAssignment extends React.Component {
       }}>
         {name}
         <br />
-        {number}
+        <a href={`tel:+1${interviewee.phone}`}
+           style={{color: BernieColors.blue,
+                   textDecoration: 'none'}}>
+          {formattedNumber}
+        </a>
       </div>
     )
 
