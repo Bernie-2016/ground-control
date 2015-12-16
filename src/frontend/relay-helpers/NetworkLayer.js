@@ -1,6 +1,6 @@
 import Relay from 'react-relay'
 
-export default class RelayNetworkLayer extends Relay.DefaultNetworkLayer {
+export default class NetworkLayer extends Relay.DefaultNetworkLayer {
   formatRequestErrors(request, errors) {
     const CONTEXT_BEFORE = 20;
     const CONTEXT_LENGTH = 60;
