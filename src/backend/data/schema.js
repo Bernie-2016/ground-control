@@ -147,7 +147,10 @@ const GraphQLListContainer = new GraphQLObjectType({
       type: GraphQLEventConnection,
       args: connectionArgs,
       resolve: async (event, {first}) => {
-        let events = await BSDEvent.all({order: 'start_dt ASC'});
+        let events = await BSDEvent.all({
+          order: 'start_dt ASC',
+          limit: first
+        });
         return connectionFromArray(events, {first});
       }
     },
