@@ -315,6 +315,12 @@ export default class BSD {
     return
   }
 
+  async updateEvent(event_id, event_type_id, creator_cons_id, updatedValues) {
+    Object.assign(updatedValues, {event_id, event_type_id, creator_cons_id});
+    let response = await this.request('/event/update_event', {event_api_version: 2, values: JSON.stringify(updatedValues)}, 'POST');
+    return response
+  }
+
   async createEvents(cons_id, form, event_types, callback) {
     let eventType = null;
     event_types.forEach((type) => {
