@@ -120,6 +120,30 @@ class AdminEventsSection extends React.Component {
     </Cell>
   )
 
+  DateCell = ({rowIndex, data, col, ...props}) => (
+    <Cell {...props}
+    style={{
+      fontFamily: 'Roboto',
+      fontSize: '13px',
+      lineHeight: '18px',
+    }}
+    >
+      {data[rowIndex]['node']['localTimezone']}
+    </Cell>
+  )
+
+  DurationCell = ({rowIndex, data, col, ...props}) => (
+    <Cell {...props}
+    style={{
+      fontFamily: 'Roboto',
+      fontSize: '13px',
+      lineHeight: '18px',
+    }}
+    >
+      {data[rowIndex]['node'][col]/60}
+    </Cell>
+  )
+
   ActionCell = ({rowIndex, data, col, ...props}) => (
     <Cell {...props}>
     <div style={{position: 'relative', left: '-5px'}}>
@@ -582,29 +606,6 @@ class AdminEventsSection extends React.Component {
           />
         </ColumnGroup>
         <ColumnGroup
-          header={<this.HeaderCell content="About" />}>
-          <Column
-            flexGrow={1}
-            header={<this.HeaderCell content="Event Type" />}
-            cell={
-              <this.EventTypeCell data={events} col="eventType" />
-            }
-            width={150}
-          />
-          <Column
-            flexGrow={1}
-            header={<this.HeaderCell content="Event Name" />}
-            cell={<this.TextCell data={events} col="name" />}
-            width={250}
-          />          
-          <Column
-            flexGrow={1}
-            header={<this.HeaderCell content="Description" />}
-            cell={<this.TextCell data={events} col="description" />}
-            width={250}
-          />
-        </ColumnGroup>
-        <ColumnGroup
           header={<this.HeaderCell content="Event Host" />}>
           <Column
             flexGrow={1}
@@ -614,28 +615,28 @@ class AdminEventsSection extends React.Component {
           />
           <Column
             flexGrow={1}
+            header={<this.HeaderCell content="Phone" />}
+            cell={<this.TextCell data={events} col="contactPhone" />}
+            width={100}
+          />
+          <Column
+            flexGrow={1}
             header={<this.HeaderCell content="Email" />}
             cell={<this.HostInfoCell data={events} col="host" info="email" />}
             width={220}
           />
-          <Column
-            flexGrow={1}
-            header={<this.HeaderCell content="Phone" />}
-            cell={<this.TextCell data={events} col="contactPhone" />}
-            width={150}
-          />         
         </ColumnGroup>
         <ColumnGroup
           header={<this.HeaderCell content="Time" />}>
           <Column
             header={<this.HeaderCell content="Datetime" />}
-            cell={<this.TextCell data={events} col="startDate" />}
+            cell={<this.DateCell data={events} col="startDate" />}
             flexGrow={1}
-            width={190}
+            width={170}
           />
           <Column
             header={<this.HeaderCell content="Duration" />}
-            cell={<this.TextCell data={events} col="duration" />}
+            cell={<this.DurationCell data={events} col="duration" />}
             flexGrow={1}
             width={100}
           />
@@ -673,6 +674,29 @@ class AdminEventsSection extends React.Component {
             flexGrow={1}
             width={120}
             align='center'
+          />
+        </ColumnGroup>
+        <ColumnGroup
+          header={<this.HeaderCell content="About" />}>
+          <Column
+            flexGrow={1}
+            header={<this.HeaderCell content="Event Type" />}
+            cell={
+              <this.EventTypeCell data={events} col="eventType" />
+            }
+            width={100}
+          />
+          <Column
+            flexGrow={1}
+            header={<this.HeaderCell content="Event Name" />}
+            cell={<this.TextCell data={events} col="name" />}
+            width={250}
+          />          
+          <Column
+            flexGrow={1}
+            header={<this.HeaderCell content="Description" />}
+            cell={<this.TextCell data={events} col="description" />}
+            width={250}
           />
         </ColumnGroup>
       </Table>
