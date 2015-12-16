@@ -54,7 +54,7 @@ class GraphQLError extends Error {
     let message = JSON.stringify(errorObject);
     super(message);
 
-    this.name = 'MyError',
+    this.name = 'GraphQLError',
     this.message = message,
     Error.captureStackTrace(this, this.constructor.name)
   }

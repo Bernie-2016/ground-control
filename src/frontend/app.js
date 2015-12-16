@@ -24,6 +24,7 @@ import CallAssignmentsSection from './components/CallAssignmentsSection';
 import Dashboard from './components/Dashboard';
 import Signup from './components/Signup';
 import NotFound from './components/NotFound'
+import Unauthorized from './components/Unauthorized'
 import Form from 'react-formal';
 import {createHistory} from 'history';
 import NetworkLayer from './relay-helpers/NetworkLayer'
@@ -141,6 +142,7 @@ ReactDOM.render(
         />
       </Route>
     </Route>
+    <Route path='/unauthorized' component={Unauthorized} />
     <Route path="*" component={NotFound} />
   </Router>,
   document.getElementById('root')

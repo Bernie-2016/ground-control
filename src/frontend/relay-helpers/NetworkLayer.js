@@ -1,35 +1,6 @@
 import Relay from 'react-relay'
 
 export default class NetworkLayer extends Relay.DefaultNetworkLayer {
-  formatRequestErrors(request, errors) {
-    const CONTEXT_BEFORE = 20;
-    const CONTEXT_LENGTH = 60;
-
-    let queryLines = request.getQueryString().split('\n');
-
-    return errors.map( (_ref, ii) => {
-      let locations = _ref.locations;
-      let message = _ref.message;
-
-      let prefix = ii + 1 + '. ';
-      let indent = ' '.repeat(prefix.length);
-
-      // custom errors thrown in graphql-server may not have locations
-      let locationMessage = locations ? '\n' + locations.map( (_ref2) => {
-        let column = _ref2.column;
-        let line = _ref2.line;
-
-        let queryLine = queryLines[line - 1];
-        let offset = Math.min(column - 1, CONTEXT_BEFORE);
-
-        return [queryLine.substr(column - 1 - offset, CONTEXT_LENGTH), ' '.repeat(offset) + '^^^'].map( (messageLine) => {
-          return indent + messageLine;
-        }).join('\n');
-      }).join('\n') : '';
-
-      return prefix + message + locationMessage;
-    }).join('\n');
-  }
 
   handleStructuredError(error) {
     let parsedError = null;
@@ -43,8 +14,9 @@ export default class NetworkLayer extends Relay.DefaultNetworkLayer {
 
       if (parsedError.status === 401) {
         window.location = '/signup';
-      } else if (parsedError.status === 404) {
-        window.location = '/404';
+      }
+      else if (parsedError.status === 403) {
+        window.location = '/unauthorized';
       }
     }
   }
