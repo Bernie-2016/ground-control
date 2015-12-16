@@ -10,6 +10,7 @@ import { introspectionQuery, printSchema } from 'graphql/utilities';
 export default async function writeSchema() {
   await async function() {
     let result = await (graphql(Schema, introspectionQuery));
+
     if (result.errors) {
       log.error(
         'ERROR introspecting schema: ',
@@ -22,6 +23,7 @@ export default async function writeSchema() {
       );
     }
   }();
+  
   fs.writeFileSync(
     path.join('/', 'tmp', 'schema.graphql'),
     printSchema(Schema)
