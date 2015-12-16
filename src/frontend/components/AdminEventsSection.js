@@ -286,7 +286,7 @@ class AdminEventsSection extends React.Component {
             autoWidth={false}
             style={{width: '140px', marginRight: '0'}}
           />
-          <IconButton
+          {/*<IconButton
             iconClassName="material-icons"
             tooltipPosition="bottom-center"
             title="Refresh Events"
@@ -295,7 +295,7 @@ class AdminEventsSection extends React.Component {
             onTouchTap={function(){
               this._handleRequestRefresh();
             }.bind(this)}
-          >refresh</IconButton>
+          >refresh</IconButton>*/}
         </ToolbarGroup>
         <ToolbarGroup key={1} float="right">
           <RaisedButton
