@@ -85,7 +85,6 @@ export default class AdminCallAssignmentCreationForm extends React.Component {
               this.clearState()
               this.setState({globalStatusMessage: 'Call assignment created successfully!'})
             };
-            console.log(formValue)
 
             Relay.Store.update(
               new CreateCallAssignment({
