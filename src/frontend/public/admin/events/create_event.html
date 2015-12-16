@@ -99,8 +99,6 @@
 
 <form method="post" name="secondform" id="secondform">
 <div>
-<input name="is_searchable" type="hidden" value="-2">
-
 
                 <div class="section-wrap"><div class="sectionheader section-what"><h3>What:<span class="bsd-image-replacement"></span></h3></div><div class="inputgroup">
 
@@ -153,6 +151,9 @@
 
                         <span class="explain">(Say a little more about your event and why people should attend)</span>
 
+                        <div class="checkboxgroup">
+                                            <label class="form_label" for="is_searchable">Make this event public?</label>
+                                            <input name="is_searchable" type="checkbox" value="1" id="is_searchable" checked="checked"></div>
 
                         <div class="checkboxgroup">
                                             <label class="form_label" for="qf_aa7bcc">Receive email when users sign up?</label>
@@ -1372,7 +1373,7 @@ jQuery(document).ready(function() {
 
 		$.ajax({
 		    dataType: "json",
-		    url: '/admin/events/create',
+		    url: '/events/create',
 		    data: formdata,
 		    type: 'POST',
 		    success: function(xhr, status){

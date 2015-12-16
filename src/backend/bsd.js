@@ -341,6 +341,7 @@ export default class BSD {
     let params = {
         event_type_id: form['event_type_id'],
         creator_cons_id: cons_id,
+        flag_approval: form['flag_approval'],
         name: form['name'],
         description: form['description'],
         venue_name: form['venue_name'],
@@ -357,18 +358,13 @@ export default class BSD {
         }],
         local_timezone: form['start_tz'],
         attendee_volunteer_message: form['attendee_volunteer_message'],
-        is_searchable: form['is_searchable'],
+        is_searchable: (form['is_searchable']) ? 1 : 0,
         public_phone: form['public_phone'],
         contact_phone: contact_phone,
         host_receive_rsvp_emails: form['host_receive_rsvp_emails'],
         rsvp_use_reminder_email: form['rsvp_use_reminder_email'],
         rsvp_reminder_hours: form['rsvp_email_reminder_hours']
     };
-
-    // Add flag_approval if it exists
-    if (form['flag_approval'] == 1){
-      params['flag_approval'] = 1;
-    }
 
     // Add params if supported by event type
     if (Number(eventType.attendee_volunteer_show) == 1){
