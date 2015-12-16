@@ -180,8 +180,8 @@ class AdminEventsSection extends React.Component {
       {/*
         Iconmenu does not not work inside of fixed-data-table cells because of overflow:hidden on parent divs;
         The plan is to use https://github.com/tajo/react-portal to overcome this limitation
-      */} 
-      {/*  
+      */}
+      {/*
       <IconMenu
         iconButtonElement={<FontIcon className="material-icons" hoverColor={BernieColors.blue}>more_vert</FontIcon>}
         desktop={true}
@@ -191,7 +191,7 @@ class AdminEventsSection extends React.Component {
         <MenuItem index={1} primaryText="Send feedback" leftIcon={<FontIcon className="material-icons">delete</FontIcon>} />
         <MenuItem index={2} primaryText="Settings" leftIcon={<FontIcon className="material-icons">delete</FontIcon>} />
       </IconMenu>
-      */} 
+      */}
 
     </div>
     </Cell>
@@ -357,7 +357,7 @@ class AdminEventsSection extends React.Component {
           ref="creationForm"
           src="create"
           style={{width: '100%', height: this.state.tableHeight*0.7, border: 'none'}}
-        />  
+        />
       </Dialog>
     )
   }
@@ -416,7 +416,7 @@ class AdminEventsSection extends React.Component {
             }}
         >
           <Tab label="Preview" value={'0'} >
-            <EventPreview 
+            <EventPreview
               eventsArray={events}
               eventIndex={this.state.activeEventIndex}
               onChangeEventIndex={function(n){
@@ -437,7 +437,7 @@ class AdminEventsSection extends React.Component {
             />
           </Tab>
           <Tab label="Edit" value={'1'} >
-            <EventEdit 
+            <EventEdit
               eventsArray={events}
               eventIndex={this.state.activeEventIndex}
               key={this.state.activeEventIndex}
@@ -593,7 +593,7 @@ class AdminEventsSection extends React.Component {
             header={<this.HeaderCell content="Event Name" />}
             cell={<this.TextCell data={events} col="name" />}
             width={250}
-          />          
+          />
           <Column
             flexGrow={1}
             header={<this.HeaderCell content="Description" />}
@@ -620,7 +620,7 @@ class AdminEventsSection extends React.Component {
             header={<this.HeaderCell content="Phone" />}
             cell={<this.TextCell data={events} col="contactPhone" />}
             width={150}
-          />         
+          />
         </ColumnGroup>
         <ColumnGroup
           header={<this.HeaderCell content="Time" />}>
@@ -716,7 +716,6 @@ export default Relay.createContainer(AdminEventsSection, {
               venueAddr2
               venueCountry
               venueDirections
-              localTimezone
               startDate
               duration
               capacity

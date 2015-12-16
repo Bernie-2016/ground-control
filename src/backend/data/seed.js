@@ -194,7 +194,7 @@ models.sequelize.sync({force: true}).then(async () => {
       startDate: formatDate(faker.date.future()),
       duration: faker.random.number({min:1, max:1600}),
       capacity: capacity,
-      localTimezone: faker.random.arrayElement(['US/Eastern', 'US/Pacific', 'Africa/Cairo']),
+      localTimezone: faker.random.arrayElement(['US/Central', 'US/Eastern', 'US/Pacific', 'US/Mountain']),
       attendeeVolunteerShow: faker.random.arrayElement([0, 1]),
       attendeeVolunteerMessage: faker.lorem.sentence(),
       isSearchable: -2,

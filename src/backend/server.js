@@ -117,7 +117,6 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 app.use('/graphql', graphQLHTTP((request) => {
-  console.log('request HIHI', request.user)
   return {
     rootValue: { user: request.user },
     schema: Schema
