@@ -365,6 +365,11 @@ export default class BSD {
         rsvp_reminder_hours: form['rsvp_email_reminder_hours']
     };
 
+    // Add flag_approval if it exists
+    if (form['flag_approval'] == 1){
+      params['flag_approval'] = 1;
+    }
+
     // Add params if supported by event type
     if (Number(eventType.attendee_volunteer_show) == 1){
       params['attendee_volunteer_show'] = form['attendee_volunteer_show'];

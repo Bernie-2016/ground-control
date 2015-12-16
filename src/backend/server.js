@@ -170,8 +170,17 @@ app.get('/admin/events/create', isAuthenticated, wrap(async (req, res) => {
   res.sendFile(publicPath + '/admin/events/create_event.html');
 }));
 
-app.post('/admin/events/create', isAuthenticated, wrap(async (req, res) => {
+app.get('/events/create', wrap(async (req, res) => {
+  res.sendFile(publicPath + '/admin/events/create_event_public.html');
+}));
+
+app.post('/events/create', wrap(async (req, res) => {
   let form = req.body;
+
+  // Flag event as needing approval if user is not authenticated
+  if (!req.user){
+    form['flag_approval'] = 1;
+  }
 
   // constituent object not being returned right now
   let constituent = await BSDClient.getConstituentByEmail(form.cons_email);
