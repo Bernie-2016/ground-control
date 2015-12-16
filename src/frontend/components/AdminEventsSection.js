@@ -128,7 +128,7 @@ class AdminEventsSection extends React.Component {
       lineHeight: '18px',
     }}
     >
-      {data[rowIndex]['node']['localTimezone']}
+      {new Date(data[rowIndex]['node']['startDate']).toString()}
     </Cell>
   )
 
@@ -140,7 +140,9 @@ class AdminEventsSection extends React.Component {
       lineHeight: '18px',
     }}
     >
-      {data[rowIndex]['node'][col]/60}
+      {(data[rowIndex]['node'][col]/60).toString().split('.')[0] + ' hours'}
+      <br/>
+      {data[rowIndex]['node'][col] % 60 + ' minutes'}
     </Cell>
   )
 
@@ -638,7 +640,7 @@ class AdminEventsSection extends React.Component {
             header={<this.HeaderCell content="Duration" />}
             cell={<this.DurationCell data={events} col="duration" />}
             flexGrow={1}
-            width={100}
+            width={90}
           />
         </ColumnGroup>
         <ColumnGroup
