@@ -234,12 +234,11 @@ class AdminEventsSection extends React.Component {
     ];
 
     let resultLengthOptions = [
-       { payload: 5, text: '5 Events' },
        { payload: 10, text: '10 Events' },
        { payload: 25, text: '25 Events' },
        { payload: 50, text: '50 Events' },
        { payload: 100, text: '100 Events' },
-       { payload: 500, text: '500 Events' },
+       // { payload: 500, text: '500 Events' },
     ];
 
     let resultLengthOptionsIndex = 0;
