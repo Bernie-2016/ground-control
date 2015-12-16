@@ -270,13 +270,12 @@ class AdminEventsSection extends React.Component {
     return (
       <Toolbar>
         <ToolbarGroup key={0} float="left">
-          <ToolbarTitle text="Event Admin" />
-          <DropDownMenu
+          {/*<DropDownMenu
             menuItems={filterOptions}
             selectedIndex={this.state.filterOptionsIndex}
             menuItemStyle={BernieText.menuItem}
             style={{marginRight: '0'}}
-          />
+          />*/}
           <DropDownMenu
             menuItems={resultLengthOptions}
             selectedIndex={resultLengthOptionsIndex}
@@ -349,6 +348,15 @@ class AdminEventsSection extends React.Component {
     let numEvents = this.state.indexesMarkedForDeletion.length;
     let s = (numEvents > 1) ? 's.' : '.';
     let dialogTitle = 'You are about to delete ' + numEvents + ' event' + s;
+    let textConfirm = (
+      <div>
+        <p>Type <span style={{color: BernieColors.red}}>DELETE</span> to confirm.</p>
+        <TextField hintText="DELETE" underlineFocusStyle={{borderColor: BernieColors.red}} ref="deleteConfirmationInput" />
+      </div>
+    )
+    if (numEvents < 5)
+      textConfirm = <div></div>
+
     return (
       <Dialog
         title={dialogTitle}
@@ -356,8 +364,7 @@ class AdminEventsSection extends React.Component {
         open={this.state.showDeleteEventDialog}
         onRequestClose={this._handleDeleteModalRequestClose}
       >
-        <p>Type <span style={{color: BernieColors.red}}>DELETE</span> to confirm.</p>
-        <TextField hintText="DELETE" underlineFocusStyle={{borderColor: BernieColors.red}} ref="deleteConfirmationInput" />
+      {textConfirm}
       </Dialog>
     )
   }
@@ -692,7 +699,7 @@ class AdminEventsSection extends React.Component {
             header={<this.HeaderCell content="Event Name" />}
             cell={<this.TextCell data={events} col="name" />}
             width={250}
-          />          
+          />
           <Column
             flexGrow={1}
             header={<this.HeaderCell content="Description" />}
