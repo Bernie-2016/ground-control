@@ -24,28 +24,31 @@ class Event {
 const eventTypeOptions = [
    { payload: 1, text: 'Test event 1' },
    { payload: 2, text: 'Test event 2' },
-   { payload: 3, text: 'Really Really Long Event Type That Is Long' }
+   { payload: 3, text: 'Phonebank' }
 ];
 
 export class EventEdit extends React.Component {
   constructor(props) {
     super(props);
+    this.setState = this.setState.bind(this);
+    this.state = {
+      event: new Event(this.props.eventsArray[this.props.eventIndex]['node'])
+    };
   }
 
   render() {
-    let event = new Event(this.props.eventsArray[this.props.eventIndex]['node']);
     return (
     <div>
       <CardText>
         
         <TextField
-          defaultValue={event.node.name}
+          defaultValue={this.state.event.node.name}
           floatingLabelText="Event Name"
           fullWidth={true}
         />
 
         <SelectField
-          value={event.node.eventType.name}
+          value={this.state.event.node.eventType.name}
           floatingLabelText="Event Type"
           valueMember="text"
           menuItems={eventTypeOptions}
@@ -53,7 +56,7 @@ export class EventEdit extends React.Component {
         />
 
         <TextField
-          defaultValue={event.node.description}
+          defaultValue={this.state.event.node.description}
           floatingLabelText="Event Description"
           multiLine={true}
           fullWidth={true}
@@ -62,25 +65,25 @@ export class EventEdit extends React.Component {
         <InfoHeader content='Event Date & Time' />
 
         <DatePicker
-          defaultDate={event.dateTime.startDate}
+          defaultDate={this.state.event.dateTime.startDate}
           autoOk={true}
         />
 
         <TimePicker
-          defaultTime={event.dateTime.startDate}
+          defaultTime={this.state.event.dateTime.startDate}
           format="ampm"
           autoOk={true}
         />
 
         <TextField
-          defaultValue={event.dateTime.duration.h}
+          defaultValue={this.state.event.dateTime.duration.h}
           floatingLabelText="Duration (Hours)"
           type="number"
           min="0"
         />
 
         <TextField
-          defaultValue={event.dateTime.duration.m}
+          defaultValue={this.state.event.dateTime.duration.m}
           floatingLabelText="Duration (Minutes)"
           type="number"
           min="0"
@@ -90,49 +93,49 @@ export class EventEdit extends React.Component {
         <InfoHeader content='Event Location' />
 
         <TextField
-          defaultValue={event.node.venueName}
+          defaultValue={this.state.event.node.venueName}
           floatingLabelText="Venue Name"
         />
 
         <TextField
-          defaultValue={event.node.venueAddr1}
+          defaultValue={this.state.event.node.venueAddr1}
           floatingLabelText="Address Line 1"
         />
 
         <TextField
-          defaultValue={event.node.venueAddr2}
+          defaultValue={this.state.event.node.venueAddr2}
           floatingLabelText="Address Line 2"
         />
 
         <TextField
-          defaultValue={event.node.venueZip}
+          defaultValue={this.state.event.node.venueZip}
           floatingLabelText="Zip Code"
         />
 
         <TextField
-          defaultValue={event.node.venueCity}
+          defaultValue={this.state.event.node.venueCity}
           floatingLabelText="City"
         />
 
         <TextField
-          defaultValue={event.node.venueState}
+          defaultValue={this.state.event.node.venueState}
           floatingLabelText="State"
         />
 
         <TextField
-          defaultValue={event.node.venueCountry}
+          defaultValue={this.state.event.node.venueCountry}
           floatingLabelText="Country"
         />
 
         <TextField
-          defaultValue={event.node.venueDirections}
+          defaultValue={this.state.event.node.venueDirections}
           floatingLabelText="Venue Directions"
           multiLine={true}
           fullWidth={true}
         />
 
         <TextField
-          defaultValue={event.node.capacity}
+          defaultValue={this.state.event.node.capacity}
           floatingLabelText="Venue Capacity"
           type="number"
           min="0"
@@ -142,11 +145,11 @@ export class EventEdit extends React.Component {
 
         <Checkbox
           label="Send RSVP Reminder Emails"
-          defaultChecked={event.node.rsvpUseReminderEmail}
+          defaultChecked={this.state.event.node.rsvpUseReminderEmail}
         />
 
         <TextField
-          defaultValue={event.node.rsvpReminderHours}
+          defaultValue={this.state.event.node.rsvpReminderHours}
           floatingLabelText="RSVP Reminder (Hours Before)"
           type="number"
           min="0"
@@ -154,11 +157,11 @@ export class EventEdit extends React.Component {
 
         <Checkbox
           label="Request Volunteers"
-          defaultChecked={event.node.attendeeVolunteerShow}
+          defaultChecked={this.state.event.node.attendeeVolunteerShow}
         />
 
         <TextField
-          defaultValue={event.node.attendeeVolunteerMessage}
+          defaultValue={this.state.event.node.attendeeVolunteerMessage}
           floatingLabelText="Volunteer Message"
           multiLine={true}
           fullWidth={true}
@@ -167,19 +170,19 @@ export class EventEdit extends React.Component {
         <InfoHeader content='Event Host' />
 
         <TextField
-          defaultValue={event.node.contactPhone}
+          defaultValue={this.state.event.node.contactPhone}
           floatingLabelText="Contact Phone"
           type="tel"
         />
 
         <Checkbox
           label="Make Contact Number Public"
-          defaultChecked={event.node.publicPhone}
+          defaultChecked={this.state.event.node.publicPhone}
         />
 
         <Checkbox
           label="Send Host RSVPs via Email"
-          defaultChecked={event.node.hostReceiveRsvpEmails}
+          defaultChecked={this.state.event.node.hostReceiveRsvpEmails}
         />
 
       </CardText>
