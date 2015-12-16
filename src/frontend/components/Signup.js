@@ -12,12 +12,21 @@ import {BernieTheme} from './styles/bernie-theme';
 @Styles.ThemeDecorator(Styles.ThemeManager.getMuiTheme(BernieTheme))
 export default class Signup extends React.Component {
   state = {
-    formState : 'signup',
+    formState: 'signup',
     errorMessage: null,
   }
 
   clearError() {
     this.setState({errorMessage: null})
+  }
+
+  redirectToNext() {
+    let queryDict = {};
+    location.search.substr(1).split("&").forEach((item) => {
+      queryDict[item.split("=")[0]] = item.split("=")[1]
+    })
+
+    window.location = queryDict.next || '/call';
   }
 
   formStates = {
@@ -32,12 +41,14 @@ export default class Signup extends React.Component {
           <Form.Field
             name='email'
             label='E-mail Address'
-          /><br />
+          />
+          <br />
           <Form.Field
             name='password'
             type='password'
             label='Password'
-          /><br />
+          />
+          <br />
         </div>
       ),
       onSubmit: (formState) => {
@@ -49,10 +60,11 @@ export default class Signup extends React.Component {
             password: formState.password
           })
           .end((err, res) => {
-            if (!err)
-              window.location = '/call';
-            else
+            if (!err) {
+              this.redirectToNext();
+            } else {
               this.setState({errorMessage: 'Incorrect e-mail or password'});
+            }
           })
       }
     }
@@ -139,9 +151,11 @@ export default class Signup extends React.Component {
     let formSchema = signupState.formSchema;
     let submitHandler = signupState.onSubmit;
     let errorElement = <div></div>
+
     if (this.state.errorMessage) {
       errorElement = <div style={this.styles.errorMessage}>{this.state.errorMessage}</div>
     }
+
     return (
       <Paper style={this.styles.signupForm}>
         <div style={

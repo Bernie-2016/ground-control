@@ -41,8 +41,8 @@ export default class RelayNetworkLayer extends Relay.DefaultNetworkLayer {
     if (parsedError) {
       log.debug(parsedError);
 
-      if (parsedError.status === 401) {
-        window.location = '/signup';
+      if (parsedError.status === 401 || parsedError.status === 403) {
+        window.location = `/signup?next=${window.location.pathname}`;
       } else if (parsedError.status === 404) {
         window.location = '/404';
       }
