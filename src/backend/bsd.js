@@ -305,6 +305,16 @@ export default class BSD {
     return response
   }
 
+  async deleteEvents(eventIdArray, callback) {
+    eventIdArray.forEach(async (event_id, index, array) => {
+      let response = await this.request('/event/delete_event', {event_id}, 'POST');
+      if (callback){
+        callback(response);
+      }
+    });
+    return
+  }
+
   async createEvents(cons_id, form, event_types, callback) {
     let eventType = null;
     event_types.forEach((type) => {
