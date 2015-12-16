@@ -149,7 +149,8 @@ class AdminEventsSection extends React.Component {
   ActionCell = ({rowIndex, data, col, ...props}) => (
     <Cell {...props}>
     <div style={{position: 'relative', left: '-5px'}}>
-      <IconButton
+      {/*
+        <IconButton
         title="preview"
         onTouchTap={function(){
           this._handleEventPreviewOpen(rowIndex, 0);
@@ -157,8 +158,6 @@ class AdminEventsSection extends React.Component {
       >
         <FontIcon className="material-icons" hoverColor={BernieColors.blue}>search</FontIcon>
       </IconButton>
-
-      {/*
       <IconButton
         title="view public event"
         onTouchTap={function(){
@@ -325,6 +324,11 @@ class AdminEventsSection extends React.Component {
     )
   }
 
+  _deleteEvent = () => {
+    console.log("Delete");
+    this._handleDeleteModalRequestClose();
+  }
+
   renderDeleteModal() {
     let standardActions = [
       { text: 'Cancel' },
@@ -332,7 +336,7 @@ class AdminEventsSection extends React.Component {
     ];
 
     this._handleDeleteModalRequestClose = () => {
-      if (this.state.activeEventIndex){
+      if (this.state.activeEventIndex) {
         this.setState({
           showDeleteEventDialog: false,
           showEventPreview: true
