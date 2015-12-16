@@ -44,7 +44,7 @@ window.onerror = (msg, file, line, col, error) => {
   StackTrace
   .fromError(error)
   .then((stack) => {
-    log.error('Uncaught exception!', stack);
+    log.error('Uncaught exception!', error.message, stack);
     setTimeout(() => {
         alert('Whoops! Something went wrong. We\'re looking into it, but in the meantime please refresh your browser.');
         document.location.reload(true);
