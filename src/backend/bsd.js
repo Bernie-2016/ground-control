@@ -44,6 +44,17 @@ export default class BSD {
       return null
   }
 
+  createGroupObject(group) {
+    let groupObj = {};
+    groupObj['id'] = group['$']['id'];
+    groupObj['modified_dt'] = group['$']['modified_dt'];
+
+    Object.keys(group).forEach((key) => {
+      groupObj[key] = this.cleanField(group[key]);
+    })
+    return groupObj;
+  }
+
   createSurveyObject(survey) {
     let surveyObj = {}
     Object.keys(survey).forEach((key) => {
@@ -142,7 +153,13 @@ export default class BSD {
   async getConstituentGroup(groupId) {
     let response = await this.request('cons_group/get_constituent_group', {cons_group_id: groupId}, 'GET');
     response = await parseStringPromise(response);
-    return response;
+    let group = response.api.cons_group;
+    if (!group)
+      return null;
+    if (group.length && group.length > 0)
+      group = group[0];
+
+    return this.createGroupObject(group);
   }
 
   async getForm(formId) {

@@ -284,7 +284,7 @@ export class CallAssignment extends React.Component {
             </div>
             {survey}
             <div style={this.styles.submitButton}>
-              <Form.Button type='submit' label='Submit and on to the person!' fullWidth={true} style={this.styles.submitButton}/>
+              <Form.Button type='submit' label='Submit and on to the next person!' fullWidth={true} style={this.styles.submitButton}/>
             </div>
           </GCForm>
         </div>

@@ -4,6 +4,11 @@ import Sequelize from 'sequelize';
 import configOpts from '../config/config';
 import log from '../../log'
 
+require('pg').types.setTypeParser(1114, function(stringValue) {
+  return new Date(stringValue + "+00:00");
+  // e.g., UTC offset. Use any offset that you would like.
+});
+
 let basename  = path.basename(module.filename);
 let env       = process.env.NODE_ENV || 'development';
 let db        = {};

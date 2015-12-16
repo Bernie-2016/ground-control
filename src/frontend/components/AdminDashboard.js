@@ -10,13 +10,13 @@ class AdminDashboard extends React.Component {
   tabs = [
     {
       value: '/admin/call-assignments',
-      label: 'Call Assignments',
+      label: 'Call Assignments'
     },
     {
       value: '/admin/events',
-      label: 'Events',
+      label: 'Events'
     }
-  ]
+  ];
 
   render() {
     return (
