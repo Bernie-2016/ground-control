@@ -43,6 +43,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
           }}
         />
       )
+    console.log(marker.startDate, moment(marker.startDate).format('h:mm a'));
     return (
       <Paper zDepth={0} style={{
         marginTop: 10,
@@ -54,7 +55,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
           color: BernieColors.gray,
           fontSize: '1.0em'
         }}>
-          {moment(marker.startDate).format('h:mm A  MMM D')}
+          {moment(marker.startDate).utcOffset(marker.localUTCOffset).format('h:mm A  MMM D')}
         </div>
         <div style={{
           ...BernieText.default,
@@ -109,6 +110,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
           lat: event.latitude,
           lng: event.longitude
         },
+        localUTCOffset: event.localUTCOffset,
         key: event.id,
         title: event.name,
         name: event.name,
@@ -193,6 +195,8 @@ export default Relay.createContainer(BSDPhonebankRSVPSurvey, {
           eventIdObfuscated
           name
           startDate
+          localTimezone
+          localUTCOffset
           venueName
           venueAddr1
           venueAddr2
