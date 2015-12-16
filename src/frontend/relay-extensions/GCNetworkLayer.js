@@ -1,6 +1,6 @@
 import Relay from 'react-relay'
 
-export default class NetworkLayer extends Relay.DefaultNetworkLayer {
+export default class GCNetworkLayer extends Relay.DefaultNetworkLayer {
 
   handleStructuredError(error) {
     let parsedError = null;

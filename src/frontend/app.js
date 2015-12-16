@@ -27,7 +27,7 @@ import NotFound from './components/NotFound'
 import Unauthorized from './components/Unauthorized'
 import Form from 'react-formal';
 import {createHistory} from 'history';
-import NetworkLayer from './relay-helpers/NetworkLayer'
+import GCNetworkLayer from './relay-extensions/GCNetworkLayer'
 import StackTrace from 'stacktrace-js';
 
 // Necessary to make minilog work
@@ -56,7 +56,7 @@ window.onerror = (msg, file, line, col, error) => {
 };
 
 injectTapEventPlugin();
-Relay.injectNetworkLayer(new NetworkLayer('/graphql'));
+Relay.injectNetworkLayer(new GCNetworkLayer('/graphql'));
 
 Form.addInputTypes({
   string: GCTextField,
