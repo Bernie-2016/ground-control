@@ -13,7 +13,7 @@ export default class MutationHandler extends React.Component {
       successMessage: React.PropTypes.string
     }
 
-    props = {
+    static defaultProps = {
       defaultErrorMessage: 'Something went wrong! Try again in a little bit.',
       successMessage: null
     }
@@ -78,7 +78,6 @@ export default class MutationHandler extends React.Component {
     }
 
     render() {
-
       let globalSnack = <div></div>;
       if (this.state.errorMessage) {
         globalSnack = <Snackbar
