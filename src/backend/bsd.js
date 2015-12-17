@@ -305,14 +305,12 @@ export default class BSD {
     return response
   }
 
-  async deleteEvents(eventIdArray, callback) {
-    eventIdArray.forEach(async (event_id, index, array) => {
-      let response = await this.request('/event/delete_event', {event_id}, 'POST');
-      if (callback){
-        callback(response);
-      }
+  async deleteEvents(eventIdArray) {
+    let promises = eventIdArray.map((event_id) => {
+      return this.request('/event/delete_event', {event_id}, 'POST');
     });
-    return
+    let responses = await Promise.all(promises);
+    return responses;
   }
 
   async updateEvent(event_id, event_type_id, creator_cons_id, updatedValues) {
@@ -405,6 +403,7 @@ export default class BSD {
       resolveWithFullResponse: true,
       json: true
     }
+    console.log(finalURL);
     return requestPromise(options)
   }
 

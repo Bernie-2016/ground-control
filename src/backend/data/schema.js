@@ -47,6 +47,7 @@ import Promise from 'bluebird';
 import Maestro from '../maestro';
 import url from 'url';
 import TZLookup from 'tz-lookup';
+import BSDClient from '../bsd-instance';
 const EVERYONE_GROUP = 'everyone';
 
 class GraphQLError extends Error {
@@ -607,8 +608,9 @@ const GraphQLDeleteEvents = mutationWithClientMutationId({
   },
   mutateAndGetPayload: async ({eventIds}, {rootValue}) => {
     adminRequired(rootValue);
-    let localIds = eventIds.map((id) => fromGlobalId(id))
-    console.log('here');
+    let localIds = eventIds.map((id) => fromGlobalId(id).id)
+    await BSDClient.deleteEvents(localIds);
+    return eventIds
   }
 })
 
@@ -786,6 +788,7 @@ let RootMutation = new GraphQLObjectType({
   fields: () => ({
     submitCallSurvey: GraphQLSubmitCallSurvey,
     createCallAssignment: GraphQLCreateCallAssignment,
+    deleteEvents: GraphQLDeleteEvents,
   })
 });
 

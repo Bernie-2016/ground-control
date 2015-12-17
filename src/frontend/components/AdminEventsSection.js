@@ -8,6 +8,8 @@ import {BernieText, BernieColors} from './styles/bernie-css';
 
 import IconMenu from 'material-ui/lib/menus/icon-menu';
 import MenuItem from 'material-ui/lib/menus/menu-item';
+import MutationHandler from './MutationHandler';
+import DeleteEvents from '../mutations/DeleteEvents';
 
 let adminInterface = null;
 let events = [];
@@ -266,7 +268,7 @@ class AdminEventsSection extends React.Component {
       });
     }
 
-    return (
+  return (
       <Toolbar>
         <ToolbarGroup key={0} float="left">
           {/*<DropDownMenu
@@ -325,7 +327,14 @@ class AdminEventsSection extends React.Component {
   }
 
   _deleteEvent = () => {
-    console.log("Delete");
+    let eventsToDelete = this.state.indexesMarkedForDeletion.map((index) => {
+      return events[index].node.id
+    })
+
+    this.refs.eventDeletionHandler.send({
+      listContainer: this.props.listContainer,
+      eventIDs: eventsToDelete
+    })
     this._handleDeleteModalRequestClose();
   }
 
@@ -577,6 +586,7 @@ class AdminEventsSection extends React.Component {
 
     return (
     <div>
+      <MutationHandler ref='eventDeletionHandler' successMessage='Event deleted!' mutationClass={DeleteEvents} />
       {this.renderDeleteModal()}
       {this.renderCreateModal()}
       {this.renderEventPreviewModal(events)}

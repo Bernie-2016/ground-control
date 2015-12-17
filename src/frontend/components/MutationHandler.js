@@ -6,7 +6,7 @@ import {BernieColors} from './styles/bernie-css';
 export default class MutationHandler extends React.Component {
 
     static propTypes = {
-      mutationClass: React.PropTypes.object,
+      mutationClass: React.PropTypes.func,
       onSuccess: React.PropTypes.func,
       onFailure: React.PropTypes.func,
       defaultErrorMessage: React.PropTypes.string,
