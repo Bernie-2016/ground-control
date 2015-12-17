@@ -63,7 +63,7 @@
     "react-tap-event-plugin": "^0.2.1",
     "request-promise": "^1.0.1",
     "retry": "^0.8.0",
-    "sequelize": "^3.14.1",
+    "sequelize": "^3.15.0",
     "sequelize-cli": "^2.2.1",
     "stacktrace-js": "^1.0.1",
     "superagent": "^1.4.0",
