@@ -610,7 +610,10 @@ const GraphQLDeleteEvents = mutationWithClientMutationId({
     adminRequired(rootValue);
     let localIds = eventIds.map((id) => fromGlobalId(id).id)
     await BSDClient.deleteEvents(localIds);
-    return eventIds
+    await BSDEvent.destroy({
+      where: { id: localIds }
+    })
+    return localIds
   }
 })
 

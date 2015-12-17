@@ -11,8 +11,6 @@ import MenuItem from 'material-ui/lib/menus/menu-item';
 import MutationHandler from './MutationHandler';
 import DeleteEvents from '../mutations/DeleteEvents';
 
-let adminInterface = null;
-let events = [];
 const keyboardActionStyles = {
   text: {fontSize: '0.9em', top: '-7px', color: BernieColors.gray, cursor: 'default'},
   icon: {cursor: 'default'}
@@ -30,28 +28,22 @@ const KeyboardActionsInfo = () => (
 );
 
 class AdminEventsSection extends React.Component {
-  constructor(props) {
-    super(props);
-    this.setState = this.setState.bind(this);
-    this.state = {
-      showDeleteEventDialog: false,
-      showEventPreview: false,
-      showCreateEventDialog: false,
-      filterOptionsIndex: 0,
-      tableWidth: window.innerWidth,
-      tableHeight: window.innerHeight - 112,
-      selectedRows: [],
-      indexesMarkedForDeletion: [],
-      activeEventIndex: null,
-      previewTabIndex: 0,
-      userMessage: '',
-      undoAction: function(){console.log('undo')}
-    };
-    this._handleResize = this._handleResize.bind(this);
-    window.addEventListener('resize', this._handleResize);
+  state = {
+    showDeleteEventDialog: false,
+    showEventPreview: false,
+    showCreateEventDialog: false,
+    filterOptionsIndex: 0,
+    tableWidth: window.innerWidth,
+    tableHeight: window.innerHeight - 112,
+    selectedRows: [],
+    indexesMarkedForDeletion: [],
+    activeEventIndex: null,
+    previewTabIndex: 0,
+    userMessage: '',
+    undoAction: function(){console.log('undo')}
   }
 
-  _handleResize(e) {
+  _handleResize = (e) => {
     this.setState({
       tableWidth: window.innerWidth,
       tableHeight: window.innerHeight - 112
@@ -327,6 +319,7 @@ class AdminEventsSection extends React.Component {
   }
 
   _deleteEvent = () => {
+    let events = this.props.listContainer.events.edges;
     let eventsToDelete = this.state.indexesMarkedForDeletion.map((index) => {
       return events[index].node.id
     })
@@ -496,41 +489,43 @@ class AdminEventsSection extends React.Component {
     )
   }
 
-  _handleRequestRefresh() {
-    adminInterface.forceUpdate()
+  _handleRequestRefresh = () => {
+    this.forceUpdate()
   }
 
-  _handleEventPreviewOpen(eventIndex, tabIndex) {
+  _handleEventPreviewOpen = (eventIndex, tabIndex) => {
     tabIndex = tabIndex ? tabIndex : 0;
-    adminInterface.setState({
+    this.setState({
       showEventPreview: true,
       activeEventIndex: eventIndex,
       previewTabIndex: tabIndex
     });
   }
 
-  _handlePublicEventOpen(eventIndex) {
+  _handlePublicEventOpen = (eventIndex) => {
+    let events = this.props.listContainer.events.edges;
     window.open('https://secure.berniesanders.com/page/event/detail/' + events[eventIndex]['node']['eventIdObfuscated']);
   }
 
-  _iterateActiveEvent(n) {
+  _iterateActiveEvent = (n) => {
     // Do not iterate if there are no more events available before/after current event
-    if (adminInterface.state.activeEventIndex === null || adminInterface.state.activeEventIndex + n < 0 || adminInterface.state.activeEventIndex + n == events.length){
+    let events = this.props.listContainer.events.edges;
+    if (this.state.activeEventIndex === null || this.state.activeEventIndex + n < 0 || this.state.activeEventIndex + n == events.length){
       return
     }
-    adminInterface.setState({
+    this.setState({
       activeEventIndex: this.state.activeEventIndex + n
     });
   }
 
-  _handleEventCreation() {
-    adminInterface.setState({
+  _handleEventCreation = () => {
+    this.setState({
       showCreateEventDialog: true
     });
   }
 
-  _handleEventDeletion(eventIndexes) {
-    adminInterface.setState({
+  _handleEventDeletion = (eventIndexes) => {
+    this.setState({
       showEventPreview: false,
       showDeleteEventDialog: true,
       indexesMarkedForDeletion: eventIndexes
@@ -539,18 +534,17 @@ class AdminEventsSection extends React.Component {
     // ReactDOM.findDOMNode(adminInterface.refs.deleteConfirmationInput).focus();
   }
 
-  _handleEventConfirmation(eventIndexes) {
-    console.log(eventIndexes.length + ' approved');
-    adminInterface._iterateActiveEvent(1);
+  _handleEventConfirmation = (eventIndexes) => {
+    this._iterateActiveEvent(1);
   }
 
-  _handleEventEdit(event) {
+  _handleEventEdit = (event) => {
     console.log(event);
     // adminInterface._iterateActiveEvent(1);
   }
 
-  _handleEventSelect(eventIndex) {
-    let currentSelectedRows = adminInterface.state.selectedRows;
+  _handleEventSelect = (eventIndex) => {
+    let currentSelectedRows = this.state.selectedRows;
     let i = currentSelectedRows.indexOf(eventIndex);
     if ( i > -1){
       currentSelectedRows.splice(i, 1);
@@ -558,31 +552,31 @@ class AdminEventsSection extends React.Component {
     else {
       currentSelectedRows.push(eventIndex);
     }
-    adminInterface.setState({
+    this.setState({
       selectedRows: currentSelectedRows
     });
   }
 
-  _handleRowClick(clickEvent, targetRowIndex) {
-    adminInterface._handleEventPreviewOpen(targetRowIndex, 1);
+  _handleRowClick = (clickEvent, targetRowIndex) => {
+    this._handleEventPreviewOpen(targetRowIndex, 1);
   }
 
-  _masterCheckBoxChecked(checkEvent, checked) {
+  _masterCheckBoxChecked = (checkEvent, checked) => {
     let currentSelectedRows = [];
+    let events = this.props.listContainer.events.edges;
 
     if (checked){
       for (let i=0; i<events.length; i++){
         currentSelectedRows.push(i);
       }
     }
-    adminInterface.setState({
+    this.setState({
       selectedRows: currentSelectedRows
     });
   }
 
   render() {
-    adminInterface = this;
-    events = this.props.listContainer.events.edges;
+    let events = this.props.listContainer.events.edges;
 
     return (
     <div>
@@ -736,6 +730,7 @@ export default Relay.createContainer(AdminEventsSection, {
   fragments: {
     listContainer: () => Relay.QL`
       fragment on ListContainer {
+        ${DeleteEvents.getFragment('listContainer')}
         events(first: $numEvents) {
           edges {
             cursor
