@@ -1,7 +1,8 @@
 import React from 'react';
 import Relay from 'react-relay';
 import {BernieText, BernieColors} from './styles/bernie-css';
-import {Paper, List, ListItem, FlatButton, RaisedButton} from 'material-ui';
+import {Paper, List, ListItem, FlatButton} from 'material-ui';
+import PlivoDialer from './PlivoDialer'
 import SideBarLayout from './SideBarLayout';
 import SurveyRenderer from './SurveyRenderer';
 import moment from 'moment';
@@ -56,9 +57,7 @@ export class CallAssignment extends React.Component {
     reasonNotCompleted: null,
     sentText: null,
     leftVoicemail: null,
-    globalErrorMessage: null,
-    plivoStatusText: null,
-    plivoCallInProgress: false,
+    globalErrorMessage: null
   }
 
   notCompletedReasons =
@@ -117,31 +116,6 @@ export class CallAssignment extends React.Component {
         )
     })
 
-  plivoSetup() {
-    Plivo.onWebrtcNotSupported = () => {
-      this.setState({plivoStatusText: 'Calling from this browser is not supported.'})
-    }
-    Plivo.onReady = () => { this.setState({plivoStatusText: 'Ready to call.'}) }
-    Plivo.onLogin = () => { this.setState({plivoStatusText: 'Ready to call.'}) }
-    Plivo.onLoginFailed = () => {
-      this.setState({plivoStatusText: 'Dialing unavailable right now. Ask the tech team for help.'})
-    }
-    Plivo.onCalling = () => { this.setState({plivoStatusText: 'Calling...'}) }
-    Plivo.onCallRemoteRinging = () => { this.setState({plivoStatusText: 'Ringing...'}) }
-    Plivo.onCallAnswered = () => {
-      this.setState({plivoStatusText: 'Call answered and in progress...'})
-      this.setState({plivoCallInProgress: true})
-    }
-    Plivo.onCallFailed = () => { this.setState({plivoStatusText: 'Call failed.'})}
-    Plivo.onCallEnded = () => {
-
-    }
-    Plivo.onMediaPermission = () => { alert('To make calls you must give your browser permission to use the microphone.') }
-
-    Plivo.init();
-    Plivo.conn.login('bernie151217012337', 'forthewin');
-  }
-
   intervieweeName() {
     let interviewee = this.props.currentUser.intervieweeForCallAssignment;
     let name = ''
@@ -156,20 +130,6 @@ export class CallAssignment extends React.Component {
 
   formatPhoneNumber(number) {
     return '(' + number.slice(0, 3) + ') ' + number.slice(3, 6) + '-' + number.slice(6)
-  }
-
-  callPhone(number) {
-    this.setState({plivoStatusText: 'calling '})
-    // Plivo.conn.call(number)
-    Plivo.conn.call('browsercheck150514110205');
-  }
-
-  hangupPhone() {
-    Plivo.conn.hangup()
-    this.setState({
-      plivoStatusText: 'Call ended. Ready to call.',
-      plivoCallInProgress: false
-    })
   }
 
   renderIntervieweeInfo() {
@@ -194,12 +154,11 @@ export class CallAssignment extends React.Component {
                      textDecoration: 'none'}}>
             {formattedNumber}
           </a>
+          <PlivoDialer number={`1${interviewee.phone}`}
+            endpointUsername='bernie151217012337'
+            endpointPassword='forthewin'
+          />
         </div>
-        <RaisedButton label="Call" primary={true} onTouchTap={this.callPhone.bind(this, '12028413640')} />
-      <RaisedButton label="Hang up"
-        onTouchTap={this.hangupPhone.bind(this)}
-        style={plivoCallInProgress ? {visibility: null} : {visibility: 'hidden'}} />
-        <div id="plivo-status">{plivoStatusText}</div>
       </div>
     )
 
@@ -258,10 +217,6 @@ export class CallAssignment extends React.Component {
       this.refs.survey.refs.component.submit()
     else
       this.submitCallSurvey({});
-  }
-
-  componentDidMount() {
-    this.plivoSetup();
   }
 
   render() {
