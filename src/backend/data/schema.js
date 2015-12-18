@@ -598,7 +598,29 @@ const GraphQLSurvey = new GraphQLObjectType({
 const GraphQLDeleteEvents = mutationWithClientMutationId({
   name: 'DeleteEvents',
   inputFields: {
-    eventIds: { type: new GraphQLNonNull(new GraphQLList(GraphQLString)) }
+    ids: { type: new GraphQLNonNull(new GraphQLList(GraphQLString)) }
+  },
+  outputFields: {
+    listContainer: {
+      type: GraphQLListContainer,
+      resolve: () => SharedListContainer
+    }
+  },
+  mutateAndGetPayload: async ({ids}, {rootValue}) => {
+    adminRequired(rootValue);
+    let localIds = ids.map((id) => fromGlobalId(id).id)
+    await BSDClient.deleteEvents(localIds);
+    await BSDEvent.destroy({
+      where: { id: localIds }
+    })
+    return localIds
+  }
+})
+
+const GraphQLEditEvents = mutationWithClientMutationId({
+  name: 'DeleteEvents',
+  inputFields: {
+    events: { type: new GraphQLNonNull(new GraphQLList(GraphQLString)) }
   },
   outputFields: {
     listContainer: {
@@ -616,6 +638,7 @@ const GraphQLDeleteEvents = mutationWithClientMutationId({
     return localIds
   }
 })
+
 
 const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
   name: 'SubmitCallSurvey',

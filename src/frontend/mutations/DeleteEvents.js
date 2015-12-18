@@ -37,7 +37,7 @@ export default class DeleteEvents extends Relay.Mutation {
 
   getVariables() {
     return {
-      eventIds: this.props.eventIDs
+      ids: this.props.eventIDs
     }
   }
 }
