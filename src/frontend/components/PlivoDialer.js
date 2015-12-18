@@ -1,5 +1,5 @@
 import React from 'react';
-import {FontIcon, RaisedButton} from 'material-ui';
+import {FloatingActionButton, FontIcon} from 'material-ui';
 
 export default class PlivoDialer extends React.Component {
   static propTypes = {
@@ -9,31 +9,50 @@ export default class PlivoDialer extends React.Component {
   }
 
   state = {
-    plivoStatusText: null,
-    plivoCallInProgress: false
+    displayed: true,
+    plivoCallInProgress: false,
+    plivoStatusText: null
   }
 
   registerCallbacks() {
     Plivo.onWebrtcNotSupported = () => {
-      this.setState({plivoStatusText: 'Calling from this browser is not supported.'})
+      this.setState({visible: false})
     }
-    Plivo.onReady = () => { this.setState({plivoStatusText: 'Ready to call.'}) }
-    Plivo.onLogin = () => { this.setState({plivoStatusText: 'Ready to call.'}) }
+    Plivo.onReady = () => {
+      console.log('PlivoJS is ready to be used')
+    }
+    Plivo.onMediaPermission = () => {
+      console.log('PlivoJS user media access permissions granted')
+    }
+    Plivo.onLogin = () => {
+      this.setState({plivoStatusText: 'Ready to call.'})
+    }
     Plivo.onLoginFailed = () => {
-      this.setState({plivoStatusText: 'Dialing unavailable right now. Ask the tech team for help.'})
+      this.setState({plivoStatusText: 'Calling unavailable right now. Ask the tech team for help.'})
     }
-    Plivo.onCalling = () => { this.setState({plivoStatusText: 'Calling...'}) }
-    Plivo.onCallRemoteRinging = () => { this.setState({plivoStatusText: 'Ringing...'}) }
+    Plivo.onCalling = () => {
+      this.setState({plivoCallInProgress: true})
+      this.setState({plivoStatusText: 'Calling...'})
+    }
+    Plivo.onCallRemoteRinging = () => {
+      this.setState({plivoStatusText: 'Ringing...'})
+    }
     Plivo.onCallAnswered = () => {
       this.setState({plivoStatusText: 'Call answered and in progress...'})
-      this.setState({plivoCallInProgress: true})
     }
-    Plivo.onCallFailed = () => { this.setState({plivoStatusText: 'Call failed.'})}
+    Plivo.onCallTerminated = () => {
+      this.setState({plivoCallInProgress: false})
+      this.setState({plivoStatusText: 'Call ended. Ready to call.'})
+    }
+    Plivo.onCallFailed = (cause) => {
+      this.setState({plivoCallInProgress: false})
+      this.setState({plivoStatusText: `Call failed: ${cause}`})
+    }
   }
 
   readyConnection() {
-    Plivo.init()
-    Plivo.conn.login(this.props.endpointUsername, this.props.endpointPassword)
+    Plivo.init({debug: true});
+    Plivo.conn.login(this.props.endpointUsername, this.props.endpointPassword);
   }
 
   componentDidMount() {
@@ -42,31 +61,14 @@ export default class PlivoDialer extends React.Component {
   }
 
   callPhone(number) {
-    this.setState({plivoStatusText: 'calling '})
-    // Plivo.conn.call(number)
-    Plivo.conn.call('browsercheck150514110205')
+    Plivo.conn.call(number)
   }
 
   hangupPhone() {
     Plivo.conn.hangup()
-    this.setState({
-      plivoStatusText: 'Call ended. Ready to call.',
-      plivoCallInProgress: false
-    })
   }
 
   styles = {
-    buttonIcon: {
-      color: 'white',
-      height: '100%',
-      lineHeight: '36px',
-      padding: '0 0 4px 8px',
-      verticalAlign: 'middle'
-    },
-    buttonLabel: {
-      fontSize: '16px',
-      verticalAlign: 'middle'
-    },
     statusText: {
       color: 'rgb(54, 67, 80)',
       fontSize: '1rem',
@@ -77,24 +79,26 @@ export default class PlivoDialer extends React.Component {
   render() {
     let plivoCallInProgress = this.state.plivoCallInProgress;
     let plivoStatusText = this.state.plivoStatusText;
+    let displayed = this.state.displayed;
 
     return (
-      <div>
-        <RaisedButton label="Call" labelPosition="after" primary={true}
+      <div style={displayed ? null : {display: 'none'}}>
+        <FloatingActionButton
           onTouchTap={this.callPhone.bind(this, this.props.number)}
-          labelStyle={this.styles.buttonLabel}>
-          <FontIcon className="material-icons" style={this.styles.buttonIcon}>
+          style={plivoCallInProgress ? {display: 'none'} : null}
+        >
+          <FontIcon className="material-icons">
             call
           </FontIcon>
-        </RaisedButton>
-        <RaisedButton label="Hang up" labelPosition="after" secondary={true}
+        </FloatingActionButton>
+        <FloatingActionButton secondary={true}
           onTouchTap={this.hangupPhone.bind(this)}
-          style={plivoCallInProgress ? {visibility: null} : {visibility: 'hidden'}}
-          labelStyle={this.styles.buttonLabel}>
-          <FontIcon className="material-icons" style={this.styles.buttonIcon}>
+          style={plivoCallInProgress ? null : {display: 'none'}}
+        >
+          <FontIcon className="material-icons">
             call_end
           </FontIcon>
-        </RaisedButton>
+        </FloatingActionButton>
         <div style={this.styles.statusText}>{plivoStatusText}</div>
       </div>
     )
