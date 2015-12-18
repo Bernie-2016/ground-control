@@ -14,6 +14,7 @@
     "seed": "./run ./src/backend/data/seed.js",
     "seed-zips": "./run ./src/backend/data/seed-zips.js",
     "sequelize": "cd ./src/backend/data && sequelize",
+    "knex": "knex",
     "sync": "./run ./src/backend/data/sync.js"
   },
   "dependencies": {

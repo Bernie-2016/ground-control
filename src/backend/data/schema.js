@@ -38,7 +38,6 @@ import {
   GCBSDGroup,
   GCBSDSurvey,
   ZipCode,
-  User,
   sequelize
 } from './models';
 
@@ -48,7 +47,26 @@ import Maestro from '../maestro';
 import url from 'url';
 import TZLookup from 'tz-lookup';
 import BSDClient from '../bsd-instance';
+import knexFactory from 'knex';
+import DataLoader from 'dataloader';
+
 const EVERYONE_GROUP = 'everyone';
+const knex = knexFactory({
+  client: 'pg',
+  connection: process.env.DATABASE_URL
+})
+
+let addTypeToData = (objects, type) => {
+  return objects.map((obj) => {
+    obj._type = type;
+    return obj;
+  })
+}
+
+let userLoader = new DataLoader(async (keys) => {
+  let users = await knex('users').whereIn('id', keys)
+  return addTypeToData(users, 'users');
+})
 
 class GraphQLError extends Error {
   constructor(errorObject) {
@@ -102,7 +120,7 @@ let {nodeInterface, nodeField} = nodeDefinitions(
     if (type === 'Event')
       return BSDEvent.findById(id);
     if (type === 'User')
-      return User.findById(id);
+      return userLoader.load(id);
     if (type === 'Address')
       return BSDAddress.findById(id);
     if (type === 'ListContainer')
@@ -126,7 +144,7 @@ let {nodeInterface, nodeField} = nodeDefinitions(
       return GraphQLEvent;
     if (obj instanceof BSDAddress)
       return GraphQLAddress;
-    if (obj instanceof User)
+    if (obj._type == 'users')
       return GraphQLUser;
     return null;
   }
@@ -831,9 +849,9 @@ let RootQuery = new GraphQLObjectType({
     },
     currentUser: {
       type: GraphQLUser,
-      resolve: (parent, _, {rootValue}) => {
+      resolve: async (parent, _, {rootValue}) => {
         authRequired(rootValue)
-        return rootValue.user
+        rootValue.user;
       }
     },
     callAssignment: {
