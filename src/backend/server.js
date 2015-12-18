@@ -44,7 +44,6 @@ function isAuthenticated(req, res, next) {
   if (req.user)
     return next();
 
-  req.session.redirectTo = req.path;
   res.redirect('/signup');
 }
 
@@ -154,15 +153,14 @@ app.post('/log', wrap(async (req, res) => {
 app.post('/signup',
   passport.authenticate('signup'),
   wrap(async (req, res) => {
-    res.redirect(req.session.redirectTo || '/');
-    delete req.session.redirectTo;
+    res.send('Successfully signed in');
   })
 );
 
 app.post('/logout',
   wrap(async (req, res) => {
-    req.logout();
-    res.redirect('/');
+    req.logout()
+    res.send('Successfully logged out')
   })
 );
 
@@ -217,6 +215,3 @@ app.use(fallback('index.html', { root: publicPath }));
 app.listen(port, () => log.info(
 `Server is now running on http://localhost:${port}`
 ));
-
-
-

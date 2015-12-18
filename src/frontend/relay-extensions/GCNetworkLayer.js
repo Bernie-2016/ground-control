@@ -12,11 +12,10 @@ export default class GCNetworkLayer extends Relay.DefaultNetworkLayer {
     if (parsedError) {
       log.debug(parsedError);
 
-      if (parsedError.status === 401) {
-        window.location = '/signup';
-      }
-      else if (parsedError.status === 403) {
-        window.location = '/unauthorized';
+      if (parsedError.status === 401 || parsedError.status === 403) {
+        window.location = `/signup?next=${window.location.pathname}`;
+      } else if (parsedError.status === 404) {
+        window.location = '/404';
       }
     }
   }
