@@ -197,7 +197,7 @@ models.sequelize.sync({force: true}).then(async () => {
       localTimezone: faker.random.arrayElement(['US/Central', 'US/Eastern', 'US/Pacific', 'US/Mountain']),
       attendeeVolunteerShow: faker.random.arrayElement([0, 1]),
       attendeeVolunteerMessage: faker.lorem.sentence(),
-      isSearchable: -2,
+      isSearchable: faker.random.arrayElement([ -2, 0, 1 ]),
       publicPhone: faker.random.boolean(),
       contactPhone: randomPhoneNumber(),
       hostReceiveRsvpEmails: 1,

@@ -53,14 +53,70 @@ export class EventEdit extends React.Component {
     const customerSchema = yup.object({
       name: yup.string().default(event.node.name)
         .required('An event name is required'),
+
+      eventTypeId: yup.number().default(event.node.eventType.id)
+        .required('Please select an event type'),
+
+      description: yup.string().default(event.node.description)
+        .required('An event description is required'),
+
+      rsvpReminderHours: yup.number()
+        .default(event.node.rsvpReminderHours)
+        .min(0),
   
-      event_date: yup.date()
+      eventDate: yup.date()
         .max(new Date(), "Are you a time traveler?!")
         .required('Please select a date'),
   
-      event_type_id: yup.number()
-        .nullable()
-        .required('Please select an event type')
+      duration: yup.object({
+        h: yup.number()
+          .default(event.dateTime.duration.h)
+          .min(0)
+          .nullable()
+          .required('Please enter a number of hours'),
+
+        m: yup.number()
+          .default(event.dateTime.duration.m)
+          .min(0).max(59)
+          .nullable()
+          .required('Please enter a number of minutes'),
+      }),
+
+      venue: yup.object({
+        name: yup.string().default(event.node.venueName)
+          .required('please enter a venue name'),
+
+        addr1: yup.string().default(event.node.venueAddr1)
+          .required('please enter an event address'),
+
+        addr2: yup.string().default(event.node.venueAddr2)
+          .nullable(),
+
+        city: yup.string().default(event.node.venueCity)
+          .required('please enter a city'),
+
+        state: yup.string().default(event.node.venueState)
+          .required('please enter a state'),
+
+        zip: yup.string().default(event.node.venueZip)
+          .required('please enter a zip code'),
+
+        country: yup.string().default(event.node.venueCountry)
+          .required('please enter a country'),
+
+        directions: yup.string().default(event.node.venueDirections)
+          .nullable(),
+
+        capacity: yup.number()
+          .default(event.node.capacity)
+          .min(0)
+          .required('please enter an event capacity'),
+      }),
+
+      contactPhone: yup.string().default(event.node.contactPhone)
+        .required('A contact phone number is required'),
+
+
     });
     
     const form = (
@@ -77,40 +133,149 @@ export class EventEdit extends React.Component {
         /><br />
 
         <Form.Field
-          name='event_type_id'
-          type='select'
-          choices={eventTypeOpts}
+          name='eventTypeId'
           label='Event Type'
         />
 
+        <Form.Field
+          name='description'
+          floatingLabelText='Event Description'
+          multiLine={true}
+          fullWidth={true}
+        /><br/><br/>
+
+        <Checkbox
+          label="Make Event Public"
+          defaultChecked={(event.node.isSearchable == 1)}
+        />
+
+        <Form.Field
+          name='rsvpReminderHours'
+          floatingLabelText="RSVP Reminder Hours"
+          type='number'
+          min="0"
+        />
+
+        <InfoHeader content='Event Date & Time' />
+
         <DatePicker
-          name='event_date'
+          name='eventDate'
           defaultDate={event.dateTime.startDate.toDate()}
           autoOk={true}
         />
 
         <TimePicker
-          name='start_time'
+          name='startTime'
           defaultTime={event.dateTime.startDate.toDate()}
           format="ampm"
           autoOk={true}
         />
 
-        <TextField
-          name='duration'
-          defaultValue={this.state.event.dateTime.duration.h}
+        <Form.Field
+          name='duration.h'
           floatingLabelText="Duration (Hours)"
-          type="number"
+          type='number'
           min="0"
         />
 
-        <TextField
-          defaultValue={this.state.event.dateTime.duration.m}
+        <Form.Field
+          name='duration.m'
           floatingLabelText="Duration (Minutes)"
-          type="number"
+          type='number'
           min="0"
           max="59"
         />
+
+        <InfoHeader content='Event Location' />
+
+        <Form.Field
+          name='venue.name'
+          floatingLabelText='Venue Name'
+        />
+
+        <Form.Field
+          name='venue.capacity'
+          floatingLabelText="Venue Capacity (enter 0 for unlimited)"
+          type='number'
+          min="0"
+        /><br/>
+
+        <Form.Field
+          name='venue.addr1'
+          floatingLabelText='Address Line 1'
+          fullWidth={true}
+        />
+
+        <Form.Field
+          name='venue.addr2'
+          floatingLabelText='Address Line 2'
+          fullWidth={true}
+        />
+
+        <Form.Field
+          name='venue.city'
+          floatingLabelText='City'
+        />
+
+        <Form.Field
+          name='venue.state'
+          floatingLabelText='State'
+        />
+
+        <Form.Field
+          name='venue.zip'
+          floatingLabelText='Zip Code'
+        />
+
+        <Form.Field
+          name='venue.country'
+          floatingLabelText='Country'
+        />
+
+        <Form.Field
+          name='venue.directions'
+          floatingLabelText='Directions to Venue'
+          multiLine={true}
+          fullWidth={true}
+        />
+
+        <InfoHeader content='Event Host' />
+
+        <Form.Field
+          name="contactPhone"
+          floatingLabelText="Contact Phone"
+        />
+
+        <Checkbox
+          name="publicPhone"
+          label="Make Contact Number Public"
+          defaultChecked={event.node.publicPhone}
+        /><br/>
+
+        <Checkbox
+          label="Send Host RSVPs via Email"
+          defaultChecked={event.node.hostReceiveRsvpEmails}
+        /><br/>
+
+        <Checkbox
+          label="Send Host RSVPs via Email"
+          defaultChecked={event.node.hostReceiveRsvpEmails}
+        /><br/>
+
+        <Checkbox
+          label="Send Host RSVPs via Email"
+          defaultChecked={event.node.hostReceiveRsvpEmails}
+        /><br/>
+
+        <Checkbox
+          label="Send Host RSVPs via Email"
+          defaultChecked={event.node.hostReceiveRsvpEmails}
+        /><br/>
+
+        <Checkbox
+          name="flagApproval"
+          label="Mark this event as incomplete/needs further review"
+        /><br/><br/>
   
       <Form.Button type='submit' label='Submit Changes' fullWidth={true} />
     </GCForm>)
