@@ -30,7 +30,6 @@ const KeyboardActionsInfo = () => (
 class AdminEventsSection extends React.Component {
   constructor(props) {
     super(props);
-    this.setState = this.setState.bind(this);
     this.state = {
       showDeleteEventDialog: false,
       showEventPreview: false,
@@ -45,7 +44,6 @@ class AdminEventsSection extends React.Component {
       userMessage: '',
       undoAction: function(){console.log('undo')}
     };
-    this._handleResize = this._handleResize.bind(this);
     window.addEventListener('resize', this._handleResize);
   }
 
