@@ -50,7 +50,7 @@ export class EventEdit extends React.Component {
 
     const defaultStr = yup.string().default('')
   
-    const customerSchema = yup.object({
+    const eventSchema = yup.object({
       name: yup.string().default(event.node.name)
         .required('An event name is required'),
 
@@ -67,6 +67,9 @@ export class EventEdit extends React.Component {
       eventDate: yup.date()
         .max(new Date(), "Are you a time traveler?!")
         .required('Please select a date'),
+
+      startTime: yup.string()
+        .required('Please select a time'),
   
       duration: yup.object({
         h: yup.number()
@@ -113,28 +116,61 @@ export class EventEdit extends React.Component {
           .required('please enter an event capacity'),
       }),
 
-      contactPhone: yup.string().default(event.node.contactPhone)
+      contactPhone: yup.string()
+        .default(event.node.contactPhone)
         .required('A contact phone number is required'),
 
+      publicPhone: yup.boolean()
+        .default(event.node.publicPhone),
+
+      hostReceiveRsvpEmails: yup.boolean()
+        .default(event.node.hostReceiveRsvpEmails),
+
+      rsvpUseReminderEmail: yup.boolean()
+        .default(event.node.rsvpUseReminderEmail),
+
+      attendeeVolunteerShow: yup.boolean()
+        .default(event.node.attendeeVolunteerShow),
+
+      attendeeVolunteerMessage: yup.string()
+        .default(event.node.attendeeVolunteerMessage),
+
+      isSearchable: yup.number()
+        .default(event.node.isSearchable),
+
+      flagApproval: yup.boolean()
+        .default(event.node.flagApproval)
 
     });
     
     const form = (
       <GCForm
-        schema={customerSchema}
-        defaultValue={customerSchema.default()}
+        schema={eventSchema}
+        defaultValue={eventSchema.default()}
         onSubmit={function(data){console.log(data)}}
         onError={function(data){console.log(data)}}
       >
+
+        <InfoHeader content='Event Information' />
+
         <Form.Field
           name='name'
           floatingLabelText='Event Name'
           fullWidth={true}
-        /><br />
+        />
+
+        <SelectField
+          value={event.node.eventType.name}
+          floatingLabelText="Event Type"
+          valueMember="text"
+          menuItems={eventTypeOptions}
+          fullWidth={true}
+        />
 
         <Form.Field
           name='eventTypeId'
           label='Event Type'
+          style={{display:'none'}}
         />
 
         <Form.Field
@@ -142,18 +178,6 @@ export class EventEdit extends React.Component {
           floatingLabelText='Event Description'
           multiLine={true}
           fullWidth={true}
-        /><br/><br/>
-
-        <Checkbox
-          label="Make Event Public"
-          defaultChecked={(event.node.isSearchable == 1)}
-        />
-
-        <Form.Field
-          name='rsvpReminderHours'
-          floatingLabelText="RSVP Reminder Hours"
-          type='number'
-          min="0"
         />
 
         <InfoHeader content='Event Date & Time' />
@@ -244,7 +268,7 @@ export class EventEdit extends React.Component {
         <Form.Field
           name="contactPhone"
           floatingLabelText="Contact Phone"
-        />
+        /><br/>
 
         <Checkbox
           name="publicPhone"
@@ -255,21 +279,39 @@ export class EventEdit extends React.Component {
         <Checkbox
           label="Send Host RSVPs via Email"
           defaultChecked={event.node.hostReceiveRsvpEmails}
-        /><br/>
+        />
+
+        <InfoHeader content='Event Attendees' />
 
         <Checkbox
-          label="Send Host RSVPs via Email"
-          defaultChecked={event.node.hostReceiveRsvpEmails}
-        /><br/>
+          label="Send Guests RSVP Email Reminder"
+          defaultChecked={event.node.rsvpUseReminderEmail}
+        />
+
+        <Form.Field
+          name='rsvpReminderHours'
+          floatingLabelText="RSVP Reminder Hours"
+          type='number'
+          min="0"
+        /><br/><br/>
 
         <Checkbox
-          label="Send Host RSVPs via Email"
-          defaultChecked={event.node.hostReceiveRsvpEmails}
-        /><br/>
+          label="Ask Attendees to Volunteer"
+          defaultChecked={event.node.attendeeVolunteerShow}
+        />
+
+        <Form.Field
+          name='attendeeVolunteerMessage'
+          floatingLabelText="Message for Event Volunteers"
+          multiLine={true}
+          fullWidth={true}
+        />
+
+        <InfoHeader content='Event Settings' />
 
         <Checkbox
-          label="Send Host RSVPs via Email"
-          defaultChecked={event.node.hostReceiveRsvpEmails}
+          label="Make Event Public"
+          defaultChecked={(event.node.isSearchable == 1)}
         /><br/>
 
         <Checkbox
