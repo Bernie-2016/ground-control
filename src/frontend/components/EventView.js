@@ -1,5 +1,9 @@
 import React from 'react';
 import Relay from 'react-relay';
+import GCForm from './forms/GCForm';
+import Form from 'react-formal';
+import yup from 'yup';
+import moment from 'moment';
 import {Card, CardActions, CardExpandable, CardTitle, CardHeader, CardText, FlatButton, TextField, DropDownMenu, SelectField, DatePicker, TimePicker, Checkbox} from 'material-ui';
 import {BernieText, BernieColors} from './styles/bernie-css';
 
@@ -11,7 +15,7 @@ class Event {
   constructor(bsdEvent) {
     this.node = bsdEvent;
     this.dateTime = {
-      startDate: new Date(bsdEvent.startDate),
+      startDate: moment(bsdEvent.startDate),
       duration: {
         h: Math.floor(bsdEvent.duration/60),
         m: bsdEvent.duration % 60
@@ -36,12 +40,92 @@ export class EventEdit extends React.Component {
     };
   }
 
+  renderForm() {
+
+    const event = new Event(this.props.eventsArray[this.props.eventIndex]['node']);
+
+    const eventTypeOpts = {
+      'bsd-event-rsvper' : 'Create event RSVPs'
+    };
+
+    const defaultStr = yup.string().default('')
+  
+    const customerSchema = yup.object({
+      name: yup.string().default(event.node.name)
+        .required('An event name is required'),
+  
+      event_date: yup.date()
+        .max(new Date(), "Are you a time traveler?!")
+        .required('Please select a date'),
+  
+      event_type_id: yup.number()
+        .nullable()
+        .required('Please select an event type')
+    });
+    
+    const form = (
+      <GCForm
+        schema={customerSchema}
+        defaultValue={customerSchema.default()}
+        onSubmit={function(data){console.log(data)}}
+        onError={function(data){console.log(data)}}
+      >
+        <Form.Field
+          name='name'
+          floatingLabelText='Event Name'
+          fullWidth={true}
+        /><br />
+
+        <Form.Field
+          name='event_type_id'
+          type='select'
+          choices={eventTypeOpts}
+          label='Event Type'
+        />
+
+        <DatePicker
+          name='event_date'
+          defaultDate={event.dateTime.startDate.toDate()}
+          autoOk={true}
+        />
+
+        <TimePicker
+          name='start_time'
+          defaultTime={event.dateTime.startDate.toDate()}
+          format="ampm"
+          autoOk={true}
+        />
+
+        <TextField
+          name='duration'
+          defaultValue={this.state.event.dateTime.duration.h}
+          floatingLabelText="Duration (Hours)"
+          type="number"
+          min="0"
+        />
+
+        <TextField
+          defaultValue={this.state.event.dateTime.duration.m}
+          floatingLabelText="Duration (Minutes)"
+          type="number"
+          min="0"
+          max="59"
+        />
+  
+      <Form.Button type='submit' label='Submit Changes' fullWidth={true} />
+    </GCForm>)
+
+    return form
+  }
+
   render() {
     return (
     <div>
       <CardText>
+
+        {this.renderForm()}
         
-        <TextField
+        {/*<TextField
           defaultValue={this.state.event.node.name}
           floatingLabelText="Event Name"
           fullWidth={true}
@@ -183,7 +267,7 @@ export class EventEdit extends React.Component {
         <Checkbox
           label="Send Host RSVPs via Email"
           defaultChecked={this.state.event.node.hostReceiveRsvpEmails}
-        />
+        />*/}
 
       </CardText>
     </div>
@@ -251,7 +335,7 @@ export class EventPreview extends React.Component {
         <p>{event.node.description}</p>
 
         <InfoHeader content='Event Date & Time' />
-        <p>{event.dateTime.startDate.toString()} <span style={{color: BernieColors.gray}}>{event.dateTime.startDate.toLocaleTimeString()} local time</span></p>
+        <p>{event.dateTime.startDate.format('LLLL')} <span style={{color: BernieColors.gray}}>{event.dateTime.startDate.format('llll')} local time</span></p>
         <p>Duration: {event.dateTime.duration.h} hours {event.dateTime.duration.m} minutes</p>
         
         <InfoHeader content='Event Location' />
