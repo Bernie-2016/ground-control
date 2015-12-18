@@ -16,33 +16,34 @@ export default class GCForm extends React.Component {
         let name = child.props.name;
         let error = this.state.formErrors ? this.state.formErrors[name] : null;
         let clonedElement = child
+
         if (error) {
           error = error[0] ? error[0].message.replace(name, child.props.label) : null;
           clonedElement = React.cloneElement(child, {
             errorText: error
           })
         }
+
         return React.cloneElement(clonedElement, {
           events: ['onBlur']
         })
-      }
-      else if (child.type === Form.Button) {
+      } else if (child.type === Form.Button) {
         return React.cloneElement(child, {
           component: GCSubmitButton
         })
-      }
-      else if (child.props && child.props.children) {
+      } else if (child.props && child.props.children) {
         return React.cloneElement(child, {
           children: this.renderChildren(child.props.children)
         })
-      }
-      else
+      } else {
         return child;
+      }
     })
   }
 
   render() {
     let globalSnack = <div></div>
+
     if (this.props.globalError) {
       globalSnack = <Snackbar
         message={this.props.globalError}
@@ -50,8 +51,7 @@ export default class GCForm extends React.Component {
         openOnMount={true}
         style={{'backgroundColor' : BernieColors.red}}
         action={null} />
-    }
-    else if (this.props.globalStatus) {
+    } else if (this.props.globalStatus) {
       globalSnack = <Snackbar
         message={this.props.globalStatus}
         autoHideDuration={10000}
@@ -59,6 +59,7 @@ export default class GCForm extends React.Component {
         style={{'backgroundColor' : BernieColors.blue}}
         action={null} />
     }
+
     return (
       <div>
         {globalSnack}

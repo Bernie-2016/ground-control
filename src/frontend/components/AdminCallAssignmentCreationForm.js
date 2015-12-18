@@ -8,19 +8,18 @@ import CreateCallAssignment from '../mutations/CreateCallAssignment';
 import yup from 'yup';
 
 export default class AdminCallAssignmentCreationForm extends React.Component {
-  surveyRenderers =
-  {
-    'BSDSurvey' : 'Simple BSD survey renderer',
-    'BSDPhonebankRSVPSurvey' : 'BSD survey + events',
+  surveyRenderers = {
+    'BSDSurvey': 'Simple BSD survey renderer',
+    'BSDPhonebankRSVPSurvey': 'BSD survey + events',
   }
 
   surveyProcessors = {
-    'bsd-event-rsvper' : 'Create event RSVPs'
+    'bsd-event-rsvper': 'Create event RSVPs'
   }
 
   styles = {
     formContainer: {
-      width: 280,
+      width: 360,
       paddingLeft: 15,
       paddingRight: 15,
       paddingTop: 15,
@@ -56,10 +55,11 @@ export default class AdminCallAssignmentCreationForm extends React.Component {
       <div style={BernieText.title}>
         Create Assignment
       </div>
-      <div>
-        Create a new phonebanking assignment. Before you fill out this form, make sure you've set up the correct objects in BSD.
+      <div style={BernieText.default}>
+        <p>Create a new phonebanking assignment.</p>
+        <p>Before you fill out this form, make sure you've set up the correct objects in BSD.</p>
       </div>
-      <Paper zDepth={0} style={this.styles.formContainer}>
+      <Paper zDepth={1} style={this.styles.formContainer}>
         <GCForm
           schema={this.formSchema}
           globalError={this.state.globalErrorMessage}

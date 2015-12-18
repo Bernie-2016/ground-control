@@ -12,12 +12,16 @@ export default class GCCheckboxesField extends React.Component {
 
   createCheckboxes() {
     let value = this.props.value || []
+
     return Object.keys(this.props.choices).map((choice) => {
       let selected = false;
+
       if (value.indexOf(choice) !== -1)
         selected = true;
+
       return (
         <Checkbox
+          key={this.props.choices[choice]}
           label={this.props.choices[choice]}
           checked={selected}
           value={choice}
