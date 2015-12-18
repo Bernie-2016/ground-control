@@ -28,19 +28,25 @@ const KeyboardActionsInfo = () => (
 );
 
 class AdminEventsSection extends React.Component {
-  state = {
-    showDeleteEventDialog: false,
-    showEventPreview: false,
-    showCreateEventDialog: false,
-    filterOptionsIndex: 0,
-    tableWidth: window.innerWidth,
-    tableHeight: window.innerHeight - 112,
-    selectedRows: [],
-    indexesMarkedForDeletion: [],
-    activeEventIndex: null,
-    previewTabIndex: 0,
-    userMessage: '',
-    undoAction: function(){console.log('undo')}
+  constructor(props) {
+    super(props);
+    this.setState = this.setState.bind(this);
+    this.state = {
+      showDeleteEventDialog: false,
+      showEventPreview: false,
+      showCreateEventDialog: false,
+      filterOptionsIndex: 0,
+      tableWidth: window.innerWidth,
+      tableHeight: window.innerHeight - 112,
+      selectedRows: [],
+      indexesMarkedForDeletion: [],
+      activeEventIndex: null,
+      previewTabIndex: 0,
+      userMessage: '',
+      undoAction: function(){console.log('undo')}
+    };
+    this._handleResize = this._handleResize.bind(this);
+    window.addEventListener('resize', this._handleResize);
   }
 
   _handleResize = (e) => {
