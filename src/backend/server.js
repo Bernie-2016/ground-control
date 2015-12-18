@@ -9,15 +9,16 @@ import session from 'express-session';
 import BSD from './bsd';
 import MG from './mail';
 import demoData from './data/demo.json';
-import models from './data/models'
 import log from './log';
 import {fromGlobalId} from 'graphql-relay'
 import passport from 'passport';
 import LocalStrategy  from 'passport-local'
-import SequelizeStoreFactory from 'connect-session-sequelize'
 import url from 'url';
 import Minilog from 'minilog';
 import rateLimit from 'express-rate-limit';
+import {compare, hash} from './bcrypt-promise';
+import knex from './data/knex';
+import KnexSessionStoreFactory from 'connect-session-knex'
 
 writeSchema();
 
@@ -33,12 +34,17 @@ const wrap = (fn) => {
 };
 
 const clientLogger = Minilog('client');
-const SequelizeStore = SequelizeStoreFactory(session.Store);
+const KnexSessionStore = KnexSessionStoreFactory(session);
 const Mailgun = new MG(process.env.MAILGUN_KEY, process.env.MAILGUN_DOMAIN);
 const BSDClient = new BSD(process.env.BSD_HOST, process.env.BSD_API_ID, process.env.BSD_API_SECRET);
 const port = process.env.PORT;
 const publicPath = path.resolve(__dirname, '../frontend/public');
 const limiter = rateLimit({windowMs: 10000, max: 50});
+
+const sessionStore = new KnexSessionStore({
+  knex: knex,
+  tablename: 'sessions'
+})
 
 function isAuthenticated(req, res, next) {
   if (req.user)
@@ -55,20 +61,19 @@ passport.use('signup', new LocalStrategy(
     passReqToCallback: true
   },
   wrap(async (req, email, password, done) => {
-    let user = await models.User.findOne({
-      where: {
-        email: email.toLowerCase()
-      }
-    });
+    let user = await knex('users').where('email', email.toLowerCase()).first();
 
     if (!user) {
-      let newUser = await models.User.create({
-        email: email.toLowerCase(),
-        password: password
-      });
-
+      let password = await hash(password)
+      let userId = await knex('users')
+        .returning('id')
+        .insert({
+          email: email.toLowerCase(),
+          password: password
+        })[0];
+      let newUser = await knex('users').where('id', id);
       return done(null, newUser);
-    } else if (!await user.verifyPassword(password)) {
+    } else if (!await compare(password, user.password)) {
       return done(null, false, { message: 'Incorrect password.' });
     }
 
@@ -81,18 +86,13 @@ passport.serializeUser(wrap(async (user, done) => {
 }));
 
 passport.deserializeUser(wrap(async (id, done) => {
-  let user = await models.User.findById(id);
+  let user = knex('users').where('id', id).first()
   done(null, user);
 }));
 
 const app = express();
 
 app.enable('trust proxy'); // don't rate limit heroku
-
-const sessionStore = new SequelizeStore({
-  db: models.sequelize,
-  table: 'Session'
-});
 
 // List the routes that need to be rate limited
 let rateLimitRoutes = [
@@ -215,7 +215,7 @@ app.post('/events/create', wrap(async (req, res) => {
 app.use(fallback('index.html', { root: publicPath }));
 
 app.listen(port, () => log.info(
-`Server is now running on http://localhost:${port}`
+  `Server is now running on http://localhost:${port}`
 ));
 
 

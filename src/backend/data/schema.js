@@ -47,26 +47,24 @@ import Maestro from '../maestro';
 import url from 'url';
 import TZLookup from 'tz-lookup';
 import BSDClient from '../bsd-instance';
-import knexFactory from 'knex';
+import knex from './knex';
 import DataLoader from 'dataloader';
 
 const EVERYONE_GROUP = 'everyone';
-const knex = knexFactory({
-  client: 'pg',
-  connection: process.env.DATABASE_URL
-})
 
-let addTypeToData = (objects, type) => {
-  return objects.map((obj) => {
-    obj._type = type;
-    return obj;
+let dataLoaderCreator = (tablename, idField) => {
+  return new DataLoader(async (keys) => {
+    let objects = await knex(tablename).whereIn(idField, keys);
+    return objects.map((obj) => {
+      obj._type = tablename;
+      return obj;
+    })
   })
 }
 
-let userLoader = new DataLoader(async (keys) => {
-  let users = await knex('users').whereIn('id', keys)
-  return addTypeToData(users, 'users');
-})
+let createLoaders = () => {
+  users: dataLoaderCreator('users', 'id')
+}
 
 class GraphQLError extends Error {
   constructor(errorObject) {
