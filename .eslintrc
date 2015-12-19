@@ -12,7 +12,6 @@
     "no-var": 1,
     "no-this-before-super": 2,
     "constructor-super": 1,
-    "prefer-arrow-callback": 1,
     "react/jsx-uses-react": 2,
     "react/jsx-uses-vars": 2,
     "react/react-in-jsx-scope": 2,
