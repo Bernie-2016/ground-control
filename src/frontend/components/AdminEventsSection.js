@@ -5,6 +5,7 @@ import {EventPreview, EventEdit} from './EventView';
 import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle, SelectField, DropDownMenu, DropDownIcon, Dialog, Tabs, Tab, FlatButton, RaisedButton, IconButton, FontIcon, Checkbox, TextField, Snackbar} from 'material-ui';
 import {Table, Column, ColumnGroup, Cell} from 'fixed-data-table';
 import {BernieText, BernieColors} from './styles/bernie-css';
+import states from './data/states';
 
 import IconMenu from 'material-ui/lib/menus/icon-menu';
 import MenuItem from 'material-ui/lib/menus/menu-item';
@@ -269,6 +270,8 @@ class AdminEventsSection extends React.Component {
       <MenuItem index={1} key='1' primaryText="Send feedback" />,
       <MenuItem index={2} key='2' primaryText="Settings" />
     ]
+
+    console.log(states);
 
     return (
       <Toolbar>
