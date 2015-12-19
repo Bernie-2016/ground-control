@@ -137,6 +137,7 @@ class QueryLoader {
 
 let createLoaders = () => {
   return {
+    queries: new QueryLoader(),
     users: dataLoaderCreator('users', 'id'),
     bsdPeople: dataLoaderCreator('bsd_people', 'cons_id'),
     bsdPhones: dataLoaderCreator('bsd_phones', 'cons_phone_id'),

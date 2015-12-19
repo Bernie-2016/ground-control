@@ -11,6 +11,7 @@ var sharedConfig = {
 }
 
 var development = {
+  debug: true,
   seeds: {
     directory: './seeds/development'
   }
