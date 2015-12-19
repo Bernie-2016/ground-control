@@ -674,7 +674,9 @@ const GraphQLDeleteEvents = mutationWithClientMutationId({
     adminRequired(rootValue)
     let localIds = ids.map((id) => fromGlobalId(id).id)
     await BSDClient.deleteEvents(localIds)
-    await knex('bsd_events').where(id, localId).del()
+    await knex('bsd_events')
+      .whereIn('event_id', localIds)
+      .del()
     return localIds
   }
 })

@@ -62,7 +62,9 @@ passport.use('signup', new LocalStrategy(
     passReqToCallback: true
   },
   wrap(async (req, email, password, done) => {
-    let user = await knex('users').where('email', email.toLowerCase()).first()
+    let user = await knex('users')
+      .where('email', email.toLowerCase())
+      .first()
 
     if (!user) {
       let password = await hash(password)
