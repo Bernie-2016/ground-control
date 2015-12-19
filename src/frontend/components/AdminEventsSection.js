@@ -264,7 +264,13 @@ class AdminEventsSection extends React.Component {
       });
     }
 
-  return (
+    const filterMenuItems = [
+      <MenuItem index={0} key='0' primaryText="Refresh" />,
+      <MenuItem index={1} key='1' primaryText="Send feedback" />,
+      <MenuItem index={2} key='2' primaryText="Settings" />
+    ]
+
+    return (
       <Toolbar>
         <ToolbarGroup key={0} float="left">
           {/*<DropDownMenu
@@ -281,6 +287,16 @@ class AdminEventsSection extends React.Component {
             autoWidth={false}
             style={{width: '140px', marginRight: '0'}}
           />
+          <IconMenu
+            iconButtonElement={<FontIcon className="material-icons" hoverColor={BernieColors.blue}>filter_list</FontIcon>}
+            desktop={true}
+            // multiple={true}
+            closeOnItemTouchTap={false}
+            openDirection="bottom-right"
+            style={{ position: 'relative', top: '15px' }}
+          >
+            {filterMenuItems.map((item) => {return item})}
+          </IconMenu>
           {/*<IconButton
             iconClassName="material-icons"
             tooltipPosition="bottom-center"
@@ -429,7 +445,9 @@ class AdminEventsSection extends React.Component {
         key="3"
         secondary={true}
         onTouchTap={() => {
-          this._handleEventConfirmation([this.state.activeEventIndex]);
+          // document.getElementById('editForm').submit();
+          console.log(this)
+          // this._handleEventConfirmation([this.state.activeEventIndex]);
         }}
       />
     ];
