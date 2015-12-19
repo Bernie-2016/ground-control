@@ -170,8 +170,6 @@ export class EventEdit extends React.Component {
         .default(false)
 
     });
-
-    console.log(eventSchema);
     
     const form = (
       <GCForm
