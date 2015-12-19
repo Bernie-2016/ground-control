@@ -44,7 +44,7 @@
     "history": "^1.13.1",
     "jquery": "^2.1.4",
     "mailgun-js": "0.7.6",
-    "material-ui": "0.14.0-rc1",
+    "material-ui": "0.14.0-rc2",
     "minilog": "^3.0.0",
     "moment": "^2.10.6",
     "moment-timezone": "^0.4.1",
