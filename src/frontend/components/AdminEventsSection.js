@@ -339,7 +339,13 @@ class AdminEventsSection extends React.Component {
   renderDeleteModal() {
     let standardActions = [
       { text: 'Cancel' },
-      { text: 'Delete', onTouchTap: this._deleteEvent, ref: 'submit' }
+      { text: 'Delete',
+        onTouchTap: () => {
+          if (!this.refs.deleteConfirmationInput || this.refs.deleteConfirmationInput.getValue() === 'DELETE')
+            this._deleteEvent()
+        },
+        ref: 'submit'
+      }
     ];
 
     this._handleDeleteModalRequestClose = () => {
@@ -362,7 +368,7 @@ class AdminEventsSection extends React.Component {
     let textConfirm = (
       <div>
         <p>Type <span style={{color: BernieColors.red}}>DELETE</span> to confirm.</p>
-        <TextField hintText="DELETE" underlineFocusStyle={{borderColor: BernieColors.red}} ref="deleteConfirmationInput" />
+        <TextField hintText="TYPE HERE" underlineFocusStyle={{borderColor: BernieColors.red}} ref="deleteConfirmationInput" />
       </div>
     )
     if (numEvents < 5)
