@@ -24,9 +24,10 @@ import CallAssignmentsSection from './components/CallAssignmentsSection';
 import Dashboard from './components/Dashboard';
 import Signup from './components/Signup';
 import NotFound from './components/NotFound'
+import Unauthorized from './components/Unauthorized'
 import Form from 'react-formal';
 import {createHistory} from 'history';
-import RelayNetworkLayer from './RelayNetworkLayer'
+import GCNetworkLayer from './relay-extensions/GCNetworkLayer'
 import StackTrace from 'stacktrace-js';
 
 // Necessary to make minilog work
@@ -43,7 +44,7 @@ window.onerror = (msg, file, line, col, error) => {
   StackTrace
   .fromError(error)
   .then((stack) => {
-    log.error('Uncaught exception!', stack);
+    log.error('Uncaught exception!', error.message, stack);
     setTimeout(() => {
         alert('Whoops! Something went wrong. We\'re looking into it, but in the meantime please refresh your browser.');
         document.location.reload(true);
@@ -55,7 +56,7 @@ window.onerror = (msg, file, line, col, error) => {
 };
 
 injectTapEventPlugin();
-Relay.injectNetworkLayer(new RelayNetworkLayer('/graphql'));
+Relay.injectNetworkLayer(new GCNetworkLayer('/graphql'));
 
 Form.addInputTypes({
   string: GCTextField,
@@ -121,7 +122,7 @@ ReactDOM.render(
       component={Dashboard}
       queries={CurrentUserQueries}
       >
-      <IndexRedirect to='/call' />
+      <IndexRedirect to='/404' />
       <Route
         path='call'
         component={CallAssignmentsDashboard}
@@ -141,6 +142,7 @@ ReactDOM.render(
         />
       </Route>
     </Route>
+    <Route path='/unauthorized' component={Unauthorized} />
     <Route path="*" component={NotFound} />
   </Router>,
   document.getElementById('root')

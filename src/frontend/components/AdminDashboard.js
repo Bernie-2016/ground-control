@@ -25,7 +25,7 @@ class AdminDashboard extends React.Component {
           barColor={BernieColors.blue}
           tabColor={BernieColors.lightBlue}
           selectedTabColor={Styles.Colors.white}
-          title="Ground Control"
+          title="Ground Control Admin"
           logoColors={{
             primary: Styles.Colors.white,
             swoosh: BernieColors.gray

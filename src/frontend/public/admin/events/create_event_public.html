@@ -12,11 +12,11 @@
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 
    <!-- this has to do with fonts -->
-   <script src="../events/static/vga4irg.js"></script>
+   <script src="../admin/events/static/vga4irg.js"></script>
    <script>try{Typekit.load();}catch(e){}</script>
 
-   <link rel="stylesheet/less" type="text/css" href="../events/static/clndr.less" />
-   <link rel="stylesheet" id="bsd-css" href="../events/static/signup.css" type="text/css" media="all">
+   <link rel="stylesheet/less" type="text/css" href="../admin/events/static/clndr.less" />
+   <link rel="stylesheet" id="bsd-css" href="../admin/events/static/signup.css" type="text/css" media="all">
 
 <style>
 
@@ -82,14 +82,25 @@
 </style>
 
 
-<script src="../events/static/ckeditor/ckeditor.js"></script>
-<script src="../events/static/less.js"></script>
-<script src="../events/static/moment.js"></script>
-<script src="../events/static/underscore-min.js"></script>
-<script src="../events/static/clndr.js"></script>
+<script src="../admin/events/static/ckeditor/ckeditor.js"></script>
+<script src="../admin/events/static/less.js"></script>
+<script src="../admin/events/static/moment.js"></script>
+<script src="../admin/events/static/underscore-min.js"></script>
+<script src="../admin/events/static/clndr.js"></script>
 
 </head>
 <body class="event-central step2">
+<header id="bsd-header" class="clear">
+<div class="container">
+  <a href="https://berniesanders.com/"><h1>Bernie Sanders for President</h1></a>
+
+  <div class="contribute">
+    <a href="https://secure.actblue.com/contribute/page/lets-go-bernie?refcode=action-page" class="contribute">
+       Contribute
+    </a>
+  </div>
+</div>
+</header>
 <div class="content" style="visibility: visible;">
 <div id="SKIN" class="module_event2 bsd-page bsd-event bsd-event-createdetails">
 
@@ -99,7 +110,6 @@
 
 <form method="post" name="secondform" id="secondform">
 <div>
-
                 <div class="section-wrap"><div class="sectionheader section-what"><h3>What:<span class="bsd-image-replacement"></span></h3></div><div class="inputgroup">
 
                 <div class="label">
@@ -1150,17 +1160,13 @@
 	<option value="1">Yes, make this number public</option>
 </select></div></div></div>
     <div class="label">
-    <label class="form_label">Host Email:</label><span style="color: red;">*</span>
+    <label class="form_label">Personal Email:</label><span style="color: red;">*</span>
 </div><div class="field">
     <input size="30" name="cons_email" type="email" required></div>
     <div class="phone-instruct">
     <span style="color: red;">*</span>
-    <div class="explain"> This email will not be publicly visible.</div>
+    <div class="explain"> Your email will not be publicly visible.</div>
     </div>
-
-    <div class="checkboxgroup">
-                        <label class="form_label" for="flag_approval">Mark this event as incomplete/needs further review</label>
-                        <input name="flag_approval" id="flag_approval" type="checkbox" value="1"></div>
 
 <input class="ui-state-default" id="submit_button" name="submit_button" value="Create Event" type="submit"><div class="required"><span class="error">*</span> denotes required field</div></div>
 
@@ -1482,5 +1488,15 @@ function geolocate() {
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAzu1FR7mpcDYkQdHctmAe2DZSy05XmYcU&signed_in=true&libraries=places&callback=initAutocomplete"
         async defer></script>
 </div></div>
+
+<footer>
+
+<p class="address">Bernie 2016<br>PO Box 905<br>Burlington, VT 05402</p>
+<p class="disclaimer">Paid for by Bernie 2016</p>
+<span class="billionaires">(not the billionaires)</span>
+<p><span class="copyright">© Bernie 2016</span> | <a href="//berniesanders.com/privacy-policy/">Privacy Policy</a></p>
+
+
+</footer>
 </body>
 </html>

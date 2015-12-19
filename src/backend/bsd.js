@@ -5,7 +5,6 @@ import querystring from 'querystring';
 import {parseString} from 'xml2js';
 import Promise from 'bluebird';
 import qs from 'querystring';
-import BSDAudit from './data/models/bsd-audit';
 import log from './log';
 
 const parseStringPromise = Promise.promisify(parseString);
@@ -305,6 +304,20 @@ export default class BSD {
     return response
   }
 
+  async deleteEvents(eventIdArray) {
+    let promises = eventIdArray.map((event_id) => {
+      return this.request('/event/delete_event', {event_id}, 'POST');
+    });
+    let responses = await Promise.all(promises);
+    return responses;
+  }
+
+  async updateEvent(event_id, event_type_id, creator_cons_id, updatedValues) {
+    Object.assign(updatedValues, {event_id, event_type_id, creator_cons_id});
+    let response = await this.request('/event/update_event', {event_api_version: 2, values: JSON.stringify(updatedValues)}, 'POST');
+    return response
+  }
+
   async createEvents(cons_id, form, event_types, callback) {
     let eventType = null;
     event_types.forEach((type) => {
@@ -325,6 +338,7 @@ export default class BSD {
     let params = {
         event_type_id: form['event_type_id'],
         creator_cons_id: cons_id,
+        flag_approval: form['flag_approval'],
         name: form['name'],
         description: form['description'],
         venue_name: form['venue_name'],
@@ -341,7 +355,7 @@ export default class BSD {
         }],
         local_timezone: form['start_tz'],
         attendee_volunteer_message: form['attendee_volunteer_message'],
-        is_searchable: form['is_searchable'],
+        is_searchable: (form['is_searchable']) ? 1 : 0,
         public_phone: form['public_phone'],
         contact_phone: contact_phone,
         host_receive_rsvp_emails: form['host_receive_rsvp_emails'],
