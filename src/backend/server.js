@@ -18,7 +18,8 @@ import Minilog from 'minilog';
 import rateLimit from 'express-rate-limit';
 import {compare, hash} from './bcrypt-promise';
 import knex from './data/knex';
-import KnexSessionStoreFactory from 'connect-session-knex'
+import KnexSessionStoreFactory from 'connect-session-knex';
+import DataLoader from 'dataloader';
 
 writeSchema();
 
@@ -86,7 +87,7 @@ passport.serializeUser(wrap(async (user, done) => {
 }));
 
 passport.deserializeUser(wrap(async (id, done) => {
-  let user = knex('users').where('id', id).first()
+  let user = await knex('users').where('id', id).first()
   done(null, user);
 }));
 
@@ -128,7 +129,8 @@ let createLoaders = () => {
     bsdSurveys: dataLoaderCreator('bsd_surveys', 'signup_form_id'),
     bsdEventTypes: dataLoaderCreator('bsd_event_types', 'event_type_id'),
     bsdEvents: dataLoaderCreator('bsd_events', 'event_id'),
-    bsdAddresses: dataLoaderCreator('bsd_addresses', 'cons_addr_id')
+    bsdAddresses: dataLoaderCreator('bsd_addresses', 'cons_addr_id'),
+    gcBsdGroups: dataLoaderCreator('gc_bsd_groups', 'id')
   }
 }
 
@@ -145,7 +147,7 @@ app.use('/graphql', graphQLHTTP((request) => {
   return {
     rootValue: {
       user: request.user,
-      dataLoaders: createLoaders()
+      loaders: createLoaders()
     },
     schema: Schema
   }

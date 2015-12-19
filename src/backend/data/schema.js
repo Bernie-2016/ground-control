@@ -29,7 +29,6 @@ import url from 'url';
 import TZLookup from 'tz-lookup';
 import BSDClient from '../bsd-instance';
 import knex from './knex';
-import DataLoader from 'dataloader';
 
 const EVERYONE_GROUP = 'everyone';
 
@@ -55,7 +54,7 @@ const authRequired = (session) => {
 
 const adminRequired = (session) => {
   authRequired(session);
-  if (!session.user || !session.user.isAdmin) {
+  if (!session.user || !session.user.is_admin) {
     throw new GraphQLError({
       status: 403,
       message: 'You are not authorized to access that resource.'
@@ -141,7 +140,7 @@ const GraphQLListContainer = new GraphQLObjectType({
     eventTypes: {
       type: GraphQLEventTypeConnection,
       args: connectionArgs,
-      resolve: async (eventType, {first}, rootValue) => {
+      resolve: async (eventType, {first}, {rootValue}) => {
         let eventTypes = await knex('bsd_event_types').limit(first)
         return connectionFromArray(eventTypes)
       }
@@ -149,7 +148,7 @@ const GraphQLListContainer = new GraphQLObjectType({
     events: {
       type: GraphQLEventConnection,
       args: connectionArgs,
-      resolve: async (event, {first}, rootValue) => {
+      resolve: async (event, {first}, {rootValue}) => {
         let events = await knex('bsd_events').limit(first).orderBy('start_dt', 'asc')
         return connectionFromArray(events, {first});
       }
@@ -157,7 +156,7 @@ const GraphQLListContainer = new GraphQLObjectType({
     callAssignments: {
       type: GraphQLCallAssignmentConnection,
       args: connectionArgs,
-      resolve: async (root, {first}, rootValue) => {
+      resolve: async (root, {first}, {rootValue}) => {
         let assignments = await knex('bsd_call_assignments').limit(first);
         return connectionFromArray(assignments, {first});
       }
@@ -392,7 +391,7 @@ const GraphQLPerson = new GraphQLObjectType({
     },
     email: {
       type: GraphQLString,
-      resolve: async (person, _, rootValue) => {
+      resolve: async (person, _, {rootValue}) => {
         return getPrimaryEmail(person)
       }
     },
@@ -416,7 +415,7 @@ const GraphQLPerson = new GraphQLObjectType({
         let boundingDistance = within / 69
         let eventTypes = null;
         if (type) {
-          eventTypes = knex('bsd_event_types')
+          eventTypes = await knex('bsd_event_types')
             .where(name, 'ilike', `%${type}%`)
             .select('event_type_id')
         }
@@ -473,11 +472,13 @@ const GraphQLEvent = new GraphQLObjectType({
     },
     host: {
       type: GraphQLPerson,
-      resolve: (event, _, rootValue) => rootValue.dataLoaders.bsdPeople.load(event.creator_cons_id)
+      resolve: (event, _, {rootValue}) => rootValue.loaders.bsdPeople.load(event.creator_cons_id)
     },
     eventType: {
       type: GraphQLEventType,
-      resolve: (event, _, rootValue) => rootValue.dataLoaders.bsdEventTypes.load(event.event_type_id)
+      resolve: (event, _, {rootValue}) => {
+        rootValue.loaders.bsdEventTypes.load(event.event_type_id)
+      }
     },
     flagApproval: {
       type: GraphQLBoolean,
@@ -594,7 +595,7 @@ const GraphQLCallAssignment = new GraphQLObjectType({
     name: { type: GraphQLString },
     survey: {
       type: GraphQLSurvey,
-      resolve: (assignment, _, rootValue) => rootValue.dataLoaders.gcBsdSurveys.load(assignment.survey_id)
+      resolve: (assignment, _, {rootValue}) => rootValue.loaders.gcBsdSurveys.load(assignment.survey_id)
     },
     callsMade: {
       type: GraphQLInt,
@@ -604,8 +605,8 @@ const GraphQLCallAssignment = new GraphQLObjectType({
     },
     query: {
       type: GraphQLString,
-      resolve: async (assignment, _, rootValue) => {
-        let group = await rootValue.dataLoaders.gcBsdGroups.load(assignment.interviewee_group_id)
+      resolve: async (assignment, _, {rootValue}) => {
+        let group = await rootValue.loaders.gcBsdGroups.load(assignment.interviewee_group_id)
         if (group.cons_group_id) {
           return 'BSD Constituent Group: ' + group.cons_group_id
         }
@@ -631,8 +632,8 @@ const GraphQLSurvey = new GraphQLObjectType({
     id: globalIdField('Survey'),
     fullURL: {
       type: GraphQLString,
-      resolve: async (survey, _, rootValue) => {
-        let underlyingSurvey = await rootValue.dataLoaders.bsdSurveys.load(survey.signup_form_id)
+      resolve: async (survey, _, {rootValue}) => {
+        let underlyingSurvey = await rootValue.loaders.bsdSurveys.load(survey.signup_form_id)
         let slug = underlyingSurvey.slug;
         return url.resolve('https://' + process.env.BSD_HOST, '/page/s/' + slug)
       }
