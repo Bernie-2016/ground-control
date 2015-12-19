@@ -296,7 +296,8 @@ class AdminEventsSection extends React.Component {
           <RaisedButton
             label="Create"
             onTouchTap={function(){
-              this._handleEventCreation(this.state.selectedRows);
+              //this._handleEventCreation(this.state.selectedRows);
+              window.location = '/admin/events/create'
             }.bind(this)}
           />
           <ToolbarSeparator style={{marginLeft: 0}} />
