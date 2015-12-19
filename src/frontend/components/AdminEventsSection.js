@@ -5,7 +5,7 @@ import {EventPreview, EventEdit} from './EventView';
 import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle, SelectField, DropDownMenu, DropDownIcon, Dialog, Tabs, Tab, FlatButton, RaisedButton, IconButton, FontIcon, Checkbox, TextField, Snackbar} from 'material-ui';
 import {Table, Column, ColumnGroup, Cell} from 'fixed-data-table';
 import {BernieText, BernieColors} from './styles/bernie-css';
-import states from './data/states';
+import {states} from './data/states';
 
 import IconMenu from 'material-ui/lib/menus/icon-menu';
 import MenuItem from 'material-ui/lib/menus/menu-item';
@@ -265,14 +265,6 @@ class AdminEventsSection extends React.Component {
       });
     }
 
-    const filterMenuItems = [
-      <MenuItem index={0} key='0' primaryText="Refresh" />,
-      <MenuItem index={1} key='1' primaryText="Send feedback" />,
-      <MenuItem index={2} key='2' primaryText="Settings" />
-    ]
-
-    console.log(states);
-
     return (
       <Toolbar>
         <ToolbarGroup key={0} float="left">
@@ -290,6 +282,7 @@ class AdminEventsSection extends React.Component {
             autoWidth={false}
             style={{width: '140px', marginRight: '0'}}
           />
+          {/*IconMenus are just broken right now
           <IconMenu
             iconButtonElement={<FontIcon className="material-icons" hoverColor={BernieColors.blue}>filter_list</FontIcon>}
             desktop={true}
@@ -297,9 +290,28 @@ class AdminEventsSection extends React.Component {
             closeOnItemTouchTap={false}
             openDirection="bottom-right"
             style={{ position: 'relative', top: '15px' }}
+            menuStyle={{ maxHeight: '300px' }}
           >
-            {filterMenuItems.map((item) => {return item})}
-          </IconMenu>
+            {states.map((item, index) => {
+              return <MenuItem index={index} key={index} primaryText={item.abbreviation} />
+            })}
+          </IconMenu>*/}
+          <div
+            style={{ position: 'relative', top: '20px', display: 'inline' }}
+          >
+            <label htmlFor="stateSelect" style={{ display: 'inline', marginRight: '0.5em', fontSize: '0.8em' }}>Filter by State</label>
+            <select
+              id='stateSelect'
+              onChange={(event) => {
+                console.log(event.target.value);
+              }}
+            >
+              <option value='none'>--</option>
+              {states.map((item, index) => {
+                return <option key={index} value={item.abbreviation}>{item.name}</option>
+              })}
+            </select>
+          </div>
           {/*<IconButton
             iconClassName="material-icons"
             tooltipPosition="bottom-center"
