@@ -1,5 +1,5 @@
 
-exports.up = async function(knex, Promise) {
+exports.up = function(knex, Promise) {
   let promises = [
     knex.schema.createTableIfNotExists('zip_codes', function(table) {
       table.increments('id').primary();
@@ -190,40 +190,9 @@ exports.up = async function(knex, Promise) {
     })
   ]
 
-  await Promise.all(promises);
-
-  await knex.schema.createTableIfNotExists('bsd_call_assignments', function(table) {
-    table.increments('id').primary();
-    table.timestamp('modified_dt').notNullable();
-    table.timestamp('create_dt').notNullable();
-    table.string('name').notNullable();
-    table.integer('gc_bsd_survey_id').index().references('id').inTable('gc_bsd_surveys').notNullable();
-    table.integer('gc_bsd_group_id').index().references('id').inTable('gc_bsd_groups').notNullable();
-  });
-
-  await knex.schema.createTableIfNotExists('bsd_calls', function(table) {
-    table.increments('id').primary();
-    table.timestamp('modified_dt').notNullable();
-    table.timestamp('create_dt').notNullable();
-    table.timestamp('attempted_at').notNullable().index();
-    table.boolean('left_voicemail');
-    table.boolean('sent_text');
-    table.enu('reason_not_completed', ['NO_PICKUP', 'CALL_BACK', 'NOT_INTERESTED', 'OTHER_LANGUAGE', 'WRONG_NUMBER', 'DISCONNECTED_NUMBER']).index()
-    table.integer('caller_id').index().notNullable().references('id').inTable('users')
-    table.bigint('interviewee_id').index().notNullable()
-    table.integer('call_assignment_id').index().notNullable().references('id').inTable('bsd_call_assignments')
-  });
-
-  await knex.schema.createTableIfNotExists('bsd_assigned_calls', function(table) {
-    table.increments('id').primary();
-    table.timestamp('modified_dt').notNullable();
-    table.timestamp('create_dt').notNullable();
-    table.integer('caller_id').index().references('id').inTable('users').notNullable();
-    table.bigint('interviewee_id').index().notNullable();
-    table.integer('call_assignment_id').index().references('id').inTable('bsd_call_assignments').notNullable();
-  });
+  return Promise.all(promises);
 };
 
 exports.down = function(knex, Promise) {
-  knex.schema.dropTable('users');
+
 };
