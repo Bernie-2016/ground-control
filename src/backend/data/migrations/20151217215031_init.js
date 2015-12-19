@@ -152,8 +152,9 @@ exports.up = function(knex, Promise) {
       table.increments('id').primary();
       table.timestamp('modified_dt').notNullable();
       table.timestamp('create_dt').notNullable();
-      table.integer('survey_id').index().references('id').inTable('gc_bsd_surveys').notNullable();
-      table.integer('interviewee_group_id').index().references('id').inTable('gc_bsd_groups').notNullable();
+      table.string('name').notNullable();
+      table.integer('gc_bsd_survey_id').index().references('id').inTable('gc_bsd_surveys').notNullable();
+      table.integer('gc_bsd_group_id').index().references('id').inTable('gc_bsd_groups').notNullable();
     }),
 
     knex.schema.createTableIfNotExists('bsd_calls', function(table) {
