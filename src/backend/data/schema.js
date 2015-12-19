@@ -168,7 +168,10 @@ const GraphQLListContainer = new GraphQLObjectType({
       type: GraphQLEventConnection,
       args: connectionArgs,
       resolve: async (event, {first}, {rootValue}) => {
-        let events = await knex('bsd_events').limit(first).orderBy('start_dt', 'asc')
+        let events = await knex('bsd_events')
+          .where('flag_approval', true)
+          .limit(first)
+          .orderBy('start_dt', 'asc')
         return connectionFromArray(events, {first})
       }
     },
