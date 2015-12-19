@@ -728,7 +728,7 @@ export default Relay.createContainer(AdminEventsSection, {
   initialVariables: {
     numEvents: 100,
     sortField: 'startDate',
-    sordDirection: 'ASC'
+    sortDirection: 'ASC'
   },
   fragments: {
     listContainer: () => Relay.QL`
