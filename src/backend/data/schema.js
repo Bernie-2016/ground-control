@@ -205,17 +205,16 @@ const GraphQLUser = new GraphQLObjectType({
       resolve: async (user, {forAssignmentId}) => {
         if (forAssignmentId) {
           let localId = fromGlobalId(forAssignmentId)
-          let count = await knex('bsd_calls').count('id').where({
+          return knex.count(knex('bsd_calls').where({
             caller_id: user.id,
             call_assignment_id: localId
-          }).first()
-          return count.count
+          }), 'id')
+
         }
         else {
-          let count = await knex('bsd_calls').count('id').where({
+          return knex.count(knex('bsd_calls').where({
             caller_id: user.id
-          }).first()
-          return count.count
+          }), 'id');
         }
       }
     },
@@ -590,8 +589,7 @@ const GraphQLEvent = new GraphQLObjectType({
     attendeesCount: {
       type: GraphQLInt,
       resolve: async(event) => {
-        let count = await knex('bsd_event_attendees').count('event_attendee_id').where('event_id', event.id).first()
-        return count.count
+        return knex.count(knex('bsd_event_attendees').where('event_id', event.id), 'event_attendee_id')
       }
     },
   }),
@@ -618,8 +616,7 @@ const GraphQLCallAssignment = new GraphQLObjectType({
     callsMade: {
       type: GraphQLInt,
       resolve: async (callAssignment) => {
-        let count = await knex('bsd_calls').count('id').where('call_assignment_id', callAssignment.id).first()
-        return count.count;
+        return knex.count(knex('bsd_calls').where('call_assignment_id', callAssignment.id), 'id')
       }
     },
     query: {
