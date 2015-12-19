@@ -45,7 +45,6 @@ const limiter = rateLimit({windowMs: 10000, max: 50})
 const sessionStore = new KnexSessionStore({
   knex: knex,
   tablename: 'sessions',
-  clearInterval: null
 })
 
 function isAuthenticated(req, res, next) {
