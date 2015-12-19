@@ -170,6 +170,8 @@ export class EventEdit extends React.Component {
         .default(false)
 
     });
+
+    console.log(eventSchema);
     
     const form = (
       <GCForm
@@ -228,7 +230,7 @@ export class EventEdit extends React.Component {
 
         <input
           name='startDate'
-          value={event.dateTime.startDate.format('dddd, MMMM Do YYYY h:mm a')}
+          value={event.dateTime.startDate.format('MM/DD/YYYY h:mm a')}
           readOnly
           // style={{display:'none'}}
         />
