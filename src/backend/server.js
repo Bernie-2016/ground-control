@@ -107,6 +107,31 @@ let rateLimitRoutes = [
 //  app.use(route,limiter);
 //});
 
+let dataLoaderCreator = (tablename, idField) => {
+  return new DataLoader(async (keys) => {
+    let objects = await knex(tablename).whereIn(idField, keys);
+    return objects.map((obj) => {
+      obj._type = tablename;
+      return obj;
+    })
+  })
+}
+
+let createLoaders = () => {
+  return {
+    users: dataLoaderCreator('users', 'id'),
+    bsdPeople: dataLoaderCreator('bsd_people', 'cons_id'),
+    bsdPhones: dataLoaderCreator('bsd_phones', 'cons_phone_id'),
+    bsdEmails: dataLoaderCreator('bsd_emails', 'cons_email_id'),
+    bsdCallAssignments: dataLoaderCreator('bsd_call_assignments', 'id'),
+    gcBsdSurveys: dataLoaderCreator('gc_bsd_surveys', 'id'),
+    bsdSurveys: dataLoaderCreator('bsd_surveys', 'signup_form_id'),
+    bsdEventTypes: dataLoaderCreator('bsd_event_types', 'event_type_id'),
+    bsdEvents: dataLoaderCreator('bsd_events', 'event_id'),
+    bsdAddresses: dataLoaderCreator('bsd_addresses', 'cons_addr_id')
+  }
+}
+
 app.use(express.static(publicPath))
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -118,7 +143,10 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use('/graphql', graphQLHTTP((request) => {
   return {
-    rootValue: { user: request.user },
+    rootValue: {
+      user: request.user,
+      dataLoaders: createLoaders()
+    },
     schema: Schema
   }
 }));

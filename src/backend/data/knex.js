@@ -1,5 +1,5 @@
 import knexFactory from 'knex';
 import knexfile from './knexfile';
 
-const knex = knexFactory(knexfile)
+let knex = knexFactory(knexfile[process.env.NODE_ENV])
 export default knex;

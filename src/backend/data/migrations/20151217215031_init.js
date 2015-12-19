@@ -21,7 +21,7 @@ exports.up = function(knex, Promise) {
       table.string('middlename');
       table.string('lastname');
       table.string('suffix');
-      table.specificType('gender', 'char[1]');
+      table.specificType('gender', 'char(1)');
       table.date('birth_dt');
       table.string('title');
       table.string('employer');
@@ -41,7 +41,7 @@ exports.up = function(knex, Promise) {
       table.string('state_cd').index();
       table.string('zip').index();
       table.string('zip_4');
-      table.specificType('country', 'char[2]');
+      table.specificType('country', 'char(2)');
       table.float('latitude').notNullable().index();
       table.float('longitude').notNullable().index();
       table.timestamp('modified_dt').notNullable();
@@ -50,7 +50,7 @@ exports.up = function(knex, Promise) {
 
     knex.schema.createTableIfNotExists('bsd_surveys', function(table) {
       table.bigint('signup_form_id').primary();
-      table.string('slug');
+      table.string('signup_form_slug');
       table.timestamp('modified_dt').notNullable();
       table.timestamp('create_dt').notNullable();
     }),
@@ -68,7 +68,7 @@ exports.up = function(knex, Promise) {
       table.string('venue_addr1').notNullable();
       table.string('venue_addr2')
       table.string('venue_country').notNullable();
-      table.string('venue_directions');
+      table.text('venue_directions');
       table.string('start_tz');
       table.dateTime('start_dt').index();
       table.float('duration');
