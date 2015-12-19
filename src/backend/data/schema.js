@@ -756,9 +756,7 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
           .transacting(trx)
           .where('id', assignedCall.id)
           .del(),
-        knex('bsd_calls')
-          .transacting(trx)
-          .insert({
+        knex.insertAndFetch('bsd_calls', {
             completed: completed,
             attemptedAt: new Date(),
             leftVoicemail: leftVoicemail,
@@ -767,7 +765,7 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
             caller_id: caller.id,
             interviewee_id: assignedCall.interviewee_id,
             call_assignment_id: assignedCall.call_assignment_id
-          })
+          }, {transaction: trx})
       ]
       await Promise.all(promises)
       return caller
@@ -804,11 +802,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
       if (!underlyingSurvey) {
         try {
           let BSDSurveyResponse = await BSDClient.getForm(surveyId)
-          underlyingSurvey = await knex('bsd_surveys')
-            .transacting(trx)
-            .insert(BSDSurveyResponse)
-            .returning('*')
-            .first()
+          underlyingSurvey = await knex.insertAndFetch('bsd_surveys', BSDSurveyResponse, {transaction: trx, idField: 'signup_form_id'})
         } catch (err) {
           if (err && err.response && err.response.statusCode === 409)
             throw new GraphQLError({
@@ -820,13 +814,11 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
         }
       }
 
-      survey = await knex('gc_bsd_surveys')
-        .transacting(trx)
-        .insert({
+      survey = await knex.insertAndFetch('gc_bsd_surveys', {
           signup_form_id: surveyId,
           renderer: renderer,
           processors: processors
-        })
+        }, {transaction: trx})
 
       if (/^\d+$/.test(groupText)) {
         let underlyingGroup = await knex('bsd_groups')
@@ -837,11 +829,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
         if (!underlyingGroup) {
           try {
             let BSDGroupResponse = await BSDClient.getConstituentGroup(groupText)
-            underlyingGroup = await knex('bsd_groups')
-              .transacting(trx)
-              .insert(BSDGroupResponse)
-              .returning('*')
-              .first()
+            underlyingGroup = await knex.insertAndFetch('bsd_groups', BSDGroupResponse, {transaction: trx, idField: 'cons_group_id'})
           } catch (err) {
             if (err && err.response && err.response.statusCode === 409)
               throw new GraphQLError({
@@ -895,22 +883,16 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
           .first()
 
         if (!group)
-          group = await knex('gc_bsd_groups')
-            .transacting(trx)
-            .insert({
+          group = await knex.insertAndFetch('gc_bsd_groups', {
               query: query
-            })
-            .returning('*')
-            .first()
+            }, {transaction: trx})
       }
 
-      return knex('bsd_call_assignments')
-        .transacting(trx)
-        .insert({
+      return knex.insertAndFetch('bsd_call_assignments', {
           name: name,
           gc_bsd_group_id: group.id,
           gc_bsd_survey_id: survey.id
-        })
+        }, {transaction: trx});
     })
   }
 })

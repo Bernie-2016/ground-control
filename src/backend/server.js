@@ -67,14 +67,12 @@ passport.use('signup', new LocalStrategy(
       .first()
 
     if (!user) {
-      let password = await hash(password)
-      let userId = await knex('users')
-        .returning('id')
-        .insert({
+      let hashedPassword = await hash(password)
+      let newUser = await knex.insertAndFetch('users', {
           email: email.toLowerCase(),
-          password: password
-        })[0]
-      let newUser = await knex('users').where('id', id)
+          password: hashedPassword
+        })
+      console.log(newUser);
       return done(null, newUser)
     } else if (!await compare(password, user.password)) {
       return done(null, false, { message: 'Incorrect password.' })

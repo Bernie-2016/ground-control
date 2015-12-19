@@ -3,17 +3,18 @@ import bcrypt from 'bcrypt';
 
 export function hash(password, salt) {
   salt = salt || 10
+  console.log(password, salt);
   return new Promise((resolve, reject) => {
-    bcrypt.hash(password, salt, (err, hash) => {
+    bcrypt.hash(password, salt, (err, hashedValue) => {
       if (err) return reject(err)
-      resolve(hash)
+      resolve(hashedValue)
     })
   })
 }
 
-export function compare(expected, hash) {
+export function compare(expected, hashedValue) {
   return new Promise((resolve, reject) => {
-    bcrypt.compare(expected, hash, (err, res) => {
+    bcrypt.compare(expected, hashedValue, (err, res) => {
       if (err) return reject(err)
       resolve(res)
     })
