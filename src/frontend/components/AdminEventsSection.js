@@ -74,9 +74,9 @@ class AdminEventsSection extends React.Component {
         value="checkboxValue1"
         checked={selectedRows.indexOf(rowIndex) > -1}
         eventIndex={rowIndex}
-        onCheck={function(){
+        onCheck={() => {
           this._handleEventSelect(rowIndex);
-        }.bind(this)}
+        }}
         style={{marginLeft: '15px'}}
       />
     </Cell>
@@ -187,18 +187,18 @@ class AdminEventsSection extends React.Component {
 
       <IconButton
         title="delete"
-        onTouchTap={function(){
+        onTouchTap={() => {
           this._handleEventDeletion([rowIndex]);
-        }.bind(this)}
+        }}
       >
         <FontIcon className="material-icons" hoverColor={BernieColors.red}>delete</FontIcon>
       </IconButton>
 
       <IconButton
         title="approve"
-        onTouchTap={function(){
+        onTouchTap={() => {
           this._handleEventConfirmation([rowIndex]);
-        }.bind(this)}
+        }}
       >
         <FontIcon className="material-icons" hoverColor={BernieColors.blue}>event_available</FontIcon>
       </IconButton>
@@ -287,35 +287,35 @@ class AdminEventsSection extends React.Component {
             title="Refresh Events"
             style={{float: 'left', top: '5px'}}
             tooltipStyles={{zIndex: 10}}
-            onTouchTap={function(){
+            onTouchTap={() => {
               this._handleRequestRefresh();
-            }.bind(this)}
+            }}
           >refresh</IconButton>*/}
         </ToolbarGroup>
         <ToolbarGroup key={1} float="right">
           <RaisedButton
             label="Create"
-            onTouchTap={function(){
+            onTouchTap={() => {
               this._handleEventCreation(this.state.selectedRows);
-            }.bind(this)}
+            }}
           />
           <ToolbarSeparator style={{marginLeft: 0}} />
           <RaisedButton
             label="Delete"
             primary={true}
             disabled={(this.state.selectedRows.length == 0)}
-                onTouchTap={function(){
+                onTouchTap={() => {
               this._handleEventDeletion(this.state.selectedRows);
-            }.bind(this)}
+            }}
           />
           <RaisedButton
             label="Approve Selected"
             style={{marginLeft: 0}}
             secondary={true}
             disabled={(this.state.selectedRows.length == 0)}
-            onTouchTap={function(){
+            onTouchTap={() => {
           this._handleEventConfirmation(this.state.selectedRows);
-        }.bind(this)}
+        }}
           />
         </ToolbarGroup>
       </Toolbar>
@@ -420,17 +420,17 @@ class AdminEventsSection extends React.Component {
         label="Delete"
         key="2"
         primary={true}
-        onTouchTap={function(){
+        onTouchTap={() => {
           this._handleEventDeletion([this.state.activeEventIndex]);
-        }.bind(this)}
+        }}
       />,
       <FlatButton
         label={(this.state.previewTabIndex == 0) ? 'Approve' : 'Update and Approve'}
         key="3"
         secondary={true}
-        onTouchTap={function(){
+        onTouchTap={() => {
           this._handleEventConfirmation([this.state.activeEventIndex]);
-        }.bind(this)}
+        }}
       />
     ];
 
@@ -464,21 +464,21 @@ class AdminEventsSection extends React.Component {
             <EventPreview
               eventsArray={events}
               eventIndex={this.state.activeEventIndex}
-              onChangeEventIndex={function(n){
+              onChangeEventIndex={(n) => {
               this._iterateActiveEvent(n);
-            }.bind(this)}
-              onEventConfirm={function(indexArray){
+            }}
+              onEventConfirm={(indexArray) => {
               this._handleEventConfirmation(indexArray);
-            }.bind(this)}
-              onEventEdit={function(modifiedEvent){
+            }}
+              onEventEdit={(modifiedEvent) => {
               this._handleEventEdit(modifiedEvent);
-            }.bind(this)}
-              onTabRequest={function(eventIndex, tabIndex){
+            }}
+              onTabRequest={(eventIndex, tabIndex) => {
               this._handleEventPreviewOpen(eventIndex, tabIndex);
-            }.bind(this)}
-              onEventDelete={function(indexArray){
+            }}
+              onEventDelete={(indexArray) => {
               this._handleEventDeletion(indexArray);
-            }.bind(this)}
+            }}
             />
           </Tab>
           <Tab label="Edit" value={'1'} >
