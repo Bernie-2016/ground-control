@@ -620,7 +620,7 @@ class AdminEventsSection extends React.Component {
             header={<this.HeaderCell content="Manage" />}
             cell={<this.ActionCell data={events} col="actions" />}
             fixed={true}
-            width={170}
+            width={115}
             align='center'
           />
         </ColumnGroup>
