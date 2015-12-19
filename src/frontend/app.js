@@ -13,6 +13,7 @@ import AdminCallAssignmentsSection from './components/AdminCallAssignmentsSectio
 import AdminCallAssignmentCreationForm from './components/AdminCallAssignmentCreationForm';
 import GCTextField from './components/forms/GCTextField';
 import GCDateField from './components/forms/GCDateField';
+import GCTimeField from './components/forms/GCTimeField';
 import GCPasswordField from './components/forms/GCPasswordField';
 import GCRadioButtonsField from './components/forms/GCRadioButtonsField';
 import GCSelectField from './components/forms/GCSelectField';
@@ -68,6 +69,7 @@ Form.addInputTypes({
   array: GCCheckboxesField,
   password: GCPasswordField,
   date: GCDateField,
+  time: GCTimeField
 });
 
 const ListContainerQueries = {

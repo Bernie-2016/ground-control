@@ -217,9 +217,10 @@ export class EventEdit extends React.Component {
           autoOk={true}
         />
 
-        <TimePicker
-          defaultTime={event.dateTime.startDate.toDate()}
-          format="ampm"
+        <Form.Field
+          name='startDate'
+          type='time'
+          format='ampm'
           autoOk={true}
           onChange={(changeEvent, time) => {
             const updatedTime = moment(time);
