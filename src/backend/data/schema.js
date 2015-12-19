@@ -85,7 +85,7 @@ async function getPrimaryAddress(person) {
       .first()
 }
 
-async function getPrimaryPhone(person, loaders) {
+async function getPrimaryPhone(person) {
   let phones = await knex('bsd_phones')
     .where({
       is_primary: true,
