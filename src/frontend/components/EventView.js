@@ -78,8 +78,7 @@ export class EventEdit extends React.Component {
 
   renderForm() {
     let event = this.state.event;
-    const defaultStr = yup.string().default('')
-  
+    const defaultStr = yup.string().default('')  
     const eventSchema = yup.object({
       name: yup.string().default(event.name)
         .required('An event name is required'),
@@ -93,7 +92,8 @@ export class EventEdit extends React.Component {
 
       rsvpReminderHours: yup.number()
         .default(event.rsvpReminderHours)
-        .min(0),
+        .min(0)
+        .nullable(),
 
       startDate: yup.date()
         .default(event.dateTime.startDate.toDate())
