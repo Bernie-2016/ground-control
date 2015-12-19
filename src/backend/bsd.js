@@ -402,7 +402,6 @@ export default class BSD {
       resolveWithFullResponse: true,
       json: true
     }
-    console.log(finalURL);
     return requestPromise(options)
   }
 

@@ -71,7 +71,6 @@ passport.use('signup', new LocalStrategy(
           email: email.toLowerCase(),
           password: hashedPassword
         })
-      console.log(newUser);
       return done(null, newUser)
     } else if (!await compare(password, user.password)) {
       return done(null, false, { message: 'Incorrect password.' })
