@@ -78,7 +78,7 @@ export class EventEdit extends React.Component {
 
   renderForm() {
     let event = this.state.event;
-    const defaultStr = yup.string().default('');  
+    const defaultStr = yup.string().default('');
     const eventSchema = yup.object({
       name: yup.string().default(event.name)
         .required('An event name is required'),
@@ -98,7 +98,7 @@ export class EventEdit extends React.Component {
       startDate: yup.date()
         .default(event.dateTime.startDate.toDate())
         .required('Please select a date'),
-  
+
       duration: yup.object({
         h: yup.number()
           .default(event.dateTime.duration.h)
@@ -170,12 +170,14 @@ export class EventEdit extends React.Component {
         .default(false)
 
     });
-    
+
     const form = (
       <GCForm
         schema={eventSchema}
         defaultValue={eventSchema.default()}
-        onSubmit={function(data){console.log(data)}}
+        onSubmit={function(data){
+          console.log(data)
+        }}
         onError={function(data){console.log(data)}}
       >
 
@@ -209,29 +211,10 @@ export class EventEdit extends React.Component {
 
         <InfoHeader content='Event Date & Time' />
 
-        <DatePicker
-          defaultDate={event.dateTime.startDate.toDate()}
+        <Form.Field
+          name='startDate'
           minDate={new Date()}
           autoOk={true}
-          onChange={(changeEvent, time) => {
-            const updatedDate = moment(time);
-            let currentDate = event.dateTime.startDate;
-
-            currentDate.set('year', updatedDate.get('year'));
-            currentDate.set('month', updatedDate.get('month'));
-            currentDate.set('date', updatedDate.get('date'));
-
-            this.setState({
-              event: event
-            })
-          }}
-        />
-
-        <input
-          name='startDate'
-          value={event.dateTime.startDate.format('MM/DD/YYYY h:mm a')}
-          readOnly
-          // style={{display:'none'}}
         />
 
         <TimePicker
@@ -373,7 +356,7 @@ export class EventEdit extends React.Component {
           name="flagApproval"
           label="Mark this event as incomplete/needs further review"
         /><br/><br/>
-  
+
       <Form.Button type='submit' label='Submit Changes' fullWidth={true} />
     </GCForm>)
 
@@ -384,153 +367,7 @@ export class EventEdit extends React.Component {
     return (
     <div>
       <CardText>
-
         {this.renderForm()}
-        
-        {/*<TextField
-          defaultValue={this.state.event.node.name}
-          floatingLabelText="Event Name"
-          fullWidth={true}
-        />
-
-        <SelectField
-          value={this.state.event.node.eventType.name}
-          floatingLabelText="Event Type"
-          valueMember="text"
-          menuItems={eventTypeOptions}
-          fullWidth={true}
-        />
-
-        <TextField
-          defaultValue={this.state.event.node.description}
-          floatingLabelText="Event Description"
-          multiLine={true}
-          fullWidth={true}
-        />
-
-        <InfoHeader content='Event Date & Time' />
-
-        <DatePicker
-          defaultDate={this.state.event.dateTime.startDate}
-          autoOk={true}
-        />
-
-        <TimePicker
-          defaultTime={this.state.event.dateTime.startDate}
-          format="ampm"
-          autoOk={true}
-        />
-
-        <TextField
-          defaultValue={this.state.event.dateTime.duration.h}
-          floatingLabelText="Duration (Hours)"
-          type="number"
-          min="0"
-        />
-
-        <TextField
-          defaultValue={this.state.event.dateTime.duration.m}
-          floatingLabelText="Duration (Minutes)"
-          type="number"
-          min="0"
-          max="59"
-        />
-
-        <InfoHeader content='Event Location' />
-
-        <TextField
-          defaultValue={this.state.event.node.venueName}
-          floatingLabelText="Venue Name"
-        />
-
-        <TextField
-          defaultValue={this.state.event.node.venueAddr1}
-          floatingLabelText="Address Line 1"
-        />
-
-        <TextField
-          defaultValue={this.state.event.node.venueAddr2}
-          floatingLabelText="Address Line 2"
-        />
-
-        <TextField
-          defaultValue={this.state.event.node.venueZip}
-          floatingLabelText="Zip Code"
-        />
-
-        <TextField
-          defaultValue={this.state.event.node.venueCity}
-          floatingLabelText="City"
-        />
-
-        <TextField
-          defaultValue={this.state.event.node.venueState}
-          floatingLabelText="State"
-        />
-
-        <TextField
-          defaultValue={this.state.event.node.venueCountry}
-          floatingLabelText="Country"
-        />
-
-        <TextField
-          defaultValue={this.state.event.node.venueDirections}
-          floatingLabelText="Venue Directions"
-          multiLine={true}
-          fullWidth={true}
-        />
-
-        <TextField
-          defaultValue={this.state.event.node.capacity}
-          floatingLabelText="Venue Capacity"
-          type="number"
-          min="0"
-        />
-
-        <InfoHeader content='Event Attendees' />
-
-        <Checkbox
-          label="Send RSVP Reminder Emails"
-          defaultChecked={this.state.event.node.rsvpUseReminderEmail}
-        />
-
-        <TextField
-          defaultValue={this.state.event.node.rsvpReminderHours}
-          floatingLabelText="RSVP Reminder (Hours Before)"
-          type="number"
-          min="0"
-        />
-
-        <Checkbox
-          label="Request Volunteers"
-          defaultChecked={this.state.event.node.attendeeVolunteerShow}
-        />
-
-        <TextField
-          defaultValue={this.state.event.node.attendeeVolunteerMessage}
-          floatingLabelText="Volunteer Message"
-          multiLine={true}
-          fullWidth={true}
-        />
-
-        <InfoHeader content='Event Host' />
-
-        <TextField
-          defaultValue={this.state.event.node.contactPhone}
-          floatingLabelText="Contact Phone"
-          type="tel"
-        />
-
-        <Checkbox
-          label="Make Contact Number Public"
-          defaultChecked={this.state.event.node.publicPhone}
-        />
-
-        <Checkbox
-          label="Send Host RSVPs via Email"
-          defaultChecked={this.state.event.node.hostReceiveRsvpEmails}
-        />*/}
-
       </CardText>
     </div>
     )
@@ -599,7 +436,7 @@ export class EventPreview extends React.Component {
         <InfoHeader content='Event Date & Time' />
         <p>{event.dateTime.startDate.format('LLLL')} <span style={{color: BernieColors.gray}}>{event.dateTime.startDate.format('llll')} local time</span></p>
         <p>Duration: {event.dateTime.duration.h} hours {event.dateTime.duration.m} minutes</p>
-        
+
         <InfoHeader content='Event Location' />
         <p>{event.node.venueName}</p>
         <p>{event.node.venueAddr1} {event.node.venueAddr2}</p>
