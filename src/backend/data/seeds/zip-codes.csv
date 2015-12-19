@@ -1,4 +1,4 @@
-"zip","city","state","latitude","longitude","timezoneOffset","hasDST"
+"zip","city","state","latitude","longitude","timezone_offset","has_dst"
 "00210","Portsmouth","NH","43.005895","-71.013202","-5","1"
 "00211","Portsmouth","NH","43.005895","-71.013202","-5","1"
 "00212","Portsmouth","NH","43.005895","-71.013202","-5","1"

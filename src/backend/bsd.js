@@ -5,7 +5,6 @@ import querystring from 'querystring';
 import {parseString} from 'xml2js';
 import Promise from 'bluebird';
 import qs from 'querystring';
-import BSDAudit from './data/models/bsd-audit';
 import log from './log';
 
 const parseStringPromise = Promise.promisify(parseString);
@@ -307,7 +306,6 @@ export default class BSD {
 
   async deleteEvents(eventIdArray) {
     let promises = eventIdArray.map((event_id) => {
-      event_id = 100
       return this.request('/event/delete_event', {event_id}, 'POST');
     });
     let responses = await Promise.all(promises);
@@ -404,7 +402,6 @@ export default class BSD {
       resolveWithFullResponse: true,
       json: true
     }
-    console.log(finalURL);
     return requestPromise(options)
   }
 

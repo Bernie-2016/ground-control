@@ -316,6 +316,7 @@ class AdminEventsSection extends React.Component {
             label="Create"
             onTouchTap={() => {
               this._handleEventCreation(this.state.selectedRows);
+              // window.location = '/admin/events/create'
             }}
           />
           <ToolbarSeparator style={{marginLeft: 0}} />
@@ -795,6 +796,7 @@ export default Relay.createContainer(AdminEventsSection, {
               hostReceiveRsvpEmails
               rsvpUseReminderEmail
               rsvpReminderHours
+              attendeesCount
             }
           }
         }

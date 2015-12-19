@@ -25,6 +25,7 @@ setTimeout(function() {
     }
 
     console.log("Seeding data...")
+    childProcess.execSync('npm run migrate');
     childProcess.execSync('npm run seed');
     console.log("Done!")
 }, 2000)

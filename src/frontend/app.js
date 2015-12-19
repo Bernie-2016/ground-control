@@ -122,7 +122,7 @@ ReactDOM.render(
       component={Dashboard}
       queries={CurrentUserQueries}
       >
-      <IndexRedirect to='/call' />
+      <IndexRedirect to='/404' />
       <Route
         path='call'
         component={CallAssignmentsDashboard}
