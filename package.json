@@ -6,7 +6,7 @@
   "version": "0.1.0",
   "scripts": {
     "bundle": "mustache ./src/frontend/index/production.json ./src/frontend/index/index.mustache > ./src/frontend/public/index.html && mkdir -p ./src/frontend/public/js && webpack --config ./webpack/config.js",
-    "prestart": "npm run bundle",
+    "postinstall": "npm run bundle",
     "start": "./run ./src/backend/server.js",
     "predev": "mustache ./src/frontend/index/development.json ./src/frontend/index/index.mustache > ./src/frontend/public/index.html",
     "dev": "nf start -w --procfile Procfile.dev",
