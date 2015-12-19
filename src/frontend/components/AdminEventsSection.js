@@ -483,8 +483,7 @@ class AdminEventsSection extends React.Component {
           </Tab>
           <Tab label="Edit" value={'1'} >
             <EventEdit
-              eventsArray={events}
-              eventIndex={this.state.activeEventIndex}
+              event={events[this.state.activeEventIndex]}
               key={this.state.activeEventIndex}
             />
           </Tab>

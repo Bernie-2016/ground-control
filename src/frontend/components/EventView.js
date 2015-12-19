@@ -11,6 +11,25 @@ const InfoHeader = ({content}) => (
   <h3 style={BernieText.smallHeader}>{content}</h3>
 );
 
+let GCSelectField = ({name, floatingLabelText, selectedIndex, onChange, valueMember, menuItems, fullWidth}) => (
+  <div>
+    <SelectField
+      selectedIndex={selectedIndex}
+      floatingLabelText={floatingLabelText}
+      menuItems={menuItems}
+      fullWidth={fullWidth}
+      floatingLabelStyle={{transform: 'perspective(1px) scale(0.75) translate3d(2px, -28px, 0)'}}
+      onChange={onChange}
+    />
+    <input
+      name={name}
+      value={menuItems[selectedIndex]['payload']}
+      readOnly
+      // style={{display:'none'}}
+    />
+  </div>
+);
+
 class Event {
   constructor(bsdEvent) {
     this.node = bsdEvent;
@@ -34,42 +53,51 @@ const eventTypeOptions = [
 export class EventEdit extends React.Component {
   constructor(props) {
     super(props);
-    this.setState = this.setState.bind(this);
+
+    let event = this.props.event.node;
+    event['dateTime'] = {
+      startDate: moment(event.startDate),
+      duration: {
+        h: Math.floor(event.duration/60),
+        m: event.duration % 60
+      }
+    };
+
+    let eventTypeIndex = 0;
+    eventTypeOptions.forEach((type, index) => {
+      if (type.text == event.eventType.name){
+        eventTypeIndex = index;
+      }
+    });
+
     this.state = {
-      event: new Event(this.props.eventsArray[this.props.eventIndex]['node'])
+      event: event,
+      eventTypeIndex: eventTypeIndex
     };
   }
 
   renderForm() {
-
-    const event = new Event(this.props.eventsArray[this.props.eventIndex]['node']);
-
-    const eventTypeOpts = {
-      'bsd-event-rsvper' : 'Create event RSVPs'
-    };
-
+    let event = this.state.event;
     const defaultStr = yup.string().default('')
   
     const eventSchema = yup.object({
-      name: yup.string().default(event.node.name)
+      name: yup.string().default(event.name)
         .required('An event name is required'),
 
-      eventTypeId: yup.number().default(event.node.eventType.id)
+      eventTypeId: yup.number()
+        .default(eventTypeOptions[this.state.eventTypeIndex]['payload'])
         .required('Please select an event type'),
 
-      description: yup.string().default(event.node.description)
+      description: yup.string().default(event.description)
         .required('An event description is required'),
 
       rsvpReminderHours: yup.number()
-        .default(event.node.rsvpReminderHours)
+        .default(event.rsvpReminderHours)
         .min(0),
-  
-      eventDate: yup.date()
-        .max(new Date(), "Are you a time traveler?!")
-        .required('Please select a date'),
 
-      startTime: yup.string()
-        .required('Please select a time'),
+      startDate: yup.date()
+        .default(event.dateTime.startDate.toDate())
+        .required('Please select a date'),
   
       duration: yup.object({
         h: yup.number()
@@ -86,60 +114,60 @@ export class EventEdit extends React.Component {
       }),
 
       venue: yup.object({
-        name: yup.string().default(event.node.venueName)
+        name: yup.string().default(event.venueName)
           .required('please enter a venue name'),
 
-        addr1: yup.string().default(event.node.venueAddr1)
+        addr1: yup.string().default(event.venueAddr1)
           .required('please enter an event address'),
 
-        addr2: yup.string().default(event.node.venueAddr2)
+        addr2: yup.string().default(event.venueAddr2)
           .nullable(),
 
-        city: yup.string().default(event.node.venueCity)
+        city: yup.string().default(event.venueCity)
           .required('please enter a city'),
 
-        state: yup.string().default(event.node.venueState)
+        state: yup.string().default(event.venueState)
           .required('please enter a state'),
 
-        zip: yup.string().default(event.node.venueZip)
+        zip: yup.string().default(event.venueZip)
           .required('please enter a zip code'),
 
-        country: yup.string().default(event.node.venueCountry)
+        country: yup.string().default(event.venueCountry)
           .required('please enter a country'),
 
-        directions: yup.string().default(event.node.venueDirections)
+        directions: yup.string().default(event.venueDirections)
           .nullable(),
 
         capacity: yup.number()
-          .default(event.node.capacity)
+          .default(event.capacity)
           .min(0)
           .required('please enter an event capacity'),
       }),
 
       contactPhone: yup.string()
-        .default(event.node.contactPhone)
+        .default(event.contactPhone)
         .required('A contact phone number is required'),
 
       publicPhone: yup.boolean()
-        .default(event.node.publicPhone),
+        .default(event.publicPhone),
 
       hostReceiveRsvpEmails: yup.boolean()
-        .default(event.node.hostReceiveRsvpEmails),
+        .default(event.hostReceiveRsvpEmails),
 
       rsvpUseReminderEmail: yup.boolean()
-        .default(event.node.rsvpUseReminderEmail),
+        .default(event.rsvpUseReminderEmail),
 
       attendeeVolunteerShow: yup.boolean()
-        .default(event.node.attendeeVolunteerShow),
+        .default(event.attendeeVolunteerShow),
 
       attendeeVolunteerMessage: yup.string()
-        .default(event.node.attendeeVolunteerMessage),
+        .default(event.attendeeVolunteerMessage),
 
-      isSearchable: yup.number()
-        .default(event.node.isSearchable),
+      isSearchable: yup.boolean()
+        .default((event.isSearchable == 1)),
 
       flagApproval: yup.boolean()
-        .default(event.node.flagApproval)
+        .default(false)
 
     });
     
@@ -159,18 +187,17 @@ export class EventEdit extends React.Component {
           fullWidth={true}
         />
 
-        <SelectField
-          value={event.node.eventType.name}
+        <GCSelectField
+          name="eventTypeId"
           floatingLabelText="Event Type"
-          valueMember="text"
+          selectedIndex={this.state.eventTypeIndex}
           menuItems={eventTypeOptions}
           fullWidth={true}
-        />
-
-        <Form.Field
-          name='eventTypeId'
-          label='Event Type'
-          style={{display:'none'}}
+          onChange={(event, index) => {
+            this.setState({
+              eventTypeIndex: index
+            })
+          }}
         />
 
         <Form.Field
@@ -183,16 +210,44 @@ export class EventEdit extends React.Component {
         <InfoHeader content='Event Date & Time' />
 
         <DatePicker
-          name='eventDate'
           defaultDate={event.dateTime.startDate.toDate()}
           autoOk={true}
+          onChange={(changeEvent, time) => {
+            const updatedDate = moment(time);
+            let currentDate = event.dateTime.startDate;
+
+            currentDate.set('year', updatedDate.get('year'));
+            currentDate.set('month', updatedDate.get('month'));
+            currentDate.set('date', updatedDate.get('date'));
+
+            this.setState({
+              event: event
+            })
+          }}
+        />
+
+        <input
+          name='startDate'
+          value={event.dateTime.startDate.format('dddd, MMMM Do YYYY h:mm a')}
+          readOnly
+          // style={{display:'none'}}
         />
 
         <TimePicker
-          name='startTime'
           defaultTime={event.dateTime.startDate.toDate()}
           format="ampm"
           autoOk={true}
+          onChange={(changeEvent, time) => {
+            const updatedTime = moment(time);
+            let currentDate = event.dateTime.startDate;
+
+            currentDate.set('hour', updatedTime.get('hour'));
+            currentDate.set('minute', updatedTime.get('minute'));
+
+            this.setState({
+              event: event
+            })
+          }}
         />
 
         <Form.Field
@@ -268,24 +323,23 @@ export class EventEdit extends React.Component {
         <Form.Field
           name="contactPhone"
           floatingLabelText="Contact Phone"
-        /><br/>
+        /><br/><br/>
 
-        <Checkbox
+        <Form.Field
           name="publicPhone"
           label="Make Contact Number Public"
-          defaultChecked={event.node.publicPhone}
         /><br/>
 
-        <Checkbox
+        <Form.Field
+          name="hostReceiveRsvpEmails"
           label="Send Host RSVPs via Email"
-          defaultChecked={event.node.hostReceiveRsvpEmails}
         />
 
         <InfoHeader content='Event Attendees' />
 
-        <Checkbox
+        <Form.Field
+          name="rsvpUseReminderEmail"
           label="Send Guests RSVP Email Reminder"
-          defaultChecked={event.node.rsvpUseReminderEmail}
         />
 
         <Form.Field
@@ -295,9 +349,9 @@ export class EventEdit extends React.Component {
           min="0"
         /><br/><br/>
 
-        <Checkbox
+        <Form.Field
+          name="attendeeVolunteerShow"
           label="Ask Attendees to Volunteer"
-          defaultChecked={event.node.attendeeVolunteerShow}
         />
 
         <Form.Field
@@ -309,12 +363,12 @@ export class EventEdit extends React.Component {
 
         <InfoHeader content='Event Settings' />
 
-        <Checkbox
+        <Form.Field
+          name="isSearchable"
           label="Make Event Public"
-          defaultChecked={(event.node.isSearchable == 1)}
         /><br/>
 
-        <Checkbox
+        <Form.Field
           name="flagApproval"
           label="Mark this event as incomplete/needs further review"
         /><br/><br/>
