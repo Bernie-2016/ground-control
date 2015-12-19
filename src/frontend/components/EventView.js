@@ -78,7 +78,7 @@ export class EventEdit extends React.Component {
 
   renderForm() {
     let event = this.state.event;
-    const defaultStr = yup.string().default('')  
+    const defaultStr = yup.string().default('');  
     const eventSchema = yup.object({
       name: yup.string().default(event.name)
         .required('An event name is required'),
@@ -211,6 +211,7 @@ export class EventEdit extends React.Component {
 
         <DatePicker
           defaultDate={event.dateTime.startDate.toDate()}
+          minDate={new Date()}
           autoOk={true}
           onChange={(changeEvent, time) => {
             const updatedDate = moment(time);
