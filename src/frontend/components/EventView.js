@@ -175,8 +175,13 @@ export class EventEdit extends React.Component {
       <GCForm
         schema={eventSchema}
         defaultValue={eventSchema.default()}
-        onSubmit={function(data){console.log(data)}}
-        onError={function(data){console.log(data)}}
+        onSubmit={(data) => {
+          console.log(data)
+        }}
+        onError={(data) => {
+          console.log(data)
+        }}
+        id='editForm'
       >
 
         <InfoHeader content='Event Information' />
