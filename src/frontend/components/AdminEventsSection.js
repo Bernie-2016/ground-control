@@ -723,7 +723,7 @@ class AdminEventsSection extends React.Component {
 
 export default Relay.createContainer(AdminEventsSection, {
   initialVariables: {
-    numEvents: 2,
+    numEvents: 100,
     sortField: 'startDate',
     sordDirection: 'ASC'
   },

@@ -62,17 +62,17 @@ passport.use('signup', new LocalStrategy(
     passReqToCallback: true
   },
   wrap(async (req, email, password, done) => {
-    let user = await knex.wrap(knex('users').where('email', email.toLowerCase()).first())
+    let user = await knex('users').where('email', email.toLowerCase()).first()
 
     if (!user) {
       let password = await hash(password)
-      let userId = await knex.wrap(knex('users'))
+      let userId = await knex('users')
         .returning('id')
         .insert({
           email: email.toLowerCase(),
           password: password
         })[0]
-      let newUser = await knex.wrap(knex('users').where('id', id))
+      let newUser = await knex('users').where('id', id)
       return done(null, newUser)
     } else if (!await compare(password, user.password)) {
       return done(null, false, { message: 'Incorrect password.' })
@@ -87,7 +87,7 @@ passport.serializeUser(wrap(async (user, done) => {
 }))
 
 passport.deserializeUser(wrap(async (id, done) => {
-  let user = await knex.wrap(knex('users').where('id', id).first())
+  let user = await knex('users').where('id', id).first()
   done(null, user)
 }))
 
@@ -110,7 +110,7 @@ let rateLimitRoutes = [
 
 function dataLoaderCreator(tablename, idField) {
   return new DataLoader(async (keys) => {
-    return knex.wrap(knex(tablename).whereIn(idField, keys))
+    return knex(tablename).whereIn(idField, keys)
   })
 }
 

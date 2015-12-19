@@ -76,14 +76,13 @@ async function getPrimaryEmail(person) {
 }
 
 async function getPrimaryAddress(person) {
-  return knex.wrap(knex('bsd_addresses')
+  return knex('bsd_addresses')
       .where({
         is_primary: true,
         cons_id: person.cons_id
       })
       .select('cons_addr_id')
       .first()
-  )
 }
 
 async function getPrimaryPhone(person, loaders) {
@@ -102,23 +101,30 @@ const SharedListContainer = {
   _type: 'list_container'
 }
 
+async function addType(query) {
+  let table = query._single.tablename
+  let results = await query
+  results._type = table;
+  return results
+}
+
 let {nodeInterface, nodeField} = nodeDefinitions(
   (globalId) => {
     let {type, id} = fromGlobalId(globalId)
     if (type === 'Person')
-      return knex.wrap(knex('bsd_people').where('cons_id', id))
+      return addType(knex('bsd_people').where('cons_id', id))
     if (type === 'CallAssignment')
-      return knex.wrap(knex('bsd_call_assignments').where('id', id))
+      return addType(knex('bsd_call_assignments').where('id', id))
     if (type === 'Survey')
-      return knex.wrap(knex('gc_bsd_surveys').where('id', id))
+      return addType(knex('gc_bsd_surveys').where('id', id))
     if (type === 'EventType')
-      return knex.wrap(knex('bsd_event_types').where('event_type_id', id))
+      return addType(knex('bsd_event_types').where('event_type_id', id))
     if (type === 'Event')
-      return knex.wrap(knex('bsd_events').where('event_id', id))
+      return addType(knex('bsd_events').where('event_id', id))
     if (type === 'User')
-      return knex.wrap(knex('users').where('id', id))
+      return addType(knex('users').where('id', id))
     if (type === 'Address')
-      return knex.wrap(knex('bsd_addresses').where('cons_addr_id', id))
+      return addType(knex('bsd_addresses').where('cons_addr_id', id))
     if (type === 'ListContainer')
       return SharedListContainer
     return null
@@ -154,7 +160,7 @@ const GraphQLListContainer = new GraphQLObjectType({
       type: GraphQLEventTypeConnection,
       args: connectionArgs,
       resolve: async (eventType, {first}, {rootValue}) => {
-        let eventTypes = await knex.wrap(knex('bsd_event_types').limit(first))
+        let eventTypes = await knex('bsd_event_types').limit(first)
         return connectionFromArray(eventTypes)
       }
     },
@@ -162,7 +168,7 @@ const GraphQLListContainer = new GraphQLObjectType({
       type: GraphQLEventConnection,
       args: connectionArgs,
       resolve: async (event, {first}, {rootValue}) => {
-        let events = await knex.wrap(knex('bsd_events').limit(first).orderBy('start_dt', 'asc'))
+        let events = await knex('bsd_events').limit(first).orderBy('start_dt', 'asc')
         return connectionFromArray(events, {first})
       }
     },
@@ -170,7 +176,7 @@ const GraphQLListContainer = new GraphQLObjectType({
       type: GraphQLCallAssignmentConnection,
       args: connectionArgs,
       resolve: async (root, {first}, {rootValue}) => {
-        let assignments = await knex.wrap(knex('bsd_call_assignments').limit(first))
+        let assignments = await knex('bsd_call_assignments').limit(first)
         return connectionFromArray(assignments, {first})
       }
     },
@@ -187,7 +193,7 @@ const GraphQLUser = new GraphQLObjectType({
       type: GraphQLCallAssignmentConnection,
       args: connectionArgs,
       resolve: async (user, {first}) => {
-        let assignments = await knex.wrap(knex('bsd_call_assignments').limit(first))
+        let assignments = knex('bsd_call_assignments').limit(first)
         return connectionFromArray(assignments, {first})
       }
     },
@@ -428,9 +434,9 @@ const GraphQLPerson = new GraphQLObjectType({
         let boundingDistance = within / 69
         let eventTypes = null
         if (type) {
-          eventTypes = await knex.wrap(knex('bsd_event_types')
+          eventTypes = knex('bsd_event_types')
             .where(name, 'ilike', `%${type}%`)
-            .select('event_type_id'))
+            .select('event_type_id')
         }
 
         let query = knex('bsd_events')
@@ -441,7 +447,7 @@ const GraphQLPerson = new GraphQLObjectType({
         if (eventTypes)
           query = query.whereIn('event_type_id', [eventTypes])
 
-        return knex.wrap(query);
+        return query;
       }
     }
   }),
@@ -699,10 +705,10 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
     let localCallAssignmentId = parseInt(fromGlobalId(callAssignmentId).id, 10)
     return knex.transaction(async (trx) => {
       // To ensure that the assigned call exists
-      let assignedCall = await knex.wrap(knex('bsd_assigned_calls')
+      let assignedCall = await knex('bsd_assigned_calls')
         .transacting(trx)
         .where('caller_id', caller.id)
-        .first())
+        .first()
 
       let assignedCallInfo = {
         callerId: assignedCall.caller_id,
@@ -722,17 +728,17 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
         }
       })
 
-      let callAssignment = await knex.wrap(knex('bsd_call_assignments')
+      let callAssignment = await knex('bsd_call_assignments')
         .transacting(trx)
-        .where('id', localCallAssignmentId))
-      let survey = await knex.wrap(knex('gc_bsd_surveys')
+        .where('id', localCallAssignmentId)
+      let survey = await knex('gc_bsd_surveys')
         .transacting(trx)
-        .where('id', callAssignment.survey_id))
+        .where('id', callAssignment.survey_id)
 
       let fieldValues = JSON.parse(surveyFieldValues)
-      fieldValues['person'] = await knex.wrap(knex('bsd_people')
+      fieldValues['person'] = await knex('bsd_people')
         .transacting(trx)
-        .where('id', localIntervieweeId))
+        .where('id', localIntervieweeId)
 
       if (completed) {
         if (survey.processors.length === 0)
