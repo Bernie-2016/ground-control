@@ -5,10 +5,11 @@ import moment from 'moment';
 
 export default class GCDateField extends React.Component {
   render() {
-    console.log(this.props.value, typeof this.props.value);
+    let floatingLabelText = this.props.floatingLabelText || this.props.label
     let oldDate = moment(this.props.value);
     return <DatePicker
       {...this.props}
+      floatingLabelText={floatingLabelText}
       hintText={this.props.label}
       onChange={(_, date) => {
         let newDate = moment(date);

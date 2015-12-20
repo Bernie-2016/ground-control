@@ -121,13 +121,11 @@ export default class EventEdit extends React.Component {
         <Form.Field
           name='name'
           label='Event Name'
-          floatLabel={true}
         />
 
         <Form.Field
           name='description'
           label='Event Description'
-          floatLabel={true}
           multiLine={true}
           fullWidth={true}
         />
@@ -136,12 +134,14 @@ export default class EventEdit extends React.Component {
 
         <Form.Field
           name='startDate'
+          label='Start Date'
           minDate={new Date()}
           autoOk={true}
         />
 
         <Form.Field
           name='startDate'
+          label='Start Time'
           type='time'
           format='ampm'
           autoOk={true}
@@ -149,14 +149,14 @@ export default class EventEdit extends React.Component {
 
         <Form.Field
           name='duration.h'
-          floatingLabelText="Duration (Hours)"
+          label="Duration (Hours)"
           type='number'
           min="0"
         />
 
         <Form.Field
           name='duration.m'
-          floatingLabelText="Duration (Minutes)"
+          label="Duration (Minutes)"
           type='number'
           min="0"
           max="59"
@@ -166,51 +166,51 @@ export default class EventEdit extends React.Component {
 
         <Form.Field
           name='venue.name'
-          floatingLabelText='Venue Name'
+          label='Venue Name'
         />
 
         <Form.Field
           name='venue.capacity'
-          floatingLabelText="Venue Capacity (enter 0 for unlimited)"
+          label="Venue Capacity (enter 0 for unlimited)"
           type='number'
           min="0"
         /><br/>
 
         <Form.Field
           name='venue.addr1'
-          floatingLabelText='Address Line 1'
+          label='Address Line 1'
           fullWidth={true}
         />
 
         <Form.Field
           name='venue.addr2'
-          floatingLabelText='Address Line 2'
+          label='Address Line 2'
           fullWidth={true}
         />
 
         <Form.Field
           name='venue.city'
-          floatingLabelText='City'
+          label='City'
         />
 
         <Form.Field
           name='venue.state'
-          floatingLabelText='State'
+          label='State'
         />
 
         <Form.Field
           name='venue.zip'
-          floatingLabelText='Zip Code'
+          label='Zip Code'
         />
 
         <Form.Field
           name='venue.country'
-          floatingLabelText='Country'
+          label='Country'
         />
 
         <Form.Field
           name='venue.directions'
-          floatingLabelText='Directions to Venue'
+          label='Directions to Venue'
           multiLine={true}
           fullWidth={true}
         />
@@ -219,7 +219,7 @@ export default class EventEdit extends React.Component {
 
         <Form.Field
           name="contactPhone"
-          floatingLabelText="Contact Phone"
+          label="Contact Phone"
         /><br/><br/>
 
         <Form.Field
@@ -241,7 +241,7 @@ export default class EventEdit extends React.Component {
 
         <Form.Field
           name='rsvpReminderHours'
-          floatingLabelText="RSVP Reminder Hours"
+          label="RSVP Reminder Hours"
           type='number'
           min="0"
         /><br/><br/>
@@ -253,7 +253,7 @@ export default class EventEdit extends React.Component {
 
         <Form.Field
           name='attendeeVolunteerMessage'
-          floatingLabelText="Message for Event Volunteers"
+          label="Message for Event Volunteers"
           multiLine={true}
           fullWidth={true}
         />

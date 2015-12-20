@@ -4,12 +4,11 @@ import {BernieText} from '../styles/bernie-css';
 
 export default class GCTextField extends React.Component {
   render() {
-    let extraProps = {}
-    if (this.props.floatLabel)
-      extraProps['floatingLabelText'] = this.props.label
+    let floatingLabelText = this.props.floatingLabelText || this.props.label
+
     return <TextField
       {...this.props}
-      {...extraProps}
+      floatingLabelText={floatingLabelText}
       errorStyle={BernieText.inputError}
       hintText={this.props.label}
       onChange={(event) => {this.props.onChange(event.target.value)}}

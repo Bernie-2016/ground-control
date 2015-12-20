@@ -29,9 +29,16 @@ export default class GCSelectField extends React.Component {
         color: BernieColors.red
       }
     }
+
+    let extraProps = {
+      floatLabel: this.props.label
+    }
+    if (typeof this.props.floatLabel === false)
+      extraProps = {}
     return (
       <SelectField
         {...this.props}
+        {...extraProps}
         displayMember='name'
         valueMember='value'
         floatingLabelText={this.props.label}

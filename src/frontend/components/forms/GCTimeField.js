@@ -5,10 +5,12 @@ import moment from 'moment';
 
 export default class GCTimeField extends React.Component {
   render() {
+    let floatingLabelText = this.props.floatingLabelText || this.props.label
     let time = moment(this.props.value).format('HH:mm')
     let oldDate = moment(this.props.value)
     return <TimePicker
       {...this.props}
+      floatingLabelText={floatingLabelText}
       value={time}
       hintText={this.props.label}
       onChange={(_, time) => {
