@@ -91,7 +91,10 @@ class AdminEventsSection extends React.Component {
       cursor: 'pointer'
     }}
     >
-      {content}
+      {content}{(this.props.relay.variables.sortField == attribute) ? <FontIcon
+      className="material-icons"
+      style={{display: 'inline', float: 'right', position: 'relative', top: '-3px'}}
+      >{(this.props.relay.variables.sortDirection == 'ASC') ? 'arrow_drop_down' : 'arrow_drop_up'}</FontIcon> : ''}
     </Cell>
   )
 
@@ -750,7 +753,7 @@ class AdminEventsSection extends React.Component {
             header={<this.SortControllerCell content="Duration" attribute="duration" />}
             cell={<this.DurationCell data={events} col="duration" />}
             flexGrow={1}
-            width={90}
+            width={110}
           />
         </ColumnGroup>
         <ColumnGroup
@@ -777,7 +780,7 @@ class AdminEventsSection extends React.Component {
             header={<this.SortControllerCell content="State" attribute="venueStateCd" />}
             cell={<this.TextCell data={events} col="venueStateCd" />}
             flexGrow={1}
-            width={60}
+            width={80}
             align='center'
           />
           <Column
@@ -796,7 +799,7 @@ class AdminEventsSection extends React.Component {
             cell={
               <this.EventTypeCell data={events} col="eventType" />
             }
-            width={100}
+            width={120}
           />
           <Column
             flexGrow={1}
@@ -814,14 +817,14 @@ class AdminEventsSection extends React.Component {
             flexGrow={1}
             header={<this.SortControllerCell content="Capacity" attribute="capacity" />}
             cell={<this.TextCell data={events} col="capacity" />}
-            width={80}
+            width={100}
             align='center'
           />
           <Column
             flexGrow={1}
             header={<this.HeaderCell content="RSVPs" />}
             cell={<this.TextCell data={events} col="attendeesCount" />}
-            width={80}
+            width={100}
             align='center'
           />
         </ColumnGroup>
