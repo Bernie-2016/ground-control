@@ -43,7 +43,6 @@ export default class GCForm extends React.Component {
 
   render() {
     return (
-      <div>
         <Form
           onError={(errors) => {
             this.setState({formErrors: errors})
@@ -51,7 +50,6 @@ export default class GCForm extends React.Component {
           {...this.props} >
           {this.renderChildren(this.props.children)}
         </Form>
-      </div>
     )
   }
 }
