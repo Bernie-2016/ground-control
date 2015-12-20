@@ -86,7 +86,7 @@ async function getPrimaryAddress(person) {
       .first()
 }
 
-async function getPrimaryPhone(person, loaders) {
+async function getPrimaryPhone(person) {
   let phones = await knex('bsd_phones')
     .where({
       is_primary: true,
@@ -184,7 +184,10 @@ const GraphQLListContainer = new GraphQLObjectType({
         filterProps.forEach((prop) => {
           filters[humps.decamelize(prop)] = filterOptions[prop];
         });
-        let events = await knex('bsd_events').where(filters).limit(first).orderBy('start_dt', 'asc')
+        let events = await knex('bsd_events')
+          .where(filters)
+          .limit(first)
+          .orderBy('start_dt', 'asc')
         return connectionFromArray(events, {first})
       }
     },

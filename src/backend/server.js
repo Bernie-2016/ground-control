@@ -21,6 +21,7 @@ import knex from './data/knex'
 import KnexSessionStoreFactory from 'connect-session-knex'
 import DataLoader from 'dataloader'
 
+log.info('Writing schema...')
 writeSchema()
 
 const wrap = (fn) => {
@@ -163,7 +164,7 @@ app.use('/graphql', graphQLHTTP((request) => {
   return {
     rootValue: {
       user: request.user,
-      loaders: createLoaders()
+      loaders: createLoaders(),
     },
     schema: Schema
   }
@@ -259,6 +260,7 @@ app.post('/events/create', wrap(async (req, res) => {
 
 app.use(fallback('index.html', { root: publicPath }))
 
+log.info('Starting up...')
 app.listen(port, () => log.info(
   `Server is now running on http://localhost:${port}`
 ))

@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Relay from 'react-relay';
-import {EventPreview, EventEdit} from './EventView';
+import EventPreview from './EventPreview';
+import EventEdit from './EventEdit';
 import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle, SelectField, DropDownMenu, DropDownIcon, Dialog, Tabs, Tab, FlatButton, RaisedButton, IconButton, FontIcon, Checkbox, TextField, Snackbar} from 'material-ui';
 import {Table, Column, ColumnGroup, Cell} from 'fixed-data-table';
 import {BernieText, BernieColors} from './styles/bernie-css';
@@ -382,7 +383,13 @@ class AdminEventsSection extends React.Component {
   renderDeleteModal() {
     let standardActions = [
       { text: 'Cancel' },
-      { text: 'Delete', onTouchTap: this._deleteEvent, ref: 'submit' }
+      { text: 'Delete',
+        onTouchTap: () => {
+          if (!this.refs.deleteConfirmationInput || this.refs.deleteConfirmationInput.getValue() === 'DELETE')
+            this._deleteEvent()
+        },
+        ref: 'submit'
+      }
     ];
 
     this._handleDeleteModalRequestClose = () => {
@@ -405,7 +412,7 @@ class AdminEventsSection extends React.Component {
     let textConfirm = (
       <div>
         <p>Type <span style={{color: BernieColors.red}}>DELETE</span> to confirm.</p>
-        <TextField hintText="DELETE" underlineFocusStyle={{borderColor: BernieColors.red}} ref="deleteConfirmationInput" />
+        <TextField hintText="TYPE HERE" underlineFocusStyle={{borderColor: BernieColors.red}} ref="deleteConfirmationInput" />
       </div>
     )
     if (numEvents < 5)
@@ -451,8 +458,8 @@ class AdminEventsSection extends React.Component {
     )
   }
 
-  renderEventPreviewModal(events) {
-
+  renderEventPreviewModal() {
+    let events = this.props.listContainer.events.edges;
     let customActions = [
       // <KeyboardActionsInfo key="0" />,
       <FlatButton
@@ -487,6 +494,8 @@ class AdminEventsSection extends React.Component {
       });
     }
 
+    let activeEvent = events[this.state.activeEventIndex] ? events[this.state.activeEventIndex].node : null;
+
     return (
       <Dialog
         actions={customActions}
@@ -508,28 +517,27 @@ class AdminEventsSection extends React.Component {
         >
           <Tab label="Preview" value={'0'} >
             <EventPreview
-              eventsArray={events}
-              eventIndex={this.state.activeEventIndex}
+              event={activeEvent}
               onChangeEventIndex={(n) => {
-              this._iterateActiveEvent(n);
-            }}
+                this._iterateActiveEvent(n);
+              }}
               onEventConfirm={(indexArray) => {
-              this._handleEventConfirmation(indexArray);
-            }}
+                this._handleEventConfirmation(indexArray);
+              }}
               onEventEdit={(modifiedEvent) => {
-              this._handleEventEdit(modifiedEvent);
-            }}
+                this._handleEventEdit(modifiedEvent);
+              }}
               onTabRequest={(eventIndex, tabIndex) => {
-              this._handleEventPreviewOpen(eventIndex, tabIndex);
-            }}
+                this._handleEventPreviewOpen(eventIndex, tabIndex);
+              }}
               onEventDelete={(indexArray) => {
-              this._handleEventDeletion(indexArray);
-            }}
+                this._handleEventDeletion(indexArray);
+              }}
             />
           </Tab>
           <Tab label="Edit" value={'1'} >
             <EventEdit
-              event={events[this.state.activeEventIndex]}
+              event={activeEvent}
               key={this.state.activeEventIndex}
             />
           </Tab>
@@ -640,7 +648,7 @@ class AdminEventsSection extends React.Component {
       <MutationHandler ref='eventDeletionHandler' successMessage='Event deleted!' mutationClass={DeleteEvents} />
       {this.renderDeleteModal()}
       {this.renderCreateModal()}
-      {this.renderEventPreviewModal(events)}
+      {this.renderEventPreviewModal()}
       {this.renderToolbar()}
       <Table
         rowHeight={83}
