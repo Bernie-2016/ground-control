@@ -6,8 +6,8 @@ import Form from 'react-formal';
 import yup from 'yup';
 import moment from 'moment';
 import {Card, CardActions, CardExpandable, CardTitle, CardHeader, CardText, FlatButton, TextField, DropDownMenu, SelectField, DatePicker, TimePicker, Checkbox} from 'material-ui';
-import GCSelectField from './forms/GCSelectField'
 import InfoHeader from './InfoHeader'
+import {USTimeZones} from './data/USTimeZones';
 
 class EventEdit extends React.Component {
   eventTypes() {
@@ -18,9 +18,16 @@ class EventEdit extends React.Component {
     return allTypes;
   }
 
+  timezones() {
+    let allZones = {}
+    USTimeZones.forEach((zone) => {
+      allZones[zone.value] = zone.name
+    })
+    return allZones;
+  }
+
   renderForm() {
     let event = this.props.event;
-    const defaultStr = yup.string().default('');
     const eventSchema = yup.object({
       name: yup
         .string()
@@ -30,64 +37,68 @@ class EventEdit extends React.Component {
       eventTypeId: yup
         .string()
         .default(event.eventType.id)
-        .required('Please select an event type'),
+        .required(),
 
       description: yup.string().default(event.description)
-        .required('An event description is required'),
+        .required(),
 
       rsvpEmailReminderHours: yup.number()
         .default(event.rsvpEmailReminderHours)
         .min(0)
         .nullable(),
 
-      startDate: yup.date()
-        .default(moment(event.startDate).toDate())
-        .required('Please select a date'),
+      startDt: yup.date()
+        .default(moment(event.startDt).toDate())
+        .required(),
+
+      startTz: yup.string()
+        .default(event.startTz)
+        .required(),
 
       duration: yup.object({
         h: yup.number()
           .default(Math.floor(event.duration / 60))
           .min(0)
           .nullable()
-          .required('Please enter a number of hours'),
+          .required(),
 
         m: yup.number()
           .default(event.duration % 60)
           .min(0).max(59)
           .nullable()
-          .required('Please enter a number of minutes'),
+          .required(),
       }),
 
       venueName: yup.string().default(event.venueName)
-        .required('please enter a venue name'),
+        .required(),
 
       venueAddr1: yup.string().default(event.venueAddr1)
-        .required('please enter an event address'),
+        .required(),
 
       venueAddr2: yup.string().default(event.venueAddr2)
         .nullable(),
 
       venueCity: yup.string().default(event.venueCity)
-        .required('please enter a city'),
+        .required(),
 
       venueState: yup.string().default(event.venueState)
-        .required('please enter a state'),
+        .required(),
 
       venueZip: yup.string().default(event.venueZip)
-        .required('please enter a zip code'),
+        .required(),
 
       venueCountry: yup.string().default(event.venueCountry)
-        .required('please enter a country'),
+        .required(),
 
       venueDirections: yup.string().default(event.venueDirections)
         .nullable(),
       capacity: yup.number()
         .default(event.capacity)
         .min(0)
-        .required('please enter an event capacity'),
+        .required(),
       contactPhone: yup.string()
         .default(event.contactPhone)
-        .required('A contact phone number is required'),
+        .required(),
 
       publicPhone: yup.boolean()
         .default(event.publicPhone),
@@ -146,18 +157,27 @@ class EventEdit extends React.Component {
         <InfoHeader content='Event Date & Time' />
 
         <Form.Field
-          name='startDate'
+          name='startDt'
           label='Start Date'
           minDate={new Date()}
           autoOk={true}
+          utcOffset={event.localUTCOffset}
         />
 
         <Form.Field
-          name='startDate'
+          name='startDt'
           label='Start Time'
           type='time'
           format='ampm'
+          utcOffset={event.localUTCOffset}
         />
+
+        <Form.Field
+          name='startTz'
+          type='select'
+          label='Time Zone'
+          choices={this.timezones()}
+        /><br/>
 
         <Form.Field
           name='duration.h'

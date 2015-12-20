@@ -6,6 +6,7 @@ import EventEdit from './EventEdit';
 import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle, SelectField, DropDownMenu, DropDownIcon, Dialog, Tabs, Tab, FlatButton, RaisedButton, IconButton, FontIcon, Checkbox, TextField, Snackbar} from 'material-ui';
 import {Table, Column, ColumnGroup, Cell} from 'fixed-data-table';
 import {BernieText, BernieColors} from './styles/bernie-css';
+import moment from 'moment';
 import {states} from './data/states';
 
 import IconMenu from 'material-ui/lib/menus/icon-menu';
@@ -62,10 +63,39 @@ class AdminEventsSection extends React.Component {
       fontFamily: 'Roboto',
       fontSize: '14px',
       fontWeight: 400,
-      color: '#9e9e9e'
+      color: '#9e9e9e',
     }}
     >
       {content}
+    </Cell>
+  )
+
+  SortControllerCell = ({content, attribute, ...props}) => (
+    <Cell {...props}
+    onClick={(event) => {
+      let sortDir = 'ASC';
+      let columnWasAlreadySelected = (this.props.relay.variables.sortField == attribute);
+      if (columnWasAlreadySelected && this.props.relay.variables.sortDirection == 'ASC'){
+        sortDir = 'DESC';
+      };
+
+      this.props.relay.setVariables({
+        sortField: attribute,
+        sortDirection: sortDir
+      });
+    }}
+    style={{
+      fontFamily: 'Roboto',
+      fontSize: '14px',
+      fontWeight: 400,
+      color: '#9e9e9e',
+      cursor: 'pointer'
+    }}
+    >
+      {content}{(this.props.relay.variables.sortField == attribute) ? <FontIcon
+      className="material-icons"
+      style={{display: 'inline', float: 'right', position: 'relative', top: '-3px'}}
+      >{(this.props.relay.variables.sortDirection == 'ASC') ? 'arrow_drop_down' : 'arrow_drop_up'}</FontIcon> : ''}
     </Cell>
   )
 
@@ -128,7 +158,7 @@ class AdminEventsSection extends React.Component {
       lineHeight: '18px',
     }}
     >
-      {new Date(data[rowIndex]['node']['startDate']).toString()}
+      {moment(data[rowIndex]['node']['startDt']).utcOffset(data[rowIndex]['node']['localUTCOffset']).format('l LT')}
     </Cell>
   )
 
@@ -453,7 +483,7 @@ class AdminEventsSection extends React.Component {
         <iframe
           ref="creationForm"
           src="create"
-          style={{width: '100%', height: this.state.tableHeight*0.7, border: 'none'}}
+          style={{width: '100%', height: this.state.windowHeight*0.6, border: 'none'}}
         />
       </Dialog>
     )
@@ -480,9 +510,9 @@ class AdminEventsSection extends React.Component {
         label={(this.state.previewTabIndex == 0) ? 'Approve' : 'Update and Approve'}
         key="3"
         secondary={true}
-        onTouchTap={function(){
+        onTouchTap={() => {
           this.refs.eventEdit.refs.component.submit()
-        }.bind(this)}
+        }}
       />
     ];
 
@@ -712,7 +742,7 @@ class AdminEventsSection extends React.Component {
           />
           <Column
             flexGrow={1}
-            header={<this.HeaderCell content="Phone" />}
+            header={<this.SortControllerCell content="Phone" attribute="contactPhone" />}
             cell={<this.TextCell data={events} col="contactPhone" />}
             width={100}
           />
@@ -726,47 +756,47 @@ class AdminEventsSection extends React.Component {
         <ColumnGroup
           header={<this.HeaderCell content="Time" />}>
           <Column
-            header={<this.HeaderCell content="Datetime" />}
-            cell={<this.DateCell data={events} col="startDate" />}
+            header={<this.SortControllerCell content="Datetime" attribute="startDt" />}
+            cell={<this.DateCell data={events} col="startDt" />}
             flexGrow={1}
             width={170}
           />
           <Column
-            header={<this.HeaderCell content="Duration" />}
+            header={<this.SortControllerCell content="Duration" attribute="duration" />}
             cell={<this.DurationCell data={events} col="duration" />}
             flexGrow={1}
-            width={90}
+            width={110}
           />
         </ColumnGroup>
         <ColumnGroup
           header={<this.HeaderCell content="Event Location" />}>
           <Column
-            header={<this.HeaderCell content="Venue" />}
+            header={<this.SortControllerCell content="Venue" attribute="venueName" />}
             cell={<this.TextCell data={events} col="venueName" />}
             flexGrow={1}
             width={150}
           />
           <Column
-            header={<this.HeaderCell content="Address" />}
+            header={<this.SortControllerCell content="Address" attribute="venueAddr1" />}
             cell={<this.TextCell data={events} col="venueAddr1" />}
             flexGrow={1}
             width={150}
           />
           <Column
-            header={<this.HeaderCell content="City" />}
+            header={<this.SortControllerCell content="City" attribute="venueCity" />}
             cell={<this.TextCell data={events} col="venueCity" />}
             flexGrow={1}
             width={150}
           />
           <Column
-            header={<this.HeaderCell content="State" />}
-            cell={<this.TextCell data={events} col="venueState" />}
+            header={<this.SortControllerCell content="State" attribute="venueStateCd" />}
+            cell={<this.TextCell data={events} col="venueStateCd" />}
             flexGrow={1}
-            width={60}
+            width={80}
             align='center'
           />
           <Column
-            header={<this.HeaderCell content="Zip Code" />}
+            header={<this.SortControllerCell content="Zip Code" attribute="venueZip" />}
             cell={<this.TextCell data={events} col="venueZip" />}
             flexGrow={1}
             width={120}
@@ -777,23 +807,37 @@ class AdminEventsSection extends React.Component {
           header={<this.HeaderCell content="About" />}>
           <Column
             flexGrow={1}
-            header={<this.HeaderCell content="Event Type" />}
+            header={<this.SortControllerCell content="Event Type" attribute="eventTypeId" />}
             cell={
               <this.EventTypeCell data={events} col="eventType" />
             }
-            width={100}
+            width={120}
           />
           <Column
             flexGrow={1}
-            header={<this.HeaderCell content="Event Name" />}
+            header={<this.SortControllerCell content="Event Name" attribute="name" />}
             cell={<this.TextCell data={events} col="name" />}
             width={250}
           />
           <Column
             flexGrow={1}
-            header={<this.HeaderCell content="Description" />}
+            header={<this.SortControllerCell content="Description" attribute="description" />}
             cell={<this.TextCell data={events} col="description" />}
             width={250}
+          />
+          <Column
+            flexGrow={1}
+            header={<this.SortControllerCell content="Capacity" attribute="capacity" />}
+            cell={<this.TextCell data={events} col="capacity" />}
+            width={100}
+            align='center'
+          />
+          <Column
+            flexGrow={1}
+            header={<this.HeaderCell content="RSVPs" />}
+            cell={<this.TextCell data={events} col="attendeesCount" />}
+            width={100}
+            align='center'
           />
         </ColumnGroup>
       </Table>
@@ -805,7 +849,7 @@ class AdminEventsSection extends React.Component {
 export default Relay.createContainer(AdminEventsSection, {
   initialVariables: {
     numEvents: 100,
-    sortField: 'startDate',
+    sortField: 'startDt',
     sortDirection: 'ASC',
     filters: {flagApproval: true}
   },
@@ -814,7 +858,12 @@ export default Relay.createContainer(AdminEventsSection, {
       fragment on ListContainer {
         ${EventEdit.getFragment('listContainer')}
         ${DeleteEvents.getFragment('listContainer')}
-        events( first: $numEvents filterOptions: $filters ) {
+        events(
+          first: $numEvents
+          filterOptions: $filters
+          sortField: $sortField
+          sortDirection: $sortDirection
+        ) {
           edges {
             cursor
             node {
@@ -838,12 +887,14 @@ export default Relay.createContainer(AdminEventsSection, {
               longitude
               venueZip
               venueCity
-              venueState
+              venueStateCd
               venueAddr1
               venueAddr2
               venueCountry
               venueDirections
-              startDate
+              startDt
+              startTz
+              localUTCOffset
               duration
               capacity
               attendeeVolunteerShow

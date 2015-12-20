@@ -200,17 +200,23 @@ const GraphQLListContainer = new GraphQLObjectType({
       type: GraphQLEventConnection,
       args: {
         ...connectionArgs,
-        filterOptions: {type: GraphQLEventInput }
+        filterOptions: {type: GraphQLEventInput },
+        sortField: {type: GraphQLString},
+        sortDirection: {type: new GraphQLEnumType({
+          name: 'GraphQLSortDirection',
+          values: {
+            ASC: { value: 'asc' },
+            DESC: { value: 'desc' }
+          }
+        })}
       },
-      resolve: async (event, {first, filterOptions}, {rootValue}) => {
-        console.log("HERER??")
+      resolve: async (event, {first, filterOptions, sortField, sortDirection}, {rootValue}) => {
         let filters = eventFromAPIFields(filterOptions);
-
-        console.log(filters)
+        let convertedSortField = eventFromAPIFields(sortField);
         let events = await knex('bsd_events')
           .where(filters)
           .limit(first)
-          .orderBy('start_dt', 'asc')
+          .orderBy(convertedSortField, sortDirection)
         return connectionFromArray(events, {first})
       }
     },
@@ -556,7 +562,7 @@ const GraphQLEvent = new GraphQLObjectType({
       type: GraphQLString,
       resolve: (event) => event.venue_city
     },
-    venueState: {
+    venueStateCd: {
       type: GraphQLString,
       resolve: (event) => event.venue_state_cd
     },
@@ -576,9 +582,12 @@ const GraphQLEvent = new GraphQLObjectType({
       type: GraphQLString,
       resolve: (event) => event.venue_directions
     },
-    localTimezone: {
+    startTz: {
       type: GraphQLString,
-      resolve: (event) => event.start_tz
+      resolve: (event) => {
+        let zone = moment.tz.zone(event.start_tz)
+        return zone.name;
+      }
     },
     localUTCOffset: {
       type: GraphQLString,
@@ -586,10 +595,10 @@ const GraphQLEvent = new GraphQLObjectType({
         return moment().tz(event.start_tz).format('Z')
       }
     },
-    startDate: {
+    startDt: {
       type: GraphQLString,
       resolve: (event) => {
-        return moment(event.startDate).format()
+        return moment(event.start_dt).tz(event.start_tz).format()
       }
     },
     duration: { type: GraphQLInt },
@@ -747,7 +756,7 @@ const GraphQLEditEvents = mutationWithClientMutationId({
   mutateAndGetPayload: async ({events}, {rootValue}) => {
     adminRequired(rootValue)
     let params = events.map((event) => {
-      return eventFromAPIFields(event)      
+      return eventFromAPIFields(event)
     })
     let count = params.length;
 
