@@ -92,7 +92,7 @@ function eventFromAPIFields(fields) {
     event[newFieldName] = fields[fieldName]
   })
 
-  let idFields = ['id', 'host_id', 'event_type_id'];
+  let idFields = ['event_id', 'creator_cons_id', 'event_type_id'];
   idFields.forEach((field) => {
     if (event[field]) {
       event[field] = fromGlobalId(event[field]).id
@@ -545,7 +545,7 @@ const GraphQLEvent = new GraphQLObjectType({
     },
     host: {
       type: GraphQLPerson,
-      resolve: (event, _, {rootValue}) => rootValue.loaders.bsdPeople.load(event.creator_cons_id)
+      resolve: async (event, _, {rootValue}) => rootValue.loaders.bsdPeople.load(event.creator_cons_id)
     },
     eventType: {
       type: GraphQLEventType,
@@ -777,7 +777,6 @@ const GraphQLEditEvents = mutationWithClientMutationId({
           modified_dt: new Date()
         })
     }
-    console.log('GOT TO HERE')
     return events;
   }
 })

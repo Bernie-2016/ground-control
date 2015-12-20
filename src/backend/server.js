@@ -109,7 +109,10 @@ let rateLimitRoutes = [
 
 function dataLoaderCreator(tablename, idField) {
   return new DataLoader(async (keys) => {
-    return knex(tablename).whereIn(idField, keys)
+    let rows = await knex(tablename).whereIn(idField, keys)
+    return keys.map((key) => {
+      return rows.find((row) => row[idField] === key)
+    })
   })
 }
 
