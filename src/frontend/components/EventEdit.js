@@ -47,12 +47,12 @@ class EventEdit extends React.Component {
         .min(0)
         .nullable(),
 
-      startDt: yup.date()
-        .default(moment(event.startDt).toDate())
+      startDate: yup.date()
+        .default(moment(event.startDate).toDate())
         .required(),
 
-      startTz: yup.string()
-        .default(event.startTz)
+      localTimezone: yup.string()
+        .default(event.localTimezone)
         .required(),
 
       duration: yup.object({
@@ -157,7 +157,7 @@ class EventEdit extends React.Component {
         <InfoHeader content='Event Date & Time' />
 
         <Form.Field
-          name='startDt'
+          name='startDate'
           label='Start Date'
           minDate={new Date()}
           autoOk={true}
@@ -165,7 +165,7 @@ class EventEdit extends React.Component {
         />
 
         <Form.Field
-          name='startDt'
+          name='startDate'
           label='Start Time'
           type='time'
           format='ampm'
@@ -173,7 +173,7 @@ class EventEdit extends React.Component {
         />
 
         <Form.Field
-          name='startTz'
+          name='localTimezone'
           type='select'
           label='Time Zone'
           choices={this.timezones()}

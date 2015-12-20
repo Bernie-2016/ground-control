@@ -64,36 +64,41 @@ const adminRequired = (session) => {
 }
 
 // We should move these into model-helpers or something
+function eventFieldFromAPIField(field) {
+
+  let mapFields = {
+    'id': 'eventId',
+    'hostId': 'creatorConsId',
+    'startDate': 'startDt',
+    'localTimezone': 'startTz',
+    'venueState': 'venueStateCd'
+  }
+
+  let newFieldName = field;
+
+  Object.keys(mapFields).forEach((key) => {
+    if (field === key)
+      newFieldName = mapFields[key]
+    }
+  )
+
+  return humps.decamelize(newFieldName);
+}
+
 function eventFromAPIFields(fields) {
   let event = {}
-  Object.assign(event, fields);
-  let idFields = ['id', 'hostId', 'eventTypeId'];
+  Object.keys(fields).forEach((fieldName) => {
+    let newFieldName = eventFieldFromAPIField(fieldName)
+    event[newFieldName] = fields[fieldName]
+  })
+
+  let idFields = ['id', 'host_id', 'event_type_id'];
   idFields.forEach((field) => {
     if (event[field]) {
       event[field] = fromGlobalId(event[field]).id
     }
   })
 
-  let mapFields = {
-    'id': 'eventId',
-    'hostId': 'creatorConsId',
-    'startDate': 'startDt',
-    'venueState': 'venueStateCd'
-  }
-
-  Object.keys(mapFields).forEach((field) => {
-    if (event[field]) {
-      event[mapFields[field]] = event[field];
-      delete event[field]
-    }
-  })
-
-  Object.keys(event).forEach((key) => {
-    let newKey = humps.decamelize(key)
-    event[newKey] = event[key]
-    if (newKey !== key)
-      delete event[key]
-  })
   return event
 }
 
@@ -212,7 +217,9 @@ const GraphQLListContainer = new GraphQLObjectType({
       },
       resolve: async (event, {first, filterOptions, sortField, sortDirection}, {rootValue}) => {
         let filters = eventFromAPIFields(filterOptions);
-        let convertedSortField = eventFromAPIFields(sortField);
+        let convertedSortField = eventFieldFromAPIField(sortField)
+
+        console.log(filters, convertedSortField);
         let events = await knex('bsd_events')
           .where(filters)
           .limit(first)
@@ -562,7 +569,7 @@ const GraphQLEvent = new GraphQLObjectType({
       type: GraphQLString,
       resolve: (event) => event.venue_city
     },
-    venueStateCd: {
+    venueState: {
       type: GraphQLString,
       resolve: (event) => event.venue_state_cd
     },
@@ -582,7 +589,7 @@ const GraphQLEvent = new GraphQLObjectType({
       type: GraphQLString,
       resolve: (event) => event.venue_directions
     },
-    startTz: {
+    localTimezone: {
       type: GraphQLString,
       resolve: (event) => {
         let zone = moment.tz.zone(event.start_tz)
@@ -595,7 +602,7 @@ const GraphQLEvent = new GraphQLObjectType({
         return moment().tz(event.start_tz).format('Z')
       }
     },
-    startDt: {
+    startDate: {
       type: GraphQLString,
       resolve: (event) => {
         return moment(event.start_dt).tz(event.start_tz).format()

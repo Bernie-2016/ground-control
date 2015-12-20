@@ -158,7 +158,7 @@ class AdminEventsSection extends React.Component {
       lineHeight: '18px',
     }}
     >
-      {moment(data[rowIndex]['node']['startDt']).utcOffset(data[rowIndex]['node']['localUTCOffset']).format('l LT')}
+      {moment(data[rowIndex]['node']['startDate']).utcOffset(data[rowIndex]['node']['localUTCOffset']).format('l LT')}
     </Cell>
   )
 
@@ -756,8 +756,8 @@ class AdminEventsSection extends React.Component {
         <ColumnGroup
           header={<this.HeaderCell content="Time" />}>
           <Column
-            header={<this.SortControllerCell content="Datetime" attribute="startDt" />}
-            cell={<this.DateCell data={events} col="startDt" />}
+            header={<this.SortControllerCell content="Datetime" attribute="startDate" />}
+            cell={<this.DateCell data={events} col="startDate" />}
             flexGrow={1}
             width={170}
           />
@@ -789,8 +789,8 @@ class AdminEventsSection extends React.Component {
             width={150}
           />
           <Column
-            header={<this.SortControllerCell content="State" attribute="venueStateCd" />}
-            cell={<this.TextCell data={events} col="venueStateCd" />}
+            header={<this.SortControllerCell content="State" attribute="venueState" />}
+            cell={<this.TextCell data={events} col="venueState" />}
             flexGrow={1}
             width={80}
             align='center'
@@ -849,7 +849,7 @@ class AdminEventsSection extends React.Component {
 export default Relay.createContainer(AdminEventsSection, {
   initialVariables: {
     numEvents: 100,
-    sortField: 'startDt',
+    sortField: 'startDate',
     sortDirection: 'ASC',
     filters: {flagApproval: true}
   },
@@ -887,13 +887,13 @@ export default Relay.createContainer(AdminEventsSection, {
               longitude
               venueZip
               venueCity
-              venueStateCd
+              venueState
               venueAddr1
               venueAddr2
               venueCountry
               venueDirections
-              startDt
-              startTz
+              startDate
+              localTimezone
               localUTCOffset
               duration
               capacity
