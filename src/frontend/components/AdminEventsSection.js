@@ -35,9 +35,8 @@ class AdminEventsSection extends React.Component {
       showDeleteEventDialog: false,
       showEventPreview: false,
       showCreateEventDialog: false,
-      filterOptionsIndex: 0,
-      tableWidth: window.innerWidth,
-      tableHeight: window.innerHeight - 112,
+      windowWidth: window.innerWidth,
+      windowHeight: window.innerHeight,
       selectedRows: [],
       indexesMarkedForDeletion: [],
       activeEventIndex: null,
@@ -50,8 +49,8 @@ class AdminEventsSection extends React.Component {
 
   _handleResize = (e) => {
     this.setState({
-      tableWidth: window.innerWidth,
-      tableHeight: window.innerHeight - 112
+      windowWidth: window.innerWidth,
+      windowHeight: window.innerHeight
     });
   }
 
@@ -226,10 +225,18 @@ class AdminEventsSection extends React.Component {
 
   renderToolbar() {
     let filterOptions = [
-      { payload: '1', text: 'Pending Approval' },
-      { payload: '2', text: 'Approved Events' },
-      { payload: '3', text: 'Past Events' }
+      { payload: '0', text: 'Pending Approval' },
+      { payload: '1', text: 'Approved Events' },
+      // { payload: '3', text: 'Past Events' }
     ];
+
+    let filterOptionsIndex = 0;
+
+    filterOptions.forEach((option, index)=>{
+      if (!(option.payload) == this.props.relay.variables.filters.flagApproval){
+        filterOptionsIndex = index;
+      }
+    });
 
     let resultLengthOptions = [
        { payload: 10, text: '10 Events' },
@@ -268,12 +275,15 @@ class AdminEventsSection extends React.Component {
     return (
       <Toolbar>
         <ToolbarGroup key={0} float="left">
-          {/*<DropDownMenu
+          <DropDownMenu
             menuItems={filterOptions}
-            selectedIndex={this.state.filterOptionsIndex}
+            selectedIndex={filterOptionsIndex}
+            onChange={(event, value) => {
+              this._handleRequestFiltersChange('flagApproval', !(value));
+            }}
             menuItemStyle={BernieText.menuItem}
             style={{marginRight: '0'}}
-          />*/}
+          />
           <DropDownMenu
             menuItems={resultLengthOptions}
             selectedIndex={resultLengthOptionsIndex}
@@ -303,7 +313,9 @@ class AdminEventsSection extends React.Component {
             <select
               id='stateSelect'
               onChange={(event) => {
-                console.log(event.target.value);
+                let updatedValue = event.target.value;
+                if (updatedValue == 'none'){updatedValue = null}
+                this._handleRequestFiltersChange('venueStateCd', updatedValue);
               }}
             >
               <option value='none'>--</option>
@@ -530,6 +542,14 @@ class AdminEventsSection extends React.Component {
     this.forceUpdate()
   }
 
+  _handleRequestFiltersChange = (prop, value) => {
+    let newVar = {}
+    newVar[prop] = value;
+    let oldVars = this.props.relay.variables.filters;
+
+    this.props.relay.setVariables(Object.assign(oldVars, newVar));
+  }
+
   _handleEventPreviewOpen = (eventIndex, tabIndex) => {
     tabIndex = tabIndex ? tabIndex : 0;
     this.setState({
@@ -627,8 +647,8 @@ class AdminEventsSection extends React.Component {
         groupHeaderHeight={35}
         headerHeight={50}
         rowsCount={events.length}
-        width={this.state.tableWidth}
-        height={this.state.tableHeight}
+        width={this.state.windowWidth}
+        height={this.state.windowHeight - 112}
         onRowDoubleClick={this._handleRowClick}
         {...this.props}>
         <ColumnGroup
@@ -762,13 +782,14 @@ export default Relay.createContainer(AdminEventsSection, {
   initialVariables: {
     numEvents: 100,
     sortField: 'startDate',
-    sortDirection: 'ASC'
+    sortDirection: 'ASC',
+    filters: {flagApproval: true}
   },
   fragments: {
     listContainer: () => Relay.QL`
       fragment on ListContainer {
         ${DeleteEvents.getFragment('listContainer')}
-        events(first: $numEvents) {
+        events( first: $numEvents filterOptions: $filters ) {
           edges {
             cursor
             node {

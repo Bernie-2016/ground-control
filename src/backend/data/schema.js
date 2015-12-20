@@ -29,6 +29,7 @@ import url from 'url'
 import TZLookup from 'tz-lookup'
 import BSDClient from '../bsd-instance'
 import knex from './knex'
+import humps from 'humps'
 
 const EVERYONE_GROUP = 'everyone'
 
@@ -166,9 +167,24 @@ const GraphQLListContainer = new GraphQLObjectType({
     },
     events: {
       type: GraphQLEventConnection,
-      args: connectionArgs,
-      resolve: async (event, {first}, {rootValue}) => {
-        let events = await knex('bsd_events').limit(first).orderBy('start_dt', 'asc')
+      args: {
+        ...connectionArgs,
+        filterOptions: {type: new GraphQLInputObjectType({
+            name: 'GraphQLFilterOptions',
+            fields: {
+              venueStateCd: {type: GraphQLString},
+              flagApproval: {type: GraphQLBoolean}
+            }
+          })}
+      },
+      resolve: async (event, {first, filterOptions}, {rootValue}) => {
+        let filters = {};
+        let filterProps = Object.keys(filterOptions);
+        console.log(filterProps);
+        filterProps.forEach((prop) => {
+          filters[humps.decamelize(prop)] = filterOptions[prop];
+        });
+        let events = await knex('bsd_events').where(filters).limit(first).orderBy('start_dt', 'asc')
         return connectionFromArray(events, {first})
       }
     },
