@@ -8,7 +8,14 @@ import {Card, CardActions, CardExpandable, CardTitle, CardHeader, CardText, Flat
 import GCSelectField from './forms/GCSelectField'
 import InfoHeader from './InfoHeader'
 
-export default class EventEdit extends React.Component {
+class EventEdit extends React.Component {
+  eventTypes() {
+    let allTypes = {}
+    this.props.listContainer.eventTypes.forEach((eventType) => {
+      allTypes[eventType.id] = eventType.name
+    })
+    return allTypes;
+  }
 
   renderForm() {
     let event = this.props.event;
@@ -19,8 +26,9 @@ export default class EventEdit extends React.Component {
         .default(event.name)
         .required(),
 
-      eventTypeId: yup.number()
-        .default(1)
+      eventTypeId: yup
+        .string()
+        .default(event.eventType.id)
         .required('Please select an event type'),
 
       description: yup.string().default(event.description)
@@ -115,12 +123,18 @@ export default class EventEdit extends React.Component {
           console.log(data)
         }}
       >
-
         <InfoHeader content='Event Information' />
-
         <Form.Field
           name='name'
           label='Event Name'
+        />
+        <br />
+
+        <Form.Field
+          name='eventTypeId'
+          type='select'
+          label='Event Type'
+          choices={this.eventTypes()}
         />
 
         <Form.Field
@@ -144,7 +158,6 @@ export default class EventEdit extends React.Component {
           label='Start Time'
           type='time'
           format='ampm'
-          autoOk={true}
         />
 
         <Form.Field
@@ -286,3 +299,16 @@ export default class EventEdit extends React.Component {
     )
   }
 }
+
+export default Relay.createContainer(EventEdit, {
+  fragments: {
+    listContainer: () => Relay.QL`
+      fragment on ListContainer {
+        eventTypes {
+          id
+          name
+        }
+      }
+    `
+  }
+})

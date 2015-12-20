@@ -538,6 +538,7 @@ class AdminEventsSection extends React.Component {
           <Tab label="Edit" value={'1'} >
             <EventEdit
               event={activeEvent}
+              listContainer={this.props.listContainer}
               key={this.state.activeEventIndex}
             />
           </Tab>
@@ -796,6 +797,7 @@ export default Relay.createContainer(AdminEventsSection, {
   fragments: {
     listContainer: () => Relay.QL`
       fragment on ListContainer {
+        ${EventEdit.getFragment('listContainer')}
         ${DeleteEvents.getFragment('listContainer')}
         events( first: $numEvents filterOptions: $filters ) {
           edges {

@@ -78,12 +78,12 @@ async function getPrimaryEmail(person) {
 
 async function getPrimaryAddress(person) {
   return knex('bsd_addresses')
-      .where({
-        is_primary: true,
-        cons_id: person.cons_id
-      })
-      .select('cons_addr_id')
-      .first()
+    .where({
+      is_primary: true,
+      cons_id: person.cons_id
+    })
+    .select('cons_addr_id')
+    .first()
 }
 
 async function getPrimaryPhone(person) {
@@ -158,11 +158,9 @@ const GraphQLListContainer = new GraphQLObjectType({
   fields: () => ({
     id: globalIdField('ListContainer'),
     eventTypes: {
-      type: GraphQLEventTypeConnection,
-      args: connectionArgs,
-      resolve: async (eventType, {first}, {rootValue}) => {
-        let eventTypes = await knex('bsd_event_types').limit(first)
-        return connectionFromArray(eventTypes)
+      type: new GraphQLList(GraphQLEventType),
+      resolve: async (eventType, {rootValue}) => {
+        return knex('bsd_event_types')
       }
     },
     events: {
