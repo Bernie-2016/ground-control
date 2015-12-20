@@ -165,6 +165,7 @@ class EventEdit extends React.Component {
           label='Start Date'
           minDate={new Date()}
           autoOk={true}
+          utcOffset={event.localUTCOffset}
         />
 
         <Form.Field
@@ -172,6 +173,7 @@ class EventEdit extends React.Component {
           label='Start Time'
           type='time'
           format='ampm'
+          utcOffset={event.localUTCOffset}
         />
 
         <Form.Field
