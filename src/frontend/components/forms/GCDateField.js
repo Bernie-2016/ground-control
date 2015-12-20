@@ -5,6 +5,7 @@ import moment from 'moment';
 
 export default class GCDateField extends React.Component {
   render() {
+    console.log(this.props.value, typeof this.props.value);
     let oldDate = moment(this.props.value);
     return <DatePicker
       {...this.props}

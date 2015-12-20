@@ -32,7 +32,7 @@ export default class EventEdit extends React.Component {
         .nullable(),
 
       startDate: yup.date()
-        .default(event.startDate)
+        .default(moment(event.startDate).toDate())
         .required('Please select a date'),
 
       duration: yup.object({
