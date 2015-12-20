@@ -480,7 +480,7 @@ class AdminEventsSection extends React.Component {
         key="3"
         secondary={true}
         onTouchTap={function(){
-          this.refs.eventEdit.submit()
+          this.refs.eventEdit.refs.component.submit()
         }.bind(this)}
       />
     ];
