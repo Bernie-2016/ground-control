@@ -78,7 +78,7 @@ export class EventEdit extends React.Component {
 
   renderForm() {
     let event = this.state.event;
-    const defaultStr = yup.string().default('');  
+    const defaultStr = yup.string().default('');
     const eventSchema = yup.object({
       name: yup.string().default(event.name)
         .required('An event name is required'),
@@ -90,15 +90,15 @@ export class EventEdit extends React.Component {
       description: yup.string().default(event.description)
         .required('An event description is required'),
 
-      rsvpReminderHours: yup.number()
-        .default(event.rsvpReminderHours)
+      rsvpEmailReminderHours: yup.number()
+        .default(event.rsvpEmailReminderHours)
         .min(0)
         .nullable(),
 
       startDate: yup.date()
         .default(event.dateTime.startDate.toDate())
         .required('Please select a date'),
-  
+
       duration: yup.object({
         h: yup.number()
           .default(event.dateTime.duration.h)
@@ -154,8 +154,8 @@ export class EventEdit extends React.Component {
       hostReceiveRsvpEmails: yup.boolean()
         .default(event.hostReceiveRsvpEmails),
 
-      rsvpUseReminderEmail: yup.boolean()
-        .default(event.rsvpUseReminderEmail),
+      rsvpUserReminderEmail: yup.boolean()
+        .default(event.rsvpUserReminderEmail),
 
       attendeeVolunteerShow: yup.boolean()
         .default(event.attendeeVolunteerShow),
@@ -170,7 +170,7 @@ export class EventEdit extends React.Component {
         .default(false)
 
     });
-    
+
     const form = (
       <GCForm
         schema={eventSchema}
@@ -344,12 +344,12 @@ export class EventEdit extends React.Component {
         <InfoHeader content='Event Attendees' />
 
         <Form.Field
-          name="rsvpUseReminderEmail"
+          name="rsvpUserReminderEmail"
           label="Send Guests RSVP Email Reminder"
         />
 
         <Form.Field
-          name='rsvpReminderHours'
+          name='rsvpEmailReminderHours'
           floatingLabelText="RSVP Reminder Hours"
           type='number'
           min="0"
@@ -378,7 +378,7 @@ export class EventEdit extends React.Component {
           name="flagApproval"
           label="Mark this event as incomplete/needs further review"
         /><br/><br/>
-  
+
       <Form.Button type='submit' label='Submit Changes' fullWidth={true} />
     </GCForm>)
 
@@ -391,7 +391,7 @@ export class EventEdit extends React.Component {
       <CardText>
 
         {this.renderForm()}
-        
+
         {/*<TextField
           defaultValue={this.state.event.node.name}
           floatingLabelText="Event Name"
@@ -496,11 +496,11 @@ export class EventEdit extends React.Component {
 
         <Checkbox
           label="Send RSVP Reminder Emails"
-          defaultChecked={this.state.event.node.rsvpUseReminderEmail}
+          defaultChecked={this.state.event.node.rsvpUserReminderEmail}
         />
 
         <TextField
-          defaultValue={this.state.event.node.rsvpReminderHours}
+          defaultValue={this.state.event.node.rsvpEmailReminderHours}
           floatingLabelText="RSVP Reminder (Hours Before)"
           type="number"
           min="0"
@@ -604,7 +604,7 @@ export class EventPreview extends React.Component {
         <InfoHeader content='Event Date & Time' />
         <p>{event.dateTime.startDate.format('LLLL')} <span style={{color: BernieColors.gray}}>{event.dateTime.startDate.format('llll')} local time</span></p>
         <p>Duration: {event.dateTime.duration.h} hours {event.dateTime.duration.m} minutes</p>
-        
+
         <InfoHeader content='Event Location' />
         <p>{event.node.venueName}</p>
         <p>{event.node.venueAddr1} {event.node.venueAddr2}</p>

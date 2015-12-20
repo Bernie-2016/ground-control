@@ -35,8 +35,8 @@ class EventEdit extends React.Component {
       description: yup.string().default(event.description)
         .required('An event description is required'),
 
-      rsvpReminderHours: yup.number()
-        .default(event.rsvpReminderHours)
+      rsvpEmailReminderHours: yup.number()
+        .default(event.rsvpEmailReminderHours)
         .min(0)
         .nullable(),
 
@@ -58,37 +58,33 @@ class EventEdit extends React.Component {
           .required('Please enter a number of minutes'),
       }),
 
-      venue: yup.object({
-        name: yup.string().default(event.venueName)
-          .required('please enter a venue name'),
+      venueName: yup.string().default(event.venueName)
+        .required('please enter a venue name'),
 
-        addr1: yup.string().default(event.venueAddr1)
-          .required('please enter an event address'),
+      venueAddr1: yup.string().default(event.venueAddr1)
+        .required('please enter an event address'),
 
-        addr2: yup.string().default(event.venueAddr2)
-          .nullable(),
+      venueAddr2: yup.string().default(event.venueAddr2)
+        .nullable(),
 
-        city: yup.string().default(event.venueCity)
-          .required('please enter a city'),
+      venueCity: yup.string().default(event.venueCity)
+        .required('please enter a city'),
 
-        state: yup.string().default(event.venueState)
-          .required('please enter a state'),
+      venueState: yup.string().default(event.venueState)
+        .required('please enter a state'),
 
-        zip: yup.string().default(event.venueZip)
-          .required('please enter a zip code'),
+      venueZip: yup.string().default(event.venueZip)
+        .required('please enter a zip code'),
 
-        country: yup.string().default(event.venueCountry)
-          .required('please enter a country'),
+      venueCountry: yup.string().default(event.venueCountry)
+        .required('please enter a country'),
 
-        directions: yup.string().default(event.venueDirections)
-          .nullable(),
-
-        capacity: yup.number()
-          .default(event.capacity)
-          .min(0)
-          .required('please enter an event capacity'),
-      }),
-
+      venueDirections: yup.string().default(event.venueDirections)
+        .nullable(),
+      capacity: yup.number()
+        .default(event.capacity)
+        .min(0)
+        .required('please enter an event capacity'),
       contactPhone: yup.string()
         .default(event.contactPhone)
         .required('A contact phone number is required'),
@@ -99,8 +95,8 @@ class EventEdit extends React.Component {
       hostReceiveRsvpEmails: yup.boolean()
         .default(event.hostReceiveRsvpEmails),
 
-      rsvpUseReminderEmail: yup.boolean()
-        .default(event.rsvpUseReminderEmail),
+      rsvpUserReminderEmail: yup.boolean()
+        .default(event.rsvpUserReminderEmail),
 
       attendeeVolunteerShow: yup.boolean()
         .default(event.attendeeVolunteerShow),
@@ -122,8 +118,8 @@ class EventEdit extends React.Component {
         schema={eventSchema}
         defaultValue={eventSchema.default()}
         onSubmit={ (data) => {
-          console.log(data)
-          this.props.onSubmit()
+          data.duration = data.duration.h * 60 + data.duration.m
+          this.props.onSubmit(data)
         }}
       >
         <InfoHeader content='Event Information' />
@@ -181,51 +177,51 @@ class EventEdit extends React.Component {
         <InfoHeader content='Event Location' />
 
         <Form.Field
-          name='venue.name'
+          name='venueName'
           label='Venue Name'
         />
 
         <Form.Field
-          name='venue.capacity'
+          name='capacity'
           label="Venue Capacity (enter 0 for unlimited)"
           type='number'
           min="0"
         /><br/>
 
         <Form.Field
-          name='venue.addr1'
+          name='venueAddr1'
           label='Address Line 1'
           fullWidth={true}
         />
 
         <Form.Field
-          name='venue.addr2'
+          name='venueAddr2'
           label='Address Line 2'
           fullWidth={true}
         />
 
         <Form.Field
-          name='venue.city'
+          name='venueCity'
           label='City'
         />
 
         <Form.Field
-          name='venue.state'
+          name='venueState'
           label='State'
         />
 
         <Form.Field
-          name='venue.zip'
+          name='venueZip'
           label='Zip Code'
         />
 
         <Form.Field
-          name='venue.country'
+          name='venueCountry'
           label='Country'
         />
 
         <Form.Field
-          name='venue.directions'
+          name='venueDirections'
           label='Directions to Venue'
           multiLine={true}
           fullWidth={true}
@@ -251,12 +247,12 @@ class EventEdit extends React.Component {
         <InfoHeader content='Event Attendees' />
 
         <Form.Field
-          name="rsvpUseReminderEmail"
+          name="rsvpUserReminderEmail"
           label="Send Guests RSVP Email Reminder"
         />
 
         <Form.Field
-          name='rsvpReminderHours'
+          name='rsvpEmailReminderHours'
           label="RSVP Reminder Hours"
           type='number'
           min="0"

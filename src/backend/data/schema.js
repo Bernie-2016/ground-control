@@ -64,6 +64,39 @@ const adminRequired = (session) => {
 }
 
 // We should move these into model-helpers or something
+function eventFromAPIFields(fields) {
+  let event = {}
+  Object.assign(event, fields);
+  let idFields = ['id', 'hostId', 'eventTypeId'];
+  idFields.forEach((field) => {
+    if (event[field]) {
+      event[field] = fromGlobalId(event[field]).id
+    }
+  })
+
+  let mapFields = {
+    'id': 'eventId',
+    'hostId': 'creatorConsId',
+    'startDate': 'startDt',
+    'venueState': 'venueStateCd'
+  }
+
+  Object.keys(mapFields).forEach((field) => {
+    if (event[field]) {
+      event[mapFields[field]] = event[field];
+      delete event[field]
+    }
+  })
+
+  Object.keys(event).forEach((key) => {
+    let newKey = humps.decamelize(key)
+    event[newKey] = event[key]
+    if (newKey !== key)
+      delete event[key]
+  })
+  return event
+}
+
 async function getPrimaryEmail(person) {
   let emails = await knex('bsd_emails')
     .where({
@@ -167,21 +200,13 @@ const GraphQLListContainer = new GraphQLObjectType({
       type: GraphQLEventConnection,
       args: {
         ...connectionArgs,
-        filterOptions: {type: new GraphQLInputObjectType({
-            name: 'GraphQLFilterOptions',
-            fields: {
-              venueStateCd: {type: GraphQLString},
-              flagApproval: {type: GraphQLBoolean}
-            }
-          })}
+        filterOptions: {type: GraphQLEventInput }
       },
       resolve: async (event, {first, filterOptions}, {rootValue}) => {
-        let filters = {};
-        let filterProps = Object.keys(filterOptions);
-        console.log(filterProps);
-        filterProps.forEach((prop) => {
-          filters[humps.decamelize(prop)] = filterOptions[prop];
-        });
+        console.log("HERER??")
+        let filters = eventFromAPIFields(filterOptions);
+
+        console.log(filters)
         let events = await knex('bsd_events')
           .where(filters)
           .limit(first)
@@ -595,11 +620,11 @@ const GraphQLEvent = new GraphQLObjectType({
       type: GraphQLBoolean,
       resolve: (event) => event.host_receive_rsvp_emails
     },
-    rsvpUseReminderEmail: {
+    rsvpUserReminderEmail: {
       type: GraphQLBoolean,
       resolve: (event) => event.rsvp_user_reminder_email
     },
-    rsvpReminderHours: {
+    rsvpEmailReminderHours: {
       type: GraphQLInt,
       resolve: (event) => event.rsvp_email_reminder_hours
     },
@@ -674,6 +699,71 @@ const GraphQLSurvey = new GraphQLObjectType({
     renderer: { type: GraphQLString }
   }),
   interfaces: [nodeInterface]
+})
+
+const GraphQLEventInput = new GraphQLInputObjectType({
+  name: 'EventInput',
+  fields: {
+    id: { type: GraphQLString },
+    eventTypeId: { type: GraphQLString },
+    hostId: { type: GraphQLString },
+    flagApproval: { type: GraphQLBoolean },
+    name: { type: GraphQLString },
+    description: { type: GraphQLString },
+    venueName: { type: GraphQLString },
+    venueZip: { type: GraphQLString },
+    venueCity: { type: GraphQLString },
+    venueState: { type: GraphQLString },
+    venueAddr1: { type: GraphQLString },
+    venueAddr2: { type: GraphQLString },
+    venueCountry: { type: GraphQLString },
+    venueDirections: { type: GraphQLString },
+    localTimezone: { type: GraphQLString },
+    startDate: { type: GraphQLString },
+    duration: { type: GraphQLInt },
+    capacity: { type: GraphQLInt },
+    attendeeVolunteerShow: { type: GraphQLBoolean },
+    attendeeVolunteerMessage: { type: GraphQLString },
+    isSearchable: { type: GraphQLInt },
+    publicPhone: { type: GraphQLBoolean },
+    contactPhone: { type: GraphQLString },
+    hostReceiveRsvpEmails: { type: GraphQLBoolean },
+    rsvpUserReminderEmail: { type: GraphQLBoolean },
+    rsvpEmailReminderHours: { type: GraphQLInt },
+  }
+})
+
+const GraphQLEditEvents = mutationWithClientMutationId({
+  name: 'EditEvents',
+  inputFields: {
+    events: { type: new GraphQLNonNull(new GraphQLList(GraphQLEventInput)) }
+  },
+  outputFields: {
+    listContainer: {
+      type: GraphQLListContainer,
+      resolve: () => SharedListContainer
+    }
+  },
+  mutateAndGetPayload: async ({events}, {rootValue}) => {
+    adminRequired(rootValue)
+    let params = events.map((event) => {
+      return eventFromAPIFields(event)      
+    })
+    let count = params.length;
+
+    for (let index = 0; index < count; index++) {
+      let event = params[index]
+//      await BSDClient.updateEvent(event.event_id, event.event_type_id, event.creator_cons_id, event)
+      await knex('bsd_events')
+        .where('event_id', event.event_id)
+        .update({
+          ...event,
+          modified_dt: new Date()
+        })
+    }
+    console.log('GOT TO HERE')
+    return events;
+  }
 })
 
 const GraphQLDeleteEvents = mutationWithClientMutationId({
@@ -917,6 +1007,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
 let RootMutation = new GraphQLObjectType({
   name: 'RootMutation',
   fields: () => ({
+    editEvents: GraphQLEditEvents,
     submitCallSurvey: GraphQLSubmitCallSurvey,
     createCallAssignment: GraphQLCreateCallAssignment,
     deleteEvents: GraphQLDeleteEvents,

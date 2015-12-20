@@ -12,6 +12,7 @@ import IconMenu from 'material-ui/lib/menus/icon-menu';
 import MenuItem from 'material-ui/lib/menus/menu-item';
 import MutationHandler from './MutationHandler';
 import DeleteEvents from '../mutations/DeleteEvents';
+import EditEvents from '../mutations/EditEvents';
 
 const keyboardActionStyles = {
   text: {fontSize: '0.9em', top: '-7px', color: BernieColors.gray, cursor: 'default'},
@@ -316,7 +317,7 @@ class AdminEventsSection extends React.Component {
               onChange={(event) => {
                 let updatedValue = event.target.value;
                 if (updatedValue == 'none'){updatedValue = null}
-                this._handleRequestFiltersChange('venueStateCd', updatedValue);
+                this._handleRequestFiltersChange('venueState', updatedValue);
               }}
             >
               <option value='none'>--</option>
@@ -536,7 +537,14 @@ class AdminEventsSection extends React.Component {
           <Tab label="Edit" value={'1'} >
             <EventEdit
               ref="eventEdit"
-              onSubmit={ () => this._handleEventConfirmation([this.state.activeEventIndex]) }
+              onSubmit={ (data) => {
+                data.id = events[this.state.activeEventIndex].node.id
+                data.hostId = events[this.state.activeEventIndex].node.host.id
+                this.refs.eventEditHandler.send({
+                  events: [data],
+                  listContainer: this.props.listContainer
+                })
+              }}
               event={activeEvent}
               listContainer={this.props.listContainer}
               key={this.state.activeEventIndex}
@@ -650,6 +658,10 @@ class AdminEventsSection extends React.Component {
     return (
     <div>
       <MutationHandler ref='eventDeletionHandler' successMessage='Event deleted!' mutationClass={DeleteEvents} />
+      <MutationHandler
+        ref='eventEditHandler'
+        mutationClass={EditEvents}
+        onSuccess={() => this._handleEventConfirmation([this.state.activeEventIndex])} />
       {this.renderDeleteModal()}
       {this.renderCreateModal()}
       {this.renderEventPreviewModal()}
@@ -840,8 +852,8 @@ export default Relay.createContainer(AdminEventsSection, {
               publicPhone
               contactPhone
               hostReceiveRsvpEmails
-              rsvpUseReminderEmail
-              rsvpReminderHours
+              rsvpUserReminderEmail
+              rsvpEmailReminderHours
               attendeesCount
             }
           }
