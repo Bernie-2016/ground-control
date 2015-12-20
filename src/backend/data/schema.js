@@ -564,7 +564,7 @@ const GraphQLEvent = new GraphQLObjectType({
     startDate: {
       type: GraphQLString,
       resolve: (event) => {
-        return moment(event.startDate).format()
+        return moment(event.start_dt).format()
       }
     },
     duration: { type: GraphQLInt },

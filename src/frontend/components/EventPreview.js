@@ -74,7 +74,7 @@ export default class EventPreview extends React.Component {
           <p>{event.description}</p>
 
           <InfoHeader content='Event Date & Time' />
-          <p>{moment(event.startDate).format('LLLL')} <span style={{color: BernieColors.gray}}>{moment(event.startDate).format('llll')} local time</span></p>
+          <p>{moment(event.startDate).format('LLLL')}</p>
           <p>Duration: {Math.floor(event.duration / 60)} hours {event.duration % 60} minutes</p>
 
           <InfoHeader content='Event Location' />
