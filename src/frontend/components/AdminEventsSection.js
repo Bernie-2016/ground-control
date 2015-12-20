@@ -479,11 +479,9 @@ class AdminEventsSection extends React.Component {
         label={(this.state.previewTabIndex == 0) ? 'Approve' : 'Update and Approve'}
         key="3"
         secondary={true}
-        onTouchTap={() => {
-          // document.getElementById('editForm').submit();
-          console.log(this)
-          // this._handleEventConfirmation([this.state.activeEventIndex]);
-        }}
+        onTouchTap={function(){
+          this.refs.eventEdit.submit()
+        }.bind(this)}
       />
     ];
 
@@ -537,6 +535,8 @@ class AdminEventsSection extends React.Component {
           </Tab>
           <Tab label="Edit" value={'1'} >
             <EventEdit
+              ref="eventEdit"
+              onSubmit={ () => this._handleEventConfirmation([this.state.activeEventIndex]) }
               event={activeEvent}
               listContainer={this.props.listContainer}
               key={this.state.activeEventIndex}
@@ -582,6 +582,9 @@ class AdminEventsSection extends React.Component {
     this.setState({
       activeEventIndex: this.state.activeEventIndex + n
     });
+
+    var element = ReactDOM.findDOMNode(this.refs.eventEdit)
+    element.scrollIntoView && element.scrollIntoView()
   }
 
   _handleEventCreation = () => {

@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import Relay from 'react-relay';
 import GCForm from './forms/GCForm';
 import Form from 'react-formal';
@@ -117,10 +118,12 @@ class EventEdit extends React.Component {
 
     const form = (
       <GCForm
+        ref="form"
         schema={eventSchema}
         defaultValue={eventSchema.default()}
-        onSubmit={function(data){
+        onSubmit={ (data) => {
           console.log(data)
+          this.props.onSubmit()
         }}
       >
         <InfoHeader content='Event Information' />
@@ -283,7 +286,8 @@ class EventEdit extends React.Component {
           label="Mark this event as incomplete/needs further review"
         /><br/><br/>
 
-      <Form.Button type='submit' label='Submit Changes' fullWidth={true} />
+      <Form.Button  style={ { display: "none" } } ref="submit" type='submit' label='Submit Changes' fullWidth={true} />
+
     </GCForm>)
 
     return form
@@ -297,6 +301,10 @@ class EventEdit extends React.Component {
       </CardText>
     </div>
     )
+  }
+
+  submit() {
+    jQuery("button", ReactDOM.findDOMNode(this.refs.submit)).click()
   }
 }
 
