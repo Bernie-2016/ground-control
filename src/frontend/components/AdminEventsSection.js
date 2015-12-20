@@ -479,9 +479,9 @@ class AdminEventsSection extends React.Component {
         label={(this.state.previewTabIndex == 0) ? 'Approve' : 'Update and Approve'}
         key="3"
         secondary={true}
-        onTouchTap={function(){
+        onTouchTap={() => {
           this.refs.eventEdit.refs.component.submit()
-        }.bind(this)}
+        }}
       />
     ];
 
@@ -782,6 +782,13 @@ class AdminEventsSection extends React.Component {
             header={<this.HeaderCell content="Description" />}
             cell={<this.TextCell data={events} col="description" />}
             width={250}
+          />
+          <Column
+            flexGrow={1}
+            header={<this.HeaderCell content="RSVPs" />}
+            cell={<this.TextCell data={events} col="attendeesCount" />}
+            width={60}
+            align='center'
           />
         </ColumnGroup>
       </Table>

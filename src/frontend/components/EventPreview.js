@@ -66,6 +66,9 @@ export default class EventPreview extends React.Component {
           <InfoHeader content='Event Type' />
           <p>{event.eventType.name}</p>
 
+          <InfoHeader content='Event Attendees' />
+          <p>Number of RSVPs: {event.attendeesCount}</p>
+
           <InfoHeader content='Event Description' />
           <p>{event.description}</p>
 
