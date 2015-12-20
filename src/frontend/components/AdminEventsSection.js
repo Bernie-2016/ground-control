@@ -479,7 +479,7 @@ class AdminEventsSection extends React.Component {
         <iframe
           ref="creationForm"
           src="create"
-          style={{width: '100%', height: this.state.tableHeight*0.7, border: 'none'}}
+          style={{width: '100%', height: this.state.windowHeight*0.6, border: 'none'}}
         />
       </Dialog>
     )
