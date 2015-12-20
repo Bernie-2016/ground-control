@@ -371,8 +371,8 @@ class AdminEventsSection extends React.Component {
           <RaisedButton
             label="Create"
             onTouchTap={() => {
-              this._handleEventCreation(this.state.selectedRows);
-              // window.location = '/admin/events/create'
+              //this._handleEventCreation(this.state.selectedRows);
+              window.location = '/admin/events/create'
             }}
           />
           <ToolbarSeparator style={{marginLeft: 0}} />
@@ -568,8 +568,8 @@ class AdminEventsSection extends React.Component {
             <EventEdit
               ref="eventEdit"
               onSubmit={ (data) => {
-                data.id = events[this.state.activeEventIndex].node.id
-                data.hostId = events[this.state.activeEventIndex].node.host.id
+                data.id = activeEvent.node.id
+                data.hostId = activeEvent.node.host.id
                 this.refs.eventEditHandler.send({
                   events: [data],
                   listContainer: this.props.listContainer
@@ -577,7 +577,6 @@ class AdminEventsSection extends React.Component {
               }}
               event={activeEvent}
               listContainer={this.props.listContainer}
-              key={this.state.activeEventIndex}
             />
           </Tab>
         </Tabs>
@@ -836,6 +835,13 @@ class AdminEventsSection extends React.Component {
             flexGrow={1}
             header={<this.HeaderCell content="RSVPs" />}
             cell={<this.TextCell data={events} col="attendeesCount" />}
+            width={100}
+            align='center'
+          />
+          <Column
+            flexGrow={1}
+            header={<this.HeaderCell content="ID" />}
+            cell={<this.TextCell data={events} col="eventIdObfuscated" />}
             width={100}
             align='center'
           />
