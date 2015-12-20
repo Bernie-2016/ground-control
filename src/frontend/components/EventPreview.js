@@ -67,6 +67,7 @@ export default class EventPreview extends React.Component {
           <p>{event.eventType.name}</p>
 
           <InfoHeader content='Event Attendees' />
+          <p>Venue Capacity: {(event.capacity) ? event.capacity : 'unlimited'}</p>
           <p>Number of RSVPs: {event.attendeesCount}</p>
 
           <InfoHeader content='Event Description' />

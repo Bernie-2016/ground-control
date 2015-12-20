@@ -785,9 +785,16 @@ class AdminEventsSection extends React.Component {
           />
           <Column
             flexGrow={1}
+            header={<this.HeaderCell content="Capacity" />}
+            cell={<this.TextCell data={events} col="capacity" />}
+            width={80}
+            align='center'
+          />
+          <Column
+            flexGrow={1}
             header={<this.HeaderCell content="RSVPs" />}
             cell={<this.TextCell data={events} col="attendeesCount" />}
-            width={60}
+            width={80}
             align='center'
           />
         </ColumnGroup>
