@@ -6,8 +6,8 @@ import Form from 'react-formal';
 import yup from 'yup';
 import moment from 'moment';
 import {Card, CardActions, CardExpandable, CardTitle, CardHeader, CardText, FlatButton, TextField, DropDownMenu, SelectField, DatePicker, TimePicker, Checkbox} from 'material-ui';
-import GCSelectField from './forms/GCSelectField'
 import InfoHeader from './InfoHeader'
+import {USTimeZones} from './data/USTimeZones';
 
 class EventEdit extends React.Component {
   eventTypes() {
@@ -18,9 +18,16 @@ class EventEdit extends React.Component {
     return allTypes;
   }
 
+  timezones() {
+    let allZones = {}
+    USTimeZones.forEach((zone) => {
+      allZones[zone.value] = zone.name
+    })
+    return allZones;
+  }
+
   renderForm() {
     let event = this.props.event;
-    const defaultStr = yup.string().default('');
     const eventSchema = yup.object({
       name: yup
         .string()
@@ -40,9 +47,13 @@ class EventEdit extends React.Component {
         .min(0)
         .nullable(),
 
-      startDate: yup.date()
-        .default(moment(event.startDate).toDate())
+      startDt: yup.date()
+        .default(moment(event.startDt).toDate())
         .required('Please select a date'),
+
+      startTz: yup.string()
+        .default(event.startTz)
+        .required('Please select a timezone'),
 
       duration: yup.object({
         h: yup.number()
@@ -71,7 +82,7 @@ class EventEdit extends React.Component {
         city: yup.string().default(event.venueCity)
           .required('please enter a city'),
 
-        state: yup.string().default(event.venueState)
+        state: yup.string().default(event.venueStateCd)
           .required('please enter a state'),
 
         zip: yup.string().default(event.venueZip)
@@ -150,18 +161,25 @@ class EventEdit extends React.Component {
         <InfoHeader content='Event Date & Time' />
 
         <Form.Field
-          name='startDate'
+          name='startDt'
           label='Start Date'
           minDate={new Date()}
           autoOk={true}
         />
 
         <Form.Field
-          name='startDate'
+          name='startDt'
           label='Start Time'
           type='time'
           format='ampm'
         />
+
+        <Form.Field
+          name='startTz'
+          type='select'
+          label='Time Zone'
+          choices={this.timezones()}
+        /><br/>
 
         <Form.Field
           name='duration.h'

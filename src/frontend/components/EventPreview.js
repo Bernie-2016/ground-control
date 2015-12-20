@@ -74,13 +74,13 @@ export default class EventPreview extends React.Component {
           <p>{event.description}</p>
 
           <InfoHeader content='Event Date & Time' />
-          <p>{moment(event.startDate).format('LLLL')}</p>
+          <p>{moment(event.startDt).utcOffset(event.localUTCOffset).format('LLLL')} <span style={{color: BernieColors.gray}}>{event.startTz} time</span></p>
           <p>Duration: {Math.floor(event.duration / 60)} hours {event.duration % 60} minutes</p>
 
           <InfoHeader content='Event Location' />
           <p>{event.venueName}</p>
           <p>{event.venueAddr1} {event.venueAddr2}</p>
-          <p>{event.venueCity} {event.venueState}, {event.venueZip} ({event.venueCountry})</p>
+          <p>{event.venueCity} {event.venueStateCd}, {event.venueZip} ({event.venueCountry})</p>
           <br/>
           <p>Capacity: {(event.capacity == 0) ? 'Unlimited' : event.capacity}</p>
           <br/>

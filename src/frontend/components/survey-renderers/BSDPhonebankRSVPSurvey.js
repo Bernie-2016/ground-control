@@ -85,8 +85,8 @@ class BSDPhonebankRSVPSurvey extends React.Component {
       desc = desc + ' ' + event.venueAddr2;
     if (event.venueCity)
       desc = desc + ' ' + event.venueCity;
-    if (event.venueState)
-      desc = desc + ', ' + event.venueState
+    if (event.venueStateCd)
+      desc = desc + ', ' + event.venueStateCd
     return desc.trim();
   }
 
@@ -114,7 +114,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
         key: event.id,
         title: event.name,
         name: event.name,
-        startDate: event.startDate,
+        startDate: event.startDt,
         venueName: event.venueName,
         addr1: event.venueAddr1,
         addr2: this.getEventAddr2(event),
@@ -194,14 +194,14 @@ export default Relay.createContainer(BSDPhonebankRSVPSurvey, {
           id
           eventIdObfuscated
           name
-          startDate
-          localTimezone
+          startDt
+          startTz
           localUTCOffset
           venueName
           venueAddr1
           venueAddr2
           venueCity
-          venueState
+          venueStateCd
           description
           latitude
           longitude

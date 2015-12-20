@@ -168,24 +168,31 @@ const GraphQLListContainer = new GraphQLObjectType({
       args: {
         ...connectionArgs,
         filterOptions: {type: new GraphQLInputObjectType({
-            name: 'GraphQLFilterOptions',
-            fields: {
-              venueStateCd: {type: GraphQLString},
-              flagApproval: {type: GraphQLBoolean}
-            }
-          })}
+          name: 'GraphQLFilterOptions',
+          fields: {
+            venueStateCd: {type: GraphQLString},
+            flagApproval: {type: GraphQLBoolean}
+          }
+        })},
+        sortField: {type: GraphQLString},
+        sortDirection: {type: new GraphQLEnumType({
+          name: 'GraphQLSortDirection',
+          values: {
+            ASC: { value: 'asc' },
+            DESC: { value: 'desc' }
+          }
+        })}
       },
-      resolve: async (event, {first, filterOptions}, {rootValue}) => {
+      resolve: async (event, {first, filterOptions, sortField, sortDirection}, {rootValue}) => {
         let filters = {};
         let filterProps = Object.keys(filterOptions);
-        console.log(filterProps);
         filterProps.forEach((prop) => {
           filters[humps.decamelize(prop)] = filterOptions[prop];
         });
         let events = await knex('bsd_events')
           .where(filters)
           .limit(first)
-          .orderBy('start_dt', 'asc')
+          .orderBy(humps.decamelize(sortField), sortDirection)
         return connectionFromArray(events, {first})
       }
     },
@@ -531,7 +538,7 @@ const GraphQLEvent = new GraphQLObjectType({
       type: GraphQLString,
       resolve: (event) => event.venue_city
     },
-    venueState: {
+    venueStateCd: {
       type: GraphQLString,
       resolve: (event) => event.venue_state_cd
     },
@@ -551,9 +558,12 @@ const GraphQLEvent = new GraphQLObjectType({
       type: GraphQLString,
       resolve: (event) => event.venue_directions
     },
-    localTimezone: {
+    startTz: {
       type: GraphQLString,
-      resolve: (event) => event.start_tz
+      resolve: (event) => {
+        let zone = moment.tz.zone(event.start_tz)
+        return zone.name;
+      }
     },
     localUTCOffset: {
       type: GraphQLString,
@@ -561,10 +571,10 @@ const GraphQLEvent = new GraphQLObjectType({
         return moment().tz(event.start_tz).format('Z')
       }
     },
-    startDate: {
+    startDt: {
       type: GraphQLString,
       resolve: (event) => {
-        return moment(event.start_dt).format()
+        return moment(event.start_dt).tz(event.start_tz).format()
       }
     },
     duration: { type: GraphQLInt },
