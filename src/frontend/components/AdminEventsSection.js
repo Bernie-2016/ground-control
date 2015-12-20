@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Relay from 'react-relay';
-import {EventPreview, EventEdit} from './EventView';
+import EventPreview from './EventPreview';
+import EventEdit from './EventEdit';
 import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle, SelectField, DropDownMenu, DropDownIcon, Dialog, Tabs, Tab, FlatButton, RaisedButton, IconButton, FontIcon, Checkbox, TextField, Snackbar} from 'material-ui';
 import {Table, Column, ColumnGroup, Cell} from 'fixed-data-table';
 import {BernieText, BernieColors} from './styles/bernie-css';
@@ -414,8 +415,8 @@ class AdminEventsSection extends React.Component {
     )
   }
 
-  renderEventPreviewModal(events) {
-
+  renderEventPreviewModal() {
+    let events = this.props.listContainer.events.edges;
     let customActions = [
       // <KeyboardActionsInfo key="0" />,
       <FlatButton
@@ -448,6 +449,8 @@ class AdminEventsSection extends React.Component {
       });
     }
 
+    let activeEvent = events[this.state.activeEventIndex] ? events[this.state.activeEventIndex].node : null;
+
     return (
       <Dialog
         actions={customActions}
@@ -469,28 +472,27 @@ class AdminEventsSection extends React.Component {
         >
           <Tab label="Preview" value={'0'} >
             <EventPreview
-              eventsArray={events}
-              eventIndex={this.state.activeEventIndex}
+              event={activeEvent}
               onChangeEventIndex={function(n){
-              this._iterateActiveEvent(n);
-            }.bind(this)}
-              onEventConfirm={function(indexArray){
-              this._handleEventConfirmation(indexArray);
-            }.bind(this)}
-              onEventEdit={function(modifiedEvent){
-              this._handleEventEdit(modifiedEvent);
-            }.bind(this)}
-              onTabRequest={function(eventIndex, tabIndex){
-              this._handleEventPreviewOpen(eventIndex, tabIndex);
-            }.bind(this)}
-              onEventDelete={function(indexArray){
-              this._handleEventDeletion(indexArray);
-            }.bind(this)}
+                this._iterateActiveEvent(n);
+              }.bind(this)}
+                onEventConfirm={function(indexArray){
+                this._handleEventConfirmation(indexArray);
+              }.bind(this)}
+                onEventEdit={function(modifiedEvent){
+                this._handleEventEdit(modifiedEvent);
+              }.bind(this)}
+                onTabRequest={function(eventIndex, tabIndex){
+                this._handleEventPreviewOpen(eventIndex, tabIndex);
+              }.bind(this)}
+                onEventDelete={function(indexArray){
+                this._handleEventDeletion(indexArray);
+              }.bind(this)}
             />
           </Tab>
           <Tab label="Edit" value={'1'} >
             <EventEdit
-              event={events[this.state.activeEventIndex]}
+              event={activeEvent}
               key={this.state.activeEventIndex}
             />
           </Tab>
@@ -593,7 +595,7 @@ class AdminEventsSection extends React.Component {
       <MutationHandler ref='eventDeletionHandler' successMessage='Event deleted!' mutationClass={DeleteEvents} />
       {this.renderDeleteModal()}
       {this.renderCreateModal()}
-      {this.renderEventPreviewModal(events)}
+      {this.renderEventPreviewModal()}
       {this.renderToolbar()}
       <Table
         rowHeight={83}

@@ -30,17 +30,15 @@ export default class GCSelectField extends React.Component {
       }
     }
     return (
-      <div>
-        <div style={labelStyle}>{this.props.label}</div>
-        <SelectField
-          {...this.props}
-          displayMember='name'
-          valueMember='value'
-          errorStyle={BernieText.inputError}
-          menuItems={this.createMenuItems()}
-          onChange={(event) => {this.props.onChange(event.target.value)}}
-        />
-      </div>
+      <SelectField
+        {...this.props}
+        displayMember='name'
+        valueMember='value'
+        floatingLabelText={this.props.label}
+        errorStyle={BernieText.inputError}
+        menuItems={this.createMenuItems()}
+        onChange={(event) => {this.props.onChange(event.target.value)}}
+      />
     )
   }
 }
