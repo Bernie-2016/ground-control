@@ -41,6 +41,7 @@
     "graphql-relay": "^0.3.5",
     "handlebars": "^3.0.0",
     "history": "^1.13.1",
+    "humps": "^1.0.0",
     "jquery": "^2.1.4",
     "json2csv": "^3.0.1",
     "knex": "^0.9.0",

@@ -6,6 +6,7 @@ import EventEdit from './EventEdit';
 import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle, SelectField, DropDownMenu, DropDownIcon, Dialog, Tabs, Tab, FlatButton, RaisedButton, IconButton, FontIcon, Checkbox, TextField, Snackbar} from 'material-ui';
 import {Table, Column, ColumnGroup, Cell} from 'fixed-data-table';
 import {BernieText, BernieColors} from './styles/bernie-css';
+import {states} from './data/states';
 
 import IconMenu from 'material-ui/lib/menus/icon-menu';
 import MenuItem from 'material-ui/lib/menus/menu-item';
@@ -35,9 +36,8 @@ class AdminEventsSection extends React.Component {
       showDeleteEventDialog: false,
       showEventPreview: false,
       showCreateEventDialog: false,
-      filterOptionsIndex: 0,
-      tableWidth: window.innerWidth,
-      tableHeight: window.innerHeight - 112,
+      windowWidth: window.innerWidth,
+      windowHeight: window.innerHeight,
       selectedRows: [],
       indexesMarkedForDeletion: [],
       activeEventIndex: null,
@@ -50,8 +50,8 @@ class AdminEventsSection extends React.Component {
 
   _handleResize = (e) => {
     this.setState({
-      tableWidth: window.innerWidth,
-      tableHeight: window.innerHeight - 112
+      windowWidth: window.innerWidth,
+      windowHeight: window.innerHeight
     });
   }
 
@@ -75,9 +75,9 @@ class AdminEventsSection extends React.Component {
         value="checkboxValue1"
         checked={selectedRows.indexOf(rowIndex) > -1}
         eventIndex={rowIndex}
-        onCheck={function(){
+        onCheck={() => {
           this._handleEventSelect(rowIndex);
-        }.bind(this)}
+        }}
         style={{marginLeft: '15px'}}
       />
     </Cell>
@@ -188,18 +188,18 @@ class AdminEventsSection extends React.Component {
 
       <IconButton
         title="delete"
-        onTouchTap={function(){
+        onTouchTap={() => {
           this._handleEventDeletion([rowIndex]);
-        }.bind(this)}
+        }}
       >
         <FontIcon className="material-icons" hoverColor={BernieColors.red}>delete</FontIcon>
       </IconButton>
 
       <IconButton
         title="approve"
-        onTouchTap={function(){
+        onTouchTap={() => {
           this._handleEventConfirmation([rowIndex]);
-        }.bind(this)}
+        }}
       >
         <FontIcon className="material-icons" hoverColor={BernieColors.blue}>event_available</FontIcon>
       </IconButton>
@@ -226,10 +226,18 @@ class AdminEventsSection extends React.Component {
 
   renderToolbar() {
     let filterOptions = [
-      { payload: '1', text: 'Pending Approval' },
-      { payload: '2', text: 'Approved Events' },
-      { payload: '3', text: 'Past Events' }
+      { payload: '0', text: 'Pending Approval' },
+      { payload: '1', text: 'Approved Events' },
+      // { payload: '3', text: 'Past Events' }
     ];
+
+    let filterOptionsIndex = 0;
+
+    filterOptions.forEach((option, index)=>{
+      if (!(option.payload) == this.props.relay.variables.filters.flagApproval){
+        filterOptionsIndex = index;
+      }
+    });
 
     let resultLengthOptions = [
        { payload: 10, text: '10 Events' },
@@ -265,15 +273,18 @@ class AdminEventsSection extends React.Component {
       });
     }
 
-  return (
+    return (
       <Toolbar>
         <ToolbarGroup key={0} float="left">
-          {/*<DropDownMenu
+          <DropDownMenu
             menuItems={filterOptions}
-            selectedIndex={this.state.filterOptionsIndex}
+            selectedIndex={filterOptionsIndex}
+            onChange={(event, value) => {
+              this._handleRequestFiltersChange('flagApproval', !(value));
+            }}
             menuItemStyle={BernieText.menuItem}
             style={{marginRight: '0'}}
-          />*/}
+          />
           <DropDownMenu
             menuItems={resultLengthOptions}
             selectedIndex={resultLengthOptionsIndex}
@@ -282,42 +293,74 @@ class AdminEventsSection extends React.Component {
             autoWidth={false}
             style={{width: '140px', marginRight: '0'}}
           />
+          {/*IconMenus are just broken right now
+          <IconMenu
+            iconButtonElement={<FontIcon className="material-icons" hoverColor={BernieColors.blue}>filter_list</FontIcon>}
+            desktop={true}
+            // multiple={true}
+            closeOnItemTouchTap={false}
+            openDirection="bottom-right"
+            style={{ position: 'relative', top: '15px' }}
+            menuStyle={{ maxHeight: '300px' }}
+          >
+            {states.map((item, index) => {
+              return <MenuItem index={index} key={index} primaryText={item.abbreviation} />
+            })}
+          </IconMenu>*/}
+          <div
+            style={{ position: 'relative', top: '20px', display: 'inline' }}
+          >
+            <label htmlFor="stateSelect" style={{ display: 'inline', marginRight: '0.5em', fontSize: '0.8em' }}>Filter by State</label>
+            <select
+              id='stateSelect'
+              onChange={(event) => {
+                let updatedValue = event.target.value;
+                if (updatedValue == 'none'){updatedValue = null}
+                this._handleRequestFiltersChange('venueStateCd', updatedValue);
+              }}
+            >
+              <option value='none'>--</option>
+              {states.map((item, index) => {
+                return <option key={index} value={item.abbreviation}>{item.name}</option>
+              })}
+            </select>
+          </div>
           {/*<IconButton
             iconClassName="material-icons"
             tooltipPosition="bottom-center"
             title="Refresh Events"
             style={{float: 'left', top: '5px'}}
             tooltipStyles={{zIndex: 10}}
-            onTouchTap={function(){
+            onTouchTap={() => {
               this._handleRequestRefresh();
-            }.bind(this)}
+            }}
           >refresh</IconButton>*/}
         </ToolbarGroup>
         <ToolbarGroup key={1} float="right">
           <RaisedButton
             label="Create"
-            onTouchTap={function(){
-              //this._handleEventCreation(this.state.selectedRows);
-              window.location = '/admin/events/create'
-            }.bind(this)}
+            onTouchTap={() => {
+              this._handleEventCreation(this.state.selectedRows);
+              // window.location = '/admin/events/create'
+            }}
           />
           <ToolbarSeparator style={{marginLeft: 0}} />
           <RaisedButton
             label="Delete"
             primary={true}
             disabled={(this.state.selectedRows.length == 0)}
-                onTouchTap={function(){
+                onTouchTap={() => {
               this._handleEventDeletion(this.state.selectedRows);
-            }.bind(this)}
+            }}
           />
           <RaisedButton
             label="Approve Selected"
             style={{marginLeft: 0}}
             secondary={true}
             disabled={(this.state.selectedRows.length == 0)}
-            onTouchTap={function(){
+            onTouchTap={() => {
           this._handleEventConfirmation(this.state.selectedRows);
-        }.bind(this)}
+        }}
           />
         </ToolbarGroup>
       </Toolbar>
@@ -428,17 +471,19 @@ class AdminEventsSection extends React.Component {
         label="Delete"
         key="2"
         primary={true}
-        onTouchTap={function(){
+        onTouchTap={() => {
           this._handleEventDeletion([this.state.activeEventIndex]);
-        }.bind(this)}
+        }}
       />,
       <FlatButton
         label={(this.state.previewTabIndex == 0) ? 'Approve' : 'Update and Approve'}
         key="3"
         secondary={true}
-        onTouchTap={function(){
-          this._handleEventConfirmation([this.state.activeEventIndex]);
-        }.bind(this)}
+        onTouchTap={() => {
+          // document.getElementById('editForm').submit();
+          console.log(this)
+          // this._handleEventConfirmation([this.state.activeEventIndex]);
+        }}
       />
     ];
 
@@ -473,21 +518,21 @@ class AdminEventsSection extends React.Component {
           <Tab label="Preview" value={'0'} >
             <EventPreview
               event={activeEvent}
-              onChangeEventIndex={function(n){
+              onChangeEventIndex={(n) => {
                 this._iterateActiveEvent(n);
-              }.bind(this)}
-                onEventConfirm={function(indexArray){
+              }}
+              onEventConfirm={(indexArray) => {
                 this._handleEventConfirmation(indexArray);
-              }.bind(this)}
-                onEventEdit={function(modifiedEvent){
+              }}
+              onEventEdit={(modifiedEvent) => {
                 this._handleEventEdit(modifiedEvent);
-              }.bind(this)}
-                onTabRequest={function(eventIndex, tabIndex){
+              }}
+              onTabRequest={(eventIndex, tabIndex) => {
                 this._handleEventPreviewOpen(eventIndex, tabIndex);
-              }.bind(this)}
-                onEventDelete={function(indexArray){
+              }}
+              onEventDelete={(indexArray) => {
                 this._handleEventDeletion(indexArray);
-              }.bind(this)}
+              }}
             />
           </Tab>
           <Tab label="Edit" value={'1'} >
@@ -503,6 +548,14 @@ class AdminEventsSection extends React.Component {
 
   _handleRequestRefresh = () => {
     this.forceUpdate()
+  }
+
+  _handleRequestFiltersChange = (prop, value) => {
+    let newVar = {}
+    newVar[prop] = value;
+    let oldVars = this.props.relay.variables.filters;
+
+    this.props.relay.setVariables(Object.assign(oldVars, newVar));
   }
 
   _handleEventPreviewOpen = (eventIndex, tabIndex) => {
@@ -602,8 +655,8 @@ class AdminEventsSection extends React.Component {
         groupHeaderHeight={35}
         headerHeight={50}
         rowsCount={events.length}
-        width={this.state.tableWidth}
-        height={this.state.tableHeight}
+        width={this.state.windowWidth}
+        height={this.state.windowHeight - 112}
         onRowDoubleClick={this._handleRowClick}
         {...this.props}>
         <ColumnGroup
@@ -629,7 +682,7 @@ class AdminEventsSection extends React.Component {
             header={<this.HeaderCell content="Manage" />}
             cell={<this.ActionCell data={events} col="actions" />}
             fixed={true}
-            width={170}
+            width={115}
             align='center'
           />
         </ColumnGroup>
@@ -737,13 +790,14 @@ export default Relay.createContainer(AdminEventsSection, {
   initialVariables: {
     numEvents: 100,
     sortField: 'startDate',
-    sordDirection: 'ASC'
+    sortDirection: 'ASC',
+    filters: {flagApproval: true}
   },
   fragments: {
     listContainer: () => Relay.QL`
       fragment on ListContainer {
         ${DeleteEvents.getFragment('listContainer')}
-        events(first: $numEvents) {
+        events( first: $numEvents filterOptions: $filters ) {
           edges {
             cursor
             node {
