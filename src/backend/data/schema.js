@@ -95,7 +95,7 @@ function eventFromAPIFields(fields) {
   let idFields = ['event_id', 'creator_cons_id', 'event_type_id'];
   idFields.forEach((field) => {
     if (event[field]) {
-      event[field] = fromGlobalId(event[field]).id
+      event[field] = parseInt(fromGlobalId(event[field]).id, 10)
     }
   })
 

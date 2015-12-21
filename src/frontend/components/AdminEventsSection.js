@@ -554,9 +554,6 @@ class AdminEventsSection extends React.Component {
               onEventConfirm={(indexArray) => {
                 this._handleEventConfirmation(indexArray);
               }}
-              onEventEdit={(modifiedEvent) => {
-                this._handleEventEdit(modifiedEvent);
-              }}
               onTabRequest={(eventIndex, tabIndex) => {
                 this._handleEventPreviewOpen(eventIndex, tabIndex);
               }}
@@ -638,7 +635,35 @@ class AdminEventsSection extends React.Component {
   }
 
   _handleEventConfirmation = (eventIndexes) => {
-    this._iterateActiveEvent(1);
+    let events = this.props.listContainer.events.edges;
+    let eventsToConfirm = []
+    events.forEach((event, index) => {
+      if (eventIndexes.indexOf(index) !== -1) {
+        let node = event.node
+        // Bit of a hack, but BSD requires all these fields
+        let eventToConfirm = {
+          flagApproval: false,
+          id: node.id,
+          name: node.name,
+          eventIdObfuscated: node.eventIdObfuscated,
+          eventTypeId: node.eventType.id,
+          description: node.description,
+          venueName: node.venueName,
+          venueZip: node.venueZip,
+          venueCity: node.venueCity,
+          venueState: node.venueState,
+          startDate: node.startDate,
+          localTimezone: node.localTimezone,
+          duration: node.duration,
+          capacity: node.capacity
+        }
+        eventsToConfirm.push(eventToConfirm)
+      }
+    })
+    this.refs.eventEditHandler.send({
+      events: eventsToConfirm,
+      listContainer: this.props.listContainer
+    })
   }
 
   _handleEventEdit = (event, newData) => {
