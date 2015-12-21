@@ -2,14 +2,14 @@ import React from 'react';
 import {DatePicker} from 'material-ui';
 import {BernieText} from '../styles/bernie-css';
 import moment from 'moment';
+import GCFormField from './GCFormField'
 
-export default class GCDateField extends React.Component {
+export default class GCDateField extends GCFormField {
   render() {
-    let floatingLabelText = this.props.floatingLabelText || this.props.label
     let oldDate = moment(this.props.value).utcOffset(this.props.utcOffset);
     return <DatePicker
       {...this.props}
-      floatingLabelText={floatingLabelText}
+      floatingLabelText={this.floatingLabelText()}
       hintText={this.props.label}
       onChange={(_, date) => {
         let newDate = moment(date).utcOffset(this.props.utcOffset);

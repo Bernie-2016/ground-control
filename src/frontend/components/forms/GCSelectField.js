@@ -1,8 +1,9 @@
 import React from 'react';
 import {FlatButton, SelectField} from 'material-ui';
 import {BernieText, BernieColors} from '../styles/bernie-css'
+import GCFormField from './GCFormField';
 
-export default class GCSelectField extends React.Component {
+export default class GCSelectField extends GCFormField {
   styles = {
     label: {
       paddingBottom: 10,
@@ -54,7 +55,7 @@ export default class GCSelectField extends React.Component {
         value={this.props.value}
         displayMember='name'
         valueMember='value'
-        floatingLabelText={this.props.label}
+        floatingLabelText={this.floatingLabelText()}
         errorStyle={BernieText.inputError}
         menuItems={menuItems}
         selectedIndex={this.getMenuItemIndex(menuItems)}

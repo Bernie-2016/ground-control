@@ -1,14 +1,13 @@
 import React from 'react';
 import {TextField} from 'material-ui';
 import {BernieText} from '../styles/bernie-css';
+import GCFormField from './GCFormField';
 
-export default class GCTextField extends React.Component {
+export default class GCTextField extends GCFormField {
   render() {
-    let floatingLabelText = this.props.floatingLabelText === false ? null : floatingLabelText || this.props.label;
-
     return <TextField
       {...this.props}
-      floatingLabelText={floatingLabelText}
+      floatingLabelText={this.floatingLabelText()}
       errorStyle={BernieText.inputError}
       hintText={this.props.label}
       onChange={(event) => {this.props.onChange(event.target.value)}}
