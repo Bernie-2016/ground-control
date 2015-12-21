@@ -19,6 +19,16 @@ export default class GCSelectField extends React.Component {
     })
   }
 
+  getMenuItemIndex(menuItems) {
+    let menuItemIndex = 0;
+    menuItems.forEach((item, index) => {
+      if (item.value == this.props.value){
+        menuItemIndex = index;
+      }
+    });
+    return menuItemIndex
+  }
+
   render() {
     let error = <div></div>;
     let labelStyle = this.styles.label
@@ -35,15 +45,20 @@ export default class GCSelectField extends React.Component {
     }
     if (typeof this.props.floatLabel === false)
       extraProps = {}
+
+    const menuItems = this.createMenuItems();
+    
     return (
       <SelectField
-        {...this.props}
-        {...extraProps}
+        // {...this.props}
+        // {...extraProps}
+        value={this.props.value}
         displayMember='name'
         valueMember='value'
         floatingLabelText={this.props.label}
         errorStyle={BernieText.inputError}
-        menuItems={this.createMenuItems()}
+        menuItems={menuItems}
+        selectedIndex={this.getMenuItemIndex(menuItems)}
         onChange={(event) => {this.props.onChange(event.target.value)}}
       />
     )
