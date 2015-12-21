@@ -83,6 +83,7 @@ class AdminEventsSection extends React.Component {
         sortField: attribute,
         sortDirection: sortDir
       });
+      this.setState({selectedRows: []});
     }}
     style={{
       fontFamily: 'Roboto',
@@ -594,6 +595,7 @@ class AdminEventsSection extends React.Component {
     let oldVars = this.props.relay.variables.filters;
 
     this.props.relay.setVariables(Object.assign(oldVars, newVar));
+    this.setState({selectedRows: []});
   }
 
   _handleEventPreviewOpen = (eventIndex, tabIndex) => {
