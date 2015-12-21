@@ -343,7 +343,6 @@ export default class BSD {
     // BSD API gets mad if we send this in
     delete inputs['event_id']
     let response = await this.request('/event/update_event', {event_api_version: 2, values: JSON.stringify(inputs)}, 'POST');
-    console.log(response);
     if (response.validation_errors) {
       throw new Error(JSON.stringify(response.validation_errors));
     }

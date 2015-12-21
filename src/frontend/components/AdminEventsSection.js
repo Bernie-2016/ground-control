@@ -667,6 +667,7 @@ class AdminEventsSection extends React.Component {
   }
 
   _handleEventEdit = (event, newData) => {
+    this._handlePreviewRequestClose()
     newData.id = event.id
     newData.eventIdObfuscated = event.eventIdObfuscated
     newData.hostId = event.host.id
@@ -718,7 +719,7 @@ class AdminEventsSection extends React.Component {
         ref='eventEditHandler'
         mutationClass={EditEvents}
         successMessage="Events edited successfully!"
-        onSuccess={() => this._handlePreviewRequestClose()} />
+      />
       {this.renderDeleteModal()}
       {this.renderCreateModal()}
       {this.renderEventPreviewModal()}
