@@ -304,6 +304,9 @@ class EventEdit extends React.Component {
         <Form.Field
           name="flagApproval"
           label="Mark this event as incomplete/needs further review"
+          onChange={(val) => {
+            this.props.onFieldChanged('flagApproval', val)
+          }}
         />
 
       <Form.Button  style={ { display: "none" } } ref="submit" type='submit' label='Submit Changes' fullWidth={true} />

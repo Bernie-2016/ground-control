@@ -45,6 +45,7 @@ class AdminEventsSection extends React.Component {
       activeEventIndex: null,
       previewTabIndex: 0,
       userMessage: '',
+      approveOnUpdate: true,
       undoAction: function(){console.log('undo')}
     };
     window.addEventListener('resize', this._handleResize);
@@ -508,7 +509,7 @@ class AdminEventsSection extends React.Component {
         }}
       />,
       <FlatButton
-        label={(this.state.previewTabIndex == 0) ? 'Approve' : 'Update and Approve'}
+        label={(this.state.previewTabIndex == 0) ? 'Approve' : (this.state.approveOnUpdate ? 'Update and Approve' : 'Update')}
         key="3"
         secondary={true}
         onTouchTap={() => {
@@ -570,6 +571,14 @@ class AdminEventsSection extends React.Component {
               }}
               event={activeEvent}
               listContainer={this.props.listContainer}
+              onFieldChanged={(fieldName, val) => {
+                if (fieldName === 'flagApproval') {
+                  if (val === true)
+                    this.setState({approveOnUpdate: false})
+                  else
+                    this.setState({approveOnUpdate: true})
+                }
+              }}
             />
           </Tab>
         </Tabs>
@@ -595,7 +604,8 @@ class AdminEventsSection extends React.Component {
     this.setState({
       showEventPreview: true,
       activeEventIndex: eventIndex,
-      previewTabIndex: tabIndex
+      previewTabIndex: tabIndex,
+      approveOnUpdate: true
     });
   }
 
