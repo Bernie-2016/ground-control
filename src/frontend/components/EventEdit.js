@@ -106,8 +106,8 @@ class EventEdit extends React.Component {
       hostReceiveRsvpEmails: yup.boolean()
         .default(event.hostReceiveRsvpEmails),
 
-      rsvpUserReminderEmail: yup.boolean()
-        .default(event.rsvpUserReminderEmail),
+      rsvpUseReminderEmail: yup.boolean()
+        .default(event.rsvpUseReminderEmail),
 
       attendeeVolunteerShow: yup.boolean()
         .default(event.attendeeVolunteerShow),
@@ -269,7 +269,7 @@ class EventEdit extends React.Component {
         <InfoHeader content='Event Attendees' />
 
         <Form.Field
-          name="rsvpUserReminderEmail"
+          name="rsvpUseReminderEmail"
           label="Send Guests RSVP Email Reminder"
         />
 

@@ -939,7 +939,7 @@ export default Relay.createContainer(AdminEventsSection, {
               publicPhone
               contactPhone
               hostReceiveRsvpEmails
-              rsvpUserReminderEmail
+              rsvpUseReminderEmail
               rsvpEmailReminderHours
               attendeesCount
             }

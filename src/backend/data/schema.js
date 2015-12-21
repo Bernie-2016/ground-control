@@ -636,9 +636,9 @@ const GraphQLEvent = new GraphQLObjectType({
       type: GraphQLBoolean,
       resolve: (event) => event.host_receive_rsvp_emails
     },
-    rsvpUserReminderEmail: {
+    rsvpUseReminderEmail: {
       type: GraphQLBoolean,
-      resolve: (event) => event.rsvp_user_reminder_email
+      resolve: (event) => event.rsvp_use_reminder_email
     },
     rsvpEmailReminderHours: {
       type: GraphQLInt,
@@ -745,7 +745,7 @@ const GraphQLEventInput = new GraphQLInputObjectType({
     publicPhone: { type: GraphQLBoolean },
     contactPhone: { type: GraphQLString },
     hostReceiveRsvpEmails: { type: GraphQLBoolean },
-    rsvpUserReminderEmail: { type: GraphQLBoolean },
+    rsvpUseReminderEmail: { type: GraphQLBoolean },
     rsvpEmailReminderHours: { type: GraphQLInt },
   }
 })
