@@ -301,7 +301,7 @@ export default class BSD {
       method: 'GET',
       resolveWithFullResponse: true,
     }
-    let response = await requestPromise(options)
+    let response = await requestWrapper(options)
     return response
   }
 
@@ -343,6 +343,7 @@ export default class BSD {
     // BSD API gets mad if we send this in
     delete inputs['event_id']
     let response = await this.request('/event/update_event', {event_api_version: 2, values: JSON.stringify(inputs)}, 'POST');
+    console.log(response);
     if (response.validation_errors) {
       throw new Error(JSON.stringify(response.validation_errors));
     }
@@ -424,6 +425,18 @@ export default class BSD {
     return
   }
 
+  async requestWrapper(options) {
+    if (process.env.NODE_ENV === 'development' && options.method === 'POST') {
+      log.debug(`Would have made BSD API call with options: ${JSON.stringify(options)}`)
+      return {
+        statusCode: 200,
+        body: {}
+      }
+    }
+    else
+      return requestPromise(options)
+  }
+
   async makeRawRequest(callPath, params, method) {
     let finalURL = this.generateBSDURL(callPath, {params});
     let options = {
@@ -432,7 +445,8 @@ export default class BSD {
       resolveWithFullResponse: true,
       json: true
     }
-    return requestPromise(options)
+
+    return this.requestWrapper(options)
   }
 
   async makeRawXMLRequest(callPath, params, method) {
@@ -443,7 +457,8 @@ export default class BSD {
       body: params,
       resolveWithFullResponse: true
     }
-    return requestPromise(options)
+
+    return this.requestWrapper(options)
   }
 
   async request(callPath, params, method) {
