@@ -15,5 +15,6 @@ module.exports = {
   plugins: [
     new SchemaPlugin()
   ],
-  output: {filename: 'app.js', path: './src/frontend/public/js/'}
+  output: {filename: 'app.js', path: './src/frontend/public/js/'},
+  devtool: "#inline-source-map"
 }

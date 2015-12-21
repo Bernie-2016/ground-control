@@ -720,7 +720,7 @@ const GraphQLSurvey = new GraphQLObjectType({
 const GraphQLEventInput = new GraphQLInputObjectType({
   name: 'EventInput',
   fields: {
-    id: { type: GraphQLString },
+    eventIdObfuscated: { type: GraphQLString },
     eventTypeId: { type: GraphQLString },
     hostId: { type: GraphQLString },
     flagApproval: { type: GraphQLBoolean },
@@ -769,7 +769,7 @@ const GraphQLEditEvents = mutationWithClientMutationId({
 
     for (let index = 0; index < count; index++) {
       let event = params[index]
-//      await BSDClient.updateEvent(event.event_id, event.event_type_id, event.creator_cons_id, event)
+      await BSDClient.updateEvent(event.event_id_obfuscated, event.event_type_id, event.creator_cons_id, event)
       await knex('bsd_events')
         .where('event_id', event.event_id)
         .update({

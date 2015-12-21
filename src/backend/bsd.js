@@ -6,6 +6,7 @@ import {parseString} from 'xml2js';
 import Promise from 'bluebird';
 import qs from 'querystring';
 import log from './log';
+import moment from 'moment-timezone';
 
 const parseStringPromise = Promise.promisify(parseString);
 
@@ -312,10 +313,38 @@ export default class BSD {
     return responses;
   }
 
-  async updateEvent(event_id, event_type_id, creator_cons_id, updatedValues) {
-    Object.assign(updatedValues, {event_id, event_type_id, creator_cons_id});
-    let response = await this.request('/event/update_event', {event_api_version: 2, values: JSON.stringify(updatedValues)}, 'POST');
-    return response
+  apiInputsFromEvent(event) {
+    let inputs = {}
+    let eventDate = {}
+    Object.keys(event).forEach((key) => {
+      if (key === 'start_tz')
+        inputs['local_timezone'] = event[key]
+      else if (key === 'start_dt') {
+        eventDate['start_datetime_system'] = moment(event['start_dt']).tz(event['start_tz']).format('YYYY-MM-DD HH:mm:ss')
+      }
+      else if (key === 'capacity')
+        eventDate[key] = event[key]
+      else if (key === 'duration')
+        eventDate[key] = event[key]
+      else
+        inputs[key] = event[key]
+    })
+    if (Object.keys(eventDate).length > 0)
+      inputs['days'] = [eventDate]
+    return inputs
+  }
+
+  async updateEvent(event_id_obfuscated, event_type_id, creator_cons_id, updatedValues) {
+    updatedValues = {
+      ...updatedValues,
+      ...{event_id_obfuscated, event_type_id, creator_cons_id}
+    }
+    let inputs = this.apiInputsFromEvent(updatedValues)
+    let response = await this.request('/event/update_event', {event_api_version: 2, values: JSON.stringify(inputs)}, 'POST');
+    if (response.validation_errors) {
+      // We do this because all the other api methods throw errors except the event ones
+      throw new Error('bad');
+    }
   }
 
   async createEvents(cons_id, form, event_types, callback) {

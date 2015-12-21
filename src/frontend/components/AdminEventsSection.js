@@ -569,8 +569,8 @@ class AdminEventsSection extends React.Component {
             <EventEdit
               ref="eventEdit"
               onSubmit={ (data) => {
-                data.id = activeEvent.node.id
-                data.hostId = activeEvent.node.host.id
+                data.eventIdObfuscated = activeEvent.eventIdObfuscated
+                data.hostId = activeEvent.host.id
                 this.refs.eventEditHandler.send({
                   events: [data],
                   listContainer: this.props.listContainer
