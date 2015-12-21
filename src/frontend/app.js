@@ -19,6 +19,7 @@ import GCRadioButtonsField from './components/forms/GCRadioButtonsField';
 import GCSelectField from './components/forms/GCSelectField';
 import GCCheckboxesField from './components/forms/GCCheckboxesField';
 import GCBooleanField from './components/forms/GCBooleanField';
+import GCToggleField from './components/forms/GCToggleField';
 import CallAssignmentsDashboard from './components/CallAssignmentsDashboard';
 import AdminCallAssignment from './components/AdminCallAssignment';
 import CallAssignment from './components/CallAssignment';

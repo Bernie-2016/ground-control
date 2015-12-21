@@ -739,7 +739,7 @@ const GraphQLEventInput = new GraphQLInputObjectType({
     startDate: { type: GraphQLString },
     duration: { type: GraphQLInt },
     capacity: { type: GraphQLInt },
-    attendeeVolunteerShow: { type: GraphQLBoolean },
+    attendeeVolunteerShow: { type: GraphQLInt },
     attendeeVolunteerMessage: { type: GraphQLString },
     isSearchable: { type: GraphQLInt },
     publicPhone: { type: GraphQLBoolean },

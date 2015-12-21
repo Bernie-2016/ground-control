@@ -4,7 +4,7 @@ import {BernieText} from '../styles/bernie-css';
 
 export default class GCTextField extends React.Component {
   render() {
-    let floatingLabelText = this.props.floatingLabelText || this.props.label
+    let floatingLabelText = this.props.floatingLabelText === false ? null : floatingLabelText || this.props.label;
 
     return <TextField
       {...this.props}

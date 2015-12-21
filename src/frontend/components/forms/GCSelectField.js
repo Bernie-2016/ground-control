@@ -47,11 +47,10 @@ export default class GCSelectField extends React.Component {
       extraProps = {}
 
     const menuItems = this.createMenuItems();
-    
+
     return (
       <SelectField
         // {...this.props}
-        // {...extraProps}
         value={this.props.value}
         displayMember='name'
         valueMember='value'

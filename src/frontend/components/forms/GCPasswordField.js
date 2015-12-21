@@ -4,14 +4,11 @@ import {BernieText} from '../styles/bernie-css';
 
 export default class GCPasswordField extends React.Component {
   render() {
-    let extraProps = {
-      floatLabel: this.props.label
-    }
-    if (typeof this.props.floatLabel === false)
-      extraProps = {}
+    let floatingLabelText = this.props.floatingLabelText === false ? null : floatingLabelText || this.props.label;
+
     return <TextField
       {...this.props}
-      {...extraProps}
+      floatingLabelText={floatingLabelText}
       type='password'
       errorStyle={BernieText.inputError}
       hintText={this.props.label}

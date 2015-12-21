@@ -137,6 +137,7 @@ class EventEdit extends React.Component {
         <Form.Field
           name='name'
           label='Event Name'
+          fullWidth={true}
         />
         <br />
 
@@ -144,6 +145,7 @@ class EventEdit extends React.Component {
           name='eventTypeId'
           type='select'
           label='Event Type'
+          fullWidth={true}
           choices={this.eventTypes()}
         />
 
