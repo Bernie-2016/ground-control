@@ -250,9 +250,11 @@ class EventEdit extends React.Component {
         />
 
         <InfoHeader content='Event Host' />
-
+        {`${event.host.firstName} ${event.host.lastName}`}<br />
+        {`${event.host.email}`}<br />
         <Form.Field
           name="contactPhone"
+          type="phone"
           label="Contact Phone"
         /><br/><br/>
 
