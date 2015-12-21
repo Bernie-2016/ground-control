@@ -720,6 +720,7 @@ const GraphQLSurvey = new GraphQLObjectType({
 const GraphQLEventInput = new GraphQLInputObjectType({
   name: 'EventInput',
   fields: {
+    id: { type: GraphQLString },
     eventIdObfuscated: { type: GraphQLString },
     eventTypeId: { type: GraphQLString },
     hostId: { type: GraphQLString },

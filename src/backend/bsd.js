@@ -340,10 +340,11 @@ export default class BSD {
       ...{event_id_obfuscated, event_type_id, creator_cons_id}
     }
     let inputs = this.apiInputsFromEvent(updatedValues)
+    // BSD API gets mad if we send this in
+    delete inputs['event_id']
     let response = await this.request('/event/update_event', {event_api_version: 2, values: JSON.stringify(inputs)}, 'POST');
     if (response.validation_errors) {
-      // We do this because all the other api methods throw errors except the event ones
-      throw new Error('bad');
+      throw new Error(JSON.stringify(response.validation_errors));
     }
   }
 
