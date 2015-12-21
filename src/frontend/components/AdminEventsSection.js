@@ -569,13 +569,7 @@ class AdminEventsSection extends React.Component {
             <EventEdit
               ref="eventEdit"
               onSubmit={ (data) => {
-                data.id = activeEvent.id
-                data.eventIdObfuscated = activeEvent.eventIdObfuscated
-                data.hostId = activeEvent.host.id
-                this.refs.eventEditHandler.send({
-                  events: [data],
-                  listContainer: this.props.listContainer
-                })
+                this._handleEventEdit(activeEvent, data)
               }}
               event={activeEvent}
               listContainer={this.props.listContainer}
@@ -647,9 +641,14 @@ class AdminEventsSection extends React.Component {
     this._iterateActiveEvent(1);
   }
 
-  _handleEventEdit = (event) => {
-    console.log(event);
-    // adminInterface._iterateActiveEvent(1);
+  _handleEventEdit = (event, newData) => {
+    newData.id = event.id
+    newData.eventIdObfuscated = event.eventIdObfuscated
+    newData.hostId = event.host.id
+    this.refs.eventEditHandler.send({
+      events: [newData],
+      listContainer: this.props.listContainer
+    })
   }
 
   _handleEventSelect = (eventIndex) => {
@@ -693,7 +692,7 @@ class AdminEventsSection extends React.Component {
       <MutationHandler
         ref='eventEditHandler'
         mutationClass={EditEvents}
-        onSuccess={() => this._handleEventConfirmation([this.state.activeEventIndex])} />
+        onSuccess={() => this._iterateActiveEvent(1)} />
       {this.renderDeleteModal()}
       {this.renderCreateModal()}
       {this.renderEventPreviewModal()}
@@ -867,6 +866,7 @@ export default Relay.createContainer(AdminEventsSection, {
       fragment on ListContainer {
         ${EventEdit.getFragment('listContainer')}
         ${DeleteEvents.getFragment('listContainer')}
+        ${EditEvents.getFragment('listContainer')}
         events(
           first: $numEvents
           filterOptions: $filters

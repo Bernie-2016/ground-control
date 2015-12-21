@@ -1,6 +1,6 @@
 import Relay from 'react-relay';
 
-export default class DeleteEvents extends Relay.Mutation {
+export default class EditEvents extends Relay.Mutation {
   static fragments = {
     listContainer: () => Relay.QL`
       fragment on ListContainer {
