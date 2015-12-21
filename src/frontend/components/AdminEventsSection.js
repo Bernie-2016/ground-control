@@ -692,7 +692,8 @@ class AdminEventsSection extends React.Component {
       <MutationHandler
         ref='eventEditHandler'
         mutationClass={EditEvents}
-        onSuccess={() => this._iterateActiveEvent(1)} />
+        successMessage="Events edited successfully!"
+        onSuccess={() => this._handlePreviewRequestClose()} />
       {this.renderDeleteModal()}
       {this.renderCreateModal()}
       {this.renderEventPreviewModal()}
