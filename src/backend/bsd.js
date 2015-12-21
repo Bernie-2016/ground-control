@@ -335,8 +335,6 @@ export default class BSD {
   }
 
   async updateEvent(event_id_obfuscated, event_type_id, creator_cons_id, updatedValues) {
-    event_id_obfuscated='w3v'
-    creator_cons_id = 6
     updatedValues = {
       ...updatedValues,
       ...{event_id_obfuscated, event_type_id, creator_cons_id}
