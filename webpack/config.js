@@ -4,6 +4,7 @@ module.exports = {
   entry: './src/frontend/app.js',
   module: {
     loaders: [
+      { test: /\.json$/, loader: 'json'},
       {
         exclude: /node_modules/,
         loader: 'babel',
