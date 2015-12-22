@@ -259,7 +259,7 @@ const GraphQLUser = new GraphQLObjectType({
       type: GraphQLCallAssignmentConnection,
       args: connectionArgs,
       resolve: async (user, {first}) => {
-        let assignments = knex('bsd_call_assignments').limit(first)
+        let assignments = await knex('bsd_call_assignments').limit(first)
         return connectionFromArray(assignments, {first})
       }
     },
