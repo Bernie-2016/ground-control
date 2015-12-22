@@ -51,6 +51,7 @@ export default class GCCheckboxesField extends React.Component {
       <div>
         <div style={labelStyle}>{this.props.label}</div>
         {this.createCheckboxes()}
+        {error}
       </div>
     )
   }

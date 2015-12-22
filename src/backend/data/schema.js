@@ -64,6 +64,17 @@ const adminRequired = (session) => {
 }
 
 // We should move these into model-helpers or something
+function modelFromBSDSurvey(BSDObject, type) {
+  let modelKeys = {
+    'bsd_surveys': ['signup_form_id', 'signup_form_slug', 'modified_dt', 'create_dt'],
+    'bsd_groups': ['cons_group_id', 'name', 'description', 'modified_dt', 'create_dt']
+  }
+  let keys = modelKeys[type]
+  let model = {}
+  keys.forEach((key) => model[key] = BSDObject[key])
+  return model;
+}
+
 function eventFieldFromAPIField(field) {
 
   let mapFields = {
@@ -926,7 +937,8 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
       if (!underlyingSurvey) {
         try {
           let BSDSurveyResponse = await BSDClient.getForm(surveyId)
-          underlyingSurvey = await knex.insertAndFetch('bsd_surveys', BSDSurveyResponse, {transaction: trx, idField: 'signup_form_id'})
+          let model = modelFromBSDSurvey(BSDSurveyResponse, 'bsd_surveys')
+          underlyingSurvey = await knex.insertAndFetch('bsd_surveys', model, {transaction: trx, idField: 'signup_form_id'})
         } catch (err) {
           if (err && err.response && err.response.statusCode === 409)
             throw new GraphQLError({
@@ -953,7 +965,8 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
         if (!underlyingGroup) {
           try {
             let BSDGroupResponse = await BSDClient.getConstituentGroup(groupText)
-            underlyingGroup = await knex.insertAndFetch('bsd_groups', BSDGroupResponse, {transaction: trx, idField: 'cons_group_id'})
+            let model = modelFromBSDSurvey(BSDGroupResponse, 'bsd_groups')
+            underlyingGroup = await knex.insertAndFetch('bsd_groups', model, {transaction: trx, idField: 'cons_group_id'})
           } catch (err) {
             if (err && err.response && err.response.statusCode === 409)
               throw new GraphQLError({
@@ -972,11 +985,9 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
           .first()
 
         if (!group)
-          group = await knex('gc_bsd_groups')
-            .transacting(trx)
-            .where('cons_group_id', consGroupID)
-            .returning('*')
-            .first()
+          group = await knex.insertAndFetch('gc_bsd_groups', {
+            'cons_group_id': consGroupID,
+          }, {transaction: trx})
       }
       else {
         let query = groupText

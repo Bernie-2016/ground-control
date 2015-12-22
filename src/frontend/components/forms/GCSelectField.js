@@ -42,28 +42,26 @@ export default class GCSelectField extends GCFormField {
       }
     }
 
-    let extraProps = {
-      floatLabel: this.props.label
-    }
-    if (typeof this.props.floatLabel === false)
-      extraProps = {}
-
     const menuItems = this.createMenuItems();
 
     return (
       <div style={{
-        maxWidth: 200,
+        width: 200,
         ...this.props.style
       }}>
+        <div style={labelStyle}>{this.props.label}</div>
         <Select
           labelKey="label"
           value={this.props.value}
           options={menuItems}
-          onChange={(element) => this.props.onChange(element.value)}
-          style={{
-            backgroundColor: 'white'
+          onChange={(element) => {
+            if (element)
+              this.props.onChange(element.value)
+            else
+              this.props.onChange(null)
           }}
         />
+        {error}
       </div>
     )
   }

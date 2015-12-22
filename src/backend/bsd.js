@@ -46,7 +46,7 @@ export default class BSD {
 
   createGroupObject(group) {
     let groupObj = {};
-    groupObj['id'] = group['$']['id'];
+    groupObj['cons_group_id'] = group['$']['id'];
     groupObj['modified_dt'] = group['$']['modified_dt'];
 
     Object.keys(group).forEach((key) => {

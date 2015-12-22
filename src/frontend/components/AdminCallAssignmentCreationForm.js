@@ -72,13 +72,17 @@ export default class AdminCallAssignmentCreationForm extends React.Component {
               name='intervieweeGroup'
               multiLine={true}
               rows={5}
-              label="Target group of interviewees.  Enter a SQL query, BSD cons_group_id, or the word 'everyone'"
+              label="Interviewee group"
+              hintText="Enter a SQL query, BSD cons_group_id, or the word 'everyone'"
             /><br />
             <Form.Field
               name='renderer'
               type='select'
               choices={this.surveyRenderers}
               label='How to render the survey?'
+              style={{
+                width: '100%'
+              }}
             /><br />
             <Form.Field
               name='processors'
