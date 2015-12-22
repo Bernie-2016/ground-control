@@ -289,21 +289,18 @@ const GraphQLUser = new GraphQLObjectType({
       args: {
         callAssignmentId: { type: GraphQLString }
       },
-      resolve: async (user, {callAssignmentId}) => {
-        return null
-/*        let localId = parseInt(fromGlobalId(callAssignmentId).id, 10)
-        let assignedCalls = await user.getAssignedCalls({
-          where: {
-            call_assignment_id: localId
-          },
+      resolve: async (user, {callAssignmentId}, {rootValue}) => {
+        let localId = parseInt(fromGlobalId(callAssignmentId).id, 10)
+        let assignedCalls = await knex('bsd_assigned_calls').where({
+          'caller_id': user.id,
+          'call_assignment_id': localId
         })
         let assignedCall = assignedCalls[0]
-        let callAssignment = await BSDCallAssignment.findById(localId)
         if (assignedCall) {
-          let interviewee = await assignedCall.getInterviewee()
-          return interviewee
+          return rootValue.loaders.bsdPeople.load(assignedCall.interviewee_id)
         }
         else {
+          let callAssignment = await rootValue.loaders.bsdCallAssignments.load(localId)
           let allOffsets = [-10, -9, -8, -7, -6, -5, -4]
           let validOffsets = []
           allOffsets.forEach((offset) => {
@@ -313,106 +310,64 @@ const GraphQLUser = new GraphQLObjectType({
           })
           if (validOffsets.length === 0)
             return null
-          // This is maybe the worst thing of all time. Switch to knex when we can.
-          let group = await callAssignment.getIntervieweeGroup()
+          let group = await rootValue.loaders.gcBsdGroups.load(callAssignment.gc_bsd_group_id)
           let filterQuery = ''
 
           if (group.cons_group_id)
-            filterQuery = `
-              INNER JOIN (
-                  SELECT cons_id
-                  FROM bsd_person_bsd_groups
-                  WHERE cons_group_id=${group.cons_group_id}
-                ) AS cons_groups
-                ON people.cons_id=cons_groups.cons_id
-            `
-          else if (group.query && group.query !== EVERYONE_GROUP)
-            filterQuery = `
-              INNER JOIN (
-                  SELECT cons_id
-                  FROM bsd_person_gc_bsd_groups
-                  WHERE gc_bsd_group_id=${group.id}
-                ) AS groups
-                ON people.cons_id=groups.cons_id
-            `
-          let query = `
-            SELECT *
-            FROM bsd_people AS people
-            INNER JOIN bsd_emails AS emails
-              ON people.cons_id=emails.cons_id
-            INNER JOIN bsd_phones AS phones
-              ON people.cons_id=phones.cons_id
-            INNER JOIN (
-              SELECT id, cons_id
-              FROM bsd_addresses AS addresses
-              INNER JOIN zip_codes AS zip_codes
-              ON zip_codes.zip=addresses.zip
-              WHERE
-                addresses.is_primary=TRUE AND
-                addresses.state_cd NOT IN ('IA','NH','NV','SC') AND
-                zip_codes.timezone_offset IN (${validOffsets.join(',')})
-              ) AS addresses
-              ON people.cons_id=addresses.cons_id
-            ${filterQuery}
-            LEFT OUTER JOIN bsd_assigned_calls AS assigned_calls
-              ON people.cons_id=assigned_calls.interviewee_id
-            LEFT OUTER JOIN (
-              SELECT id, interviewee_id, attempted_at
-              FROM bsd_calls
-              WHERE
-                (
-                  call_assignment_id = :assignmentId AND
-                  completed = TRUE
-                ) OR
-                (
-                  reason_not_completed IN ('NO_PICKUP', 'CALL_BACK', 'NOT_INTERESTED') AND
-                  attempted_at > :backoffTime
-                ) OR
-                (
-                  reason_not_completed IN ('WRONG_NUMBER', 'DISCONNECTED_NUMBER', 'OTHER_LANGUAGE')
-                ) OR
-                (
-                  call_assignment_id = :assignmentId AND
-                  reason_not_completed = 'NOT_INTERESTED'
-                )
-              ) AS calls
-              ON people.cons_id=calls.interviewee_id
-            WHERE
-              phones.is_primary=TRUE AND
-              emails.is_primary=TRUE AND
-              calls.id IS NULL AND
-              assigned_calls.id IS NULL
-            LIMIT 1
-          `
+            filterQuery = knex('bsd_person_bsd_groups')
+              .select('cons_id')
+              .where('cons_group_id', group.cons_group_id)
 
-          let people = await sequelize.query(query, {
-            replacements: {
-              assignmentId: localId,
-              backoffTime: new Date(new Date() - 7 * 24 * 60 * 60 * 1000)
-            },
-          })
-          if (people && people.length > 0 && people[0].length > 0) {
-            let person = people[0][0]
-            // Also a big hack - not sure how to convert fieldnames to model attributes without doing it explicitly.  We should maybe just switch to using snake case model attributes and get rid of all the manual conversion code.
-            person = BSDPerson.build({
-              ...person,
-              id: person.cons_id,
-              firstName: person.firstname,
-              middleName: person.middlename,
-              lastName: person.lastname,
-              birthDate: person.birth_dt,
-              created_at: person.create_dt,
-              updated_at: person.modified_dt,
+          else if (group.query && group.query !== EVERYONE_GROUP)
+            filterQuery = knex('bsd_person_gc_bsd_groups')
+              .select('cons_id')
+              .where('gc_bsd_group_id', group.id)
+
+          let addressesSubquery = knex('bsd_addresses')
+            .select('id', 'cons_id')
+            .join('zip_codes', 'zip_codes.zip', 'bsd_addresses.zip')
+            .where('is_primary', true)
+            .whereNotIn('state_cd', ['IA', 'NH', 'NV', 'SC'])
+            .whereIn('timezone_offset', validOffsets)
+
+          let previousCallsSubquery = knex('bsd_calls')
+            .select('id', 'interviewee_id', 'attempted_at')
+            .where(function() {
+              this.where('call_assignment_id', localId)
+                .where('completed', true)
             })
-            let assignedCall = await BSDAssignedCall.create({
-              caller_id: user.id,
-              interviewee_id: person.id,
-              call_assignment_id: localId
+            .orWhere(function() {
+              this.whereIn('reason_not_completed', ['NO_PICKUP', 'CALL_BACK', 'NOT_INTERESTED'])
+                .where('attempted_at', '>', new Date(new Date() - 7 * 24 * 60 * 60 * 1000))
             })
-            return person
-          }
+            .orWhereIn('reason_not_completed', ['WRONG_NUMBER', 'DISCONNECTED_NUMBER', 'OTHER_LANGUAGE'])
+            .orWhere(function() {
+              this.where('call_assignment_id', localId)
+                .where('reason_not_completed', 'NOT_INTERESTED')
+            })
+
+          let person = await knex('bsd_people')
+            .join('bsd_emails', 'bsd_people.cons_id', 'bsd_emails.cons_id')
+            .join('bsd_phones', 'bsd_people.cons_id', 'bsd_phones.cons_id')
+            .join(addressesSubquery.as('addresses'), 'addresses.cons_id', 'bsd_people.cons_id')
+            .join(filterQuery.as('groups'), 'groups.cons_id', 'bsd_people.cons_id')
+            .leftOuterJoin('bsd_assigned_calls', 'bsd_people.cons_id', 'bsd_assigned_calls.interviewee_id')
+            .leftOuterJoin(previousCallsSubquery.as('calls'), 'bsd_people.cons_id', 'calls.interviewee_id')
+            .where('bsd_phones.is_primary', true)
+            .where('bsd_emails.is_primary', true)
+            .where('bsd_assigned_calls.id', null)
+            .where('calls.id', null)
+            .limit(1)
+            .first()
+          if (person)
+            await knex('bsd_assigned_calls')
+              .insert({
+                caller_id: user.id,
+                interviewee_id: person.cons_id,
+                call_assignment_id: localId
+              })
+          return person
         }
-        */
       }
     }
   }),
@@ -1068,7 +1023,7 @@ let RootQuery = new GraphQLObjectType({
       resolve: (root, {id}, {rootValue}) => {
         authRequired(rootValue)
         let localId = fromGlobalId(id).id
-        return BSDCallAssignment.findById(localId)
+        return rootValue.loaders.bsdCallAssignments.load(localId)
       }
     },
     node: nodeField

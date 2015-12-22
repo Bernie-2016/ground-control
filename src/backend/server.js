@@ -150,7 +150,7 @@ let createLoaders = () => {
     bsdEventTypes: dataLoaderCreator('bsd_event_types', 'event_type_id'),
     bsdEvents: dataLoaderCreator('bsd_events', 'event_id'),
     bsdAddresses: dataLoaderCreator('bsd_addresses', 'cons_addr_id'),
-    gcBsdGroups: dataLoaderCreator('gc_bsd_groups', 'id')
+    gcBsdGroups: dataLoaderCreator('gc_bsd_groups', 'id'),
   }
 }
 

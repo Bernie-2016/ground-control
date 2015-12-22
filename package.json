@@ -11,6 +11,7 @@
     "predev": "mustache ./src/frontend/index/development.json ./src/frontend/index/index.mustache > ./src/frontend/public/index.html",
     "dev": "nf start -w --procfile Procfile.dev",
     "lint": "eslint src",
+    "knex": "knex --knexfile ./src/backend/data/knexfile.js",
     "migrate": "knex migrate:latest --knexfile ./src/backend/data/knexfile.js",
     "seed": "knex seed:run --knexfile ./src/backend/data/knexfile.js"
   },
