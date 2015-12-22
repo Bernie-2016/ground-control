@@ -136,7 +136,7 @@ class AdminEventsSection extends React.Component {
       lineHeight: '18px',
     }}
     >
-      {(info == 'name' && data[rowIndex]['node'] && data[rowIndex]['node'][col]) ? data[rowIndex]['node'][col]['firstName'] + ' ' + data[rowIndex]['node'][col]['lastName'] : (data[rowIndex] && data[rowIndex]['node'] && data[rowIndex] && data[rowIndex]['node'] ? data[rowIndex]['node'][col][info] : '')}
+      {(info == 'name' && data[rowIndex]['node'] && data[rowIndex]['node'][col]) ? data[rowIndex]['node'][col]['firstName'] + ' ' + data[rowIndex]['node'][col]['lastName'] : (data[rowIndex] && data[rowIndex]['node'] && data[rowIndex]['node'][col] ? data[rowIndex]['node'][col][info] : '')}
     </Cell>
   )
 
