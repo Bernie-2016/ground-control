@@ -721,7 +721,7 @@ class AdminEventsSection extends React.Component {
 
   render() {
     let events = this.props.listContainer.events.edges;
-
+    console.log(events[0].startDate)
     return (
     <div>
       <MutationHandler ref='eventDeletionHandler' successMessage='Event deleted!' mutationClass={DeleteEvents} />

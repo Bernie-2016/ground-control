@@ -24,7 +24,7 @@ export default class GCDateTimeField extends GCFormField {
             {...this.props}
             date={convertedDateTime}
             onChange={(newDate) => {
-              console.log(this.convertFromTimezone(newDate, this.props.utcOffset).toDate())
+              this.props.onChange(this.convertFromTimezone(newDate, this.props.utcOffset).toDate())
             }}
           />
         </div>
@@ -33,7 +33,6 @@ export default class GCDateTimeField extends GCFormField {
             {...this.props}
             time={convertedDateTime}
             onChange={(newDate) => {
-              let convertedDate =
               this.props.onChange(this.convertFromTimezone(newDate, this.props.utcOffset).toDate())
             }}
           />
