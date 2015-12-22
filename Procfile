@@ -1,2 +1,2 @@
-web: bin/qgsocksify npm start
+web: npm start
 worker: ./run ./src/jobs/app.js
