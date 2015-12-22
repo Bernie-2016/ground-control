@@ -5,6 +5,7 @@ module.exports = {
   module: {
     loaders: [
       { test: /\.json$/, loader: 'json'},
+      { test: /\.css$/, loader: "style!css" },
       {
         exclude: /node_modules/,
         loader: 'babel',

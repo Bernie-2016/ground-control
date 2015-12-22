@@ -135,19 +135,19 @@ class EventEdit extends React.Component {
       >
         <InfoHeader content='Event Information' />
         <Form.Field
-          name='name'
-          label='Event Name'
-          fullWidth={true}
-        />
-        <br />
-
-        <Form.Field
           name='eventTypeId'
           type='select'
           label='Event Type'
           fullWidth={true}
           choices={this.eventTypes()}
         />
+        <br />
+        <Form.Field
+          name='name'
+          label='Event Name'
+          fullWidth={true}
+        />
+        <br />
 
         <Form.Field
           name='description'
@@ -170,6 +170,10 @@ class EventEdit extends React.Component {
           type='select'
           label='Time Zone'
           choices={this.timezones()}
+          style={{
+            width: 163,
+            marginTop: 5
+          }}
         /><br/>
 
         <Form.Field
