@@ -26,6 +26,16 @@ class EventEdit extends React.Component {
     return allZones;
   }
 
+  eventSearchableOptions() {
+    // actually get valid options for event type later
+    let eventSearchableOptions = {
+      '1': 'Make Public',
+      '0': 'Make Private',
+      '-2': 'Use Event Type Default'
+    };
+    return eventSearchableOptions;
+  }
+
   renderForm() {
     let event = this.props.event;
     const eventSchema = yup.object({
@@ -115,8 +125,8 @@ class EventEdit extends React.Component {
       attendeeVolunteerMessage: yup.string()
         .default(event.attendeeVolunteerMessage),
 
-      isSearchable: yup.boolean()
-        .default((event.isSearchable == 1)),
+      isSearchable: yup.string()
+        .default(String(event.isSearchable)),
 
       flagApproval: yup.boolean()
         .default(false)
@@ -129,7 +139,8 @@ class EventEdit extends React.Component {
         schema={eventSchema}
         defaultValue={eventSchema.default()}
         onSubmit={ (data) => {
-          data.duration = data.duration.h * 60 + data.duration.m
+          data.duration = data.duration.h * 60 + data.duration.m;
+          data.isSearchable = Number(data.isSearchable);
           this.props.onSubmit(data)
         }}
       >
@@ -292,9 +303,12 @@ class EventEdit extends React.Component {
         <InfoHeader content='Event Settings' />
 
         <Form.Field
-          name="isSearchable"
-          label="Make Event Public"
-        /><br/>
+          name='isSearchable'
+          type='select'
+          label='Make Event Public?'
+          fullWidth={true}
+          choices={this.eventSearchableOptions()}
+        />
 
         <Form.Field
           name="flagApproval"

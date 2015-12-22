@@ -385,7 +385,7 @@ export default class BSD {
         }],
         local_timezone: form['start_tz'],
         attendee_volunteer_message: form['attendee_volunteer_message'],
-        is_searchable: (form['is_searchable']) ? 1 : 0,
+        is_searchable: (form['is_searchable']) ? form['is_searchable'] : -2, // second value should set to event type default
         public_phone: form['public_phone'],
         contact_phone: contact_phone,
         host_receive_rsvp_emails: form['host_receive_rsvp_emails'],
