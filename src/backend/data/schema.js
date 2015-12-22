@@ -605,7 +605,7 @@ const GraphQLEvent = new GraphQLObjectType({
     startDate: {
       type: GraphQLString,
       resolve: (event) => {
-        // Client-side code assumes the time comi
+        // Bit of a hack.  Otherwise setting times on the client side seems to do the wrong thing
         return moment(event.start_dt).format('YYYY-MM-DD HH:mm:ss +0000')
       }
     },
