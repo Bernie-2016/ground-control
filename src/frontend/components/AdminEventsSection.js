@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import Relay from 'react-relay';
 import EventPreview from './EventPreview';
 import EventEdit from './EventEdit';
-import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle, SelectField, DropDownMenu, DropDownIcon, Dialog, Tabs, Tab, FlatButton, RaisedButton, IconButton, FontIcon, Checkbox, TextField, Snackbar} from 'material-ui';
+import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle, SelectField, DropDownMenu, DropDownIcon, Dialog, Tabs, Tab, FlatButton, RaisedButton, IconButton, FontIcon, Checkbox, TextField} from 'material-ui';
 import {Table, Column, ColumnGroup, Cell} from 'fixed-data-table';
 import {BernieText, BernieColors} from './styles/bernie-css';
 import moment from 'moment';
@@ -411,6 +411,7 @@ class AdminEventsSection extends React.Component {
       eventIDs: eventsToDelete
     })
     this._handleDeleteModalRequestClose();
+    this._deselectRows({indexesToRemove: this.state.indexesMarkedForDeletion});
   }
 
   renderDeleteModal() {
@@ -640,8 +641,6 @@ class AdminEventsSection extends React.Component {
       showDeleteEventDialog: true,
       indexesMarkedForDeletion: eventIndexes
     });
-    // this needs to be fixed
-    // ReactDOM.findDOMNode(adminInterface.refs.deleteConfirmationInput).focus();
   }
 
   _handleEventConfirmation = (eventIndexes) => {
@@ -674,6 +673,7 @@ class AdminEventsSection extends React.Component {
       events: eventsToConfirm,
       listContainer: this.props.listContainer
     })
+    this._deselectRows({indexesToRemove: eventIndexes});
   }
 
   _handleEventEdit = (event, newData) => {
@@ -701,6 +701,32 @@ class AdminEventsSection extends React.Component {
     });
   }
 
+  _deselectRows = ({indexesToRemove}) => {
+    // indexesToRemove argument is optional
+    let currentSelectedRows = this.state.selectedRows;
+
+    if (indexesToRemove && currentSelectedRows.length != indexesToRemove.length){
+      indexesToRemove.forEach((eventIndex) => {
+        let i = currentSelectedRows.indexOf(eventIndex);
+        console.log(i, currentSelectedRows, indexesToRemove);
+        if (i > -1){
+          currentSelectedRows.splice(i, 1);
+        }
+      });
+
+      currentSelectedRows.forEach((eventIndex, i) => {
+        if (eventIndex > indexesToRemove[0]){
+          currentSelectedRows.splice(i, 1, eventIndex-1);
+        }
+      });
+
+      this.setState({selectedRows: currentSelectedRows});
+    }
+    else {
+      this.setState({selectedRows: []});
+    }
+  }
+
   _handleRowClick = (clickEvent, targetRowIndex) => {
     this._handleEventPreviewOpen(targetRowIndex, 1);
   }
@@ -724,7 +750,11 @@ class AdminEventsSection extends React.Component {
     console.log(events[0].startDate)
     return (
     <div>
-      <MutationHandler ref='eventDeletionHandler' successMessage='Event deleted!' mutationClass={DeleteEvents} />
+      <MutationHandler
+        ref='eventDeletionHandler'
+        successMessage='Event deleted!'
+        mutationClass={DeleteEvents}
+      />
       <MutationHandler
         ref='eventEditHandler'
         mutationClass={EditEvents}
