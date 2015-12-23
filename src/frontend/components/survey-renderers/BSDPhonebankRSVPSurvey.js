@@ -267,6 +267,9 @@ class BSDPhonebankRSVPSurvey extends React.Component {
           survey={this.props.survey}
           interviewee={this.props.interviewee}
           onSubmitted={this.props.onSubmitted}
+          onLoaded={() => {
+            this.refs.survey.refs.component.hideField('event_id')
+          }}
         />
       </div>
     )
