@@ -372,14 +372,15 @@ const GraphQLUser = new GraphQLObjectType({
           if (filterQuery)
             query = query.join(filterQuery.as('groups'), 'groups.cons_id', 'bsd_people.cons_id')
           let person = await query
+          let timestamp = new Date()
           if (person)
             await knex('bsd_assigned_calls')
               .insert({
                 caller_id: user.id,
                 interviewee_id: person.cons_id,
                 call_assignment_id: localId,
-                create_dt: new Date(),
-                modified_dt: new Date()
+                create_dt: timestamp,
+                modified_dt: timestamp
               })
           return person
         }
@@ -967,7 +968,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
       }
       else {
         let query = groupText
-        query = query.toLowerCase().trim().replace(/\*$/, '')
+        query = query.toLowerCase().trim().replace(/;*$/, '')
 
         if (query.indexOf('drop') !== -1)
           throw new GraphQLError({
