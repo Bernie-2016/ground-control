@@ -279,6 +279,13 @@ export class CallAssignment extends React.Component {
               <Form.Field
                 name='completed'
                 label='Were you able to complete the call?'
+                labelStyle={{
+                  ...BernieText.secondaryTitle,
+                  fontWeight: 600,
+                  color: BernieColors.blue,
+                  fontSize: '1.2em',
+                  letterSpacing: '0em'
+                }}
               />
               {notCompletedQuestions}
             </div>
