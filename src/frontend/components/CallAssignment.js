@@ -154,7 +154,7 @@ export class CallAssignment extends React.Component {
     let content = (
       <div style={BernieText.default}>
         Location: {location}<br />
-        Local Time: {moment().utcOffset(interviewee.address.localTime).format('h:mm a')}<br />
+        Local Time: {moment().utcOffset(interviewee.address.localUTCOffset).format('h:mm a')}<br />
       </div>
     )
 
@@ -326,7 +326,7 @@ export default Relay.createContainer(CallAssignment, {
             city
             state
             zip
-            localTime
+            localUTCOffset
             latitude
             longitude
           }

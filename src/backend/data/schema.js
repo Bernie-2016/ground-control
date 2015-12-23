@@ -131,7 +131,6 @@ async function getPrimaryAddress(person) {
       is_primary: true,
       cons_id: person.cons_id
     })
-    .select('cons_addr_id')
     .first()
 }
 
@@ -311,7 +310,7 @@ const GraphQLUser = new GraphQLObjectType({
           if (validOffsets.length === 0)
             return null
           let group = await rootValue.loaders.gcBsdGroups.load(callAssignment.gc_bsd_group_id)
-          let filterQuery = ''
+          let filterQuery = null
 
           if (group.cons_group_id)
             filterQuery = knex('bsd_person_bsd_groups')
@@ -346,11 +345,10 @@ const GraphQLUser = new GraphQLObjectType({
                 .where('reason_not_completed', 'NOT_INTERESTED')
             })
 
-          let person = await knex('bsd_people')
+          let query = knex('bsd_people')
             .join('bsd_emails', 'bsd_people.cons_id', 'bsd_emails.cons_id')
             .join('bsd_phones', 'bsd_people.cons_id', 'bsd_phones.cons_id')
             .join(addressesSubquery.as('addresses'), 'addresses.cons_id', 'bsd_people.cons_id')
-            .join(filterQuery.as('groups'), 'groups.cons_id', 'bsd_people.cons_id')
             .leftOuterJoin('bsd_assigned_calls', 'bsd_people.cons_id', 'bsd_assigned_calls.interviewee_id')
             .leftOuterJoin(previousCallsSubquery.as('calls'), 'bsd_people.cons_id', 'calls.interviewee_id')
             .where('bsd_phones.is_primary', true)
@@ -359,12 +357,18 @@ const GraphQLUser = new GraphQLObjectType({
             .where('calls.id', null)
             .limit(1)
             .first()
+
+          if (filterQuery)
+            query = query.join(filterQuery.as('groups'), 'groups.cons_id', 'bsd_people.cons_id')
+          let person = await query
           if (person)
             await knex('bsd_assigned_calls')
               .insert({
                 caller_id: user.id,
                 interviewee_id: person.cons_id,
-                call_assignment_id: localId
+                call_assignment_id: localId,
+                create_dt: new Date(),
+                modified_dt: new Date()
               })
           return person
         }
@@ -387,11 +391,11 @@ const GraphQLAddress = new GraphQLObjectType({
     zip: { type: GraphQLString },
     latitude: { type: GraphQLFloat },
     longitude: { type: GraphQLFloat },
-    localTime: {
+    localUTCOffset: {
       type: GraphQLString,
       resolve: async (address) => {
         let tz = TZLookup(address.latitude, address.longitude)
-        return moment().tz(tz).format()
+        return moment().tz(tz).format('Z')
       }
     }
   }),
@@ -455,7 +459,7 @@ const GraphQLPerson = new GraphQLObjectType({
         let eventTypes = null
         if (type) {
           eventTypes = knex('bsd_event_types')
-            .where(name, 'ilike', `%${type}%`)
+            .where('name', 'ilike', `%${type}%`)
             .select('event_type_id')
         }
 
@@ -467,7 +471,8 @@ const GraphQLPerson = new GraphQLObjectType({
         if (eventTypes)
           query = query.whereIn('event_type_id', [eventTypes])
 
-        return query;
+        let events = await query;
+        return events
       }
     }
   }),
@@ -636,7 +641,7 @@ const GraphQLCallAssignment = new GraphQLObjectType({
     name: { type: GraphQLString },
     survey: {
       type: GraphQLSurvey,
-      resolve: (assignment, _, {rootValue}) => rootValue.loaders.gcBsdSurveys.load(assignment.survey_id)
+      resolve: (assignment, _, {rootValue}) => rootValue.loaders.gcBsdSurveys.load(assignment.gc_bsd_survey_id)
     },
     callsMade: {
       type: GraphQLInt,
@@ -674,8 +679,10 @@ const GraphQLSurvey = new GraphQLObjectType({
     fullURL: {
       type: GraphQLString,
       resolve: async (survey, _, {rootValue}) => {
+        console.log(survey.signup_form_id)
         let underlyingSurvey = await rootValue.loaders.bsdSurveys.load(survey.signup_form_id)
-        let slug = underlyingSurvey.slug
+        console.log(underlyingSurvey);
+        let slug = underlyingSurvey.signup_form_slug
         return url.resolve('https://' + process.env.BSD_HOST, '/page/s/' + slug)
       }
     },
@@ -1020,7 +1027,7 @@ let RootQuery = new GraphQLObjectType({
       args: {
         id: { type: new GraphQLNonNull(GraphQLString) }
       },
-      resolve: (root, {id}, {rootValue}) => {
+      resolve: async (root, {id}, {rootValue}) => {
         authRequired(rootValue)
         let localId = fromGlobalId(id).id
         return rootValue.loaders.bsdCallAssignments.load(localId)
