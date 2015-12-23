@@ -97,7 +97,7 @@ class AdminEventsSection extends React.Component {
       {content}{(this.props.relay.variables.sortField == attribute) ? <FontIcon
       className="material-icons"
       style={{display: 'inline', float: 'right', position: 'relative', top: '-3px'}}
-      >{(this.props.relay.variables.sortDirection == 'ASC') ? 'arrow_drop_down' : 'arrow_drop_up'}</FontIcon> : ''}
+      >{(this.props.relay.variables.sortDirection == 'ASC') ? 'arrow_drop_up' : 'arrow_drop_down'}</FontIcon> : ''}
     </Cell>
   )
 
