@@ -5,6 +5,7 @@ import {BernieColors, BernieText} from '../styles/bernie-css'
 import {GoogleMapLoader, GoogleMap, Marker} from 'react-google-maps';
 import {FlatButton, Paper} from 'material-ui';
 import moment from 'moment';
+import FontIcon from 'material-ui/lib/font-icon';
 
 class BSDPhonebankRSVPSurvey extends React.Component {
   static propTypes = {
@@ -26,55 +27,68 @@ class BSDPhonebankRSVPSurvey extends React.Component {
   }
 
   renderMarkerDescription(marker) {
+    let description = <div></div>
     if (!marker)
       return <div></div>;
     if (marker.key === 'home')
-      return <div></div>
+      description = (
+        <div>
+          <div style={{
+            ...BernieText.default,
+            fontWeight: 600,
+            fontSize: '1.0em'
+          }}>
+            {`${this.props.interviewee.firstName}'s home`}
+          </div>
+        </div>
+      )
     let button = <div></div>;
     if (marker.key !== 'home')
-      button = (
-        <FlatButton label='Select' style={{
-          ...BernieText.inputLabel,
-          backgroundColor: BernieColors.red,
-          marginTop: 10,
-        }}
-          onTouchTap={(event) => {
-            this.refs.survey.refs.component.setFieldValue('event_id', marker.eventId)
-          }}
-        />
+      description = (
+        <div>
+          <div style={{
+            ...BernieText.secondaryTitle,
+            color: BernieColors.gray,
+            fontSize: '1.0em'
+          }}>
+            {moment(marker.startDate).utcOffset(marker.localUTCOffset).format('h:mm A  - dddd, MMM D')}
+          </div>
+          <div style={{
+            ...BernieText.default,
+            fontWeight: 600,
+            fontSize: '1.0em'
+          }}>
+            {marker.name}
+          </div>
+          <div style={{
+            ...BernieText.default,
+            fontSize: '1.0em'
+          }}>
+            <div>{marker.venueName}</div>
+            <div>{marker.addr1}</div>
+            <div>{marker.addr2}</div>
+            <div>Capacity: {marker.capacity}</div>
+            <div>Attendees: {marker.attendeesCount}</div>
+            <FlatButton label='Select' style={{
+              ...BernieText.inputLabel,
+              backgroundColor: BernieColors.red,
+              marginTop: 10,
+            }}
+              onTouchTap={(event) => {
+                this.refs.survey.refs.component.setFieldValue('event_id', marker.eventId)
+              }}
+            />
+          </div>
+        </div>
       )
-    console.log(marker.startDate, moment(marker.startDate).format('h:mm a'));
+
     return (
       <Paper zDepth={0} style={{
         marginTop: 10,
         padding: '10px 10px 10px 10px',
         border: 'solid 1px ' + BernieColors.lightGray
       }}>
-        <div style={{
-          ...BernieText.secondaryTitle,
-          color: BernieColors.gray,
-          fontSize: '1.0em'
-        }}>
-          {moment(marker.startDate).utcOffset(marker.localUTCOffset).format('h:mm A  MMM D')}
-        </div>
-        <div style={{
-          ...BernieText.default,
-          fontWeight: 600,
-          fontSize: '1.0em'
-        }}>
-          {marker.name}
-        </div>
-        <div style={{
-          ...BernieText.default,
-          fontSize: '1.0em'
-        }}>
-          <div>{marker.venueName}</div>
-          <div>{marker.addr1}</div>
-          <div>{marker.addr2}</div>
-          <div>Capacity: {marker.capacity}</div>
-          <div>Attendees: {marker.attendeesCount}</div>
-          {button}
-        </div>
+        {description}
       </Paper>
     )
   }
@@ -95,13 +109,22 @@ class BSDPhonebankRSVPSurvey extends React.Component {
       lat: this.props.interviewee.address.latitude,
       lng: this.props.interviewee.address.longitude
     }
+    let homeIcon = {
+      path: 'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z',
+      fillColor: BernieColors.blue,
+      fillOpacity: 1.0,
+      scale: 1,
+      strokeColor: BernieColors.blue,
+      strokeWeight: 2
+    };
     let markers = [
-//      {
-//        position: center,
-//        key: 'home',
-//        title: 'home',
-//        name: 'Interviewee home'
-//      }
+      {
+        position: center,
+        key: 'home',
+        title: 'home',
+        name: 'Interviewee home',
+        icon: homeIcon
+      }
     ];
 
     this.props.interviewee.nearbyEvents.forEach((event) => {
@@ -185,6 +208,7 @@ export default Relay.createContainer(BSDPhonebankRSVPSurvey, {
     interviewee: () => Relay.QL`
       fragment on Person {
         ${BSDSurvey.getFragment('interviewee')}
+        firstName
         email
         address {
           latitude
