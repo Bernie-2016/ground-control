@@ -2,6 +2,7 @@ import csv from 'csv-load-sync';
 import log from '../../../log';
 import json2csv from 'json2csv';
 import Promise from 'bluebird';
+var copyFrom = require('pg-copy-streams').from;
 import fs from 'fs';
 
 const toCSV = Promise.promisify(json2csv);
@@ -17,7 +18,23 @@ async function importData(knex, table, data) {
   csvData = csvData.split('\n').slice(1).join('\n')
   csvData = csvData.replace(/\"null\"/g, "null")
   await writeFile(filename, csvData);
-  await knex.raw(`\copy ${table} (${columns.join(',')}) FROM '${path}' WITH NULL AS 'null' CSV`)
+  let importPromise = new Promise((resolve, reject) => {
+    knex.client.pool.acquire(function(err, client) {
+      if (err)
+        reject(err)
+      function done (err) {
+        knex.client.pool.release(client)
+        if (err) reject(err)
+        else resolve()
+      }
+      let stream = client.query(copyFrom(`COPY ${table} (${columns.join(',')}) FROM STDIN WITH NULL AS 'null' CSV`))
+      let fileStream = fs.createReadStream(filename)
+      fileStream.on('error', done)
+      fileStream.pipe(stream).on('finish', done).on('error', done)
+    })
+  })
+
+  await importPromise
   await unlink(filename);
 }
 
