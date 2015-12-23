@@ -1,4 +1,4 @@
-import loadZips from '../shared/zip-loader'
+import loadZips from '../shared/load-zips'
 import importData from '../shared/import-data'
 
 exports.seed = async function(knex, Promise) {
