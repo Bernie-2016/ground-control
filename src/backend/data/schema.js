@@ -106,15 +106,15 @@ function eventFromAPIFields(fields) {
   let idFields = ['event_id', 'creator_cons_id', 'event_type_id'];
   idFields.forEach((field) => {
     if (event[field]) {
-      event[field] = parseInt(fromGlobalId(event[field]).id, 10)
+      event[field] = fromGlobalId(event[field]).id
     }
   })
 
   return event
 }
 
-async function getPrimaryEmail(person) {
-  let emails = await knex('bsd_emails')
+async function getPrimaryEmail(person, transaction) {
+  let query = knex('bsd_emails')
     .where({
       is_primary: true,
       cons_id: person.cons_id
@@ -122,26 +122,38 @@ async function getPrimaryEmail(person) {
     .select('email')
     .first()
 
+  if (transaction)
+    query = query.transacting(transaction)
+
+  let emails = await query
   return emails ? emails.email : null
 }
 
-async function getPrimaryAddress(person) {
-  return knex('bsd_addresses')
+async function getPrimaryAddress(person, transaction) {
+  let query = knex('bsd_addresses')
     .where({
       is_primary: true,
       cons_id: person.cons_id
     })
     .first()
+  if (transaction)
+    query = query.transacting(transaction)
+  return query
 }
 
-async function getPrimaryPhone(person) {
-  let phones = await knex('bsd_phones')
+async function getPrimaryPhone(person, transaction) {
+  let query = knex('bsd_phones')
     .where({
       is_primary: true,
       cons_id: person.cons_id
     })
     .select('phone')
     .first()
+
+  if (transaction)
+    query = query.transacting(transaction)
+
+  let phones = await query
   return phones ? phones.phone : null;
 }
 
@@ -229,7 +241,6 @@ const GraphQLListContainer = new GraphQLObjectType({
         let filters = eventFromAPIFields(filterOptions);
         let convertedSortField = eventFieldFromAPIField(sortField)
 
-        console.log(filters, convertedSortField);
         let events = await knex('bsd_events')
           .where(filters)
           .limit(first)
@@ -289,7 +300,7 @@ const GraphQLUser = new GraphQLObjectType({
         callAssignmentId: { type: GraphQLString }
       },
       resolve: async (user, {callAssignmentId}, {rootValue}) => {
-        let localId = parseInt(fromGlobalId(callAssignmentId).id, 10)
+        let localId = fromGlobalId(callAssignmentId).id
         let assignedCalls = await knex('bsd_assigned_calls').where({
           'caller_id': user.id,
           'call_assignment_id': localId
@@ -679,9 +690,7 @@ const GraphQLSurvey = new GraphQLObjectType({
     fullURL: {
       type: GraphQLString,
       resolve: async (survey, _, {rootValue}) => {
-        console.log(survey.signup_form_id)
         let underlyingSurvey = await rootValue.loaders.bsdSurveys.load(survey.signup_form_id)
-        console.log(underlyingSurvey);
         let slug = underlyingSurvey.signup_form_slug
         return url.resolve('https://' + process.env.BSD_HOST, '/page/s/' + slug)
       }
@@ -797,8 +806,8 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
   mutateAndGetPayload: async ({callAssignmentId, intervieweeId, completed, leftVoicemail, sentText, reasonNotCompleted, surveyFieldValues}, {rootValue}) => {
     authRequired(rootValue)
     let caller = rootValue.user
-    let localIntervieweeId = parseInt(fromGlobalId(intervieweeId).id, 10)
-    let localCallAssignmentId = parseInt(fromGlobalId(callAssignmentId).id, 10)
+    let localIntervieweeId = fromGlobalId(intervieweeId).id
+    let localCallAssignmentId = fromGlobalId(callAssignmentId).id
     return knex.transaction(async (trx) => {
       // To ensure that the assigned call exists
       let assignedCall = await knex('bsd_assigned_calls')
@@ -827,25 +836,28 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
       let callAssignment = await knex('bsd_call_assignments')
         .transacting(trx)
         .where('id', localCallAssignmentId)
+        .first()
+
       let survey = await knex('gc_bsd_surveys')
         .transacting(trx)
-        .where('id', callAssignment.survey_id)
+        .where('id', callAssignment.gc_bsd_survey_id)
+        .first()
 
       let fieldValues = JSON.parse(surveyFieldValues)
       fieldValues['person'] = await knex('bsd_people')
         .transacting(trx)
-        .where('id', localIntervieweeId)
+        .where('cons_id', localIntervieweeId)
+        .first()
 
-      if (completed) {
-        if (survey.processors.length === 0)
-          return
-        if (!fieldValues['event_id'])
-          return
-        let person = fieldValues['person']
-        let email = await getPrimaryEmail(person).transacting(trx)
-        let address = await getPrimaryAddress(person).transacting(trx)
-        let zip = address.zip
-        await BSDClient.addRSVPToEvent(email, zip, surveyFields['event_id'])
+      if (completed && survey.processors.length > 0 ) {
+        if (fieldValues['event_id']) {
+          let person = fieldValues['person']
+          let email = await getPrimaryEmail(person, trx)
+          let address = await getPrimaryAddress(person, trx)
+
+          let zip = address.zip
+          await BSDClient.noFailApiRequest('addRSVPToEvent', email, zip, fieldValues['event_id'])
+        }
       }
 
       let promises = [
@@ -855,10 +867,10 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
           .del(),
         knex.insertAndFetch('bsd_calls', {
             completed: completed,
-            attemptedAt: new Date(),
-            leftVoicemail: leftVoicemail,
-            sentText: sentText,
-            reasonNotCompleted: reasonNotCompleted,
+            attempted_at: new Date(),
+            left_voicemail: leftVoicemail,
+            sent_text: sentText,
+            reason_not_completed: reasonNotCompleted,
             caller_id: caller.id,
             interviewee_id: assignedCall.interviewee_id,
             call_assignment_id: assignedCall.call_assignment_id
@@ -940,7 +952,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
           }
         }
 
-        let consGroupID = parseInt(groupText, 10)
+        let consGroupID = groupText
         group = await knex('gc_bsd_groups')
           .transacting(trx)
           .where('cons_group_id', consGroupID)

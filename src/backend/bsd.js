@@ -7,6 +7,7 @@ import Promise from 'bluebird';
 import qs from 'querystring';
 import log from './log';
 import moment from 'moment-timezone';
+import knex from './data/knex';
 
 const parseStringPromise = Promise.promisify(parseString);
 
@@ -21,14 +22,16 @@ export default class BSD {
 
   noFailApiRequest(method, ...args) {
     try {
-      BSD[method](...args);
+      this[method](...args);
     } catch (e) {
       log.error(e);
-      BSDAudit.create({
+      knex('bsd_audits').insert({
         class: 'BSDClient',
         method: method,
         params: String(args),
-        error: e.message
+        error: e.message,
+        modified_dt: new Date(),
+        create_dt: new Date()
       })
     }
   }
