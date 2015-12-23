@@ -23,22 +23,42 @@ export default class SideBarLayout extends React.Component {
   }
 
   render() {
-    return (
-      <div zDepth={1} style={this.styles.container}>
-        <div zDepth={0} style={{
-          ...this.styles.sideBar,
-          ...this.props.sideBarStyle
-        }}>
-          {this.props.sideBar}
-        </div>
-        <div zDepth={0} style={
-          {
-            ...this.styles.content,
-            ...this.props.contentViewStyle
-          }}>
-          {this.props.content}
-        </div>
+    let sideBarPosition = this.props.sideBarPosition || 'left'
+    let sideBar = (
+      <div zDepth={0} style={{
+        ...this.styles.sideBar,
+        ...this.props.sideBarStyle
+      }}>
+        {this.props.sideBar}
       </div>
     )
+
+    let content = (
+      <div zDepth={0} style={
+        {
+          ...this.styles.content,
+          ...this.props.contentViewStyle
+        }}>
+        {this.props.content}
+      </div>
+    )
+    let containerStyle = {
+      ...this.styles.container,
+      ...this.props.containerStyle
+    }
+    let body = (
+      <div zDepth={1} style={containerStyle}>
+        {sideBar}
+        {content}
+      </div>
+    )
+    if (sideBarPosition === 'right')
+      body = (
+        <div zDepth={1} style={containerStyle}>
+          {content}
+          {sideBar}
+        </div>
+      )
+    return body
   }
 }

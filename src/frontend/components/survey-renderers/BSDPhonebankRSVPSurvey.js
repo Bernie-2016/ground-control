@@ -6,6 +6,7 @@ import {GoogleMapLoader, GoogleMap, Marker} from 'react-google-maps';
 import {FlatButton, Paper} from 'material-ui';
 import moment from 'moment';
 import FontIcon from 'material-ui/lib/font-icon';
+import SideBarLayout from '../SideBarLayout'
 
 class BSDPhonebankRSVPSurvey extends React.Component {
   static propTypes = {
@@ -19,11 +20,92 @@ class BSDPhonebankRSVPSurvey extends React.Component {
   }
 
   state = {
-    clickedMarker: null
+    clickedMarker: null,
+    selectedEventId: null
   }
 
   handleMarkerClick(marker) {
     this.setState({clickedMarker: marker})
+  }
+
+  selectButton(marker) {
+    return (
+      <FlatButton label='Select' style={{
+        ...BernieText.inputLabel,
+        backgroundColor: BernieColors.green,
+        marginTop: 10,
+      }}
+        onTouchTap={(event) => {
+          this.setState({
+            clickedMarker: null,
+            selectedEventId: marker.eventId
+          })
+          this.refs.survey.refs.component.setFieldValue('event_id', marker.eventId)
+        }}
+      />
+    )
+  }
+
+  deselectButton() {
+    return (
+      <FlatButton
+        label="Deselect"
+        style={{
+          ...BernieText.inputLabel,
+          backgroundColor: BernieColors.red,
+        }}
+        onTouchTap={() => {
+          this.setState({
+            selectedEventId: null
+          })
+          this.refs.survey.refs.component.setFieldValue('event_id', '')
+        }}
+      />
+    )
+  }
+
+  renderSelectedEvent() {
+    if (!this.state.selectedEventId)
+      return <div></div>
+    let event = this.props.interviewee.nearbyEvents.find((event) => event.eventIdObfuscated === this.state.selectedEventId)
+    let content = (
+      <div>
+        <p>Selected <strong>{event.name}</strong></p>
+        <p>on <strong>{moment(event.startDate).utcOffset(event.localUTCOffset).format('MMM D')}</strong>.</p>
+      </div>
+    )
+    let sideBar = (
+      <div>
+        {this.deselectButton()}
+      </div>
+    )
+    return (
+      <Paper zDepth={0} style={{
+        padding: '10px 10px 10px 10px',
+        marginTop: 10,
+        border: 'solid 1px ' + BernieColors.green,
+        minHeight: 25
+      }}>
+        <SideBarLayout
+          containerStyle={{
+            'border': 'none'
+          }}
+          sideBar={sideBar}
+          content={content}
+          contentViewStyle={{
+            border: 'none',
+            paddingRight: 10
+          }}
+          sideBarStyle={{
+            border: 'none',
+            textAlign: 'right',
+            marginTop: 'auto',
+            marginBottom: 'auto'
+          }}
+          sideBarPosition='right'
+        />
+      </Paper>
+    )
   }
 
   renderMarkerDescription(marker) {
@@ -69,15 +151,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
             <div>{marker.addr2}</div>
             <div>Capacity: {marker.capacity}</div>
             <div>Attendees: {marker.attendeesCount}</div>
-            <FlatButton label='Select' style={{
-              ...BernieText.inputLabel,
-              backgroundColor: BernieColors.red,
-              marginTop: 10,
-            }}
-              onTouchTap={(event) => {
-                this.refs.survey.refs.component.setFieldValue('event_id', marker.eventId)
-              }}
-            />
+            {this.state.selectedEventId === marker.eventId ? this.deselectButton() : this.selectButton(marker)}
           </div>
         </div>
       )
@@ -186,6 +260,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
         <div style={{width: '100%', height: 200}}>
           {this.renderMap()}
         </div>
+        {this.renderSelectedEvent()}
         {this.renderMarkerDescription(this.state.clickedMarker)}
         <BSDSurvey
           ref='survey'
