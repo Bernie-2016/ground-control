@@ -16,16 +16,16 @@ exports.up = async function(knex, Promise) {
 
     knex.schema.createTableIfNotExists('bsd_people', function(table) {
       table.bigint('cons_id').primary();
-      table.string('prefix');
-      table.string('firstname');
-      table.string('middlename');
-      table.string('lastname');
-      table.string('suffix');
+      table.string('prefix', 16);
+      table.string('firstname', 256);
+      table.string('middlename', 128);
+      table.string('lastname', 256);
+      table.string('suffix', 16);
       table.specificType('gender', 'char(1)');
-      table.date('birth_dt');
-      table.string('title');
-      table.string('employer');
-      table.string('occupation');
+      table.specificType('birth_dt', 'timestamp without time zone');
+      table.string('title', 128);
+      table.string('employer', 128);
+      table.string('occupation', 255);
       table.timestamp('modified_dt').notNullable();
       table.timestamp('create_dt').notNullable();
     }),
@@ -37,20 +37,20 @@ exports.up = async function(knex, Promise) {
       table.string('addr1', 300);
       table.string('addr2', 300);
       table.string('addr3', 300);
-      table.string('city');
-      table.string('state_cd').index();
-      table.string('zip').index();
-      table.string('zip_4');
+      table.string('city', 200);
+      table.string('state_cd', 200).index();
+      table.string('zip', 30).index();
+      table.string('zip_4', 20);
       table.specificType('country', 'char(2)');
-      table.float('latitude').notNullable().index();
-      table.float('longitude').notNullable().index();
+      table.specificType('latitude', 'double precision').notNullable().index();
+      table.specificType('longitude', 'double precision').notNullable().index();
       table.timestamp('modified_dt').notNullable();
       table.timestamp('create_dt').notNullable();
     }),
 
     knex.schema.createTableIfNotExists('bsd_surveys', function(table) {
       table.bigint('signup_form_id').primary();
-      table.string('signup_form_slug');
+      table.string('signup_form_slug', 100);
       table.timestamp('modified_dt').notNullable();
       table.timestamp('create_dt').notNullable();
     }),
@@ -92,7 +92,7 @@ exports.up = async function(knex, Promise) {
     knex.schema.createTableIfNotExists('bsd_groups', function(table) {
       table.bigint('cons_group_id').primary();
       table.string('name').notNullable();
-      table.string('description')
+      table.text('description')
       table.timestamp('modified_dt').notNullable();
       table.timestamp('create_dt').notNullable();
     }),
@@ -107,7 +107,7 @@ exports.up = async function(knex, Promise) {
 
     knex.schema.createTableIfNotExists('bsd_event_types', function(table) {
       table.bigint('event_type_id').primary();
-      table.string('name').notNullable();
+      table.string('name', 128).notNullable();
       table.timestamp('modified_dt').notNullable();
       table.timestamp('create_dt').notNullable();
     }),
@@ -116,7 +116,7 @@ exports.up = async function(knex, Promise) {
       table.bigint('cons_phone_id').primary();
       table.bigint('cons_id').notNullable().index();
       table.boolean('is_primary').notNullable();
-      table.string('phone').notNullable();
+      table.string('phone', 30).notNullable();
       table.boolean('isunsub')
       table.timestamp('modified_dt').notNullable();
       table.timestamp('create_dt').notNullable();
