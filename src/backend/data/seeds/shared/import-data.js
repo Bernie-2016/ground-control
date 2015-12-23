@@ -17,7 +17,7 @@ async function importData(knex, table, data) {
   csvData = csvData.split('\n').slice(1).join('\n')
   csvData = csvData.replace(/\"null\"/g, "null")
   await writeFile(filename, csvData);
-  await knex.raw(`COPY ${table} (${columns.join(',')}) FROM '${path}' WITH NULL AS 'null' CSV;`)
+  await knex.raw(`\copy ${table} (${columns.join(',')}) FROM '${path}' WITH NULL AS 'null' CSV`)
   await unlink(filename);
 }
 
