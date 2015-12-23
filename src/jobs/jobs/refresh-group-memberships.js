@@ -39,7 +39,6 @@ export let job = async () => {
           limitedQuery = knex.raw(`${group.query} order by cons_id limit ${limit} offset ${offset}`).transacting(trx)
           log.info('Running query: ' + limitedQuery.toString())
           results = await limitedQuery;
-          console.log(results.rows)
           let peopleToInsert = results.rows.map((result) => {
             return {
               cons_id: result.cons_id,
