@@ -650,6 +650,7 @@ const GraphQLCallAssignment = new GraphQLObjectType({
   fields: () => ({
     id: globalIdField('CallAssignment'),
     name: { type: GraphQLString },
+    instructions: { type: GraphQLString },
     survey: {
       type: GraphQLSurvey,
       resolve: (assignment, _, {rootValue}) => rootValue.loaders.gcBsdSurveys.load(assignment.gc_bsd_survey_id)
@@ -889,7 +890,8 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
     intervieweeGroup: { type: new GraphQLNonNull(GraphQLString) },
     surveyId: { type: new GraphQLNonNull(GraphQLInt) },
     renderer: { type: new GraphQLNonNull(GraphQLString) },
-    processors: { type: new GraphQLList(GraphQLString) }
+    processors: { type: new GraphQLList(GraphQLString) },
+    instructions: { type: GraphQLString }
   },
   outputFields: {
     listContainer: {
@@ -897,7 +899,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
       resolve: () => SharedListContainer
     }
   },
-  mutateAndGetPayload: async ({name, intervieweeGroup, surveyId, renderer, processors}, {rootValue}) => {
+  mutateAndGetPayload: async ({name, intervieweeGroup, surveyId, renderer, processors, instructions}, {rootValue}) => {
     adminRequired(rootValue)
     let groupText = intervieweeGroup
     let group = null
@@ -999,6 +1001,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
 
       return knex.insertAndFetch('bsd_call_assignments', {
           name: name,
+          instructions: instructions,
           gc_bsd_group_id: group.id,
           gc_bsd_survey_id: survey.id
         }, {transaction: trx});

@@ -35,6 +35,7 @@ export default class AdminCallAssignmentCreationForm extends React.Component {
     surveyId: yup.number().required(),
     intervieweeGroup: yup.string().required(),
     name: yup.string().required(),
+    instructions: yup.string(),
     renderer: yup.string().required(),
     processors: yup.array().of(yup.string()).required()
   })
@@ -64,6 +65,13 @@ export default class AdminCallAssignmentCreationForm extends React.Component {
               label='Name'
             />
             <br />
+            <Form.Field
+              name='instructions'
+              multiLine={true}
+              rows={5}
+              label="Instructions"
+              hintText="(Optional) Enter HTML or plain text instructions for this call assignment."
+            /><br />
             <Form.Field
               name='surveyId'
               label='BSD signup form ID'

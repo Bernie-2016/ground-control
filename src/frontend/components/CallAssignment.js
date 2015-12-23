@@ -1,7 +1,7 @@
 import React from 'react';
 import Relay from 'react-relay';
 import {BernieText, BernieColors} from './styles/bernie-css';
-import {Paper, List, ListItem, FlatButton} from 'material-ui';
+import {Paper, List, ListItem, RaisedButton} from 'material-ui';
 import SideBarLayout from './SideBarLayout';
 import SurveyRenderer from './SurveyRenderer';
 import moment from 'moment';
@@ -10,7 +10,7 @@ import GCForm from './forms/GCForm';
 import Form from 'react-formal';
 import SubmitCallSurvey from '../mutations/SubmitCallSurvey'
 
-export class CallAssignment extends React.Component {
+class CallAssignment extends React.Component {
   styles = {
     assignmentBar: {
       backgroundColor: BernieColors.lightGray,
@@ -40,6 +40,15 @@ export class CallAssignment extends React.Component {
       marginLeft: 'auto',
       marginRight: 'auto'
     },
+    instructions: {
+      marginLeft: 'auto',
+      marginRight: 'auto',
+      border: 'solid 1px ' + BernieColors.blue,
+      maxWidth: 720,
+      marginTop: 15,
+      marginBottom: 50,
+      padding: '15px 15px 15px 15px'
+    },
     submitButton: {
 
     }
@@ -57,6 +66,7 @@ export class CallAssignment extends React.Component {
     sentText: null,
     leftVoicemail: null,
     globalErrorMessage: null,
+    showInstructions: true
   }
 
   notCompletedReasons =
@@ -206,6 +216,31 @@ export class CallAssignment extends React.Component {
       this.submitCallSurvey({});
   }
 
+  renderInstructions() {
+    if (!this.state.showInstructions)
+      return <div></div>
+    return (
+      <Paper
+          zDepth={0}
+          style={this.styles.instructions}
+        >
+        <div>
+          {this.props.callAssignment.instructions}
+        </div>
+        <RaisedButton
+          style={{
+            marginTop: 10
+          }}
+          label="Ok, I got it!"
+          secondary={true}
+          onTouchTap={(event) => {
+            this.setState({showInstructions: false})
+          }}
+        />
+      </Paper>
+    )
+  }
+
   render() {
     if (this.props.currentUser.intervieweeForCallAssignment === null)
       return (
@@ -260,6 +295,7 @@ export class CallAssignment extends React.Component {
       )
     return (
       <div style={this.styles.container}>
+        {this.renderInstructions()}
         <Paper
           style={this.styles.assignmentBar}
         >
@@ -307,6 +343,7 @@ export default Relay.createContainer(CallAssignment, {
       fragment on CallAssignment {
         id
         name
+        instructions
         survey {
           ${SurveyRenderer.getFragment('survey')}
         }
