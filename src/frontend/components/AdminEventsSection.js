@@ -160,7 +160,8 @@ class AdminEventsSection extends React.Component {
       lineHeight: '18px',
     }}
     >
-      {moment(data[rowIndex]['node']['startDate']).utcOffset(data[rowIndex]['node']['localUTCOffset']).format('l LT')}
+      {moment(data[rowIndex]['node']['startDate']).utcOffset(data[rowIndex]['node']['localUTCOffset']).format('l LT')}<br/>
+      {data[rowIndex]['node']['localTimezone']}
     </Cell>
   )
 
