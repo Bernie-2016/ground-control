@@ -1,16 +1,12 @@
 import faker from 'faker';
-import csv from 'csv-load-sync';
 import log from '../../../log';
 import {hash} from '../../../bcrypt-promise';
-import json2csv from 'json2csv';
 import Promise from 'bluebird'
-import fs from 'fs';
+import loadZips from '../shared/load-zips'
+import importData from '../shared/import-data'
 
-const toCSV = Promise.promisify(json2csv);
-const writeFile = Promise.promisify(fs.writeFile)
-let unlink = Promise.promisify(fs.unlink)
-const NUM_PERSONS=25342;
-const NUM_EVENTS=15413;
+const NUM_PERSONS=1;
+const NUM_EVENTS=1;
 
 // Use this instead of faker because we want it to be just digits
 let randomPhoneNumber = () => {
@@ -75,9 +71,10 @@ exports.seed = async function(knex, Promise) {
 
   await Promise.all(deletePromises);
 
+  let timestamp = new Date()
   let timestamps = {
-    create_dt: new Date(),
-    modified_dt: new Date()
+    create_dt: timestamp,
+    modified_dt: timestamp
   }
 
   log.info('Creating admin user...')
@@ -91,15 +88,7 @@ exports.seed = async function(knex, Promise) {
   }]
 
   log.info('Generating zips...')
-  data.zip_codes = csv('./seeds/zip-codes.csv')
-  data.zip_codes.forEach((datum) => {
-    datum.timezone_offset = parseInt(datum.timezone_offset, 10)
-    datum.latitude = parseFloat(datum.latitude)
-    datum.longitude = parseFloat(datum.longitude)
-    datum.has_dst = datum.has_dst == '1' ? true : false
-    datum.create_dt = timestamps.create_dt;
-    datum.modified_dt = timestamps.modified_dt;
-  })
+  data.zip_codes = loadZips('./seeds/shared/zip-codes.csv')
 
   log.info('Generating groups...')
   data.bsd_groups = [
@@ -268,18 +257,9 @@ exports.seed = async function(knex, Promise) {
 
   for (let index = 0; index < insertOrder.length; index++) {
     let key = insertOrder[index]
-    log.info(`Importing ${key}...`)
     if (data[key].length === 0)
       continue
-    let columns = Object.keys(data[key][0]);
-    let csvData = await toCSV({data: data[key]})
-    let filename = `${key}.csv`
-    let path = `${process.cwd()}/${filename}`;
-    csvData = csvData.split('\n').slice(1).join('\n')
-    csvData = csvData.replace(/\"null\"/g, "null")
-    await writeFile(filename, csvData);
-    await knex.raw(`COPY ${key} (${columns.join(',')}) FROM '${path}' WITH NULL AS 'null' CSV;`)
-    await unlink(filename);
+    await importData(knex, key, data[key])
   }
 
   log.info('Done!')
