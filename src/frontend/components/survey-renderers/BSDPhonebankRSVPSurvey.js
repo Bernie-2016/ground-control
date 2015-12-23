@@ -160,6 +160,9 @@ class BSDPhonebankRSVPSurvey extends React.Component {
         googleMapElement={
           <GoogleMap
             ref='map'
+            options={{
+              scrollwheel: false
+            }}
             defaultZoom={9}
             defaultCenter={center}>
             {markers.map((marker, index) => {
