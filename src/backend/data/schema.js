@@ -669,7 +669,7 @@ const GraphQLCallAssignment = new GraphQLObjectType({
     query: {
       type: GraphQLString,
       resolve: async (assignment, _, {rootValue}) => {
-        let group = await rootValue.loaders.gcBsdGroups.load(assignment.interviewee_group_id)
+        let group = await rootValue.loaders.gcBsdGroups.load(assignment.gc_bsd_group_id)
         if (group.cons_group_id) {
           return 'BSD Constituent Group: ' + group.cons_group_id
         }
