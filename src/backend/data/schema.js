@@ -399,7 +399,10 @@ const GraphQLAddress = new GraphQLObjectType({
     addr2: { type: GraphQLString },
     addr3: { type: GraphQLString },
     city: { type: GraphQLString },
-    state: { type: GraphQLString },
+    state: {
+      type: GraphQLString,
+      resolve: (address) => address.state_cd
+    },
     zip: { type: GraphQLString },
     latitude: { type: GraphQLFloat },
     longitude: { type: GraphQLFloat },
