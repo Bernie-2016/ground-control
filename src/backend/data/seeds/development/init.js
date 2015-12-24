@@ -3,10 +3,10 @@ import log from '../../../log';
 import {hash} from '../../../bcrypt-promise';
 import Promise from 'bluebird'
 import loadZips from '../shared/load-zips'
-import importData from '../shared/import-data'
+import importData from '../../import-data'
 
-const NUM_PERSONS=1;
-const NUM_EVENTS=1;
+const NUM_PERSONS=25345;
+const NUM_EVENTS=15432;
 
 // Use this instead of faker because we want it to be just digits
 let randomPhoneNumber = () => {

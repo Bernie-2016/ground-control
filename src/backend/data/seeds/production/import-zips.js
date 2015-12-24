@@ -1,5 +1,5 @@
 import loadZips from '../shared/load-zips'
-import importData from '../shared/import-data'
+import importData from '../../import-data'
 
 exports.seed = async function(knex, Promise) {
   let zipCodes = loadZips('./seeds/shared/zip-codes.csv')

@@ -1,5 +1,5 @@
 import csv from 'csv-load-sync';
-import log from '../../../log';
+import log from '../log';
 import json2csv from 'json2csv';
 import Promise from 'bluebird';
 var copyFrom = require('pg-copy-streams').from;
