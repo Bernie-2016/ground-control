@@ -30,13 +30,6 @@ class CallAssignmentsSection extends React.Component {
           callAssignments={this.props.currentUser.callAssignments}
           subheader="Active Assignments"
           onSelect={(id) => {
-/*            Relay.Store.update(
-              new AssignCall({
-                currentUser: this.props.currentUser,
-                callAssignmentId: id
-              })
-            )
-    */
             this.props.history.push('/call/' + id)
           }}
         />

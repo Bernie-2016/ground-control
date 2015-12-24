@@ -1,7 +1,7 @@
 import React from 'react';
 import Relay from 'react-relay';
 import {BernieText, BernieColors} from './styles/bernie-css';
-import {Paper, List, ListItem, FlatButton} from 'material-ui';
+import {Paper, List, ListItem, RaisedButton} from 'material-ui';
 import PlivoDialer from './PlivoDialer'
 import SideBarLayout from './SideBarLayout';
 import SurveyRenderer from './SurveyRenderer';
@@ -11,7 +11,7 @@ import GCForm from './forms/GCForm';
 import Form from 'react-formal';
 import SubmitCallSurvey from '../mutations/SubmitCallSurvey'
 
-export class CallAssignment extends React.Component {
+class CallAssignment extends React.Component {
   styles = {
     assignmentBar: {
       backgroundColor: BernieColors.lightGray,
@@ -41,6 +41,15 @@ export class CallAssignment extends React.Component {
       marginLeft: 'auto',
       marginRight: 'auto'
     },
+    instructions: {
+      marginLeft: 'auto',
+      marginRight: 'auto',
+      border: 'solid 1px ' + BernieColors.blue,
+      maxWidth: 720,
+      marginTop: 15,
+      marginBottom: 50,
+      padding: '15px 15px 15px 15px'
+    },
     submitButton: {
 
     }
@@ -57,7 +66,8 @@ export class CallAssignment extends React.Component {
     reasonNotCompleted: null,
     sentText: null,
     leftVoicemail: null,
-    globalErrorMessage: null
+    globalErrorMessage: null,
+    showInstructions: true
   }
 
   notCompletedReasons =
@@ -167,7 +177,7 @@ export class CallAssignment extends React.Component {
     let content = (
       <div style={BernieText.default}>
         Location: {location}<br />
-        Local Time: {moment().utcOffset(interviewee.address.localTime).format('h:mm a')}<br />
+        Local Time: {moment().utcOffset(interviewee.address.localUTCOffset).format('h:mm a')}<br />
       </div>
     )
 
@@ -217,6 +227,31 @@ export class CallAssignment extends React.Component {
       this.refs.survey.refs.component.submit()
     else
       this.submitCallSurvey({});
+  }
+
+  renderInstructions() {
+    if (!this.state.showInstructions)
+      return <div></div>
+    return (
+      <Paper
+          zDepth={0}
+          style={this.styles.instructions}
+        >
+        <div>
+          {this.props.callAssignment.instructions}
+        </div>
+        <RaisedButton
+          style={{
+            marginTop: 10
+          }}
+          label="Ok, I got it!"
+          secondary={true}
+          onTouchTap={(event) => {
+            this.setState({showInstructions: false})
+          }}
+        />
+      </Paper>
+    )
   }
 
   render() {
@@ -273,6 +308,7 @@ export class CallAssignment extends React.Component {
       )
     return (
       <div style={this.styles.container}>
+        {this.renderInstructions()}
         <Paper
           style={this.styles.assignmentBar}
         >
@@ -292,6 +328,13 @@ export class CallAssignment extends React.Component {
               <Form.Field
                 name='completed'
                 label='Were you able to complete the call?'
+                labelStyle={{
+                  ...BernieText.secondaryTitle,
+                  fontWeight: 600,
+                  color: BernieColors.blue,
+                  fontSize: '1.2em',
+                  letterSpacing: '0em'
+                }}
               />
               {notCompletedQuestions}
             </div>
@@ -313,6 +356,7 @@ export default Relay.createContainer(CallAssignment, {
       fragment on CallAssignment {
         id
         name
+        instructions
         survey {
           ${SurveyRenderer.getFragment('survey')}
         }
@@ -339,7 +383,7 @@ export default Relay.createContainer(CallAssignment, {
             city
             state
             zip
-            localTime
+            localUTCOffset
             latitude
             longitude
           }

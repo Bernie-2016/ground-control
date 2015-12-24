@@ -99,13 +99,13 @@
 
 <form method="post" name="secondform" id="secondform">
 <div>
-<input name="is_searchable" type="hidden" value="-2">
 
+                <div class="section-wrap"><div class="sectionheader section-what"><h3>What:<span class="bsd-image-replacement"></span></h3></div>
 
-                <div class="section-wrap"><div class="sectionheader section-what"><h3>What:<span class="bsd-image-replacement"></span></h3></div><div class="inputgroup">
-
-                <div class="label">
-                    <label class="form_label">Event Type:</label></div>
+                <div class="inputgroup">
+                	<div class="label">
+                    	<label class="form_label">Event Type:</label>
+                	</div>
                     <div class="field">
                         <div class="select-wrapper" style="float:none;">
                 			<select size="1" name="event_type_id">
@@ -114,7 +114,7 @@
                 				<option value="17">Flyering and Tabling</option>
                 				<option value="30">Gather ballot access signatures</option>
                 				<option value="18">Making Phone Calls</option> -->
-                				<option value="31">Phonebanks</option>
+                				<option value="31">Phonebank</option>
                 				<!-- <option value="22">Registering Voters</option>
                 				<option value="24">Volunteer activity or meeting</option>
                 				<option value="25">Volunteer meeting to get organized or learn more</option>
@@ -123,8 +123,9 @@
                 			</select>
                 		</div>
                 	</div>
+                </div>
 
-                </div><div class="inputgroup"><div class="label">
+                <div class="inputgroup"><div class="label">
                     <label class="form_label">Event Title: </label><span style="color: red;">*</span>
                 </div><div class="field">
                     <input size="30" maxlength="128" name="name" type="text" required value="Phone banking for Bernie"></div></div><span class="explain">(This should be descriptive, possibly including the name of your city or area)</span><div class="inputgroup"><div class="label">
@@ -144,7 +145,7 @@
                         	CKEDITOR.on('instanceReady', function (e) {
                         	  $('.cke_top').css('background', '#eee');
 
-                        	  CKEDITOR.instances.description.setData('Join other volunteers in your area to make phone calls for Bernie. This is a great opportunity to meet other Bernie supporters, make calls to voters, and help make a big impact in our campaign for President.');
+                        	  CKEDITOR.instances.description.setData('<p>Join other volunteers in your area to make phone calls for Bernie. This is a great opportunity to meet other Bernie supporters, make calls to voters, and help make a big impact in our campaign for President.</p><p>Please bring a laptop, phone, chargers, and any extra batteries you have.</p>');
 
                         	  $('#description').val(CKEDITOR.instances.description.getData());
 
@@ -153,6 +154,20 @@
 
                         <span class="explain">(Say a little more about your event and why people should attend)</span>
 
+                        <div class="inputgroup">
+                        	<div class="label">
+                            	<label class="form_label">Make this event public?</label>
+                        	</div>
+                            <div class="field">
+                                <div class="select-wrapper" style="float:none;">
+                        			<select size="1" name="is_searchable">
+                        				<option value="1">Make Public</option>
+                        				<option value="0">Make Private</option>
+                        				<option value="-2">Use Event Type Default</option>
+                        			</select>
+                        		</div>
+                        	</div>
+                        </div>
 
                         <div class="checkboxgroup">
                                             <label class="form_label" for="qf_aa7bcc">Receive email when users sign up?</label>
@@ -187,7 +202,7 @@
                 <div class="label">
                     <label class="form_label">Enter # of hours before event to send reminder:</label></div>
                 <div class="field">
-                    <input size="8" id="rsvp_email_reminder_hours" name="rsvp_email_reminder_hours" type="number" value="24" min="0" step="0.5"></div>
+                    <input size="8" id="rsvp_email_reminder_hours" name="rsvp_email_reminder_hours" type="number" value="8" min="0" step="0.5"></div>
             </div><div class="bsd-when" style="display: block;">
 
 
@@ -198,8 +213,8 @@
             <div class="section-wrap"><div class="sectionheader section-when"><h3>When:<span class="bsd-image-replacement"></span></h3></div><div class="inputgroup"><div class="label">
                     <label class="form_label">Event Timezone:</label><span style="color: red;">*</span>
                 </div><div class="field">
-                    <div class="select-wrapper"><select name="start_tz">
-	<option value="US/Eastern" selected="selected">US/Eastern, EST</option>
+                    <div class="select-wrapper"><select name="start_tz" required>
+	<option value="US/Eastern">US/Eastern, EST</option>
 	<option value="US/Michigan">US/Michigan, EST</option>
 	<option value="US/East-Indiana">US/East-Indiana, EST</option>
 	<option value="US/Central">US/Central, CST</option>
@@ -210,7 +225,7 @@
 	<option value="US/Alaska">US/Alaska, AKST</option>
 	<option value="US/Aleutian">US/Aleutian, HAST</option>
 	<option value="US/Hawaii">US/Hawaii, HST</option>
-	<option value=""></option>
+	<option selected="selected"></option>
 	<option value="Africa/Abidjan">Africa/Abidjan, GMT</option>
 	<option value="Africa/Accra">Africa/Accra, GMT</option>
 	<option value="Africa/Addis_Ababa">Africa/Addis_Ababa, EAT</option>
@@ -792,7 +807,7 @@
 <div class="inputgroup event-length"><div class="label">
                     <label class="form_label">Event Length:</label><span style="color: red;">*</span>
                 </div><div class="field">
-                    <input size="4" onclick="document.secondform.duration_allday.checked = false;" name="duration_num" id="duration_num" type="number" value="1" step="0.5" min="0.5">&nbsp;<div class="select-wrapper"><select onclick="document.secondform.duration_allday.checked = false;" name="duration_unit">
+                    <input size="4" onclick="document.secondform.duration_allday.checked = false;" name="duration_num" id="duration_num" type="number" value="2" step="0.5" min="0.5">&nbsp;<div class="select-wrapper"><select onclick="document.secondform.duration_allday.checked = false;" name="duration_unit">
 	<option value="1">minutes</option>
 	<option value="60" selected="selected">hours</option>
 	<option value="1440">days</option>
@@ -1157,6 +1172,10 @@
     <div class="explain"> This email will not be publicly visible.</div>
     </div>
 
+    <div class="checkboxgroup">
+                        <label class="form_label" for="flag_approval">Mark this event as incomplete/needs further review</label>
+                        <input name="flag_approval" id="flag_approval" type="checkbox" value="1"></div>
+
 <input class="ui-state-default" id="submit_button" name="submit_button" value="Create Event" type="submit"><div class="required"><span class="error">*</span> denotes required field</div></div>
 
 </div>
@@ -1368,7 +1387,7 @@ jQuery(document).ready(function() {
 
 		$.ajax({
 		    dataType: "json",
-		    url: '/admin/events/create',
+		    url: '/events/create',
 		    data: formdata,
 		    type: 'POST',
 		    success: function(xhr, status){

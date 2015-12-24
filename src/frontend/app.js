@@ -12,11 +12,16 @@ import AdminEventsSection from './components/AdminEventsSection';
 import AdminCallAssignmentsSection from './components/AdminCallAssignmentsSection';
 import AdminCallAssignmentCreationForm from './components/AdminCallAssignmentCreationForm';
 import GCTextField from './components/forms/GCTextField';
+import GCPhoneField from './components/forms/GCPhoneField';
+import GCDateField from './components/forms/GCDateField';
+import GCDateTimeField from './components/forms/GCDateTimeField';
+//import GCTimeField from './components/forms/GCTimeField';
 import GCPasswordField from './components/forms/GCPasswordField';
 import GCRadioButtonsField from './components/forms/GCRadioButtonsField';
 import GCSelectField from './components/forms/GCSelectField';
 import GCCheckboxesField from './components/forms/GCCheckboxesField';
 import GCBooleanField from './components/forms/GCBooleanField';
+import GCToggleField from './components/forms/GCToggleField';
 import CallAssignmentsDashboard from './components/CallAssignmentsDashboard';
 import AdminCallAssignment from './components/AdminCallAssignment';
 import CallAssignment from './components/CallAssignment';
@@ -24,9 +29,10 @@ import CallAssignmentsSection from './components/CallAssignmentsSection';
 import Dashboard from './components/Dashboard';
 import Signup from './components/Signup';
 import NotFound from './components/NotFound'
+import Unauthorized from './components/Unauthorized'
 import Form from 'react-formal';
 import {createHistory} from 'history';
-import RelayNetworkLayer from './RelayNetworkLayer'
+import GCNetworkLayer from './relay-extensions/GCNetworkLayer'
 import StackTrace from 'stacktrace-js';
 
 // Necessary to make minilog work
@@ -43,7 +49,7 @@ window.onerror = (msg, file, line, col, error) => {
   StackTrace
   .fromError(error)
   .then((stack) => {
-    log.error('Uncaught exception!', stack);
+    log.error('Uncaught exception!', error.message, stack);
     setTimeout(() => {
         alert('Whoops! Something went wrong. We\'re looking into it, but in the meantime please refresh your browser.');
         document.location.reload(true);
@@ -55,7 +61,7 @@ window.onerror = (msg, file, line, col, error) => {
 };
 
 injectTapEventPlugin();
-Relay.injectNetworkLayer(new RelayNetworkLayer('/graphql'));
+Relay.injectNetworkLayer(new GCNetworkLayer('/graphql'));
 
 Form.addInputTypes({
   string: GCTextField,
@@ -64,7 +70,11 @@ Form.addInputTypes({
   radio: GCRadioButtonsField,
   select: GCSelectField,
   array: GCCheckboxesField,
-  password: GCPasswordField
+  password: GCPasswordField,
+  date: GCDateField,
+//  time: GCTimeField, <-- broken
+  datetime: GCDateTimeField,
+  phone: GCPhoneField
 });
 
 const ListContainerQueries = {
@@ -141,6 +151,7 @@ ReactDOM.render(
         />
       </Route>
     </Route>
+    <Route path='/unauthorized' component={Unauthorized} />
     <Route path="*" component={NotFound} />
   </Router>,
   document.getElementById('root')

@@ -54,6 +54,14 @@ class BSDSurvey extends React.Component {
     }})
   }
 
+  hideField(fieldId) {
+    this.sendFrameMessage({
+    message: 'hideField',
+    details: {
+      inputId: fieldId,
+    }})
+  }
+
   frameMessageHandler = (event) => {
     if (event.origin !== this.frameHost())
       return;
@@ -66,6 +74,8 @@ class BSDSurvey extends React.Component {
             inputId: 'email',
             value: this.props.interviewee.email
           }})
+        if (this.props.onLoaded)
+          this.props.onLoaded()
         this.sendFrameMessage({message: 'getHeight'});
       }
       else {
@@ -74,7 +84,6 @@ class BSDSurvey extends React.Component {
     }
 
     else if (event.data.message === 'fieldValues') {
-      console.log('got field values')
       this.setState({surveyFields: event.data.details})
       this.sendFrameMessage({message: 'submit'})
     }

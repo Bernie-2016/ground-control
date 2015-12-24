@@ -44,10 +44,7 @@ export const BernieText = {
   inputLabel: {
     color: BernieColors.darkGray,
     fontFamily: 'freight-sans-pro',
-    fontWeight: 600,
-    textTransform: 'uppercase',
-    fontSize: '0.95em',
-    letterSpacing: '0.1em',
+    fontSize: '1.0em',
   },
 
   smallHeader: {
@@ -63,7 +60,7 @@ export const BernieText = {
     fontFamily: 'Roboto, sans-serif',
     fontWeight: 400
   },
-  
+
   inputError: {
     color: BernieColors.red,
     fontFamily: 'freight-sans-pro',

@@ -1,7 +1,7 @@
 import React from 'react';
 import Form from 'react-formal';
 import GCSubmitButton from './GCSubmitButton';
-import {RefreshIndicator, Snackbar} from 'material-ui';
+import {RefreshIndicator} from 'material-ui';
 import {BernieColors} from '../styles/bernie-css';
 
 export default class GCForm extends React.Component {
@@ -42,26 +42,7 @@ export default class GCForm extends React.Component {
   }
 
   render() {
-    let globalSnack = <div></div>
-    if (this.props.globalError) {
-      globalSnack = <Snackbar
-        message={this.props.globalError}
-        autoHideDuration={10000}
-        openOnMount={true}
-        style={{'backgroundColor' : BernieColors.red}}
-        action={null} />
-    }
-    else if (this.props.globalStatus) {
-      globalSnack = <Snackbar
-        message={this.props.globalStatus}
-        autoHideDuration={10000}
-        openOnMount={true}
-        style={{'backgroundColor' : BernieColors.blue}}
-        action={null} />
-    }
     return (
-      <div>
-        {globalSnack}
         <Form
           onError={(errors) => {
             this.setState({formErrors: errors})
@@ -69,7 +50,6 @@ export default class GCForm extends React.Component {
           {...this.props} >
           {this.renderChildren(this.props.children)}
         </Form>
-      </div>
     )
   }
 }

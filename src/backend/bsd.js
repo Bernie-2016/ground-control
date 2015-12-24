@@ -5,8 +5,9 @@ import querystring from 'querystring';
 import {parseString} from 'xml2js';
 import Promise from 'bluebird';
 import qs from 'querystring';
-import BSDAudit from './data/models/bsd-audit';
 import log from './log';
+import moment from 'moment-timezone';
+import knex from './data/knex';
 
 const parseStringPromise = Promise.promisify(parseString);
 
@@ -21,14 +22,16 @@ export default class BSD {
 
   noFailApiRequest(method, ...args) {
     try {
-      BSD[method](...args);
+      this[method](...args);
     } catch (e) {
       log.error(e);
-      BSDAudit.create({
+      knex('bsd_audits').insert({
         class: 'BSDClient',
         method: method,
         params: String(args),
-        error: e.message
+        error: e.message,
+        modified_dt: new Date(),
+        create_dt: new Date()
       })
     }
   }
@@ -46,7 +49,7 @@ export default class BSD {
 
   createGroupObject(group) {
     let groupObj = {};
-    groupObj['id'] = group['$']['id'];
+    groupObj['cons_group_id'] = group['$']['id'];
     groupObj['modified_dt'] = group['$']['modified_dt'];
 
     Object.keys(group).forEach((key) => {
@@ -301,8 +304,51 @@ export default class BSD {
       method: 'GET',
       resolveWithFullResponse: true,
     }
-    let response = await requestPromise(options)
+    let response = await requestWrapper(options)
     return response
+  }
+
+  async deleteEvents(eventIdArray) {
+    let promises = eventIdArray.map((event_id) => {
+      return this.request('/event/delete_event', {event_id}, 'POST');
+    });
+    let responses = await Promise.all(promises);
+    return responses;
+  }
+
+  apiInputsFromEvent(event) {
+    let inputs = {}
+    let eventDate = {}
+    Object.keys(event).forEach((key) => {
+      if (key === 'start_tz')
+        inputs['local_timezone'] = event[key]
+      else if (key === 'start_dt') {
+        eventDate['start_datetime_system'] = moment(event['start_dt']).tz(event['start_tz']).format('YYYY-MM-DD HH:mm:ss')
+      }
+      else if (key === 'capacity')
+        eventDate[key] = event[key]
+      else if (key === 'duration')
+        eventDate[key] = event[key]
+      else
+        inputs[key] = event[key]
+    })
+    if (Object.keys(eventDate).length > 0)
+      inputs['days'] = [eventDate]
+    return inputs
+  }
+
+  async updateEvent(event_id_obfuscated, event_type_id, creator_cons_id, updatedValues) {
+    updatedValues = {
+      ...updatedValues,
+      ...{event_id_obfuscated, event_type_id, creator_cons_id}
+    }
+    let inputs = this.apiInputsFromEvent(updatedValues)
+    // BSD API gets mad if we send this in
+    delete inputs['event_id']
+    let response = await this.request('/event/update_event', {event_api_version: 2, values: JSON.stringify(inputs)}, 'POST');
+    if (response.validation_errors) {
+      throw new Error(JSON.stringify(response.validation_errors));
+    }
   }
 
   async createEvents(cons_id, form, event_types, callback) {
@@ -325,6 +371,7 @@ export default class BSD {
     let params = {
         event_type_id: form['event_type_id'],
         creator_cons_id: cons_id,
+        flag_approval: form['flag_approval'],
         name: form['name'],
         description: form['description'],
         venue_name: form['venue_name'],
@@ -341,7 +388,7 @@ export default class BSD {
         }],
         local_timezone: form['start_tz'],
         attendee_volunteer_message: form['attendee_volunteer_message'],
-        is_searchable: form['is_searchable'],
+        is_searchable: (form['is_searchable']) ? form['is_searchable'] : -2, // second value should set to event type default
         public_phone: form['public_phone'],
         contact_phone: contact_phone,
         host_receive_rsvp_emails: form['host_receive_rsvp_emails'],
@@ -380,6 +427,18 @@ export default class BSD {
     return
   }
 
+  async requestWrapper(options) {
+    if (process.env.NODE_ENV === 'development' && options.method === 'POST') {
+      log.debug(`Would have made BSD API call with options: ${JSON.stringify(options)}`)
+      return {
+        statusCode: 200,
+        body: {}
+      }
+    }
+    else
+      return requestPromise(options)
+  }
+
   async makeRawRequest(callPath, params, method) {
     let finalURL = this.generateBSDURL(callPath, {params});
     let options = {
@@ -388,7 +447,8 @@ export default class BSD {
       resolveWithFullResponse: true,
       json: true
     }
-    return requestPromise(options)
+
+    return this.requestWrapper(options)
   }
 
   async makeRawXMLRequest(callPath, params, method) {
@@ -399,7 +459,8 @@ export default class BSD {
       body: params,
       resolveWithFullResponse: true
     }
-    return requestPromise(options)
+
+    return this.requestWrapper(options)
   }
 
   async request(callPath, params, method) {

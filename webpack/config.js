@@ -4,6 +4,8 @@ module.exports = {
   entry: './src/frontend/app.js',
   module: {
     loaders: [
+      { test: /\.json$/, loader: 'json'},
+      { test: /\.css$/, loader: "style!css" },
       {
         exclude: /node_modules/,
         loader: 'babel',
@@ -15,5 +17,6 @@ module.exports = {
   plugins: [
     new SchemaPlugin()
   ],
-  output: {filename: 'app.js', path: './src/frontend/public/js/'}
+  output: {filename: 'app.js', path: './src/frontend/public/js/'},
+  devtool: "#inline-source-map"
 }
