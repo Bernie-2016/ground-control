@@ -159,6 +159,8 @@ app.use(express.static(publicPath))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(session({
+  resave: false,
+  saveUninitialized: false,
   secret: process.env.SESSION_SECRET,
   store: sessionStore
 }))
@@ -268,4 +270,3 @@ log.info('Starting up...')
 app.listen(port, () => log.info(
   `Server is now running on http://localhost:${port}`
 ))
-
