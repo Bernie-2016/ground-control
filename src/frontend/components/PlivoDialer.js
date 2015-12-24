@@ -9,14 +9,14 @@ export default class PlivoDialer extends React.Component {
   }
 
   state = {
-    displayed: true,
     plivoCallInProgress: false,
-    plivoStatusText: null
+    plivoStatusText: null,
+    useTelLinkFallback: false
   }
 
   registerCallbacks() {
     Plivo.onWebrtcNotSupported = () => {
-      this.setState({visible: false})
+      this.setState({useTelLinkFallback: true})
     }
     Plivo.onReady = () => {
       console.log('PlivoJS is ready to be used')
@@ -61,7 +61,11 @@ export default class PlivoDialer extends React.Component {
   }
 
   callPhone(number) {
-    Plivo.conn.call(number)
+    if (this.state.useTelLinkFallback) {
+      window.location = `tel:+1${number}`
+    } else {
+      Plivo.conn.call(number)
+    }
   }
 
   hangupPhone() {
@@ -82,7 +86,7 @@ export default class PlivoDialer extends React.Component {
     let displayed = this.state.displayed;
 
     return (
-      <div style={displayed ? null : {display: 'none'}}>
+      <div>
         <FloatingActionButton
           onTouchTap={this.callPhone.bind(this, this.props.number)}
           style={plivoCallInProgress ? {display: 'none'} : null}

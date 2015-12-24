@@ -159,11 +159,7 @@ class CallAssignment extends React.Component {
         }}>
           {name}
           <br />
-          <a href={`tel:+1${interviewee.phone}`}
-             style={{color: BernieColors.blue,
-                     textDecoration: 'none'}}>
-            {formattedNumber}
-          </a>
+          {formattedNumber}
           <PlivoDialer number={`1${interviewee.phone}`}
             endpointUsername='bernie151217012337'
             endpointPassword='forthewin'
