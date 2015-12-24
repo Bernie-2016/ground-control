@@ -576,13 +576,14 @@ const GraphQLEvent = new GraphQLObjectType({
       type: GraphQLString,
       resolve: (event) => {
         let zone = moment.tz.zone(event.start_tz)
-        return zone.name;
+        return zone ? zone.name : null;
       }
     },
     localUTCOffset: {
       type: GraphQLString,
       resolve: (event) => {
-        return moment().tz(event.start_tz).format('Z')
+        let tz = moment().tz(event.start_tz);
+        return tz ? tz.format('Z') : '+0000'
       }
     },
     startDate: {

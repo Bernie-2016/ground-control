@@ -12,7 +12,7 @@ export let job = async () => {
     let groups = []
     await knex.transaction(async (trx) => {
       groups = await knex('gc_bsd_groups')
-        .where('modified_dt', '<', new Date(new Date() - 24 * 60 * 60 * 1000))
+        .where('modified_dt', '<', new Date(new Date() - 60 * 1000))
         .orWhere('modified_dt', knex.column('create_dt'))
         .transacting(trx)
       let promises = groups.map(async (group) => {
@@ -38,7 +38,6 @@ export let job = async () => {
         limitedQuery = knex.raw(`${group.query} order by cons_id limit ${limit} offset ${offset}`)
         log.info('Running query: ' + limitedQuery.toString())
         results = await limitedQuery;
-        log.info('Inserting data...')
         let peopleToInsert = results.rows.map((result) => {
           return {
             cons_id: result.cons_id,
