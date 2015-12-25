@@ -296,10 +296,6 @@ class BSDPhonebankRSVPSurvey extends React.Component {
 
   renderDateFilters(){
     return (
-      <div>
-        <label htmlFor="dateFilter">
-          Filter by Date:
-        </label>
         <GCSelectField
           name="dateFilter"
           key="dateFilter"
@@ -309,8 +305,12 @@ class BSDPhonebankRSVPSurvey extends React.Component {
             this.setState({dateFilter: value});
           }}
           value={this.state.dateFilter}
+          style={{
+            ...BernieText.inputLabel,
+            paddingTop: 10
+          }}
+          label="Filter Events by Date"
         />
-      </div>
     )
   }
 
