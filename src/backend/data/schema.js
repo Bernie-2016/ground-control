@@ -30,6 +30,7 @@ import TZLookup from 'tz-lookup'
 import BSDClient from '../bsd-instance'
 import knex from './knex'
 import humps from 'humps'
+import log from './log'
 
 const EVERYONE_GROUP = 'everyone'
 
