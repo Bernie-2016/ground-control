@@ -72,6 +72,7 @@ export let job = async () => {
           peopleToInsert = shuffleArray(peopleToInsert)
 
           if (peopleToInsert.length > 0) {
+            log.info('Inserting data...')
             await knex.bulkInsert('bsd_person_gc_bsd_groups', peopleToInsert, {transaction: trx})
             log.info('Done inserting ' + peopleToInsert.length + ' rows for group ' + group.id)
           }

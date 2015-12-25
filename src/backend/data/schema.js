@@ -372,6 +372,7 @@ const GraphQLUser = new GraphQLObjectType({
 
           if (filterQuery)
             query = query.join(filterQuery.as('groups'), 'groups.cons_id', 'bsd_people.cons_id')
+          log.info(`Running query: ${query}`)
           let person = await query
           let timestamp = new Date()
           if (person)
