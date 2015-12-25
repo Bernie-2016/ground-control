@@ -296,21 +296,21 @@ class BSDPhonebankRSVPSurvey extends React.Component {
 
   renderDateFilters(){
     return (
-      <div>
-        <label htmlFor="dateFilter">
-          Filter by Date:
-        </label>
-        <GCSelectField
-          name="dateFilter"
-          key="dateFilter"
-          id="dateFilter"
-          choices={ this.getDateChoices() }
-          onChange={(value) => {
-            this.setState({dateFilter: value});
-          }}
-          value={this.state.dateFilter}
-        />
-      </div>
+      <GCSelectField
+        name="dateFilter"
+        key="dateFilter"
+        id="dateFilter"
+        choices={ this.getDateChoices() }
+        onChange={(value) => {
+          this.setState({dateFilter: value});
+        }}
+        value={this.state.dateFilter}
+        style={{
+          ...BernieText.inputLabel,
+          paddingTop: 10
+        }}
+        label="Filter Events by Date"
+      />
     )
   }
 
