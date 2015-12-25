@@ -30,6 +30,7 @@ import TZLookup from 'tz-lookup'
 import BSDClient from '../bsd-instance'
 import knex from './knex'
 import humps from 'humps'
+import log from '../log'
 
 const EVERYONE_GROUP = 'everyone'
 
@@ -242,6 +243,7 @@ const GraphQLListContainer = new GraphQLObjectType({
         let convertedSortField = eventFieldFromAPIField(sortField)
 
         let events = await knex('bsd_events')
+          .where('start_dt', '>=', new Date())
           .where(filters)
           .limit(first)
           .orderBy(convertedSortField, sortDirection)
@@ -371,6 +373,7 @@ const GraphQLUser = new GraphQLObjectType({
 
           if (filterQuery)
             query = query.join(filterQuery.as('groups'), 'groups.cons_id', 'bsd_people.cons_id')
+          log.info(`Running query: ${query}`)
           let person = await query
           let timestamp = new Date()
           if (person)
@@ -669,7 +672,7 @@ const GraphQLCallAssignment = new GraphQLObjectType({
     query: {
       type: GraphQLString,
       resolve: async (assignment, _, {rootValue}) => {
-        let group = await rootValue.loaders.gcBsdGroups.load(assignment.interviewee_group_id)
+        let group = await rootValue.loaders.gcBsdGroups.load(assignment.gc_bsd_group_id)
         if (group.cons_group_id) {
           return 'BSD Constituent Group: ' + group.cons_group_id
         }

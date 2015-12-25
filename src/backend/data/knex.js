@@ -9,6 +9,32 @@ if (!process.env.NO_DB) {
     return results.count
   }
 
+  knex.bulkInsert = async function(table, values, {transaction}={}) {
+    if (values.length < 1)
+      return;
+
+    let valueKeys = Object.keys(values[0])
+    let columns = `("${valueKeys.join('","')}")`;
+    let valueString = values.map((valueObj) => {
+      let quotedValues = valueKeys.map((key) => {
+        let val = valueObj[key]
+        if (typeof val === 'object')
+          val = val.toISOString()
+        else
+          val = val.toString()
+        val = val.replace('\'', '\'\'')
+        return `'${val}'`
+      })
+      return `(${quotedValues.join(',')})`
+    }).join(', ')
+    let statement = `INSERT INTO "${table}" ${columns} VALUES ${valueString}`
+
+    let query = knex.raw(statement)
+    if (transaction)
+      query = query.transacting(transaction)
+    return query
+  }
+
   knex.insertAndFetch = async function(table, values, {idField, transaction}={}) {
     let timestamp = new Date()
     if (!values.length)

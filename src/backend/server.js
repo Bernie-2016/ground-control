@@ -159,6 +159,8 @@ app.use(express.static(publicPath))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(session({
+  resave: false,
+  saveUninitialized: false,
   secret: process.env.SESSION_SECRET,
   store: sessionStore
 }))

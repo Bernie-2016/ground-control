@@ -7,6 +7,8 @@ import {FlatButton, Paper} from 'material-ui';
 import moment from 'moment';
 import FontIcon from 'material-ui/lib/font-icon';
 import SideBarLayout from '../SideBarLayout'
+import GCSelectField from '../forms/GCSelectField';
+
 
 class BSDPhonebankRSVPSurvey extends React.Component {
   static propTypes = {
@@ -21,7 +23,9 @@ class BSDPhonebankRSVPSurvey extends React.Component {
 
   state = {
     clickedMarker: null,
-    selectedEventId: null
+    selectedEventId: null,
+    dateFilter: "upcoming",
+    markers: []
   }
 
   handleMarkerClick(marker) {
@@ -133,7 +137,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
             color: BernieColors.gray,
             fontSize: '1.0em'
           }}>
-            {moment(marker.startDate).utcOffset(marker.localUTCOffset).format('h:mm A  - dddd, MMM D')}
+            {moment(marker.startDate).utcOffset(marker.localUTCOffset).format('dddd, MMMM Do — h:mm A')}
           </div>
           <div style={{
             ...BernieText.default,
@@ -201,7 +205,14 @@ class BSDPhonebankRSVPSurvey extends React.Component {
       }
     ];
 
+
+
     this.props.interviewee.nearbyEvents.forEach((event) => {
+      if(this.state.dateFilter != 'upcoming'){
+        if(!moment().add(this.state.dateFilter.split('_')[0], 'days').isSame(moment(event.startDate), 'day')){
+          return;
+        }
+      }
       markers.push({
         position: {
           lat: event.latitude,
@@ -220,6 +231,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
         attendeesCount: event.attendeesCount
       })
     })
+
     return (
       <div style={{height: '100%', width: '100%'}}>
       <GoogleMapLoader
@@ -254,11 +266,82 @@ class BSDPhonebankRSVPSurvey extends React.Component {
     )
   }
 
+  getDateChoices(){
+    let options = {"upcoming": "All Upcoming Events"}
+    let WEEKDAY_DATE_FORMAT = 'dddd, MMMM Do';
+
+    // comically large for test purposes
+    // 10 or 14 would be well suited for the real world I think.
+    for(let dayCount = 0; dayCount < 300; dayCount++){
+      let label = '';
+      if(dayCount == 0){
+        label = 'Today, '
+      } else if(dayCount == 1){
+        label = 'Tomorrow, '
+      }
+
+      let date = moment().add(dayCount, 'days')
+
+      // make sure we have events to accommodate that day.
+      this.props.interviewee.nearbyEvents.forEach((event) => {
+        if(moment(event.startDate).isSame(date, 'day')){
+          options[dayCount + "_days"] = label + date.format(WEEKDAY_DATE_FORMAT)
+        }
+      })
+
+    }
+
+    return options
+  }
+
+  renderDateFilters(){
+    let content = (
+      <GCSelectField
+        choices={ this.getDateChoices() }
+        onChange={(value) => {
+          this.setState({dateFilter: value});
+        }}
+        clearable={false}
+        value={this.state.dateFilter}
+        labelStyle={{
+          paddingBottom: 0
+        }}
+      />
+    )
+
+    let sidebar = (
+      <div>
+        Show:
+      </div>
+    )
+    return (
+      <SideBarLayout
+        content={content}
+        sideBar={sidebar}
+        containerStyle={{
+          border: 'none',
+          paddingTop: 10
+        }}
+        sideBarStyle={{
+          ...BernieText.inputLabel,
+          border: 'none',
+          width: 50
+        }}
+        contentViewStyle={{
+          border: 'none'
+        }}
+      />
+    )
+  }
+
   render() {
     return (
       <div>
         <div style={{width: '100%', height: 200}}>
           {this.renderMap()}
+        </div>
+        <div>
+          {this.renderDateFilters()}
         </div>
         {this.renderSelectedEvent()}
         {this.renderMarkerDescription(this.state.clickedMarker)}

@@ -5,8 +5,8 @@
       "job": "./jobs/bsd-assigned-calls-ttl.js"
     },
     {
-        "cron": "00 */5 * * * *",
-        "job": "./jobs/refresh-group-memberships.js"
+      "cron": "00 */5 * * * *",
+      "job": "./jobs/refresh-group-memberships.js"
     }
   ]
 }
