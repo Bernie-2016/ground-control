@@ -242,6 +242,7 @@ const GraphQLListContainer = new GraphQLObjectType({
         let convertedSortField = eventFieldFromAPIField(sortField)
 
         let events = await knex('bsd_events')
+          .where('start_dt', '>=', new Date())
           .where(filters)
           .limit(first)
           .orderBy(convertedSortField, sortDirection)
