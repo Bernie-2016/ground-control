@@ -295,21 +295,41 @@ class BSDPhonebankRSVPSurvey extends React.Component {
   }
 
   renderDateFilters(){
-    return (
+    let content = (
       <GCSelectField
-        name="dateFilter"
-        key="dateFilter"
-        id="dateFilter"
         choices={ this.getDateChoices() }
         onChange={(value) => {
           this.setState({dateFilter: value});
         }}
+        clearable={false}
         value={this.state.dateFilter}
-        style={{
-          ...BernieText.inputLabel,
+        labelStyle={{
+          paddingBottom: 0
+        }}
+      />
+    )
+
+    let sidebar = (
+      <div>
+        Show:
+      </div>
+    )
+    return (
+      <SideBarLayout
+        content={content}
+        sideBar={sidebar}
+        containerStyle={{
+          border: 'none',
           paddingTop: 10
         }}
-        label="Filter Events by Date"
+        sideBarStyle={{
+          ...BernieText.inputLabel,
+          border: 'none',
+          width: 50
+        }}
+        contentViewStyle={{
+          border: 'none'
+        }}
       />
     )
   }
