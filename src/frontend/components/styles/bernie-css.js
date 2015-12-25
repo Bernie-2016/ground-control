@@ -3,6 +3,7 @@ import {Styles} from 'material-ui';
 export const BernieColors = {
   blue: 'rgb(20, 127, 215)',
   lightBlue: 'rgb(196, 223, 245)',
+  darkBlue: 'rgb(13, 81, 139)',
   red: 'rgb(245, 91, 91)',
   darkRed: 'rgb(237, 60, 57)',
   green: 'rgb(74, 204, 102)',

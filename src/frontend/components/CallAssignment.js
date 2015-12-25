@@ -2,6 +2,7 @@ import React from 'react';
 import Relay from 'react-relay';
 import {BernieText, BernieColors} from './styles/bernie-css';
 import {Paper, List, ListItem, RaisedButton} from 'material-ui';
+import PlivoDialer from './PlivoDialer'
 import SideBarLayout from './SideBarLayout';
 import SurveyRenderer from './SurveyRenderer';
 import moment from 'moment';
@@ -137,25 +138,27 @@ class CallAssignment extends React.Component {
     return name === '' ? 'Unknown name' : name
   }
 
-  formatPhoneNumber(number) {
-    return '(' + number.slice(0, 3) + ') ' + number.slice(3, 6) + '-' + number.slice(6)
-  }
-
   renderIntervieweeInfo() {
-    let interviewee = this.props.currentUser.intervieweeForCallAssignment;
-    let name = this.intervieweeName();
-    let number = this.formatPhoneNumber(interviewee.phone)
+    let interviewee = this.props.currentUser.intervieweeForCallAssignment
+    let name = this.intervieweeName()
+    let plivoStatusText = this.state.plivoStatusText;
+    let plivoCallInProgress = this.state.plivoCallInProgress;
 
     let sideBar = (
-      <div style={{
-        ...BernieText.default,
-        color: BernieColors.blue,
-        fontSize: '1.5em',
-        fontWeight: 600
-      }}>
-        {name}
-        <br />
-        {number}
+      <div>
+        <div style={{
+          ...BernieText.default,
+          color: BernieColors.blue,
+          fontSize: '1.5em',
+          fontWeight: 600
+        }}>
+          {name}
+          <br />
+          <PlivoDialer number={`1${interviewee.phone}`}
+            endpointUsername='bernie2016151225174042'
+            endpointPassword='gUi3BAcj8MOtku1TOeGsjPBNuH21GL'
+          />
+        </div>
       </div>
     )
 
