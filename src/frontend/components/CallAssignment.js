@@ -165,8 +165,8 @@ class CallAssignment extends React.Component {
             {formattedNumber}
           </a>
           <PlivoDialer number={`1${interviewee.phone}`}
-            endpointUsername='bernie151217012337'
-            endpointPassword='forthewin'
+            endpointUsername='bernie2016151225174042'
+            endpointPassword='gUi3BAcj8MOtku1TOeGsjPBNuH21GL'
           />
         </div>
       </div>
