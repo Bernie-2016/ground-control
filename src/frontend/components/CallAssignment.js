@@ -138,14 +138,9 @@ class CallAssignment extends React.Component {
     return name === '' ? 'Unknown name' : name
   }
 
-  formatPhoneNumber(number) {
-    return '(' + number.slice(0, 3) + ') ' + number.slice(3, 6) + '-' + number.slice(6)
-  }
-
   renderIntervieweeInfo() {
     let interviewee = this.props.currentUser.intervieweeForCallAssignment
     let name = this.intervieweeName()
-    let formattedNumber = this.formatPhoneNumber(interviewee.phone)
     let plivoStatusText = this.state.plivoStatusText;
     let plivoCallInProgress = this.state.plivoCallInProgress;
 
@@ -159,11 +154,6 @@ class CallAssignment extends React.Component {
         }}>
           {name}
           <br />
-          <a href={`tel:+1${interviewee.phone}`}
-             style={{color: BernieColors.blue,
-                     textDecoration: 'none'}}>
-            {formattedNumber}
-          </a>
           <PlivoDialer number={`1${interviewee.phone}`}
             endpointUsername='bernie2016151225174042'
             endpointPassword='gUi3BAcj8MOtku1TOeGsjPBNuH21GL'
