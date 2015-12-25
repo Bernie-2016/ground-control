@@ -38,6 +38,7 @@ class AdminEventsSection extends React.Component {
       showDeleteEventDialog: false,
       showEventPreview: false,
       showCreateEventDialog: false,
+      showFiltersDialog: false,
       windowWidth: window.innerWidth,
       windowHeight: window.innerHeight,
       selectedRows: [],
@@ -369,6 +370,12 @@ class AdminEventsSection extends React.Component {
               this._handleRequestRefresh();
             }}
           >refresh</IconButton>*/}
+          {/*<RaisedButton
+            label="Search Events"
+            onTouchTap={() => {
+              this.setState({showFiltersDialog: true});
+            }}
+          />*/}
         </ToolbarGroup>
         <ToolbarGroup key={1} float="right">
           <RaisedButton
@@ -489,6 +496,67 @@ class AdminEventsSection extends React.Component {
           src="create"
           style={{width: '100%', height: this.state.windowHeight*0.6, border: 'none'}}
         />
+      </Dialog>
+    )
+  }
+
+  renderFiltersModal() {
+    let standardActions = [
+      { text: 'Cancel' },
+      { text: 'Update Filters',
+        onTouchTap: () => {
+          console.log(this.refs);
+          // this.refs.eventEdit.refs.component.submit()
+        },
+        ref: 'submit'
+      }
+    ];
+
+    const labelStyle = { display: 'inline', marginRight: '0.5em', fontSize: '0.8em' };
+
+    let updateFilters = (event) => {
+      let updatedValue = event.target.value;
+      if (updatedValue == 'none'){updatedValue = null}
+      this._handleRequestFiltersChange(event.target.name, updatedValue);
+    };
+
+    return (
+      <Dialog
+        title='Search Events'
+        actions={standardActions}
+        open={this.state.showFiltersDialog}
+        onRequestClose={() => {
+          this.setState({
+            showFiltersDialog: false
+          });
+        }}
+        bodyStyle={{paddingBottom: '0'}}
+      >
+      <form
+        ref='eventSearchForm'
+        onSubmit={console.log(this)}
+      >
+        <label htmlFor="venueState" style={labelStyle}>State: </label>
+        <select
+          name='venueState'
+          value={this.props.relay.variables.filters.venueState}
+          onChange={updateFilters}
+        >
+          <option value='none'>--</option>
+          {states.map((item, index) => {
+            return <option key={index} value={item.abbreviation}>{item.name}</option>
+          })}
+        </select>
+
+        <br/>
+
+        <label htmlFor="venueZip" style={labelStyle}>Zip Code: </label>
+        <input
+          name='venueZip'
+          value={this.props.relay.variables.filters.venueZip}
+          onChange={updateFilters}
+        />
+      </form>
       </Dialog>
     )
   }
@@ -763,6 +831,7 @@ class AdminEventsSection extends React.Component {
       {this.renderDeleteModal()}
       {this.renderCreateModal()}
       {this.renderEventPreviewModal()}
+      {this.renderFiltersModal()}
       {this.renderToolbar()}
       <Table
         rowHeight={83}
