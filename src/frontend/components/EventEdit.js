@@ -26,6 +26,14 @@ class EventEdit extends React.Component {
     return allZones;
   }
 
+  volunteerShowOptions() {
+    return {
+      '1': 'Yes',
+      '0': 'No',
+      '-1': 'Use Event Type Default'
+    }
+  }
+
   eventSearchableOptions() {
     // actually get valid options for event type later
     let eventSearchableOptions = {
@@ -119,8 +127,8 @@ class EventEdit extends React.Component {
       rsvpUseReminderEmail: yup.boolean()
         .default(event.rsvpUseReminderEmail),
 
-      attendeeVolunteerShow: yup.boolean()
-        .default(event.attendeeVolunteerShow),
+      attendeeVolunteerShow: yup.string()
+        .default(String(event.attendeeVolunteerShow)),
 
       attendeeVolunteerMessage: yup.string()
         .default(event.attendeeVolunteerMessage),
@@ -182,7 +190,6 @@ class EventEdit extends React.Component {
           label='Time Zone'
           choices={this.timezones()}
           style={{
-            width: 163,
             marginTop: 5
           }}
         /><br/>
@@ -290,7 +297,10 @@ class EventEdit extends React.Component {
 
         <Form.Field
           name="attendeeVolunteerShow"
+          type='select'
           label="Ask Attendees to Volunteer"
+          fullWidth={true}
+          choices={this.volunteerShowOptions()}
         />
 
         <Form.Field

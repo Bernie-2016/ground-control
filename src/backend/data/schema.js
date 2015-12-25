@@ -604,7 +604,7 @@ const GraphQLEvent = new GraphQLObjectType({
     latitude: { type: GraphQLFloat },
     longitude: { type: GraphQLFloat },
     attendeeVolunteerShow: {
-      type: GraphQLBoolean,
+      type: GraphQLInt,
       resolve: (event) => event.attendee_volunteer_show
     },
     attendeeVolunteerMessage: {
