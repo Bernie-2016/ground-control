@@ -6,6 +6,16 @@ import Promise from 'bluebird'
 import importData from '../../backend/data/import-data'
 
 export let job = async () => {
+  // Durstenfeld shuffle
+  let shuffleArray = (array) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      let j = Math.floor(Math.random() * (i + 1));
+      let temp = array[i];
+      array[i] = array[j];
+      array[j] = temp;
+    }
+    return array;
+  }
   try {
     log.info('Starting group refresh job...')
 
@@ -58,6 +68,8 @@ export let job = async () => {
               create_dt: new Date()
             }
           })
+
+          peopleToInsert = shuffleArray(peopleToInsert)
 
           if (peopleToInsert.length > 0) {
             await knex.bulkInsert('bsd_person_gc_bsd_groups', peopleToInsert, {transaction: trx})
