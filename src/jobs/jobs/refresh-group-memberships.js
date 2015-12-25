@@ -24,7 +24,7 @@ export let job = async () => {
     // This first transaction marks these groups as having been picked up.
     await knex.transaction(async (trx) => {
       groups = await knex('gc_bsd_groups')
-        .where('modified_dt', '<', new Date(new Date() - 60 * 1000))
+        .where('modified_dt', '<', new Date(new Date() - 60 * 60 * 1000))
         .orWhere('modified_dt', knex.column('create_dt'))
         .transacting(trx)
 
