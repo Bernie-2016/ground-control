@@ -84,6 +84,6 @@ export let job = async () => {
 
     log.info('Done refreshing groups')
   } catch (ex) {
-    log.error(ex.stack)
+    log.error(ex.message, ex.stack)
   }
 }
