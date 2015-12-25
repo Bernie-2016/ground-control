@@ -123,6 +123,7 @@ export default class PlivoDialer extends React.Component {
           backgroundColor={backgroundColor}
           onTouchTap={touchAction}
           style={this.styles.actionButton}
+          mini={true}
         >
           {icon}
         </FloatingActionButton>
