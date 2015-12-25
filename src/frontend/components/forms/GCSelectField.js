@@ -33,7 +33,10 @@ export default class GCSelectField extends GCFormField {
 
   render() {
     let error = <div></div>;
-    let labelStyle = this.styles.label
+    let labelStyle = {
+      ...this.styles.label,
+      ...this.props.labelStyle
+    }
     if (this.props.errorText) {
       error = <div style={BernieText.inputError}>{this.props.errorText}</div>
       labelStyle = {
@@ -43,7 +46,11 @@ export default class GCSelectField extends GCFormField {
     }
 
     const menuItems = this.createMenuItems();
-
+    let selectProps = {}
+    Object.keys(this.props).forEach((key) => {
+      if (key !== 'style' && key !== 'onChange' && key !== 'value' && key !== 'label')
+        selectProps[key] = this.props[key]
+    })
     return (
       <div style={{
         width: 200,
@@ -51,6 +58,7 @@ export default class GCSelectField extends GCFormField {
       }}>
         <div style={labelStyle}>{this.props.label}</div>
         <Select
+          {...selectProps}
           labelKey="label"
           value={this.props.value}
           options={menuItems}
