@@ -20,7 +20,6 @@ var production = {
   seeds: {
     directory: './seeds/production'
   },
-  debug: true
 };
 
 Object.assign(development, sharedConfig);
