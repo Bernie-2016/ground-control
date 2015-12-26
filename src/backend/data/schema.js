@@ -648,6 +648,12 @@ const GraphQLEvent = new GraphQLObjectType({
       type: GraphQLInt,
       resolve: (event) => event.rsvp_email_reminder_hours
     },
+    link: {
+      type: GraphQLString,
+      resolve: (event) => {
+        return url.resolve('https://' + process.env.BSD_HOST, '/page/event/detail/' + event.event_id_obfuscated)
+      }
+    },
     attendeesCount: {
       type: GraphQLInt,
       resolve: async(event) => {

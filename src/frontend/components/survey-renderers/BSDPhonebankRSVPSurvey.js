@@ -129,7 +129,10 @@ class BSDPhonebankRSVPSurvey extends React.Component {
         </div>
       )
     let button = <div></div>;
-    if (marker.key !== 'home')
+    if (marker.key !== 'home') {
+      let attendance = marker.attendeesCount
+      if (marker.capacity)
+        attendance = attendance + '/' + marker.capacity
       description = (
         <div>
           <div style={{
@@ -153,12 +156,13 @@ class BSDPhonebankRSVPSurvey extends React.Component {
             <div>{marker.venueName}</div>
             <div>{marker.addr1}</div>
             <div>{marker.addr2}</div>
-            <div>Capacity: {marker.capacity || 'No capacity limit'}</div>
-            <div>Attendees: {marker.attendeesCount}</div>
+            <div>Attendance: {attendance}</div>
+            <div><a href={marker.link} target="_blank">Direct Link</a></div>
             {this.state.selectedEventId === marker.eventId ? this.deselectButton() : this.selectButton(marker)}
           </div>
         </div>
       )
+    }
 
     return (
       <Paper zDepth={0} style={{
@@ -228,7 +232,8 @@ class BSDPhonebankRSVPSurvey extends React.Component {
         addr2: this.getEventAddr2(event),
         eventId: event.eventIdObfuscated,
         capacity: event.capacity,
-        attendeesCount: event.attendeesCount
+        attendeesCount: event.attendeesCount,
+        link: event.link
       })
     })
 
@@ -395,6 +400,7 @@ export default Relay.createContainer(BSDPhonebankRSVPSurvey, {
           longitude
           capacity
           attendeesCount
+          link
         }
       }
     `
