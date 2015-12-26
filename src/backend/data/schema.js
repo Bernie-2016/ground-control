@@ -325,24 +325,6 @@ const GraphQLUser = new GraphQLObjectType({
           if (validOffsets.length === 0)
             return null
           let group = await rootValue.loaders.gcBsdGroups.load(callAssignment.gc_bsd_group_id)
-          let filterQuery = null
-
-          if (group.cons_group_id)
-            filterQuery = knex('bsd_person_bsd_groups')
-              .select('cons_id')
-              .where('cons_group_id', group.cons_group_id)
-
-          else if (group.query && group.query !== EVERYONE_GROUP)
-            filterQuery = knex('bsd_person_gc_bsd_groups')
-              .select('cons_id')
-              .where('gc_bsd_group_id', group.id)
-
-          let addressesSubquery = knex('bsd_addresses')
-            .select('id', 'cons_id')
-            .join('zip_codes', 'zip_codes.zip', 'bsd_addresses.zip')
-            .where('is_primary', true)
-            .whereNotIn('state_cd', ['IA', 'NH', 'NV', 'SC'])
-            .whereIn('timezone_offset', validOffsets)
 
           let previousCallsSubquery = knex('bsd_calls')
             .select('id', 'interviewee_id', 'attempted_at')
@@ -364,9 +346,13 @@ const GraphQLUser = new GraphQLObjectType({
           let query = knex('bsd_people')
             .join('bsd_emails', 'bsd_people.cons_id', 'bsd_emails.cons_id')
             .join('bsd_phones', 'bsd_people.cons_id', 'bsd_phones.cons_id')
-            .join(addressesSubquery.as('addresses'), 'addresses.cons_id', 'bsd_people.cons_id')
+            .join('bsd_addresses', 'bsd_people.cons_id', 'bsd_addresses.cons_id')
+            .join('zip_codes', 'zip_codes.zip', 'bsd_addresses.zip')
             .leftOuterJoin('bsd_assigned_calls', 'bsd_people.cons_id', 'bsd_assigned_calls.interviewee_id')
             .leftOuterJoin(previousCallsSubquery.as('calls'), 'bsd_people.cons_id', 'calls.interviewee_id')
+            .whereNotIn('bsd_addresses.state_cd', ['IA', 'NH', 'NV', 'SC'])
+            .whereIn('zip_codes.timezone_offset', validOffsets)
+            .where('bsd_addresses.is_primary', true)
             .where('bsd_phones.is_primary', true)
             .where('bsd_emails.is_primary', true)
             .where('bsd_assigned_calls.id', null)
@@ -374,8 +360,16 @@ const GraphQLUser = new GraphQLObjectType({
             .limit(1)
             .first()
 
-          if (filterQuery)
-            query = query.join(filterQuery.as('groups'), 'groups.cons_id', 'bsd_people.cons_id')
+          if (group.cons_group_id)
+            query = query
+              .join('bsd_person_bsd_groups', 'bsd_person_bsd_groups.cons_id', 'bsd_people.cons_id')
+              .where('bsd_people.cons_group_id', group.cons_group_id)
+
+          else if (group.query && group.query !== EVERYONE_GROUP)
+            query = query
+              .join('bsd_person_gc_bsd_groups', 'bsd_person_gc_bsd_groups.cons_id', 'bsd_people.cons_id')
+              .where('gc_bsd_group_id', group.id)
+
           log.info(`Running query: ${query}`)
           let person = await query
           let timestamp = new Date()
