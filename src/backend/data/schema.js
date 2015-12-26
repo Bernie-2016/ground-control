@@ -347,6 +347,7 @@ const GraphQLUser = new GraphQLObjectType({
             .where(function() {
               this.where('call_assignment_id', localId)
                 .where('completed', true)
+                .where('attempted_at', '>', new Date(new Date() - 14 * 24 * 60 * 60 * 1000))
             })
             .orWhere(function() {
               this.whereIn('reason_not_completed', ['NO_PICKUP', 'CALL_BACK', 'NOT_INTERESTED'])
