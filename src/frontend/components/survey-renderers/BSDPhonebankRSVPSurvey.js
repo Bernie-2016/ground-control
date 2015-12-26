@@ -153,7 +153,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
             <div>{marker.venueName}</div>
             <div>{marker.addr1}</div>
             <div>{marker.addr2}</div>
-            <div>Capacity: {marker.capacity}</div>
+            <div>Capacity: {marker.capacity || 'No capacity limit'}</div>
             <div>Attendees: {marker.attendeesCount}</div>
             {this.state.selectedEventId === marker.eventId ? this.deselectButton() : this.selectButton(marker)}
           </div>
