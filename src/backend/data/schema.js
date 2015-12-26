@@ -173,6 +173,8 @@ async function addType(query) {
 let {nodeInterface, nodeField} = nodeDefinitions(
   (globalId) => {
     let {type, id} = fromGlobalId(globalId)
+    if (type === 'Call')
+      return addType(knex('bsd_calls').where('id', id))
     if (type === 'Person')
       return addType(knex('bsd_people').where('cons_id', id))
     if (type === 'CallAssignment')
@@ -496,6 +498,22 @@ const GraphQLPerson = new GraphQLObjectType({
     }
   }),
   interfaces: [nodeInterface]
+})
+
+const GraphQLCall = new GraphQLObjectType({
+  name: 'Call',
+  description: 'A call between a user and a person',
+  fields: () => ({
+    id: globalIdField('Call'),
+    attemptedAt: { type: GraphQLString },
+    leftVoicemail: { type: GraphQLBoolean },
+    sentText: { type: GraphQLBoolean },
+    completed: { type: GraphQLBoolean },
+    reasonNotCompleted: { type: GraphQLString },
+    caller: { type: GraphQLUser },
+    interviewee: { type: GraphQLPerson },
+    callAssignment: { type: GraphQLCallAssignment }
+  })
 })
 
 const GraphQLEventType = new GraphQLObjectType({
