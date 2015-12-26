@@ -17,6 +17,9 @@ export default class PlivoDialer extends React.Component {
 
   registerCallbacks() {
     Plivo.onWebrtcNotSupported = () => {
+      console.log('PlivoJS says WebRTC not supported by browser')
+    }
+    Plivo.onFlashNotInstalled = () => {
       this.setState({useTelLinkFallback: true})
     }
     Plivo.onReady = () => {
@@ -73,10 +76,7 @@ export default class PlivoDialer extends React.Component {
   }
 
   formatPhoneNumber(number) {
-    let formattedNumber = number
-    if (formattedNumber.length > 0 && formattedNumber[0] === '1')
-      formattedNumber = formattedNumber.slice(1)
-    return '(' + formattedNumber.slice(0, 3) + ') ' + formattedNumber.slice(3, 6) + '-' + formattedNumber.slice(6)
+    return '(' + number.slice(0, 3) + ') ' + number.slice(3, 6) + '-' + number.slice(6)
   }
 
   styles = {
@@ -119,12 +119,8 @@ export default class PlivoDialer extends React.Component {
     let backgroundColor = plivoCallInProgress ?
       BernieColors.red
       : BernieColors.green
-      return (
-        <span>
-          {formattedNumber}
-        </span>
-      )
-/*    return (
+
+    return (
       <div>
         <FloatingActionButton
           backgroundColor={backgroundColor}
@@ -142,6 +138,5 @@ export default class PlivoDialer extends React.Component {
         </p>
       </div>
     )
-*/
   }
 }
