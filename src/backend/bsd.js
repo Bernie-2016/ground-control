@@ -295,7 +295,7 @@ export default class BSD {
     if (/\d+$/.test(event_id))
       params['event_id'] = event_id
     else
-      params['event_id'] = event_id
+      params['event_id_obfuscated'] = event_id
     let host = this.baseURL.protocol + '//' + this.baseURL.host
     let URL = host + '/page/graph/addrsvp' + '?' + qs.stringify(params)
 
