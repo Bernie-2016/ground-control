@@ -315,7 +315,7 @@ const GraphQLUser = new GraphQLObjectType({
         }
         else {
           let callAssignment = await rootValue.loaders.bsdCallAssignments.load(localId)
-          let allOffsets = [-8, -7, -6, -5] // -4, -9, -10 should be in here, but makes the query super slow
+          let allOffsets = [-10, -9, -8, -7, -6, -5, -4]
           let validOffsets = []
           allOffsets.forEach((offset) => {
             let time = moment().utcOffset(offset)
@@ -324,6 +324,10 @@ const GraphQLUser = new GraphQLObjectType({
           })
           if (validOffsets.length === 0)
             return null
+          // See Issue #344
+          if (validOffsets.length === 1 && [-10, -9, -4].indexOf(validOffsets[0]) !== -1)
+            return null;
+
           let group = await rootValue.loaders.gcBsdGroups.load(callAssignment.gc_bsd_group_id)
 
           let previousCallsSubquery = knex('bsd_calls')
