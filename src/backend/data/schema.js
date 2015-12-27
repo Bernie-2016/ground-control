@@ -315,7 +315,7 @@ const GraphQLUser = new GraphQLObjectType({
         }
         else {
           let callAssignment = await rootValue.loaders.bsdCallAssignments.load(localId)
-          let allOffsets = [-10, -9, -8, -7, -6, -5, -4]
+          let allOffsets = [-8, -7, -6, -5] // -4, -9, -10 should be in here, but makes the query super slow
           let validOffsets = []
           allOffsets.forEach((offset) => {
             let time = moment().utcOffset(offset)
