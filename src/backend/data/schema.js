@@ -614,10 +614,9 @@ const GraphQLEvent = new GraphQLObjectType({
       }
     },
     startDate: {
-      type: GraphQLString,
+      type: GraphQLInt,
       resolve: (event) => {
-        // Client-side code assumes the time comi
-        return moment(event.start_dt).format('YYYY-MM-DD HH:mm:ss +0000')
+        return moment.tz(moment(event.start_dt).format('YYYY-MM-DD HH:mm:ss'), 'UTC').unix()
       }
     },
     duration: { type: GraphQLInt },

@@ -28,6 +28,12 @@ class BSDPhonebankRSVPSurvey extends React.Component {
     markers: []
   }
 
+  momentWithOffset(startDate, utcOffset) {
+    startDate = startDate * 1000
+    console.log(startDate, utcOffset)
+    return moment(startDate).utcOffset(utcOffset)
+  }
+
   handleMarkerClick(marker) {
     this.setState({clickedMarker: marker})
   }
@@ -75,7 +81,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
     let content = (
       <div>
         <p>Selected <strong>{event.name}</strong></p>
-        <p>on <strong>{moment(event.startDate).utcOffset(event.localUTCOffset).format('MMM D')}</strong>.</p>
+        <p>on <strong>{this.momentWithOffset(event.startDate, event.localUTCOffset).format('MMM D')}</strong>.</p>
       </div>
     )
     let sideBar = (
@@ -140,7 +146,8 @@ class BSDPhonebankRSVPSurvey extends React.Component {
             color: BernieColors.gray,
             fontSize: '1.0em'
           }}>
-            {moment(marker.startDate).utcOffset(marker.localUTCOffset).format('dddd, MMMM Do — h:mm A')}
+            {this.
+              momentWithOffset(marker.startDate, marker.localUTCOffset).format('dddd, MMMM Do — h:mm A')}
           </div>
           <div style={{
             ...BernieText.default,
@@ -213,7 +220,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
 
     this.props.interviewee.nearbyEvents.forEach((event) => {
       if(this.state.dateFilter != 'upcoming'){
-        if(!moment().add(this.state.dateFilter.split('_')[0], 'days').isSame(moment(event.startDate), 'day')){
+        if(!moment().add(this.state.dateFilter.split('_')[0], 'days').isSame(this.momentWithOffset(event.startDate, event.localUTCOffset), 'day')){
           return;
         }
       }
@@ -289,7 +296,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
 
       // make sure we have events to accommodate that day.
       this.props.interviewee.nearbyEvents.forEach((event) => {
-        if(moment(event.startDate).isSame(date, 'day')){
+        if(this.momentWithOffset(event.startDate, event.localUTCOffset).isSame(date, 'day')){
           options[dayCount + "_days"] = label + date.format(WEEKDAY_DATE_FORMAT)
         }
       })
