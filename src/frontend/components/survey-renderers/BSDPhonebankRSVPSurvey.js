@@ -304,7 +304,10 @@ class BSDPhonebankRSVPSurvey extends React.Component {
       <GCSelectField
         choices={ this.getDateChoices() }
         onChange={(value) => {
-          this.setState({dateFilter: value});
+          this.setState({
+            dateFilter: value,
+            clickedMarker: null
+          });
         }}
         clearable={false}
         value={this.state.dateFilter}
