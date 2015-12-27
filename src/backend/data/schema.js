@@ -343,7 +343,21 @@ const GraphQLUser = new GraphQLObjectType({
                 .where('reason_not_completed', 'NOT_INTERESTED')
             })
 
-          let query = knex('bsd_people')
+          let query = knex.select('bsd_people.cons_id')
+          if (group.cons_group_id)
+            query = query
+              .from('bsd_person_bsd_groups as bsd_people')
+              .where('bsd_people.cons_group_id', group.cons_group_id)
+
+          else if (group.query && group.query !== EVERYONE_GROUP)
+            query = query
+              .from('bsd_person_gc_bsd_groups as bsd_people')
+              .where('gc_bsd_group_id', group.id)
+          else
+            query = query
+              .from('bsd_people')
+
+          query = query
             .join('bsd_emails', 'bsd_people.cons_id', 'bsd_emails.cons_id')
             .join('bsd_phones', 'bsd_people.cons_id', 'bsd_phones.cons_id')
             .join('bsd_addresses', 'bsd_people.cons_id', 'bsd_addresses.cons_id')
@@ -360,16 +374,6 @@ const GraphQLUser = new GraphQLObjectType({
             .limit(1)
             .first()
 
-          if (group.cons_group_id)
-            query = query
-              .join('bsd_person_bsd_groups', 'bsd_person_bsd_groups.cons_id', 'bsd_people.cons_id')
-              .where('bsd_people.cons_group_id', group.cons_group_id)
-
-          else if (group.query && group.query !== EVERYONE_GROUP)
-            query = query
-              .join('bsd_person_gc_bsd_groups', 'bsd_person_gc_bsd_groups.cons_id', 'bsd_people.cons_id')
-              .where('gc_bsd_group_id', group.id)
-
           log.info(`Running query: ${query}`)
           let person = await query
           let timestamp = new Date()
@@ -382,7 +386,7 @@ const GraphQLUser = new GraphQLObjectType({
                 create_dt: timestamp,
                 modified_dt: timestamp
               })
-          return person
+          return rootValue.loaders.bsdPeople.load(person.cons_id)
         }
       }
     }
