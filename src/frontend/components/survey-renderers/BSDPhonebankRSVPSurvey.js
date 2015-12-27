@@ -30,7 +30,6 @@ class BSDPhonebankRSVPSurvey extends React.Component {
 
   momentWithOffset(startDate, utcOffset) {
     startDate = startDate * 1000
-    console.log(startDate, utcOffset)
     return moment(startDate).utcOffset(utcOffset)
   }
 

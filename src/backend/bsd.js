@@ -439,8 +439,10 @@ export default class BSD {
         body: {}
       }
     }
-    else
+    else {
+      log.debug('Making request: ', options)
       return requestPromise(options)
+    }
   }
 
   async makeRawRequest(callPath, params, method) {
