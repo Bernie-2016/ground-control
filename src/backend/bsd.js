@@ -20,9 +20,9 @@ export default class BSD {
     this.apiSecret = secret;
   }
 
-  noFailApiRequest(method, ...args) {
+  async noFailApiRequest(method, ...args) {
     try {
-      this[method](...args);
+      return await this[method](...args);
     } catch (e) {
       log.error(e);
       knex('bsd_audits').insert({
@@ -295,7 +295,7 @@ export default class BSD {
     if (/\d+$/.test(event_id))
       params['event_id'] = event_id
     else
-      params['event_id_obfuscated'] = event_id
+      params['event_id'] = event_id
     let host = this.baseURL.protocol + '//' + this.baseURL.host
     let URL = host + '/page/graph/addrsvp' + '?' + qs.stringify(params)
 
@@ -303,8 +303,11 @@ export default class BSD {
       uri: URL,
       method: 'GET',
       resolveWithFullResponse: true,
+      json: true
     }
-    let response = await requestWrapper(options)
+    let response = await this.requestWrapper(options)
+    if (response.error)
+      throw new Error(JSON.stringify(response.error))
     return response
   }
 
@@ -349,6 +352,7 @@ export default class BSD {
     if (response.validation_errors) {
       throw new Error(JSON.stringify(response.validation_errors));
     }
+    return response
   }
 
   async createEvents(cons_id, form, event_types, callback) {
