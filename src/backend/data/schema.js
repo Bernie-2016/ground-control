@@ -378,14 +378,15 @@ const GraphQLUser = new GraphQLObjectType({
             .first()
 
           let userAddress = await knex('bsd_emails')
-            .select('bsd_addresses.latitude', 'bsd_addresses.longitude')
+            .select('zip_codes.timezone_offset', 'bsd_addresses.latitude', 'bsd_addresses.longitude')
             .innerJoin('bsd_addresses', 'bsd_emails.cons_id', 'bsd_addresses.cons_id')
+            .innerJoin('zip_codes', 'zip_codes.zip', 'bsd_addresses.zip')
             .where('bsd_emails.email', user.email)
             .where('bsd_addresses.is_primary', true)
             .first()
 
           let latLng = null
-          if (userAddress && userAddress.latitude && userAddress.longitude)
+          if (userAddress && validOffsets.indexOf(userAddress.timezone_offset) !== -1 && userAddress.latitude && userAddress.longitude)
             query = query.orderByRaw(`"bsd_addresses"."geom" <-> st_transform(st_setsrid(st_makepoint(${userAddress.longitude}, ${userAddress.latitude}), 4326), 900913)`)
 
           log.info(`Running query: ${query}`)
