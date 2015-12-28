@@ -381,6 +381,7 @@ const GraphQLUser = new GraphQLObjectType({
             .select('bsd_addresses.latitude', 'bsd_addresses.longitude')
             .innerJoin('bsd_addresses', 'bsd_emails.cons_id', 'bsd_addresses.cons_id')
             .where('bsd_emails.email', user.email)
+            .where('bsd_addresses.is_primary', true)
             .first()
 
           let latLng = null
