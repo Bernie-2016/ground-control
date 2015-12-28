@@ -18,6 +18,11 @@ export default class PlivoDialer extends React.Component {
   registerCallbacks() {
     Plivo.onWebrtcNotSupported = () => {
       this.setState({useTelLinkFallback: true})
+      console.log('PlivoJS says WebRTC not supported by browser, using tel link instead')
+    }
+    Plivo.onFlashNotInstalled = () => {
+      this.setState({useTelLinkFallback: true})
+      console.log('PlivoJS says Flash not supported by browser, using tel link instead')
     }
     Plivo.onReady = () => {
       console.log('PlivoJS is ready to be used')
@@ -51,13 +56,15 @@ export default class PlivoDialer extends React.Component {
   }
 
   readyConnection() {
-    Plivo.init({debug: true});
-    Plivo.conn.login(this.props.endpointUsername, this.props.endpointPassword);
+    Plivo.init({debug: true,
+                fallback_to_flash: false})
+
+    Plivo.conn.login(this.props.endpointUsername, this.props.endpointPassword)
   }
 
   componentDidMount() {
-//    this.registerCallbacks()
-//    this.readyConnection()
+   this.registerCallbacks()
+   this.readyConnection()
   }
 
   callPhone(number) {
@@ -73,10 +80,7 @@ export default class PlivoDialer extends React.Component {
   }
 
   formatPhoneNumber(number) {
-    let formattedNumber = number
-    if (formattedNumber.length > 0 && formattedNumber[0] === '1')
-      formattedNumber = formattedNumber.slice(1)
-    return '(' + formattedNumber.slice(0, 3) + ') ' + formattedNumber.slice(3, 6) + '-' + formattedNumber.slice(6)
+    return '(' + number.slice(0, 3) + ') ' + number.slice(3, 6) + '-' + number.slice(6)
   }
 
   styles = {
@@ -119,12 +123,8 @@ export default class PlivoDialer extends React.Component {
     let backgroundColor = plivoCallInProgress ?
       BernieColors.red
       : BernieColors.green
-      return (
-        <span>
-          {formattedNumber}
-        </span>
-      )
-/*    return (
+
+    return (
       <div>
         <FloatingActionButton
           backgroundColor={backgroundColor}
@@ -142,6 +142,5 @@ export default class PlivoDialer extends React.Component {
         </p>
       </div>
     )
-*/
   }
 }
