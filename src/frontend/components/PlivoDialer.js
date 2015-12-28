@@ -80,7 +80,10 @@ export default class PlivoDialer extends React.Component {
   }
 
   formatPhoneNumber(number) {
-    return '(' + number.slice(0, 3) + ') ' + number.slice(3, 6) + '-' + number.slice(6)
+    let sliceStart = 0;
+    if (number.length === 11 && number[0] === '1')
+      sliceStart = 1
+    return '(' + number.slice(sliceStart, sliceStart + 3) + ') ' + number.slice(sliceStart + 3, sliceStart + 6) + '-' + number.slice(sliceStart + 6)
   }
 
   styles = {
