@@ -489,7 +489,9 @@ const GraphQLPerson = new GraphQLObjectType({
         let query = knex('bsd_events')
           .whereBetween('latitude', [address.latitude - boundingDistance, address.latitude + boundingDistance])
           .whereBetween('longitude', [address.longitude - boundingDistance, address.longitude + boundingDistance])
-          .andWhere('start_dt', '>', new Date())
+          .where('start_dt', '>', new Date())
+          .where('flag_approval', false)
+          .whereNot('is_searchable', 0)
 
         if (eventTypes)
           query = query.whereIn('event_type_id', [eventTypes])
