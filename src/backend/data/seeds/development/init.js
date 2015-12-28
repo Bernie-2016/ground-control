@@ -63,7 +63,7 @@ exports.seed = async function(knex, Promise) {
     'bsd_groups': [],
     'bsd_event_types' : [],
     'zip_codes' : [],
-    'sessions' : []
+    'sessions' : [],
   }
 
   let deletePromises = Object.keys(data).map((key) => {
@@ -212,7 +212,7 @@ exports.seed = async function(knex, Promise) {
     data.bsd_events.push({
       event_id: index,
       event_id_obfuscated: faker.internet.password(5),
-      flag_approval: true,
+      flag_approval: faker.random.boolean(),
       event_type_id: faker.random.arrayElement(data.bsd_event_types.map((type) => type.event_type_id)),
       creator_cons_id: faker.random.number({min: 1, max: NUM_PERSONS}),
       name: titlify(faker.lorem.sentence(3,5)),

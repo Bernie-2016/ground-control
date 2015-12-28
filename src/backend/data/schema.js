@@ -316,7 +316,7 @@ const GraphQLUser = new GraphQLObjectType({
         else {
           let callAssignment = await rootValue.loaders.bsdCallAssignments.load(localId)
           let allOffsets = [-10, -9, -8, -7, -6, -5, -4]
-          let validOffsets = []
+          let validOffsets = allOffsets
           allOffsets.forEach((offset) => {
             let time = moment().utcOffset(offset)
             if (time.hours() > 10 && time.hours() < 21)
@@ -525,20 +525,19 @@ const GraphQLPerson = new GraphQLObjectType({
         let boundingDistance = within / 69
         let eventTypes = null
         if (type) {
-          eventTypes = knex('bsd_event_types')
+          eventTypes = await knex('bsd_event_types')
             .where('name', 'ilike', `%${type}%`)
             .select('event_type_id')
         }
 
         let query = knex('bsd_events')
-          .whereBetween('latitude', [address.latitude - boundingDistance, address.latitude + boundingDistance])
-          .whereBetween('longitude', [address.longitude - boundingDistance, address.longitude + boundingDistance])
+          .whereRaw(`ST_DWithin(bsd_events.geom, st_transform(st_setsrid(st_makepoint(${address.longitude}, ${address.latitude}), 4326), 900913), ${within * 1000})`)
           .where('start_dt', '>', new Date())
           .where('flag_approval', false)
           .whereNot('is_searchable', 0)
 
         if (eventTypes)
-          query = query.whereIn('event_type_id', [eventTypes])
+          query = query.whereIn('event_type_id', eventTypes.map((type) => type.event_type_id))
 
         let events = await query;
         return events
