@@ -362,14 +362,14 @@ const GraphQLUser = new GraphQLObjectType({
               .whereIn('timezone_offset', validOffsets)
               .orderByRaw('random()')
               .limit(1)
+              .first()
             if (!randomZip)
                 return null;
             latLng = {
-              longitude: nearestZip.longitude,
-              latitude: nearestZip.latitude
+              longitude: randomZip.longitude,
+              latitude: randomZip.latitude
             }
           }
-          console.log(callAssignment, latLng)
 
           let group = await rootValue.loaders.gcBsdGroups.load(callAssignment.gc_bsd_group_id)
 
@@ -411,7 +411,7 @@ const GraphQLUser = new GraphQLObjectType({
             .join('bsd_emails', 'bsd_people.cons_id', 'bsd_emails.cons_id')
             .join('bsd_phones', 'bsd_people.cons_id', 'bsd_phones.cons_id')
             .join('bsd_addresses', 'bsd_people.cons_id', 'bsd_addresses.cons_id')
-            // Doing this instead of a left outer join because a left outer join seems to make the whole thing run really slow if I add any sort of sorting at the end of this query.
+            // Doing these subqueries instead of a left outer join because a left outer join seems to make the whole thing run really slow if I add any sort of sorting at the end of this query.
             .whereNotIn('bsd_people.cons_id', previousCallsSubquery)
             .whereNotIn('bsd_people.cons_id', assignedCallsSubquery)
             .whereNotIn('bsd_addresses.state_cd', ['IA', 'NH', 'NV', 'SC'])
