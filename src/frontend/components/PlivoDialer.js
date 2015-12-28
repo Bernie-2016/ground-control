@@ -26,6 +26,7 @@ export default class PlivoDialer extends React.Component {
     }
     Plivo.onReady = () => {
       console.log('PlivoJS is ready to be used')
+      Plivo.conn.login(this.props.endpointUsername, this.props.endpointPassword)
     }
     Plivo.onMediaPermission = () => {
       console.log('PlivoJS found media access permissions have been granted')
@@ -55,17 +56,10 @@ export default class PlivoDialer extends React.Component {
     }
   }
 
-  readyConnection() {
+  componentDidMount() {
+    this.registerCallbacks()
     Plivo.init({debug: true,
                 fallback_to_flash: false})
-
-    Plivo.conn.login(this.props.endpointUsername, this.props.endpointPassword)
-  }
-
-  componentDidMount() {
-    this.setState({useTelLinkFallback: true})
-//   this.registerCallbacks()
-//   this.readyConnection()
   }
 
   callPhone(number) {
