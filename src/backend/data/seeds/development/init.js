@@ -262,5 +262,12 @@ exports.seed = async function(knex, Promise) {
     await importData(knex, key, data[key])
   }
 
+  log.info("Building geometry data on bsd_events...")
+  await knex.raw("UPDATE bsd_events set geom = ST_Transform(ST_GeomFromText('POINT(' || longitude || ' ' || latitude || ')',4326), 900913)")
+
+  log.info("Building geometry data on bsd_addresses...")
+
+    await knex.raw("UPDATE bsd_addresses set geom = ST_Transform(ST_GeomFromText('POINT(' || longitude || ' ' || latitude || ')',4326), 900913)")
+
   log.info('Done!')
 };
