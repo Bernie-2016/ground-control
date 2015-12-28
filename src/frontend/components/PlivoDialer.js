@@ -17,10 +17,12 @@ export default class PlivoDialer extends React.Component {
 
   registerCallbacks() {
     Plivo.onWebrtcNotSupported = () => {
-      console.log('PlivoJS says WebRTC not supported by browser')
+      this.setState({useTelLinkFallback: true})
+      console.log('PlivoJS says WebRTC not supported by browser, using tel link instead')
     }
     Plivo.onFlashNotInstalled = () => {
       this.setState({useTelLinkFallback: true})
+      console.log('PlivoJS says Flash not supported by browser, using tel link instead')
     }
     Plivo.onReady = () => {
       console.log('PlivoJS is ready to be used')
@@ -54,8 +56,10 @@ export default class PlivoDialer extends React.Component {
   }
 
   readyConnection() {
-    Plivo.init({debug: true});
-    Plivo.conn.login(this.props.endpointUsername, this.props.endpointPassword);
+    Plivo.init({debug: true,
+                fallback_to_flash: false})
+
+    Plivo.conn.login(this.props.endpointUsername, this.props.endpointPassword)
   }
 
   componentDidMount() {
