@@ -1,6 +1,6 @@
 
 exports.up = function(knex, Promise) {
-  if (process.env.NODE_env === 'production')
+  if (process.env.NODE_ENV === 'production')
     return null;
 
   let promises = [
