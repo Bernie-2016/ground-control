@@ -63,13 +63,14 @@ export default class PlivoDialer extends React.Component {
   }
 
   componentDidMount() {
-   this.registerCallbacks()
-   this.readyConnection()
+    this.setState({useTelLinkFallback: true})
+//   this.registerCallbacks()
+//   this.readyConnection()
   }
 
   callPhone(number) {
     if (this.state.useTelLinkFallback) {
-      window.location = `tel:+1${number}`
+      window.open(`tel:+1${number}`)
     } else {
       Plivo.conn.call(number)
     }
