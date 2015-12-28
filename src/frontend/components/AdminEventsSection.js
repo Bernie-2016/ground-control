@@ -31,6 +31,11 @@ const KeyboardActionsInfo = () => (
   </div>
 );
 
+const momentWithOffset = (startDate, utcOffset) => {
+  startDate = startDate * 1000
+  return moment(startDate).utcOffset(utcOffset)
+};
+
 class AdminEventsSection extends React.Component {
   constructor(props) {
     super(props);
@@ -161,7 +166,7 @@ class AdminEventsSection extends React.Component {
       lineHeight: '18px',
     }}
     >
-      {moment(data[rowIndex]['node']['startDate']).utcOffset(data[rowIndex]['node']['localUTCOffset']).format('l LT')}<br/>
+      {momentWithOffset(data[rowIndex]['node']['startDate'], data[rowIndex]['node']['localUTCOffset']).format('l LT')}<br/>
       {data[rowIndex]['node']['localTimezone']}
     </Cell>
   )
@@ -777,7 +782,6 @@ class AdminEventsSection extends React.Component {
     if (indexesToRemove && currentSelectedRows.length != indexesToRemove.length){
       indexesToRemove.forEach((eventIndex) => {
         let i = currentSelectedRows.indexOf(eventIndex);
-        console.log(i, currentSelectedRows, indexesToRemove);
         if (i > -1){
           currentSelectedRows.splice(i, 1);
         }

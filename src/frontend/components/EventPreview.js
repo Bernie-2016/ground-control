@@ -9,6 +9,11 @@ import {BernieText, BernieColors} from './styles/bernie-css';
 import GCSelectField from './forms/GCSelectField'
 import InfoHeader from './InfoHeader'
 
+const momentWithOffset = (startDate, utcOffset) => {
+  startDate = startDate * 1000
+  return moment(startDate).utcOffset(utcOffset)
+};
+
 export default class EventPreview extends React.Component {
   constructor(props) {
     super(props);
@@ -74,7 +79,7 @@ export default class EventPreview extends React.Component {
           <p>{event.description}</p>
 
           <InfoHeader content='Event Date & Time' />
-          <p>{moment(event.startDate).utcOffset(event.localUTCOffset).format('LLLL')} <span style={{color: BernieColors.gray}}>{event.localTimezone} time</span></p>
+          <p>{momentWithOffset(event.startDate, event.localUTCOffset).format('LLLL')} <span style={{color: BernieColors.gray}}>{event.localTimezone} time</span></p>
           <p>Duration: {Math.floor(event.duration / 60)} hours {event.duration % 60} minutes</p>
 
           <InfoHeader content='Event Location' />

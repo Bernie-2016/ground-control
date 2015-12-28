@@ -9,6 +9,11 @@ import {Card, CardActions, CardExpandable, CardTitle, CardHeader, CardText, Flat
 import InfoHeader from './InfoHeader'
 import {USTimeZones} from './data/USTimeZones';
 
+const momentWithOffset = (startDate, utcOffset) => {
+  startDate = startDate * 1000
+  return moment(startDate).utcOffset(utcOffset)
+};
+
 class EventEdit extends React.Component {
   eventTypes() {
     let allTypes = {}
@@ -66,7 +71,7 @@ class EventEdit extends React.Component {
         .nullable(),
 
       startDate: yup.date()
-        .default(moment(event.startDate).toDate())
+        .default(momentWithOffset(event.startDate, event.localUTCOffset).toDate())
         .required(),
 
       localTimezone: yup.string()
