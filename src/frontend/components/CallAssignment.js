@@ -10,6 +10,7 @@ import yup from 'yup'
 import GCForm from './forms/GCForm';
 import Form from 'react-formal';
 import SubmitCallSurvey from '../mutations/SubmitCallSurvey'
+import CallStatsBar from './CallStatsBar'
 
 class CallAssignment extends React.Component {
   styles = {
@@ -297,42 +298,45 @@ class CallAssignment extends React.Component {
         </div>
       )
     return (
-      <div style={this.styles.container}>
-        {this.renderInstructions()}
-        <Paper
-          style={this.styles.assignmentBar}
-        >
-          <span>{this.renderIntervieweeInfo()}</span>
-        </Paper>
-        <div style={this.styles.questions}>
-          <GCForm
-            schema={this.formSchema}
-            globalError={this.state.globalErrorMessage}
-            onSubmit={() => this.submitHandler()}
-            value={this.state}
-            onChange={(formValue) => {
-              this.setState(formValue)
-            }}
+      <div>
+        <CallStatsBar callsMade={this.props.currentUser.allCallsMade} callsCompleted={this.props.currentUser.completedCallsMade} />
+        <div style={this.styles.container}>
+          {this.renderInstructions()}
+          <Paper
+            style={this.styles.assignmentBar}
           >
-            <div style={this.styles.callAssignmentQuestions}>
-              <Form.Field
-                name='completed'
-                label='Were you able to complete the call?'
-                labelStyle={{
-                  ...BernieText.secondaryTitle,
-                  fontWeight: 600,
-                  color: BernieColors.blue,
-                  fontSize: '1.2em',
-                  letterSpacing: '0em'
-                }}
-              />
-              {notCompletedQuestions}
-            </div>
-            {survey}
-            <div style={this.styles.submitButton}>
-              <Form.Button type='submit' label='Submit and on to the next person!' fullWidth={true} style={this.styles.submitButton}/>
-            </div>
-          </GCForm>
+            <span>{this.renderIntervieweeInfo()}</span>
+          </Paper>
+          <div style={this.styles.questions}>
+            <GCForm
+              schema={this.formSchema}
+              globalError={this.state.globalErrorMessage}
+              onSubmit={() => this.submitHandler()}
+              value={this.state}
+              onChange={(formValue) => {
+                this.setState(formValue)
+              }}
+            >
+              <div style={this.styles.callAssignmentQuestions}>
+                <Form.Field
+                  name='completed'
+                  label='Were you able to complete the call?'
+                  labelStyle={{
+                    ...BernieText.secondaryTitle,
+                    fontWeight: 600,
+                    color: BernieColors.blue,
+                    fontSize: '1.2em',
+                    letterSpacing: '0em'
+                  }}
+                />
+                {notCompletedQuestions}
+              </div>
+              {survey}
+              <div style={this.styles.submitButton}>
+                <Form.Button type='submit' label='Submit and on to the next person!' fullWidth={true} style={this.styles.submitButton}/>
+              </div>
+            </GCForm>
+          </div>
         </div>
       </div>
     );
@@ -355,6 +359,8 @@ export default Relay.createContainer(CallAssignment, {
     currentUser: () => Relay.QL`
       fragment on User {
         id
+        allCallsMade:callsMade(forAssignmentId:$id)
+        completedCallsMade:callsMade(forAssignmentId:$id,completed:true)
         intervieweeForCallAssignment(callAssignmentId:$id) {
           id
           prefix

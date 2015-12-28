@@ -2,17 +2,19 @@ import React from 'react';
 import Relay from 'react-relay';
 import {BernieText, BernieColors} from './styles/bernie-css'
 import Radium from 'radium'
+import {Paper} from 'material-ui';
 import SideBarLayout from './SideBarLayout';
 import CallAssignmentList from './CallAssignmentList';
 import CallAssignment from './CallAssignment';
 import Signup from './Signup';
+import CallStatsBar from './CallStatsBar';
 
 class CallAssignmentsSection extends React.Component {
   styles = {
     container: {
-      paddingLeft: 40,
-      paddingTop: 40,
-      paddingRight: 40,
+      paddingLeft: 0,
+      paddingTop: 0,
+      paddingRight: 0,
       paddingBottom: 40,
     },
     paragraph: {
@@ -21,6 +23,13 @@ class CallAssignmentsSection extends React.Component {
       paddingLeft: '0.5em',
       paddingRight: '0.5em',
     },
+  }
+
+  renderStats() {
+    return <CallStatsBar
+      callsMade={this.props.currentUser.allCallsMade}
+      callsCompleted={this.props.currentUser.completedCallsMade}
+    />
   }
 
   render() {
@@ -38,25 +47,30 @@ class CallAssignmentsSection extends React.Component {
 
     let content = (
       <div>
-        <div style={BernieText.title}>
-          Let them hear you loud and clear
-        </div>
-        <div style={BernieText.default}>
-          <p style={this.styles.paragraph}>
-            On the left, you'll find a list of calling assignments that you can start with right away.  Just click one, call the number that gets shown to you, and fill out the survey.
-          </p>
-          <p style={this.styles.paragraph}>
-            Remember that everyone you are calling are people who have signed up to help. Feel free to let them know you are a fellow volunteer -- it helps! And please be sure to follow our guidelines:
-          </p>
-          <ol>
-            <li>Treat everyone with respect and kindness.</li>
-            <li>Do not make any statements implying that you are speaking officially on behalf of the campaign.</li>
-            <li>Do not give legal advice or advice on fundraising or FEC regulations.</li>
-            <li>Do not speak disparagingly about other candidates, groups or volunteers during the course of these calls.</li>
-          </ol>
-          <p style={this.styles.paragraph}>
-            Thank you and have fun!
-          </p>
+        {this.renderStats()}
+        <div style={{
+          padding: '40px 40px 40px 40px'
+        }}>
+          <div style={BernieText.title}>
+            Let them hear you loud and clear
+          </div>
+          <div style={BernieText.default}>
+            <p style={this.styles.paragraph}>
+              On the left, you'll find a list of calling assignments that you can start with right away.  Just click one, call the number that gets shown to you, and fill out the survey.
+            </p>
+            <p style={this.styles.paragraph}>
+              Remember that everyone you are calling are people who have signed up to help. Feel free to let them know you are a fellow volunteer -- it helps! And please be sure to follow our guidelines:
+            </p>
+            <ol>
+              <li>Treat everyone with respect and kindness.</li>
+              <li>Do not make any statements implying that you are speaking officially on behalf of the campaign.</li>
+              <li>Do not give legal advice or advice on fundraising or FEC regulations.</li>
+              <li>Do not speak disparagingly about other candidates, groups or volunteers during the course of these calls.</li>
+            </ol>
+            <p style={this.styles.paragraph}>
+              Thank you and have fun!
+            </p>
+          </div>
         </div>
       </div>
     )
@@ -77,6 +91,8 @@ export default Relay.createContainer(CallAssignmentsSection, {
   fragments: {
     currentUser: () => Relay.QL`
       fragment on User {
+        allCallsMade:callsMade
+        completedCallsMade:callsMade(completed:true)
         callAssignments(first:50) {
           ${CallAssignmentList.getFragment('callAssignments')}
         }

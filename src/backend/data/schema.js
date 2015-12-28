@@ -280,22 +280,20 @@ const GraphQLUser = new GraphQLObjectType({
     callsMade: {
       type: GraphQLInt,
       args: {
-        forAssignmentId: { type: GraphQLString }
+        forAssignmentId: { type: GraphQLString },
+        completed: { type: GraphQLBoolean }
       },
-      resolve: async (user, {forAssignmentId}) => {
+      resolve: async (user, {forAssignmentId, completed}) => {
+        let query = knex('bsd_calls')
+          .where('caller_id', user.id)
         if (forAssignmentId) {
-          let localId = fromGlobalId(forAssignmentId)
-          return knex.count(knex('bsd_calls').where({
-            caller_id: user.id,
-            call_assignment_id: localId
-          }), 'id')
+          let localId = fromGlobalId(forAssignmentId).id
+          query = query.where('call_assignment_id', localId)
+        }
 
-        }
-        else {
-          return knex.count(knex('bsd_calls').where({
-            caller_id: user.id
-          }), 'id');
-        }
+        if (typeof completed !== 'undefined')
+          query = query.where('completed', completed)
+        return knex.count(query, 'id');
       }
     },
     intervieweeForCallAssignment: {
