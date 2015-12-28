@@ -219,28 +219,30 @@ class CallAssignment extends React.Component {
   }
 
   renderInstructions() {
-    if (!this.state.showInstructions)
+    if (this.state.showInstructions && this.props.callAssignment.instructions) {
+      return (
+        <Paper
+            zDepth={0}
+            style={this.styles.instructions}
+          >
+          <div>
+            {this.props.callAssignment.instructions}
+          </div>
+          <RaisedButton
+            style={{
+              marginTop: 10
+            }}
+            label="Ok, I got it!"
+            secondary={true}
+            onTouchTap={(event) => {
+              this.setState({showInstructions: false})
+            }}
+          />
+        </Paper>
+      )
+    } else {
       return <div></div>
-    return (
-      <Paper
-          zDepth={0}
-          style={this.styles.instructions}
-        >
-        <div>
-          {this.props.callAssignment.instructions}
-        </div>
-        <RaisedButton
-          style={{
-            marginTop: 10
-          }}
-          label="Ok, I got it!"
-          secondary={true}
-          onTouchTap={(event) => {
-            this.setState({showInstructions: false})
-          }}
-        />
-      </Paper>
-    )
+    }
   }
 
   render() {
