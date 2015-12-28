@@ -361,6 +361,14 @@ const GraphQLUser = new GraphQLObjectType({
           let assignedCallsSubquery = knex('bsd_assigned_calls')
             .select('interviewee_id')
 
+          let userAddress = await knex('bsd_emails')
+            .select('bsd_emails.cons_id', 'zip_codes.timezone_offset', 'bsd_addresses.latitude', 'bsd_addresses.longitude')
+            .innerJoin('bsd_addresses', 'bsd_emails.cons_id', 'bsd_addresses.cons_id')
+            .innerJoin('zip_codes', 'zip_codes.zip', 'bsd_addresses.zip')
+            .where('bsd_emails.email', user.email)
+            .where('bsd_addresses.is_primary', true)
+            .first()
+
           query = query
             .join('bsd_emails', 'bsd_people.cons_id', 'bsd_emails.cons_id')
             .join('bsd_phones', 'bsd_people.cons_id', 'bsd_phones.cons_id')
@@ -377,15 +385,11 @@ const GraphQLUser = new GraphQLObjectType({
             .limit(1)
             .first()
 
-          let userAddress = await knex('bsd_emails')
-            .select('zip_codes.timezone_offset', 'bsd_addresses.latitude', 'bsd_addresses.longitude')
-            .innerJoin('bsd_addresses', 'bsd_emails.cons_id', 'bsd_addresses.cons_id')
-            .innerJoin('zip_codes', 'zip_codes.zip', 'bsd_addresses.zip')
-            .where('bsd_emails.email', user.email)
-            .where('bsd_addresses.is_primary', true)
-            .first()
-
           let latLng = null
+          if (userAddress)
+            query = query.whereNot('bsd_people.cons_id', userAddress.cons_id)
+
+          // Only use geo sorting when the caller is in a timezone that is valid.  Otherwise it's super slow
           if (userAddress && validOffsets.indexOf(userAddress.timezone_offset) !== -1 && userAddress.latitude && userAddress.longitude)
             query = query.orderByRaw(`"bsd_addresses"."geom" <-> st_transform(st_setsrid(st_makepoint(${userAddress.longitude}, ${userAddress.latitude}), 4326), 900913)`)
 
