@@ -62,7 +62,8 @@ exports.seed = async function(knex, Promise) {
     'bsd_phones': [],
     'bsd_groups': [],
     'bsd_event_types' : [],
-    'zip_codes' : []
+    'zip_codes' : [],
+    'sessions' : []
   }
 
   let deletePromises = Object.keys(data).map((key) => {
@@ -135,7 +136,7 @@ exports.seed = async function(knex, Promise) {
       cons_email_id: index,
       cons_id: index,
       is_primary: faker.random.boolean(),
-      email: faker.internet.email().toLowerCase(),
+      email: index === 5 ? 'admin@localhost.com' : faker.internet.email().toLowerCase(),
       ...timestamps
     })
     data.bsd_phones.push({

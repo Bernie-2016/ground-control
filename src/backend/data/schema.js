@@ -324,14 +324,57 @@ const GraphQLUser = new GraphQLObjectType({
           })
           if (validOffsets.length === 0)
             return null
-          // See Issue #344
-          if (validOffsets.length === 1 && [-10, -9, -4].indexOf(validOffsets[0]) !== -1)
-            return null;
+
+          let userAddress = await knex('bsd_emails')
+            .select('zip_codes.timezone_offset', 'bsd_addresses.latitude', 'bsd_addresses.longitude')
+            .innerJoin('bsd_addresses', 'bsd_emails.cons_id', 'bsd_addresses.cons_id')
+            .innerJoin('zip_codes', 'bsd_addresses.zip', 'zip_codes.zip')
+            .where('bsd_emails.email', user.email)
+            .first()
+
+          // First pick the zip code closest to the current user that is in a valid timezone.  This turns out to be an order of magnitude faster than joining on the zip codes table in the big query or even denormalizing the bsd_addresses table to include timezone offsets
+          let latLng = null
+          if (userAddress && userAddress.latitude && userAddress.longitude) {
+            if (validOffsets.indexOf(userAddress.timezone_offset) !== -1)
+              latLng = {
+                longitude: userAddress.longitude,
+                latitude: userAddress.latitude
+              }
+            else {
+              let nearestZip = await knex('zip_codes')
+                .select('latitude', 'longitude')
+                .whereIn('timezone_offset', validOffsets)
+                .orderByRaw(`zip_codes.geom <-> st_transform(st_setsrid(st_makepoint(${userAddress.longitude}, ${userAddress.latitude}), 4326), 900913)`)
+                .limit(1)
+                .first()
+              if (!nearestZip)
+                return null;
+              latLng = {
+                longitude: nearestZip.longitude,
+                latitude: nearestZip.latitude
+              }
+            }
+          }
+          // No user address, so just pick a random zip code among the valid timezones
+          else {
+            let randomZip = await knex('zip_codes')
+              .select('latitude', 'longitude')
+              .whereIn('timezone_offset', validOffsets)
+              .orderByRaw('random()')
+              .limit(1)
+            if (!randomZip)
+                return null;
+            latLng = {
+              longitude: nearestZip.longitude,
+              latitude: nearestZip.latitude
+            }
+          }
+          console.log(callAssignment, latLng)
 
           let group = await rootValue.loaders.gcBsdGroups.load(callAssignment.gc_bsd_group_id)
 
           let previousCallsSubquery = knex('bsd_calls')
-            .select('id', 'interviewee_id', 'attempted_at')
+            .select('interviewee_id')
             .where(function() {
               this.where('call_assignment_id', localId)
                 .where('completed', true)
@@ -361,20 +404,21 @@ const GraphQLUser = new GraphQLObjectType({
             query = query
               .from('bsd_people')
 
+          let assignedCallsSubquery = knex('bsd_assigned_calls')
+            .select('interviewee_id')
+
           query = query
             .join('bsd_emails', 'bsd_people.cons_id', 'bsd_emails.cons_id')
             .join('bsd_phones', 'bsd_people.cons_id', 'bsd_phones.cons_id')
             .join('bsd_addresses', 'bsd_people.cons_id', 'bsd_addresses.cons_id')
-            .join('zip_codes', 'zip_codes.zip', 'bsd_addresses.zip')
-            .leftOuterJoin('bsd_assigned_calls', 'bsd_people.cons_id', 'bsd_assigned_calls.interviewee_id')
-            .leftOuterJoin(previousCallsSubquery.as('calls'), 'bsd_people.cons_id', 'calls.interviewee_id')
+            // Doing this instead of a left outer join because a left outer join seems to make the whole thing run really slow if I add any sort of sorting at the end of this query.
+            .whereNotIn('bsd_people.cons_id', previousCallsSubquery)
+            .whereNotIn('bsd_people.cons_id', assignedCallsSubquery)
             .whereNotIn('bsd_addresses.state_cd', ['IA', 'NH', 'NV', 'SC'])
-            .whereIn('zip_codes.timezone_offset', validOffsets)
             .where('bsd_addresses.is_primary', true)
             .where('bsd_phones.is_primary', true)
             .where('bsd_emails.is_primary', true)
-            .where('bsd_assigned_calls.id', null)
-            .where('calls.id', null)
+            .orderByRaw(`"bsd_addresses"."geom" <-> st_transform(st_setsrid(st_makepoint(${latLng.longitude}, ${latLng.latitude}), 4326), 900913)`)
             .limit(1)
             .first()
 
