@@ -141,8 +141,6 @@ class CallAssignment extends React.Component {
   renderIntervieweeInfo() {
     let interviewee = this.props.currentUser.intervieweeForCallAssignment
     let name = this.intervieweeName()
-    let plivoStatusText = this.state.plivoStatusText;
-    let plivoCallInProgress = this.state.plivoCallInProgress;
 
     let sideBar = (
       <div>
