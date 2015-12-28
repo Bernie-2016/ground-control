@@ -24,8 +24,8 @@ export default class BSD {
     try {
       return await this[method](...args);
     } catch (e) {
-      log.error(e);
-      knex('bsd_audits').insert({
+      log.error(e.message, e.stack);
+      await knex('bsd_audits').insert({
         class: 'BSDClient',
         method: method,
         params: String(args),
@@ -285,10 +285,11 @@ export default class BSD {
     return response
   }
 
-  async addRSVPToEvent(email, zip, event_id) {
+  async addRSVPToEvent(email, zip, phone, event_id) {
     let params = {
       'email' : email,
       'zip' : zip,
+      'phone': phone,
       'will_attend' : 1,
       'guests': 0
     }
@@ -306,7 +307,8 @@ export default class BSD {
       json: true
     }
     let response = await this.requestWrapper(options)
-    if (response.error)
+
+    if (response.body && response.body.error)
       throw new Error(JSON.stringify(response.error))
     return response
   }

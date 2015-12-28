@@ -889,9 +889,10 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
           let person = fieldValues['person']
           let email = await getPrimaryEmail(person, trx)
           let address = await getPrimaryAddress(person, trx)
+          let phone = await getPrimaryPhone(person, trx)
 
           let zip = address.zip
-          await BSDClient.noFailApiRequest('addRSVPToEvent', email, zip, fieldValues['event_id'])
+          await BSDClient.noFailApiRequest('addRSVPToEvent', email, zip, phone, fieldValues['event_id'])
         }
       }
 
