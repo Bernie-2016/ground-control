@@ -1,5 +1,12 @@
 var SchemaPlugin = require('./schemaPlugin')
+var webpack = require('webpack')
 
+var plugins = [
+  new SchemaPlugin(),
+]
+
+if (process.env.NODE_ENV === 'production')
+  plugins.push(new webpack.optimize.UglifyJsPlugin({minimize: true}))
 module.exports = {
   entry: './src/frontend/app.js',
   module: {
@@ -14,9 +21,9 @@ module.exports = {
       }
     ]
   },
-  plugins: [
-    new SchemaPlugin()
-  ],
-  output: {filename: 'app.js', path: './src/frontend/public/js/'},
+  plugins: plugins,
+  output: {
+    filename: 'app.js',
+    path: './src/frontend/public/js/'},
   devtool: "#inline-source-map"
 }
