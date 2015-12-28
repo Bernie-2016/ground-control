@@ -59,8 +59,8 @@ export default class PlivoDialer extends React.Component {
   }
 
   componentDidMount() {
-    this.registerCallbacks()
-    this.readyConnection()
+//    this.registerCallbacks()
+//    this.readyConnection()
   }
 
   callPhone(number) {

@@ -20,12 +20,12 @@ export default class BSD {
     this.apiSecret = secret;
   }
 
-  noFailApiRequest(method, ...args) {
+  async noFailApiRequest(method, ...args) {
     try {
-      this[method](...args);
+      return await this[method](...args);
     } catch (e) {
-      log.error(e);
-      knex('bsd_audits').insert({
+      log.error(e.message, e.stack);
+      await knex('bsd_audits').insert({
         class: 'BSDClient',
         method: method,
         params: String(args),
@@ -285,10 +285,11 @@ export default class BSD {
     return response
   }
 
-  async addRSVPToEvent(email, zip, event_id) {
+  async addRSVPToEvent(email, zip, phone, event_id) {
     let params = {
       'email' : email,
       'zip' : zip,
+      'phone': phone,
       'will_attend' : 1,
       'guests': 0
     }
@@ -303,8 +304,12 @@ export default class BSD {
       uri: URL,
       method: 'GET',
       resolveWithFullResponse: true,
+      json: true
     }
-    let response = await requestWrapper(options)
+    let response = await this.requestWrapper(options)
+
+    if (response.body && response.body.error)
+      throw new Error(JSON.stringify(response.error))
     return response
   }
 
@@ -349,6 +354,7 @@ export default class BSD {
     if (response.validation_errors) {
       throw new Error(JSON.stringify(response.validation_errors));
     }
+    return response
   }
 
   async createEvents(cons_id, form, event_types, callback) {
@@ -435,8 +441,10 @@ export default class BSD {
         body: {}
       }
     }
-    else
+    else {
+      log.debug('Making request: ', options)
       return requestPromise(options)
+    }
   }
 
   async makeRawRequest(callPath, params, method) {

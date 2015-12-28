@@ -173,6 +173,8 @@ async function addType(query) {
 let {nodeInterface, nodeField} = nodeDefinitions(
   (globalId) => {
     let {type, id} = fromGlobalId(globalId)
+    if (type === 'Call')
+      return addType(knex('bsd_calls').where('id', id))
     if (type === 'Person')
       return addType(knex('bsd_people').where('cons_id', id))
     if (type === 'CallAssignment')
@@ -317,33 +319,16 @@ const GraphQLUser = new GraphQLObjectType({
           let validOffsets = []
           allOffsets.forEach((offset) => {
             let time = moment().utcOffset(offset)
-            if (time.hours() > 9 && time.hours() < 21)
+            if (time.hours() > 10 && time.hours() < 21)
               validOffsets.push(offset)
           })
           if (validOffsets.length === 0)
             return null
+
           let group = await rootValue.loaders.gcBsdGroups.load(callAssignment.gc_bsd_group_id)
-          let filterQuery = null
-
-          if (group.cons_group_id)
-            filterQuery = knex('bsd_person_bsd_groups')
-              .select('cons_id')
-              .where('cons_group_id', group.cons_group_id)
-
-          else if (group.query && group.query !== EVERYONE_GROUP)
-            filterQuery = knex('bsd_person_gc_bsd_groups')
-              .select('cons_id')
-              .where('gc_bsd_group_id', group.id)
-
-          let addressesSubquery = knex('bsd_addresses')
-            .select('id', 'cons_id')
-            .join('zip_codes', 'zip_codes.zip', 'bsd_addresses.zip')
-            .where('is_primary', true)
-            .whereNotIn('state_cd', ['IA', 'NH', 'NV', 'SC'])
-            .whereIn('timezone_offset', validOffsets)
 
           let previousCallsSubquery = knex('bsd_calls')
-            .select('id', 'interviewee_id', 'attempted_at')
+            .select('interviewee_id')
             .where(function() {
               this.where('call_assignment_id', localId)
                 .where('completed', true)
@@ -359,21 +344,55 @@ const GraphQLUser = new GraphQLObjectType({
                 .where('reason_not_completed', 'NOT_INTERESTED')
             })
 
-          let query = knex('bsd_people')
+          let query = knex.select('bsd_people.cons_id')
+          if (group.cons_group_id)
+            query = query
+              .from('bsd_person_bsd_groups as bsd_people')
+              .where('bsd_people.cons_group_id', group.cons_group_id)
+
+          else if (group.query && group.query !== EVERYONE_GROUP)
+            query = query
+              .from('bsd_person_gc_bsd_groups as bsd_people')
+              .where('gc_bsd_group_id', group.id)
+          else
+            query = query
+              .from('bsd_people')
+
+          let assignedCallsSubquery = knex('bsd_assigned_calls')
+            .select('interviewee_id')
+
+          let userAddress = await knex('bsd_emails')
+            .select('bsd_emails.cons_id', 'zip_codes.timezone_offset', 'bsd_addresses.latitude', 'bsd_addresses.longitude')
+            .innerJoin('bsd_addresses', 'bsd_emails.cons_id', 'bsd_addresses.cons_id')
+            .innerJoin('zip_codes', 'zip_codes.zip', 'bsd_addresses.zip')
+            .where('bsd_emails.email', user.email)
+            .where('bsd_addresses.is_primary', true)
+            .first()
+
+          query = query
             .join('bsd_emails', 'bsd_people.cons_id', 'bsd_emails.cons_id')
             .join('bsd_phones', 'bsd_people.cons_id', 'bsd_phones.cons_id')
-            .join(addressesSubquery.as('addresses'), 'addresses.cons_id', 'bsd_people.cons_id')
-            .leftOuterJoin('bsd_assigned_calls', 'bsd_people.cons_id', 'bsd_assigned_calls.interviewee_id')
-            .leftOuterJoin(previousCallsSubquery.as('calls'), 'bsd_people.cons_id', 'calls.interviewee_id')
+            .join('bsd_addresses', 'bsd_people.cons_id', 'bsd_addresses.cons_id')
+            .join('zip_codes', 'zip_codes.zip', 'bsd_addresses.zip')
+            // Doing these subqueries instead of a left outer join because a left outer join seems to make the whole thing run really slow if I add any sort of sorting at the end of this query.
+            .whereNotIn('bsd_people.cons_id', previousCallsSubquery)
+            .whereNotIn('bsd_people.cons_id', assignedCallsSubquery)
+            .whereNotIn('bsd_addresses.state_cd', ['IA', 'NH', 'NV', 'SC'])
+            .whereIn('zip_codes.timezone_offset', validOffsets)
+            .where('bsd_addresses.is_primary', true)
             .where('bsd_phones.is_primary', true)
             .where('bsd_emails.is_primary', true)
-            .where('bsd_assigned_calls.id', null)
-            .where('calls.id', null)
             .limit(1)
             .first()
 
-          if (filterQuery)
-            query = query.join(filterQuery.as('groups'), 'groups.cons_id', 'bsd_people.cons_id')
+          let latLng = null
+          if (userAddress)
+            query = query.whereNot('bsd_people.cons_id', userAddress.cons_id)
+
+          // Only use geo sorting when the caller is in a timezone that is valid.  Otherwise it's super slow
+          if (userAddress && validOffsets.indexOf(userAddress.timezone_offset) !== -1 && userAddress.latitude && userAddress.longitude)
+            query = query.orderByRaw(`"bsd_addresses"."geom" <-> st_transform(st_setsrid(st_makepoint(${userAddress.longitude}, ${userAddress.latitude}), 4326), 900913)`)
+
           log.info(`Running query: ${query}`)
           let person = await query
           let timestamp = new Date()
@@ -386,7 +405,7 @@ const GraphQLUser = new GraphQLObjectType({
                 create_dt: timestamp,
                 modified_dt: timestamp
               })
-          return person
+          return rootValue.loaders.bsdPeople.load(person.cons_id)
         }
       }
     }
@@ -477,18 +496,19 @@ const GraphQLPerson = new GraphQLObjectType({
         let boundingDistance = within / 69
         let eventTypes = null
         if (type) {
-          eventTypes = knex('bsd_event_types')
+          eventTypes = await knex('bsd_event_types')
             .where('name', 'ilike', `%${type}%`)
             .select('event_type_id')
         }
 
         let query = knex('bsd_events')
-          .whereBetween('latitude', [address.latitude - boundingDistance, address.latitude + boundingDistance])
-          .whereBetween('longitude', [address.longitude - boundingDistance, address.longitude + boundingDistance])
-          .andWhere('start_dt', '>', new Date())
+          .whereRaw(`ST_DWithin(bsd_events.geom, st_transform(st_setsrid(st_makepoint(${address.longitude}, ${address.latitude}), 4326), 900913), ${within * 1000})`)
+          .where('start_dt', '>', new Date())
+          .where('flag_approval', false)
+          .whereNot('is_searchable', 0)
 
         if (eventTypes)
-          query = query.whereIn('event_type_id', [eventTypes])
+          query = query.whereIn('event_type_id', eventTypes.map((type) => type.event_type_id))
 
         let events = await query;
         return events
@@ -496,6 +516,22 @@ const GraphQLPerson = new GraphQLObjectType({
     }
   }),
   interfaces: [nodeInterface]
+})
+
+const GraphQLCall = new GraphQLObjectType({
+  name: 'Call',
+  description: 'A call between a user and a person',
+  fields: () => ({
+    id: globalIdField('Call'),
+    attemptedAt: { type: GraphQLString },
+    leftVoicemail: { type: GraphQLBoolean },
+    sentText: { type: GraphQLBoolean },
+    completed: { type: GraphQLBoolean },
+    reasonNotCompleted: { type: GraphQLString },
+    caller: { type: GraphQLUser },
+    interviewee: { type: GraphQLPerson },
+    callAssignment: { type: GraphQLCallAssignment }
+  })
 })
 
 const GraphQLEventType = new GraphQLObjectType({
@@ -594,10 +630,9 @@ const GraphQLEvent = new GraphQLObjectType({
       }
     },
     startDate: {
-      type: GraphQLString,
+      type: GraphQLInt,
       resolve: (event) => {
-        // Client-side code assumes the time comi
-        return moment(event.start_dt).format('YYYY-MM-DD HH:mm:ss +0000')
+        return moment.tz(moment(event.start_dt).format('YYYY-MM-DD HH:mm:ss'), 'UTC').unix()
       }
     },
     duration: { type: GraphQLInt },
@@ -635,6 +670,12 @@ const GraphQLEvent = new GraphQLObjectType({
     rsvpEmailReminderHours: {
       type: GraphQLInt,
       resolve: (event) => event.rsvp_email_reminder_hours
+    },
+    link: {
+      type: GraphQLString,
+      resolve: (event) => {
+        return url.resolve('https://' + process.env.BSD_HOST, '/page/event/detail/' + event.event_id_obfuscated)
+      }
     },
     attendeesCount: {
       type: GraphQLInt,
@@ -864,9 +905,10 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
           let person = fieldValues['person']
           let email = await getPrimaryEmail(person, trx)
           let address = await getPrimaryAddress(person, trx)
+          let phone = await getPrimaryPhone(person, trx)
 
           let zip = address.zip
-          await BSDClient.noFailApiRequest('addRSVPToEvent', email, zip, fieldValues['event_id'])
+          await BSDClient.noFailApiRequest('addRSVPToEvent', email, zip, phone, fieldValues['event_id'])
         }
       }
 

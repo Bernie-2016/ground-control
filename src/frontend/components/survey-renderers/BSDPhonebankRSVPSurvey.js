@@ -28,6 +28,11 @@ class BSDPhonebankRSVPSurvey extends React.Component {
     markers: []
   }
 
+  momentWithOffset(startDate, utcOffset) {
+    startDate = startDate * 1000
+    return moment(startDate).utcOffset(utcOffset)
+  }
+
   handleMarkerClick(marker) {
     this.setState({clickedMarker: marker})
   }
@@ -75,7 +80,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
     let content = (
       <div>
         <p>Selected <strong>{event.name}</strong></p>
-        <p>on <strong>{moment(event.startDate).utcOffset(event.localUTCOffset).format('MMM D')}</strong>.</p>
+        <p>on <strong>{this.momentWithOffset(event.startDate, event.localUTCOffset).format('MMM D')}</strong>.</p>
       </div>
     )
     let sideBar = (
@@ -129,7 +134,10 @@ class BSDPhonebankRSVPSurvey extends React.Component {
         </div>
       )
     let button = <div></div>;
-    if (marker.key !== 'home')
+    if (marker.key !== 'home') {
+      let attendance = marker.attendeesCount
+      if (marker.capacity)
+        attendance = attendance + '/' + marker.capacity
       description = (
         <div>
           <div style={{
@@ -137,7 +145,8 @@ class BSDPhonebankRSVPSurvey extends React.Component {
             color: BernieColors.gray,
             fontSize: '1.0em'
           }}>
-            {moment(marker.startDate).utcOffset(marker.localUTCOffset).format('dddd, MMMM Do — h:mm A')}
+            {this.
+              momentWithOffset(marker.startDate, marker.localUTCOffset).format('dddd, MMMM Do — h:mm A')}
           </div>
           <div style={{
             ...BernieText.default,
@@ -153,12 +162,13 @@ class BSDPhonebankRSVPSurvey extends React.Component {
             <div>{marker.venueName}</div>
             <div>{marker.addr1}</div>
             <div>{marker.addr2}</div>
-            <div>Capacity: {marker.capacity}</div>
-            <div>Attendees: {marker.attendeesCount}</div>
+            <div>Attendance: {attendance}</div>
+            <div><a href={marker.link} target="_blank">Direct Link</a></div>
             {this.state.selectedEventId === marker.eventId ? this.deselectButton() : this.selectButton(marker)}
           </div>
         </div>
       )
+    }
 
     return (
       <Paper zDepth={0} style={{
@@ -209,7 +219,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
 
     this.props.interviewee.nearbyEvents.forEach((event) => {
       if(this.state.dateFilter != 'upcoming'){
-        if(!moment().add(this.state.dateFilter.split('_')[0], 'days').isSame(moment(event.startDate), 'day')){
+        if(!moment().add(this.state.dateFilter.split('_')[0], 'days').isSame(this.momentWithOffset(event.startDate, event.localUTCOffset), 'day')){
           return;
         }
       }
@@ -228,7 +238,8 @@ class BSDPhonebankRSVPSurvey extends React.Component {
         addr2: this.getEventAddr2(event),
         eventId: event.eventIdObfuscated,
         capacity: event.capacity,
-        attendeesCount: event.attendeesCount
+        attendeesCount: event.attendeesCount,
+        link: event.link
       })
     })
 
@@ -284,7 +295,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
 
       // make sure we have events to accommodate that day.
       this.props.interviewee.nearbyEvents.forEach((event) => {
-        if(moment(event.startDate).isSame(date, 'day')){
+        if(this.momentWithOffset(event.startDate, event.localUTCOffset).isSame(date, 'day')){
           options[dayCount + "_days"] = label + date.format(WEEKDAY_DATE_FORMAT)
         }
       })
@@ -299,7 +310,10 @@ class BSDPhonebankRSVPSurvey extends React.Component {
       <GCSelectField
         choices={ this.getDateChoices() }
         onChange={(value) => {
-          this.setState({dateFilter: value});
+          this.setState({
+            dateFilter: value,
+            clickedMarker: null
+          });
         }}
         clearable={false}
         value={this.state.dateFilter}
@@ -395,6 +409,7 @@ export default Relay.createContainer(BSDPhonebankRSVPSurvey, {
           longitude
           capacity
           attendeesCount
+          link
         }
       }
     `
