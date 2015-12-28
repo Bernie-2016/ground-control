@@ -303,11 +303,10 @@ const GraphQLUser = new GraphQLObjectType({
       },
       resolve: async (user, {callAssignmentId}, {rootValue}) => {
         let localId = fromGlobalId(callAssignmentId).id
-        let assignedCalls = await knex('bsd_assigned_calls').where({
+        let assignedCall = await knex('bsd_assigned_calls').where({
           'caller_id': user.id,
           'call_assignment_id': localId
-        })
-        let assignedCall = assignedCalls[0]
+        }).first()
         if (assignedCall) {
           return rootValue.loaders.bsdPeople.load(assignedCall.interviewee_id)
         }
@@ -394,7 +393,14 @@ const GraphQLUser = new GraphQLObjectType({
           log.info(`Running query: ${query}`)
           let person = await query
           let timestamp = new Date()
-          if (person)
+          if (person) {
+            // Do this check again to avoid race conditions
+            let assignedCall = await knex('bsd_assigned_calls').where({
+              'caller_id': user.id,
+              'call_assignment_id': localId
+            }).first()
+            if (assignedCall)
+              return rootValue.loaders.bsdPeople.load(assignedCall.interviewee_id)
             await knex('bsd_assigned_calls')
               .insert({
                 caller_id: user.id,
@@ -403,6 +409,7 @@ const GraphQLUser = new GraphQLObjectType({
                 create_dt: timestamp,
                 modified_dt: timestamp
               })
+          }
           return rootValue.loaders.bsdPeople.load(person.cons_id)
         }
       }
