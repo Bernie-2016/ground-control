@@ -1,5 +1,4 @@
 import express from 'express'
-import compression from 'compression'
 import graphQLHTTP from 'express-graphql'
 import {Schema} from './data/schema'
 import writeSchema from './data/writeSchema'
@@ -43,7 +42,6 @@ const BSDClient = new BSD(process.env.BSD_HOST, process.env.BSD_API_ID, process.
 const port = process.env.PORT
 const publicPath = path.resolve(__dirname, '../frontend/public')
 const limiter = rateLimit({windowMs: 10000, max: 50})
-const oneYearInMillis = 3600000 * 24 * 365
 
 const sessionStore = new KnexSessionStore({
   knex: knex,
@@ -158,13 +156,9 @@ let createLoaders = () => {
 }
 
 app.use(express.static(publicPath))
-app.use(compression())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(session({
-  cookie: {
-    maxAge: oneYearInMillis
-  },
   resave: false,
   saveUninitialized: false,
   secret: process.env.SESSION_SECRET,
@@ -270,7 +264,10 @@ app.post('/events/create', wrap(async (req, res) => {
   }
 }))
 
-app.use(fallback('index.html', { root: publicPath }))
+app.use(fallback('index.html', {
+  root: publicPath,
+  maxAge: 0
+}))
 
 log.info('Starting up...')
 app.listen(port, () => log.info(
