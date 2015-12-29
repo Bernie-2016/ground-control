@@ -24,6 +24,6 @@ module.exports = {
   plugins: plugins,
   output: {
     filename: 'app.js',
-    path: './src/frontend/public/js/'},
+    path: './src/frontend/public/assets/js/'},
   devtool: "#inline-source-map"
 }
