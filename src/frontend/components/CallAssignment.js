@@ -35,6 +35,7 @@ class CallAssignment extends React.Component {
     },
     surveyFrame: {
       borderTop: 'solid 1px ' + BernieColors.lightGray,
+      paddingTop: 30
     },
     questions: {
       paddingTop: 15,
@@ -270,6 +271,7 @@ class CallAssignment extends React.Component {
           ref='survey'
           survey={this.props.callAssignment.survey}
           interviewee={this.props.currentUser.intervieweeForCallAssignment}
+          currentUser={this.props.currentUser}
           onSubmitted={(surveyFields) => this.submitCallSurvey(surveyFields)} />
       </div>
     )
@@ -320,7 +322,7 @@ class CallAssignment extends React.Component {
               <div style={this.styles.callAssignmentQuestions}>
                 <Form.Field
                   name='completed'
-                  label='Were you able to complete the call?'
+                  label='Did the person pick up and answer all your questions?'
                   labelStyle={{
                     ...BernieText.secondaryTitle,
                     fontWeight: 600,
@@ -385,6 +387,7 @@ export default Relay.createContainer(CallAssignment, {
           }
           ${SurveyRenderer.getFragment('interviewee')}
         }
+        ${SurveyRenderer.getFragment('currentUser')}
       }
     `
   }

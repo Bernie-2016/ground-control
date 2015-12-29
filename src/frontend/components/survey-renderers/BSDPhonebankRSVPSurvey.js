@@ -8,7 +8,7 @@ import moment from 'moment';
 import FontIcon from 'material-ui/lib/font-icon';
 import SideBarLayout from '../SideBarLayout'
 import GCSelectField from '../forms/GCSelectField';
-
+import GCBooleanField from '../forms/GCBooleanField';
 
 class BSDPhonebankRSVPSurvey extends React.Component {
   static propTypes = {
@@ -24,6 +24,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
   state = {
     clickedMarker: null,
     selectedEventId: null,
+    joinCallTeam: null,
     dateFilter: "upcoming",
     markers: []
   }
@@ -324,8 +325,12 @@ class BSDPhonebankRSVPSurvey extends React.Component {
     )
 
     let sidebar = (
-      <div>
-        Show:
+      <div style={{
+        ...BernieText.inputLabel,
+        color: BernieColors.blue,
+        fontWeight: '600'
+      }}>
+        Show events on date:
       </div>
     )
     return (
@@ -339,7 +344,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
         sideBarStyle={{
           ...BernieText.inputLabel,
           border: 'none',
-          width: 50
+          width: 200
         }}
         contentViewStyle={{
           border: 'none'
@@ -350,17 +355,45 @@ class BSDPhonebankRSVPSurvey extends React.Component {
 
   render() {
     return (
-      <div>
-        <div style={{width: '100%', height: 200}}>
-          {this.renderMap()}
+      <div style={BernieText.default}>
+        <div style={{marginBottom: 15}}>
+          <p>Hi <strong>{this.props.interviewee.firstName || ''}</strong>, my name is {this.props.currentUser.firstName || '_______'} and I'm a volunteer with the Bernie Sanders campaign. I'm calling you because you signed up at some point to help out with the Bernie Sanders campaign.  Right now, we are trying to get as many volunteers as possible to show up to phone bank parties that other volunteers are hosting.  These phone banks are events where volunteers get together to contact voters in the early states.  It's an incredibly crucial part of our strategy to get Senator Sanders elected as president because we've seen that when volunteers talk to voters, Bernie starts doing better.
+          </p>
+          <p style={{marginTop: 10}}>
+          I see that there is a phone bank being held near you on <strong>Thursday, January 2</strong> at <strong>555 Christopher St</strong>.  Can I sign you up for this phone bank?
+          </p>
         </div>
-        <div>
+        <div style={{marginBottom: 10}}>
           {this.renderDateFilters()}
+        </div>
+        <div style={{width: '100%', height: 300}}>
+          {this.renderMap()}
         </div>
         {this.renderSelectedEvent()}
         {this.renderMarkerDescription(this.state.clickedMarker)}
+        <div>
+          <p style={{marginTop: 20}}>
+            <strong>[If yes, click 'Select' on the phone bank above]</strong> Great! I've signed you up!
+          </p>
+          <p style={{marginTop: 10}}>
+            <strong>[If no]</strong> That's ok - is there a day that you are free to go to a phone bank party? There are <strong>20</strong> upcoming phone banks in your area. [Click the event date filter above to find a date that works for them]
+          </p>
+          <p style={{marginTop: 10}}>
+            <strong>One last thing:</strong> we need more people to make calls like the one I'm making. Can we send you some information about joining our calling team?
+          </p>
+          <div style={{marginBottom: 15}}>
+            <GCBooleanField
+              label=""
+              value={this.state.joinCallTeam}
+              onChange={(value) => this.setState({joinCallTeam: value})}
+            />
+          </div>
+        </div>
         <BSDSurvey
           ref='survey'
+          style={{
+            display: 'none'
+          }}
           survey={this.props.survey}
           interviewee={this.props.interviewee}
           onSubmitted={this.props.onSubmitted}
@@ -381,6 +414,11 @@ export default Relay.createContainer(BSDPhonebankRSVPSurvey, {
     survey: () => Relay.QL`
       fragment on Survey {
         ${BSDSurvey.getFragment('survey')}
+      }
+    `,
+    currentUser: () => Relay.QL`
+      fragment on User {
+        firstName
       }
     `,
     interviewee: () => Relay.QL`

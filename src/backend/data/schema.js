@@ -270,6 +270,20 @@ const GraphQLUser = new GraphQLObjectType({
   description: 'User of ground control',
   fields: () => ({
     id: globalIdField('User'),
+    email: { type: GraphQLString },
+    firstName: {
+      type: GraphQLString,
+      resolve: async (user) => {
+        let name = await knex('bsd_emails')
+          .select('bsd_people.firstname')
+          .innerJoin('bsd_people', 'bsd_emails.cons_id', 'bsd_people.cons_id')
+          .where('email', user.email)
+          .first()
+        if (name)
+          return name['firstname']
+        return null;
+      }
+    },
     callAssignments: {
       type: GraphQLCallAssignmentConnection,
       args: connectionArgs,
