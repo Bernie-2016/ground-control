@@ -5,7 +5,7 @@
   "repository": "Bernie-2016/ground-control",
   "version": "0.1.0",
   "scripts": {
-    "bundle": "mustache ./src/frontend/index/production.json ./src/frontend/index/index.mustache > ./src/frontend/public/index.html && mkdir -p ./src/frontend/public/assets/js && webpack --config ./webpack/config.js",
+    "bundle": "mustache ./src/frontend/index/production.json ./src/frontend/index/index.mustache > ./src/frontend/public/index.html && mkdir -p ./src/frontend/public/assets/js && webpack --output.filename blee.js --config ./webpack/config.js",
     "postinstall": "NO_DB=true npm run bundle",
     "start": "./run ./src/backend/server.js",
     "predev": "mustache ./src/frontend/index/development.json ./src/frontend/index/index.mustache > ./src/frontend/public/index.html",

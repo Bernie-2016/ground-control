@@ -7,7 +7,8 @@ var plugins = [
 
 if (process.env.NODE_ENV === 'production')
   plugins.push(new webpack.optimize.UglifyJsPlugin({minimize: true}))
-module.exports = {
+
+var config = {
   entry: './src/frontend/app.js',
   module: {
     loaders: [
@@ -25,5 +26,9 @@ module.exports = {
   output: {
     filename: 'app.js',
     path: './src/frontend/public/assets/js/'},
-  devtool: "#inline-source-map"
 }
+
+if (process.env.NODE_ENV === 'development')
+  config['devtool'] = "#inline-source-map"
+
+module.exports = config

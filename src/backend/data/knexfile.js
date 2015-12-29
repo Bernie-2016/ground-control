@@ -1,4 +1,4 @@
-if (typeof process.env.DATABASE_URL === 'undefined')
+if (typeof process.env.DATABASE_URL === 'undefined' && !process.env.NO_DB)
   require('dotenv').load({path: '../../../.env'});
 require("babel/register");
 var sharedConfig = {
