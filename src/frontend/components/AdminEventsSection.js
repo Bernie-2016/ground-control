@@ -134,6 +134,21 @@ class AdminEventsSection extends React.Component {
     </Cell>
   )
 
+  NoHTMLCell = ({rowIndex, data, col, ...props}) => {
+    let displayString = data[rowIndex]['node'][col];
+    return (
+      <Cell {...props}
+      style={{
+        fontFamily: 'Roboto',
+        fontSize: '13px',
+        lineHeight: '18px',
+      }}
+      >
+        {displayString.replace(/(<([^>]+)>)|\\n/ig, "")}
+      </Cell>
+    )
+  }
+    
   HostInfoCell = ({rowIndex, data, col, info, ...props}) => (
     <Cell {...props}
     style={{
@@ -914,7 +929,7 @@ class AdminEventsSection extends React.Component {
           <Column
             flexGrow={1}
             header={<this.SortControllerCell content="Description" attribute="description" />}
-            cell={<this.TextCell data={events} col="description" />}
+            cell={<this.NoHTMLCell data={events} col="description" />}
             width={250}
           />
           <Column
