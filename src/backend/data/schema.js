@@ -528,10 +528,12 @@ const GraphQLPerson = new GraphQLObjectType({
           .where('flag_approval', false)
           .whereNot('is_searchable', 0)
 
+        log.info(query.toString())
         if (eventTypes)
           query = query.whereIn('event_type_id', eventTypes.map((type) => type.event_type_id))
 
         let events = await query;
+        console.log(events);
         return events
       }
     }

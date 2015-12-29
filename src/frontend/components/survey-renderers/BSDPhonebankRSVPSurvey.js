@@ -25,8 +25,21 @@ class BSDPhonebankRSVPSurvey extends React.Component {
     clickedMarker: null,
     selectedEventId: null,
     joinCallTeam: null,
-    dateFilter: "upcoming",
-    markers: []
+    dateFilter: "upcoming"
+  }
+
+  styles = {
+    question: {
+      ...BernieText.secondaryTitle,
+      fontWeight: 600,
+      marginTop: 20,
+      color: BernieColors.blue,
+      fontSize: '1em',
+      letterSpacing: '0em'
+    },
+    paragraph: {
+      marginTop: 10
+    }
   }
 
   momentWithOffset(startDate, utcOffset) {
@@ -93,7 +106,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
       <Paper zDepth={0} style={{
         padding: '10px 10px 10px 10px',
         marginTop: 10,
-        border: 'solid 1px ' + BernieColors.green,
+        border: 'solid 2px ' + BernieColors.green,
         minHeight: 25
       }}>
         <SideBarLayout
@@ -216,15 +229,13 @@ class BSDPhonebankRSVPSurvey extends React.Component {
       }
     ];
 
-
-
     this.props.interviewee.nearbyEvents.forEach((event) => {
       if(this.state.dateFilter != 'upcoming'){
         if(!moment().add(this.state.dateFilter.split('_')[0], 'days').isSame(this.momentWithOffset(event.startDate, event.localUTCOffset), 'day')){
           return;
         }
       }
-      markers.push({
+      let marker = {
         position: {
           lat: event.latitude,
           lng: event.longitude
@@ -241,7 +252,12 @@ class BSDPhonebankRSVPSurvey extends React.Component {
         capacity: event.capacity,
         attendeesCount: event.attendeesCount,
         link: event.link
-      })
+      }
+      if (this.state.clickedMarker && marker.eventIdObfuscated === this.state.clickedMarker.eventIdObfuscated){
+        console.log(marker, this.state.clickedMarker)
+        marker.icon = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
+      }
+      markers.push(marker)
     })
 
     return (
@@ -327,7 +343,6 @@ class BSDPhonebankRSVPSurvey extends React.Component {
     let sidebar = (
       <div style={{
         ...BernieText.inputLabel,
-        color: BernieColors.blue,
         fontWeight: '600'
       }}>
         Show events on date:
@@ -359,11 +374,14 @@ class BSDPhonebankRSVPSurvey extends React.Component {
         <div style={{marginBottom: 15}}>
           <p>Hi <strong>{this.props.interviewee.firstName || ''}</strong>, my name is {this.props.currentUser.firstName || '_______'} and I'm a volunteer with the Bernie Sanders campaign. I'm calling you because you signed up at some point to help out with the Bernie Sanders campaign.  Right now, we are trying to get as many volunteers as possible to show up to phone bank parties that other volunteers are hosting.  These phone banks are events where volunteers get together to contact voters in the early states.  It's an incredibly crucial part of our strategy to get Senator Sanders elected as president because we've seen that when volunteers talk to voters, Bernie starts doing better.
           </p>
-          <p style={{marginTop: 10}}>
-          I see that there is a phone bank being held near you on <strong>Thursday, January 2</strong> at <strong>555 Christopher St</strong>.  Can I sign you up for this phone bank?
+          <p style={this.styles.paragraph}>
+          I see that there is a phone bank being held near you on <strong>Thursday, January 2</strong> at <strong>555 Christopher St</strong>.
+          </p>
+          <p style={this.styles.question}>
+            Can I sign you up for this phone bank?
           </p>
         </div>
-        <div style={{marginBottom: 10}}>
+        <div style={{marginBottom: 5}}>
           {this.renderDateFilters()}
         </div>
         <div style={{width: '100%', height: 300}}>
@@ -375,15 +393,19 @@ class BSDPhonebankRSVPSurvey extends React.Component {
           <p style={{marginTop: 20}}>
             <strong>[If yes, click 'Select' on the phone bank above]</strong> Great! I've signed you up!
           </p>
-          <p style={{marginTop: 10}}>
+          <p style={this.styles.paragraph}>
             <strong>[If no]</strong> That's ok - is there a day that you are free to go to a phone bank party? There are <strong>20</strong> upcoming phone banks in your area. [Click the event date filter above to find a date that works for them]
           </p>
-          <p style={{marginTop: 10}}>
-            <strong>One last thing:</strong> we need more people to make calls like the one I'm making. Can we send you some information about joining our calling team?
+          <p style={this.styles.paragraph}>
+            <strong>One last thing:</strong> we need more people to make calls like the one I'm making.
+          </p>
+          <p style={this.styles.question}>
+
           </p>
           <div style={{marginBottom: 15}}>
             <GCBooleanField
-              label=""
+              label="Can we send you some information about joining our calling team?"
+              labelStyle={this.styles.question}
               value={this.state.joinCallTeam}
               onChange={(value) => this.setState({joinCallTeam: value})}
             />

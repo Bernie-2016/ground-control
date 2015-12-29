@@ -58,9 +58,10 @@ export default class GCBooleanField extends React.Component {
         <div style={labelStyle}>
           {this.props.label}
         </div>
-        <br />
-        {yesButton}
-        {noButton}
+        <div style={{marginTop: 10}}>
+          {yesButton}
+          {noButton}
+        </div>
         <br />
         {error}
       </div>
