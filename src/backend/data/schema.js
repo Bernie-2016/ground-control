@@ -829,6 +829,8 @@ const GraphQLEditEvents = mutationWithClientMutationId({
       delete event['latitude']
       delete event['longitude']
 
+      log.debug('Updated event: ', event)
+
       await BSDClient.updateEvent(event.event_id_obfuscated, event.event_type_id, event.creator_cons_id, event)
       await knex('bsd_events')
         .where('event_id', event.event_id)
