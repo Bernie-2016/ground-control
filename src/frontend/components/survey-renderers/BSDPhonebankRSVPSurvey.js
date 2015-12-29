@@ -10,6 +10,7 @@ import SideBarLayout from '../SideBarLayout'
 import GCSelectField from '../forms/GCSelectField';
 import GCBooleanField from '../forms/GCBooleanField';
 
+const WEEKDAY_DATE_FORMAT = 'dddd, MMMM Do';
 class BSDPhonebankRSVPSurvey extends React.Component {
   static propTypes = {
     onSubmitted : React.PropTypes.func,
@@ -300,7 +301,6 @@ class BSDPhonebankRSVPSurvey extends React.Component {
 
   getDateChoices(){
     let options = {"upcoming": "All Upcoming Events"}
-    let WEEKDAY_DATE_FORMAT = 'dddd, MMMM Do';
 
     // comically large for test purposes
     // 10 or 14 would be well suited for the real world I think.
@@ -372,6 +372,25 @@ class BSDPhonebankRSVPSurvey extends React.Component {
     )
   }
 
+  renderNo() {
+    let eventCount = this.props.interviewee.nearbyEvents.length;
+    let text = <div></div>
+    if (eventCount >= 2) {
+      text = (
+        <div>
+          <strong>[If no]</strong> That's ok - is there a day that you are free to go to a phone bank party? There are <strong>{eventCount}</strong> upcoming phone banks in your area. <strong>[Click the event date filter above to find a date that works for them and click on an event pin on the map to get its description]</strong>.
+        </div>
+      )
+    }
+    else
+      text = (
+        <div>
+          <strong>[If no]</strong> That's ok.  There's no other phone banks in your area upcoming, but check out https://map.berniesanders.com.  And if you are interested, sign up to host a phone bank there and we'll make sure people in your area find out about it!
+        </div>
+      )
+    return text
+  }
+
   render() {
     return (
       <div style={BernieText.default}>
@@ -379,7 +398,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
           <p>Hi <strong>{this.props.interviewee.firstName || ''}</strong>, my name is {this.props.currentUser.firstName || '_______'} and I'm a volunteer with the Bernie Sanders campaign. I'm calling you because you signed up at some point to help out with the Bernie Sanders campaign.  Right now, we are trying to get as many volunteers as possible to show up to phone bank parties that other volunteers are hosting.  These phone banks are events where volunteers get together to contact voters in the early states.  It's an incredibly crucial part of our strategy to get Senator Sanders elected as president because we've seen that when volunteers talk to voters, Bernie starts doing better.
           </p>
           <p style={this.styles.paragraph}>
-          I see that there is a phone bank being held near you on <strong>Thursday, January 2</strong> at <strong>555 Christopher St</strong>.
+          I see that there is a phone bank being held near you on <strong>{this.state.clickedMarker ? this.momentWithOffset(this.state.clickedMarker.startDate, this.state.clickedMarker.localUTCOffset).format(WEEKDAY_DATE_FORMAT) : '[event date]'}</strong> at <strong>{this.state.clickedMarker ? this.state.clickedMarker.addr1 : '[event address]'}</strong>.
           </p>
           <p style={this.styles.question}>
             Can I sign you up for this phone bank?
@@ -398,10 +417,10 @@ class BSDPhonebankRSVPSurvey extends React.Component {
             <strong>[If yes, click 'Select' on the phone bank above]</strong> Great! I've signed you up!
           </p>
           <p style={this.styles.paragraph}>
-            <strong>[If no]</strong> That's ok - is there a day that you are free to go to a phone bank party? There are <strong>20</strong> upcoming phone banks in your area. [Click the event date filter above to find a date that works for them]
+            {this.renderNo()}
           </p>
           <p style={this.styles.paragraph}>
-            <strong>One last thing:</strong> we need more people to make calls like the one I'm making.
+            One last thing: we need more people to make calls like the one I'm making.
           </p>
           <p style={this.styles.question}>
 
