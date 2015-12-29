@@ -107,6 +107,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
       <Paper zDepth={0} style={{
         padding: '10px 10px 10px 10px',
         marginTop: 10,
+        backgroundColor: BernieColors.lightBlue,
         border: 'solid 1px ' + BernieColors.blue,
         minHeight: 25
       }}>
