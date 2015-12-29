@@ -322,6 +322,61 @@ export default class BSD {
   }
 
   apiInputsFromEvent(event) {
+    let apiKeys = [
+      'event_id',
+      'event_id_obfuscated',
+      'event_type_id',
+      'creator_cons_id',
+      'name',
+      'description',
+      'creator_name',
+      'local_timezone',
+      'venue_name',
+      'venue_addr1',
+      'venue_addr2',
+      'venue_zip',
+      'venue_city',
+      'venue_state_cd',
+      'venue_country',
+      'venue_directions',
+      'host_addr_addressee',
+      'host_addr_addr1',
+      'host_addr_addr2',
+      'host_addr_zip',
+      'host_addr_city',
+      'host_addr_state_cd',
+      'host_addr_country',
+      'host_receive_rsvp_emails',
+      'contact_phone',
+      'public_phone',
+      'attendee_visibility',
+      'attendee_require_phone',
+      'attendee_volunteer_show',
+      'attendee_volunteer_message',
+      'is_official',
+      'pledge_override_type',
+      'pledge_show',
+      'pledge_source',
+      'pledge_subsource',
+      'pledge_require',
+      'pledge_min',
+      'pledge_max',
+      'pledge_suggest',
+      'rsvp_use_default_email_message',
+      'rsvrp_email_message',
+      'rsvp_email_message_html',
+      'rsvp_use_reminder_email',
+      'rsvp_reminder_email_sent',
+      'rsvp_reminder_hours',
+      'rsvp_allow',
+      'rsvp_require_signup',
+      'rsvp_disallow_account',
+      'is_searchable',
+      'chapter_id',
+      'flag_approval',
+      'outreach_page_id',
+      'days'
+    ]
     let inputs = {}
     let eventDate = {}
     Object.keys(event).forEach((key) => {
@@ -334,7 +389,14 @@ export default class BSD {
         eventDate[key] = event[key]
       else if (key === 'duration')
         eventDate[key] = event[key]
-      else
+      else if (key === 'attendee_visibility') {
+        inputs[key] = 'NONE'
+        if (event[key] === 0)
+          inputs[key] = 'COUNT'
+        else if (event[key] === 2)
+          inputs[key] = 'FIRST'
+      }
+      else if (apiKeys.indexOf(key) !== -1)
         inputs[key] = event[key]
     })
     if (Object.keys(eventDate).length > 0)
@@ -343,6 +405,7 @@ export default class BSD {
   }
 
   async updateEvent(event_id_obfuscated, event_type_id, creator_cons_id, updatedValues) {
+
     updatedValues = {
       ...updatedValues,
       ...{event_id_obfuscated, event_type_id, creator_cons_id}

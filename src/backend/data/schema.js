@@ -821,13 +821,10 @@ const GraphQLEditEvents = mutationWithClientMutationId({
       let event = await knex('bsd_events')
         .where('event_id', newEventData.event_id)
         .first()
-      Object.keys(event).forEach((key) => {
-        if (newEventData.hasOwnProperty(key))
-          event[key] = newEventData[key]
-      })
-
-      delete event['latitude']
-      delete event['longitude']
+      event = {
+        ...event,
+        ...newEventData
+      }
 
       log.debug('Updated event: ', event)
 
