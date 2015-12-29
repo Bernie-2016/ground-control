@@ -816,7 +816,16 @@ const GraphQLEditEvents = mutationWithClientMutationId({
     let count = params.length;
 
     for (let index = 0; index < count; index++) {
-      let event = params[index]
+      let newEventData = params[index]
+      console.log(newEventData)
+      let event = await knex('bsd_events')
+        .where('event_id', newEventData.event_id)
+        .first()
+      console.log(event)
+      event = {
+        ...event,
+        ...newEventData
+      }
       await BSDClient.updateEvent(event.event_id_obfuscated, event.event_type_id, event.creator_cons_id, event)
       await knex('bsd_events')
         .where('event_id', event.event_id)

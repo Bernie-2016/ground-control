@@ -148,7 +148,7 @@ class AdminEventsSection extends React.Component {
       </Cell>
     )
   }
-    
+
   HostInfoCell = ({rowIndex, data, col, info, ...props}) => (
     <Cell {...props}
     style={{
@@ -742,24 +742,10 @@ class AdminEventsSection extends React.Component {
     events.forEach((event, index) => {
       if (eventIndexes.indexOf(index) !== -1) {
         let node = event.node
-        // Bit of a hack, but BSD requires all these fields
-        let eventToConfirm = {
-          flagApproval: false,
+        eventsToConfirm.push({
           id: node.id,
-          name: node.name,
-          eventIdObfuscated: node.eventIdObfuscated,
-          eventTypeId: node.eventType.id,
-          description: node.description,
-          venueName: node.venueName,
-          venueZip: node.venueZip,
-          venueCity: node.venueCity,
-          venueState: node.venueState,
-          startDate: node.startDate,
-          localTimezone: node.localTimezone,
-          duration: node.duration,
-          capacity: node.capacity
-        }
-        eventsToConfirm.push(eventToConfirm)
+          flagApproval: false
+        })
       }
     })
     this.refs.eventEditHandler.send({
@@ -772,8 +758,6 @@ class AdminEventsSection extends React.Component {
   _handleEventEdit = (event, newData) => {
     this._handlePreviewRequestClose()
     newData.id = event.id
-    newData.eventIdObfuscated = event.eventIdObfuscated
-    newData.hostId = event.host.id
     this.refs.eventEditHandler.send({
       events: [newData],
       listContainer: this.props.listContainer
