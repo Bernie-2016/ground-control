@@ -42,6 +42,7 @@ const BSDClient = new BSD(process.env.BSD_HOST, process.env.BSD_API_ID, process.
 const port = process.env.PORT
 const publicPath = path.resolve(__dirname, '../frontend/public')
 const limiter = rateLimit({windowMs: 10000, max: 50})
+const oneYearInMillis = 3600000 * 24 * 365
 
 const sessionStore = new KnexSessionStore({
   knex: knex,
@@ -159,6 +160,9 @@ app.use(express.static(publicPath))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(session({
+  cookie: {
+    maxAge: oneYearInMillis
+  },
   resave: false,
   saveUninitialized: false,
   secret: process.env.SESSION_SECRET,
