@@ -35,7 +35,9 @@ export default class GCNetworkLayer extends Relay.DefaultNetworkLayer {
 
     try {
       parsedError = JSON.parse(error.message);
-    } catch (ex) { }
+    } catch (ex) {
+      return false
+    }
 
     if (parsedError) {
       log.debug(parsedError);
@@ -45,6 +47,7 @@ export default class GCNetworkLayer extends Relay.DefaultNetworkLayer {
       } else if (parsedError.status === 404) {
         window.location = '/404';
       }
+      return true
     }
   }
 
@@ -56,11 +59,13 @@ export default class GCNetworkLayer extends Relay.DefaultNetworkLayer {
         })
         .then((payload) => {
           if (payload.hasOwnProperty('errors')) {
+            let userError = false
             if (payload.errors.length > 0)
-              this.handleStructuredError(payload.errors[0]);
+              userError = this.handleStructuredError(payload.errors[0]);
 
             let errorString = 'Server request for query `' + request.getDebugName() + '` ' + 'failed for the following reasons:\n\n' + this.formatRequestErrors(request, payload.errors);
-            log.error(errorString, payload.errors);
+            if (!userError)
+              log.error(errorString, payload.errors);
 
             let error = new Error(errorString);
             error.source = payload;
