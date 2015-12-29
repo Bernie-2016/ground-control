@@ -410,8 +410,9 @@ const GraphQLUser = new GraphQLObjectType({
                 create_dt: timestamp,
                 modified_dt: timestamp
               })
+            return rootValue.loaders.bsdPeople.load(person.cons_id)
           }
-          return rootValue.loaders.bsdPeople.load(person.cons_id)
+          return null;
         }
       }
     }
