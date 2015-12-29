@@ -106,7 +106,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
       <Paper zDepth={0} style={{
         padding: '10px 10px 10px 10px',
         marginTop: 10,
-        border: 'solid 2px ' + BernieColors.green,
+        border: 'solid 1px ' + BernieColors.blue,
         minHeight: 25
       }}>
         <SideBarLayout
@@ -188,7 +188,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
       <Paper zDepth={0} style={{
         marginTop: 10,
         padding: '10px 10px 10px 10px',
-        border: 'solid 1px ' + BernieColors.lightGray
+        border: 'solid 1px ' + BernieColors.green
       }}>
         {description}
       </Paper>
@@ -251,11 +251,15 @@ class BSDPhonebankRSVPSurvey extends React.Component {
         eventId: event.eventIdObfuscated,
         capacity: event.capacity,
         attendeesCount: event.attendeesCount,
-        link: event.link
+        link: event.link,
+        icon: null
       }
-      if (this.state.clickedMarker && marker.eventIdObfuscated === this.state.clickedMarker.eventIdObfuscated){
-        console.log(marker, this.state.clickedMarker)
-        marker.icon = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
+      if (this.state.clickedMarker && marker.eventId === this.state.clickedMarker.eventId) {
+        // FIXME - the hex code is BernieColors.green hardcoded
+        marker.icon = 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|4acc66'
+      }
+      else if (this.state.selectedEventId && marker.eventId === this.state.selectedEventId) {
+        marker.icon = 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|147FD7'
       }
       markers.push(marker)
     })
