@@ -82,6 +82,7 @@ function eventFieldFromAPIField(field) {
     'id': 'eventId',
     'hostId': 'creatorConsId',
     'startDate': 'startDt',
+    'createDate': 'createDt',
     'localTimezone': 'startTz',
     'venueState': 'venueStateCd'
   }
@@ -638,6 +639,12 @@ const GraphQLEvent = new GraphQLObjectType({
       type: GraphQLInt,
       resolve: (event) => {
         return moment.tz(moment(event.start_dt).format('YYYY-MM-DD HH:mm:ss'), 'UTC').unix()
+      }
+    },
+    createDate: {
+      type: GraphQLInt,
+      resolve: (event) => {
+        return moment.tz(moment(event.create_dt).format('YYYY-MM-DD HH:mm:ss'), 'UTC').unix()
       }
     },
     duration: { type: GraphQLInt },
