@@ -43,6 +43,19 @@ class BSDPhonebankRSVPSurvey extends React.Component {
     }
   }
 
+  componentWillMount() {
+    let markers = this.markers()
+    markers.sort((marker1, marker2) => {
+      if (marker1.key === 'home')
+        return 1
+      else if (marker2.key === 'home')
+        return -1
+      return marker1.startDate - marker2.startDate
+    })
+    console.log(markers)
+    this.setState({clickedMarker: markers[0]})
+  }
+
   momentWithOffset(startDate, utcOffset) {
     startDate = startDate * 1000
     return moment(startDate).utcOffset(utcOffset)
@@ -208,11 +221,8 @@ class BSDPhonebankRSVPSurvey extends React.Component {
     return desc.trim();
   }
 
-  renderMap() {
-    let center = {
-      lat: this.props.interviewee.address.latitude,
-      lng: this.props.interviewee.address.longitude
-    }
+  markers() {
+    let center = this.intervieweeHomeCoords();
     let homeIcon = {
       path: 'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z',
       fillColor: BernieColors.blue,
@@ -265,6 +275,19 @@ class BSDPhonebankRSVPSurvey extends React.Component {
       }
       markers.push(marker)
     })
+    return markers
+  }
+
+  intervieweeHomeCoords() {
+    return {
+      lat: this.props.interviewee.address.latitude,
+      lng: this.props.interviewee.address.longitude
+    }
+  }
+
+  renderMap() {
+    let markers = this.markers();
+    let center = this.intervieweeHomeCoords();
 
     return (
       <div style={{height: '100%', width: '100%'}}>
@@ -358,8 +381,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
         content={content}
         sideBar={sidebar}
         containerStyle={{
-          border: 'none',
-          paddingTop: 10
+          border: 'none'
         }}
         sideBarStyle={{
           ...BernieText.inputLabel,
