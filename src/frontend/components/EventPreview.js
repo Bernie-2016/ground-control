@@ -60,6 +60,16 @@ export default class EventPreview extends React.Component {
     document.removeEventListener('keydown', this.handleKeyDown);
   }
 
+  stripScripts = (s) => {
+    let div = document.createElement('div');
+    div.innerHTML = s;
+    let scripts = div.getElementsByTagName('script');
+    let i = scripts.length;
+    while (i--) {
+      scripts[i].parentNode.removeChild(scripts[i]);
+    }
+    return {__html: div.innerHTML}
+  }
 
   render() {
     let event = this.props.event
@@ -76,7 +86,7 @@ export default class EventPreview extends React.Component {
           <p>Number of RSVPs: {event.attendeesCount}</p>
 
           <InfoHeader content='Event Description' />
-          <p>{event.description}</p>
+          <p dangerouslySetInnerHTML={this.stripScripts(event.description)}></p>
 
           <InfoHeader content='Event Date & Time' />
           <p>{momentWithOffset(event.startDate, event.localUTCOffset).format('LLLL')} <span style={{color: BernieColors.gray}}>{event.localTimezone} time</span></p>
