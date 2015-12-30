@@ -455,7 +455,6 @@ export default class BSD {
             duration: form['duration_num'] * form['duration_unit'],
             capacity: form['capacity']
         }],
-        is_official: form['event_type_id'] === 14, // HACK
         local_timezone: form['start_tz'],
         attendee_volunteer_message: form['attendee_volunteer_message'],
         is_searchable: (form['is_searchable']) ? form['is_searchable'] : -2, // second value should set to event type default
@@ -465,10 +464,6 @@ export default class BSD {
         rsvp_use_reminder_email: form['rsvp_use_reminder_email'],
         rsvp_reminder_hours: form['rsvp_email_reminder_hours']
     };
-
-    // More hacks
-    if (form['event_type_id'] === 14)
-      delete params['contact_phone']
 
     // Add params if supported by event type
     if (Number(eventType.attendee_volunteer_show) == 1){
