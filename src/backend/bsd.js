@@ -515,7 +515,6 @@ export default class BSD {
     let options = {
       uri: finalURL,
       method: method,
-      body: params,
       resolveWithFullResponse: true,
       json: true
     }
