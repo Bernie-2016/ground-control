@@ -293,7 +293,7 @@ export default class BSD {
       'will_attend' : 1,
       'guests': 0
     }
-    if (/\d+$/.test(event_id))
+    if (/^\d+$/.test(event_id))
       params['event_id'] = event_id
     else
       params['event_id_obfuscated'] = event_id
