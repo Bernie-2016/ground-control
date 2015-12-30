@@ -466,6 +466,10 @@ export default class BSD {
         rsvp_reminder_hours: form['rsvp_email_reminder_hours']
     };
 
+    // More hacks
+    if (form['event_type_id'] === 14)
+      delete params['contact_phone']
+
     // Add params if supported by event type
     if (Number(eventType.attendee_volunteer_show) == 1){
       params['attendee_volunteer_show'] = form['attendee_volunteer_show'];
