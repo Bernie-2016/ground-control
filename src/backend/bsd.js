@@ -505,7 +505,7 @@ export default class BSD {
       }
     }
     else {
-      log.debug('Making request: ', options)
+      log.debug('Making request: ', JSON.stringify(options))
       return requestPromise(options)
     }
   }
@@ -515,6 +515,7 @@ export default class BSD {
     let options = {
       uri: finalURL,
       method: method,
+      body: params,
       resolveWithFullResponse: true,
       json: true
     }
