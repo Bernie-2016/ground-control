@@ -62,7 +62,6 @@ export default class GCBooleanField extends React.Component {
           {yesButton}
           {noButton}
         </div>
-        <br />
         {error}
       </div>
     )

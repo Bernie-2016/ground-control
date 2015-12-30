@@ -19,17 +19,35 @@ class BSDPhonebankRSVPSurvey extends React.Component {
   }
 
   submit() {
+    if (this.checkForm())
+      this.props.onSubmitted({
+        event_id: this.state.selectedEventId,
+        join_call_team: this.state.joinCallTeam
+      })
+  }
 
-//    this.refs.survey.refs.component.submit()
+  // This is hacky, but using a GCForm or React Formal inside this survey seems to not work
+  checkForm() {
+    let errors = {}
+    if (this.state.signupQuestion === null)
+      errors['signupQuestion'] = 'This field is required'
+    if (this.state.joinCallTeam === null)
+      errors['joinCallTeam'] = 'This field is required'
+
+    this.setState({errors: errors});
+    if (Object.keys(errors).length === 0)
+      return true;
+
+    return false
   }
 
   state = {
     clickedMarker: null,
     selectedEventId: null,
+    signupQuestion: null,
     joinCallTeam: null,
-    signupQuestion1: null,
-    signupQuestion2: null,
-    dateFilter: "upcoming"
+    dateFilter: "upcoming",
+    errors: {}
   }
 
   styles = {
@@ -46,7 +64,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
     }
   }
 
-  componentWillMount() {
+  selectDefaultMarker() {
     let markers = this.markers()
     markers.sort((marker1, marker2) => {
       if (marker1.key === 'home')
@@ -57,6 +75,10 @@ class BSDPhonebankRSVPSurvey extends React.Component {
     })
     if (markers[0] && markers[0].key !== 'home')
       this.setState({clickedMarker: markers[0]})
+  }
+
+  componentWillMount() {
+    this.selectDefaultMarker()
   }
 
   momentWithOffset(startDate, utcOffset) {
@@ -77,10 +99,9 @@ class BSDPhonebankRSVPSurvey extends React.Component {
       }}
         onTouchTap={(event) => {
           this.setState({
-            clickedMarker: null,
-            selectedEventId: marker.eventId
+            selectedEventId: marker.eventId,
+            signupQuestion: true
           })
-          this.refs.survey.refs.component.setFieldValue('event_id', marker.eventId)
         }}
       />
     )
@@ -98,7 +119,6 @@ class BSDPhonebankRSVPSurvey extends React.Component {
           this.setState({
             selectedEventId: null
           })
-          this.refs.survey.refs.component.setFieldValue('event_id', '')
         }}
       />
     )
@@ -110,47 +130,33 @@ class BSDPhonebankRSVPSurvey extends React.Component {
     let event = this.props.interviewee.nearbyEvents.find((event) => event.eventIdObfuscated === this.state.selectedEventId)
     let content = (
       <div>
-        <p>Selected <strong>{event.name}</strong></p>
-        <p>on <strong>{this.momentWithOffset(event.startDate, event.localUTCOffset).format('MMM D')}</strong>.</p>
+        Selected <strong>{event.name}</strong> on <strong>{this.momentWithOffset(event.startDate, event.localUTCOffset).format('MMM D')}</strong>.
       </div>
     )
-    let sideBar = (
-      <div>
-        {this.deselectButton()}
-      </div>
-    )
+    // We will eventually factor out the map into its own form component that can be controlled via value. If it is uncontrolled, it can show select and deselect buttons.  Otherwise it will just be selected/deselected via the parent
+    /*    let sideBar = (
+          <div>
+            {this.deselectButton()}
+          </div>
+        )
+    */
+    let sideBar = <div></div>
     return (
       <Paper zDepth={0} style={{
         padding: '10px 10px 10px 10px',
-        marginTop: 10,
+        marginTop: 0,
         backgroundColor: BernieColors.lightBlue,
         border: 'solid 1px ' + BernieColors.blue,
         minHeight: 25
       }}>
-        <SideBarLayout
-          containerStyle={{
-            'border': 'none'
-          }}
-          sideBar={sideBar}
-          content={content}
-          contentViewStyle={{
-            border: 'none',
-            paddingRight: 10
-          }}
-          sideBarStyle={{
-            border: 'none',
-            textAlign: 'right',
-            marginTop: 'auto',
-            marginBottom: 'auto'
-          }}
-          sideBarPosition='right'
-        />
+        {content}
       </Paper>
     )
   }
 
   renderMarkerDescription(marker) {
     let description = <div></div>
+    let borderColor = this.state.selectedEventId === marker.eventId ? BernieColors.blue : BernieColors.green
     if (!marker)
       return <div></div>;
     if (marker.key === 'home')
@@ -195,7 +201,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
             <div>{marker.addr1}</div>
             <div>{marker.addr2}</div>
             <div>Attendance: {attendance}</div>
-            {this.state.selectedEventId === marker.eventId ? this.deselectButton() : this.selectButton(marker)}
+            {this.state.selectedEventId === marker.eventId ? '' : this.selectButton(marker)}
           </div>
         </div>
       )
@@ -203,9 +209,9 @@ class BSDPhonebankRSVPSurvey extends React.Component {
 
     return (
       <Paper zDepth={0} style={{
-        marginTop: 10,
+        marginTop: 0,
         padding: '10px 10px 10px 10px',
-        border: 'solid 1px ' + BernieColors.green
+        border: 'solid 1px ' + borderColor
       }}>
         {description}
       </Paper>
@@ -268,12 +274,12 @@ class BSDPhonebankRSVPSurvey extends React.Component {
         link: event.link,
         icon: null
       }
-      if (this.state.clickedMarker && marker.eventId === this.state.clickedMarker.eventId) {
+      if (this.state.selectedEventId && marker.eventId === this.state.selectedEventId) {
+        marker.icon = 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|147FD7'
+      }
+      else if (this.state.clickedMarker && marker.eventId === this.state.clickedMarker.eventId) {
         // FIXME - the hex code is BernieColors.green hardcoded
         marker.icon = 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|4acc66'
-      }
-      else if (this.state.selectedEventId && marker.eventId === this.state.selectedEventId) {
-        marker.icon = 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|147FD7'
       }
       markers.push(marker)
     })
@@ -358,9 +364,8 @@ class BSDPhonebankRSVPSurvey extends React.Component {
         choices={ this.getDateChoices() }
         onChange={(value) => {
           this.setState({
-            dateFilter: value,
-            clickedMarker: null
-          });
+            dateFilter: value
+          })
         }}
         clearable={false}
         value={this.state.dateFilter}
@@ -397,72 +402,36 @@ class BSDPhonebankRSVPSurvey extends React.Component {
     )
   }
 
-  renderNo() {
-    let eventCount = this.props.interviewee.nearbyEvents.length;
-    let text = <div></div>
-    if (eventCount >= 2) {
+  renderAdditionalEvents() {
+    let eventCount = this.props.interviewee.nearbyEvents.length - 1;
+    let text = <span></span>
+    if (eventCount > 0) {
       text = (
-        <div>
-          <p>That's ok - is there a day that you are free to go to a phone bank party? There are <strong>{eventCount}</strong> upcoming phone banks in your area. <strong>[Click the event date filter above to find a date that works for them and click on a pin on the map to get its description]</strong>.
-          </p>
-          <GCBooleanField
-            label="Can I sign you up for this other phone bank party?"
-            labelStyle={this.styles.question}
-            value={this.state.signupQuestion2}
-            onChange={(value) => this.setState({signupQuestion2: value})}
-          />
-        </div>
+        <span>There {eventCount > 1 ? 'are' : 'is'} also <strong>{eventCount-1}</strong> other phone bank{eventCount > 1 ? 's' : ''} being held near you over the next month if that date doesn't work. <strong>[Click the event date filter below to find a date that works for them and click on a pin on the map to get its description]</strong>.
+        </span>
       )
     }
-    else
-      text = (
-        <div>
-          <span>That's ok.  There's no other phone banks in your area upcoming, but check out https://map.berniesanders.com.  And if you are interested, sign up to host a phone bank there and we'll make sure people in your area find out about it!
-          </span>
-        </div>
-      )
     return text
   }
 
-  renderResultFromQuestion2() {
-    if (this.state.signupQuestion2 === null)
-      return <div></div>
-    return (
-      <div>
-      {this.state.signupQuestion2 === false ? "No worries - thanks for taking the time to hear me out." : "Great! I've signed you up, and you should be receiving an e-mail with all the details soon!"}
-      </div>
-    )
-  }
-
-  renderResultFromQuestion1() {
+  renderResultFromQuestion() {
     let yes = <div>Great! I've signed you up and you should be receiving an e-mail with all the details soon!</div>
-    let no = this.renderNo();
-    let result = (
+    let no = <div>That's ok.  If you change your mind, you can always head to <strong>map.berniesanders.com</strong> to sign up.  And if you are interested, sign up to host a phone bank there and we'll make sure people in your area find out about it!</div>
+    let text = (
       <div>
         <div style={{marginTop: 20}}>
-          <strong>[If yes, click 'Select' on the phone bank above]</strong> {yes}
+          <strong>[If yes]</strong> {yes}
         </div>
         <div style={this.styles.paragraph}>
           <strong>[If no]</strong> {no}
         </div>
       </div>
     )
-    if (this.state.signupQuestion1 === true)
-      return (
-        <div style={{marginTop: 20}}>
-          <strong>[Click 'Select' on the phone bank above]</strong>
-          {yes}
-        </div>
-      )
-
-    else if (this.state.signupQuestion1 === false)
-      return (
-        <div style={this.styles.paragraph}>
-          {no}
-          {this.renderResultFromQuestion2()}
-        </div>
-      )
-    return result;
+    if (this.state.signupQuestion === true)
+      return <div style={{marginTop: 20}}>{yes}</div>
+    else if (this.state.signupQuestion === false)
+      return <div style={{marginTop: 20}}>{no}</div>
+    return text
   }
 
   render() {
@@ -472,25 +441,38 @@ class BSDPhonebankRSVPSurvey extends React.Component {
           <p>Hi <strong>{this.props.interviewee.firstName || ''}</strong>, my name is {this.props.currentUser.firstName || '_______'} and I'm a volunteer with the Bernie Sanders campaign. I'm calling you because you signed up at some point to help out with the Bernie Sanders campaign.  Right now, we are trying to get as many volunteers as possible to show up to phone bank parties that other volunteers are hosting.  These phone banks are events where volunteers get together to contact voters in the early states.  It's an incredibly crucial part of our strategy to get Senator Sanders elected as president because we've seen that when volunteers talk to voters, Bernie starts doing better.
           </p>
           <p style={this.styles.paragraph}>
-          I see that there is a phone bank being held near you on <strong>{this.state.clickedMarker ? this.momentWithOffset(this.state.clickedMarker.startDate, this.state.clickedMarker.localUTCOffset).format(WEEKDAY_DATE_FORMAT) : '[event date]'}</strong> at <strong>{this.state.clickedMarker ? this.state.clickedMarker.addr1 : '[event address]'}</strong>.
+          I see that there is a phone bank being held near you on <strong>{this.state.clickedMarker ? this.momentWithOffset(this.state.clickedMarker.startDate, this.state.clickedMarker.localUTCOffset).format(WEEKDAY_DATE_FORMAT) : '[event date]'}</strong> at <strong>{this.state.clickedMarker ? this.state.clickedMarker.addr1 : '[event address]'}</strong>.  {this.renderAdditionalEvents()}
           </p>
           <GCBooleanField
+            errorText={this.state.errors.signupQuestion}
             label="Can I sign you up for this phone bank party?"
             labelStyle={this.styles.question}
-            value={this.state.signupQuestion1}
-            onChange={(value) => this.setState({signupQuestion1: value})}
+            value={this.state.signupQuestion}
+            onChange={(value) => {
+              let selectedEventId = null
+              if (this.state.clickedMarker === null) {
+                log.error('No clicked marker when selecting event', this.props.interviewee.email, this.props.interviewee.nearbyEvents.length)
+              }
+              else
+                selectedEventId = value ? this.state.clickedMarker.eventId : null
+
+              this.setState({
+                signupQuestion: value,
+                selectedEventId: selectedEventId
+              })
+            }}
           />
         </div>
-        <div style={{marginBottom: 5}}>
+        <div style={{marginBottom: 5, marginTop: 20}}>
           {this.renderDateFilters()}
         </div>
+        {this.renderSelectedEvent()}
         <div style={{width: '100%', height: 300}}>
           {this.renderMap()}
         </div>
-        {this.renderSelectedEvent()}
         {this.renderMarkerDescription(this.state.clickedMarker)}
         <div>
-          {this.renderResultFromQuestion1()}
+          {this.renderResultFromQuestion()}
           <p style={this.styles.paragraph}>
             One last thing: we need more people to make calls like the one I'm making. You can do these from home and you'll be talking to other volunteers who have agreed to be contacted.
           </p>
@@ -499,6 +481,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
           </p>
           <div style={{marginBottom: 15}}>
             <GCBooleanField
+              errorText={this.state.errors.joinCallTeam}
               label="Can we send you some information about joining our calling team?"
               labelStyle={this.styles.question}
               value={this.state.joinCallTeam}
