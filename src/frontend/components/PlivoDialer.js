@@ -103,7 +103,6 @@ export default class PlivoDialer extends React.Component {
     let formattedNumber = this.formatPhoneNumber(this.props.number)
     let plivoCallInProgress = this.state.plivoCallInProgress
     let plivoStatusText = this.state.plivoStatusText
-    let displayed = this.state.displayed
 
     let icon = plivoCallInProgress ?
       <FontIcon className="material-icons">
