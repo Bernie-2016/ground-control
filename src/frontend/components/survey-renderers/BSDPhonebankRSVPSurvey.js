@@ -1,7 +1,7 @@
 import React from 'react';
 import Relay from 'react-relay'
-import BSDSurvey from './BSDSurvey'
 import {BernieColors, BernieText} from '../styles/bernie-css'
+import Form from 'react-formal'
 import {GoogleMapLoader, GoogleMap, Marker} from 'react-google-maps';
 import {FlatButton, Paper} from 'material-ui';
 import moment from 'moment';
@@ -19,13 +19,16 @@ class BSDPhonebankRSVPSurvey extends React.Component {
   }
 
   submit() {
-    this.refs.survey.refs.component.submit()
+
+//    this.refs.survey.refs.component.submit()
   }
 
   state = {
     clickedMarker: null,
     selectedEventId: null,
     joinCallTeam: null,
+    signupQuestion1: null,
+    signupQuestion2: null,
     dateFilter: "upcoming"
   }
 
@@ -52,8 +55,8 @@ class BSDPhonebankRSVPSurvey extends React.Component {
         return -1
       return marker1.startDate - marker2.startDate
     })
-    console.log(markers)
-    this.setState({clickedMarker: markers[0]})
+    if (markers[0] && markers[0].key !== 'home')
+      this.setState({clickedMarker: markers[0]})
   }
 
   momentWithOffset(startDate, utcOffset) {
@@ -188,11 +191,10 @@ class BSDPhonebankRSVPSurvey extends React.Component {
             ...BernieText.default,
             fontSize: '1.0em'
           }}>
-            <div>{marker.venueName}</div>
+            <div><a href={marker.link} target="_blank">{marker.venueName}</a></div>
             <div>{marker.addr1}</div>
             <div>{marker.addr2}</div>
             <div>Attendance: {attendance}</div>
-            <div><a href={marker.link} target="_blank">Direct Link</a></div>
             {this.state.selectedEventId === marker.eventId ? this.deselectButton() : this.selectButton(marker)}
           </div>
         </div>
@@ -401,31 +403,83 @@ class BSDPhonebankRSVPSurvey extends React.Component {
     if (eventCount >= 2) {
       text = (
         <div>
-          <strong>[If no]</strong> That's ok - is there a day that you are free to go to a phone bank party? There are <strong>{eventCount}</strong> upcoming phone banks in your area. <strong>[Click the event date filter above to find a date that works for them and click on an event pin on the map to get its description]</strong>.
+          <p>That's ok - is there a day that you are free to go to a phone bank party? There are <strong>{eventCount}</strong> upcoming phone banks in your area. <strong>[Click the event date filter above to find a date that works for them and click on a pin on the map to get its description]</strong>.
+          </p>
+          <GCBooleanField
+            label="Can I sign you up for this other phone bank party?"
+            labelStyle={this.styles.question}
+            value={this.state.signupQuestion2}
+            onChange={(value) => this.setState({signupQuestion2: value})}
+          />
         </div>
       )
     }
     else
       text = (
         <div>
-          <strong>[If no]</strong> That's ok.  There's no other phone banks in your area upcoming, but check out https://map.berniesanders.com.  And if you are interested, sign up to host a phone bank there and we'll make sure people in your area find out about it!
+          <span>That's ok.  There's no other phone banks in your area upcoming, but check out https://map.berniesanders.com.  And if you are interested, sign up to host a phone bank there and we'll make sure people in your area find out about it!
+          </span>
         </div>
       )
     return text
   }
 
+  renderResultFromQuestion2() {
+    if (this.state.signupQuestion2 === null)
+      return <div></div>
+    return (
+      <div>
+      {this.state.signupQuestion2 === false ? "No worries - thanks for taking the time to hear me out." : "Great! I've signed you up, and you should be receiving an e-mail with all the details soon!"}
+      </div>
+    )
+  }
+
+  renderResultFromQuestion1() {
+    let yes = <div>Great! I've signed you up and you should be receiving an e-mail with all the details soon!</div>
+    let no = this.renderNo();
+    let result = (
+      <div>
+        <div style={{marginTop: 20}}>
+          <strong>[If yes, click 'Select' on the phone bank above]</strong> {yes}
+        </div>
+        <div style={this.styles.paragraph}>
+          <strong>[If no]</strong> {no}
+        </div>
+      </div>
+    )
+    if (this.state.signupQuestion1 === true)
+      return (
+        <div style={{marginTop: 20}}>
+          <strong>[Click 'Select' on the phone bank above]</strong>
+          {yes}
+        </div>
+      )
+
+    else if (this.state.signupQuestion1 === false)
+      return (
+        <div style={this.styles.paragraph}>
+          {no}
+          {this.renderResultFromQuestion2()}
+        </div>
+      )
+    return result;
+  }
+
   render() {
     return (
       <div style={BernieText.default}>
-        <div style={{marginBottom: 15}}>
+        <div style={{marginBottom: 0}}>
           <p>Hi <strong>{this.props.interviewee.firstName || ''}</strong>, my name is {this.props.currentUser.firstName || '_______'} and I'm a volunteer with the Bernie Sanders campaign. I'm calling you because you signed up at some point to help out with the Bernie Sanders campaign.  Right now, we are trying to get as many volunteers as possible to show up to phone bank parties that other volunteers are hosting.  These phone banks are events where volunteers get together to contact voters in the early states.  It's an incredibly crucial part of our strategy to get Senator Sanders elected as president because we've seen that when volunteers talk to voters, Bernie starts doing better.
           </p>
           <p style={this.styles.paragraph}>
           I see that there is a phone bank being held near you on <strong>{this.state.clickedMarker ? this.momentWithOffset(this.state.clickedMarker.startDate, this.state.clickedMarker.localUTCOffset).format(WEEKDAY_DATE_FORMAT) : '[event date]'}</strong> at <strong>{this.state.clickedMarker ? this.state.clickedMarker.addr1 : '[event address]'}</strong>.
           </p>
-          <p style={this.styles.question}>
-            Can I sign you up for this phone bank?
-          </p>
+          <GCBooleanField
+            label="Can I sign you up for this phone bank party?"
+            labelStyle={this.styles.question}
+            value={this.state.signupQuestion1}
+            onChange={(value) => this.setState({signupQuestion1: value})}
+          />
         </div>
         <div style={{marginBottom: 5}}>
           {this.renderDateFilters()}
@@ -436,14 +490,9 @@ class BSDPhonebankRSVPSurvey extends React.Component {
         {this.renderSelectedEvent()}
         {this.renderMarkerDescription(this.state.clickedMarker)}
         <div>
-          <p style={{marginTop: 20}}>
-            <strong>[If yes, click 'Select' on the phone bank above]</strong> Great! I've signed you up!
-          </p>
+          {this.renderResultFromQuestion1()}
           <p style={this.styles.paragraph}>
-            {this.renderNo()}
-          </p>
-          <p style={this.styles.paragraph}>
-            One last thing: we need more people to make calls like the one I'm making.
+            One last thing: we need more people to make calls like the one I'm making. You can do these from home and you'll be talking to other volunteers who have agreed to be contacted.
           </p>
           <p style={this.styles.question}>
 
@@ -457,18 +506,6 @@ class BSDPhonebankRSVPSurvey extends React.Component {
             />
           </div>
         </div>
-        <BSDSurvey
-          ref='survey'
-          style={{
-            display: 'none'
-          }}
-          survey={this.props.survey}
-          interviewee={this.props.interviewee}
-          onSubmitted={this.props.onSubmitted}
-          onLoaded={() => {
-            this.refs.survey.refs.component.hideField('event_id')
-          }}
-        />
       </div>
     )
   }
@@ -479,11 +516,6 @@ export default Relay.createContainer(BSDPhonebankRSVPSurvey, {
     type: 'phonebank'
   },
   fragments: {
-    survey: () => Relay.QL`
-      fragment on Survey {
-        ${BSDSurvey.getFragment('survey')}
-      }
-    `,
     currentUser: () => Relay.QL`
       fragment on User {
         firstName
@@ -491,7 +523,6 @@ export default Relay.createContainer(BSDPhonebankRSVPSurvey, {
     `,
     interviewee: () => Relay.QL`
       fragment on Person {
-        ${BSDSurvey.getFragment('interviewee')}
         firstName
         email
         address {

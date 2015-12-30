@@ -38,7 +38,6 @@ export default Relay.createContainer(SurveyRenderer, {
       fragment on Survey {
         renderer
         ${BSDSurvey.getFragment('survey')}
-        ${BSDPhonebankRSVPSurvey.getFragment('survey')}
       }
     `,
     interviewee: () => Relay.QL`
