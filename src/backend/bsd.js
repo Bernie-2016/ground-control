@@ -455,6 +455,7 @@ export default class BSD {
             duration: form['duration_num'] * form['duration_unit'],
             capacity: form['capacity']
         }],
+        is_official: form['event_type_id'] === 14, // HACK
         local_timezone: form['start_tz'],
         attendee_volunteer_message: form['attendee_volunteer_message'],
         is_searchable: (form['is_searchable']) ? form['is_searchable'] : -2, // second value should set to event type default
