@@ -176,10 +176,18 @@ export default class BSD {
 
   async processSignup(formId, formFieldValues) {
     let fields = ''
+
     Object.keys(formFieldValues).forEach((key) => {
-      fields = fields + `<signup_form_field id="${key}">${formFieldValues[key]}</signup_form_field>`
+      let val = formFieldValues[key]
+      if (val === true)
+        val = 'Yes'
+      else if (val === false)
+        val = 'No'
+      else if (val === null)
+        val = ''
+      fields = fields + `<signup_form_field id="${key}">${val}</signup_form_field>`
     })
-    let params = `<?xml version="1.0" encoding="utf-8"?><api><signup_form id="${formId}">${fields}</api>`;
+    let params = `<?xml version="1.0" encoding="utf-8"?><api><signup_form id="${formId}">${fields}</signup_form></api>`;
 
     let response = await this.sendXML('/signup/process_signup', params, 'POST');
   }

@@ -156,9 +156,9 @@ class BSDPhonebankRSVPSurvey extends React.Component {
 
   renderMarkerDescription(marker) {
     let description = <div></div>
-    let borderColor = this.state.selectedEventId === marker.eventId ? BernieColors.blue : BernieColors.green
     if (!marker)
       return <div></div>;
+    let borderColor = this.state.selectedEventId === marker.eventId ? BernieColors.blue : BernieColors.green
     if (marker.key === 'home')
       description = (
         <div>
@@ -414,42 +414,40 @@ class BSDPhonebankRSVPSurvey extends React.Component {
     return text
   }
 
-  renderResultFromQuestion() {
-    let yes = <div>Great! I've signed you up and you should be receiving an e-mail with all the details soon!</div>
-    let no = <div>That's ok.  If you change your mind, you can always head to <strong>map.berniesanders.com</strong> to sign up.  And if you are interested, sign up to host a phone bank there and we'll make sure people in your area find out about it!</div>
-    let text = (
+  renderScriptAfterQuestion(yes, no, questionValue) {
+    let both = (
       <div>
-        <div style={{marginTop: 20}}>
-          <strong>[If yes]</strong> {yes}
-        </div>
-        <div style={this.styles.paragraph}>
-          <strong>[If no]</strong> {no}
-        </div>
+        <div><strong>[If yes]</strong> {yes}</div>
+        <div style={this.styles.paragraph}><strong>[If no]</strong> {no}</div>
       </div>
     )
-    if (this.state.signupQuestion === true)
-      return <div style={{marginTop: 20}}>{yes}</div>
-    else if (this.state.signupQuestion === false)
-      return <div style={{marginTop: 20}}>{no}</div>
-    return text
+    return (
+      <div style={{marginTop: 20}}>
+        {questionValue === true ? yes : (questionValue === false) ? no : both}
+      </div>
+    )
   }
 
   render() {
+    let signupYesText = <div>Great! I've signed you up and you should be receiving an e-mail with all the details soon!</div>
+    let signupNoText = <div>That's ok.  If you change your mind, you can always head to <strong>map.berniesanders.com</strong> to sign up.  And if you are interested, sign up to host a phone bank there and we'll make sure people in your area find out about it!</div>
+    let callTeamYesText = <div>Thanks! You should get an e-mail shortly with information in it about how to get involved.</div>
+    let callTeamNoText = <div>No worries. I understand that calling isn't everyone's thing. You can still get involved in other ways if you let us know at <strong>berniesanders.com/volunteer</strong>.</div>
     return (
       <div style={BernieText.default}>
         <div style={{marginBottom: 0}}>
           <div style={{
             ...BernieText.title,
             fontSize: '1.4em',
-            color: BernieColors.darkGray
+            color: BernieColors.lightBlue
           }}>
           Call Script
           </div>
-          <p>Hi <strong>{this.props.interviewee.firstName || ''}</strong>, my name is {this.props.currentUser.firstName || '_______'} and I'm a volunteer with the Bernie Sanders campaign. I'm calling you because you signed up at some point to help out with the Bernie Sanders campaign.  Right now, we are trying to get as many volunteers as possible to show up to phone bank parties that other volunteers are hosting.  These phone banks are events where volunteers get together to contact voters in the early states.  It's an incredibly crucial part of our strategy to get Senator Sanders elected as president because we've seen that when volunteers talk to voters, Bernie starts doing better.
-          </p>
-          <p style={this.styles.paragraph}>
+          <div>Hi <strong>{this.props.interviewee.firstName || ''}</strong>, my name is {this.props.currentUser.firstName || '_______'} and I'm a volunteer with the Bernie Sanders campaign. I'm calling you because you signed up at some point to help out with the Bernie Sanders campaign.  Right now, we are trying to get as many volunteers as possible to show up to phone bank parties that other volunteers are hosting.  These phone banks are events where volunteers get together to contact voters in the early states.  It's an incredibly crucial part of our strategy to get Senator Sanders elected as president because we've seen that when volunteers talk to voters, Bernie starts doing better.
+          </div>
+          <div style={this.styles.paragraph}>
           I see that there is a phone bank being held near you on <strong>{this.state.clickedMarker ? this.momentWithOffset(this.state.clickedMarker.startDate, this.state.clickedMarker.localUTCOffset).format(WEEKDAY_DATE_FORMAT) : '[event date]'}</strong> at <strong>{this.state.clickedMarker ? this.state.clickedMarker.addr1 : '[event address]'}</strong>.  {this.renderAdditionalEvents()}
-          </p>
+          </div>
           <GCBooleanField
             errorText={this.state.errors.signupQuestion}
             label="Can I sign you up for this phone bank party?"
@@ -457,9 +455,8 @@ class BSDPhonebankRSVPSurvey extends React.Component {
             value={this.state.signupQuestion}
             onChange={(value) => {
               let selectedEventId = null
-              if (this.state.clickedMarker === null) {
-                log.error('No clicked marker when selecting event', this.props.interviewee.email, this.props.interviewee.nearbyEvents.length)
-              }
+              if (this.state.clickedMarker === null)
+                log.error(`No clicked marker when selecting event -- Interviewee: ${this.props.interviewee.email}: Nearby events count: ${this.props.interviewee.nearbyEvents.length}`)
               else
                 selectedEventId = value ? this.state.clickedMarker.eventId : null
 
@@ -479,13 +476,10 @@ class BSDPhonebankRSVPSurvey extends React.Component {
         </div>
         {this.renderMarkerDescription(this.state.clickedMarker)}
         <div>
-          {this.renderResultFromQuestion()}
-          <p style={this.styles.paragraph}>
+          {this.renderScriptAfterQuestion(signupYesText, signupNoText, this.state.signupQuestion)}
+          <div style={this.styles.paragraph}>
             One last thing: we need more people to make calls like the one I'm making. You can do these from home and you'll be talking to other volunteers who have agreed to be contacted.
-          </p>
-          <p style={this.styles.question}>
-
-          </p>
+          </div>
           <div style={{marginBottom: 15}}>
             <GCBooleanField
               errorText={this.state.errors.joinCallTeam}
@@ -494,6 +488,9 @@ class BSDPhonebankRSVPSurvey extends React.Component {
               value={this.state.joinCallTeam}
               onChange={(value) => this.setState({joinCallTeam: value})}
             />
+          </div>
+          <div>
+            {this.renderScriptAfterQuestion(callTeamYesText, callTeamNoText, this.state.joinCallTeam)}
           </div>
         </div>
       </div>

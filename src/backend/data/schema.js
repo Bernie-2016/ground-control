@@ -933,28 +933,64 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
         .first()
 
       let fieldValues = JSON.parse(surveyFieldValues)
+
       fieldValues['person'] = await knex('bsd_people')
         .transacting(trx)
         .where('cons_id', localIntervieweeId)
         .first()
 
+      let person = fieldValues['person']
+      let email = await getPrimaryEmail(person, trx)
       let processorsLength = survey.processors.length
+
       if (completed && processorsLength > 0) {
         for (let index = 0; index < processorsLength; index++) {
           let processor = survey.processors[index];
           switch (processor) {
             case 'bsd-event-rsvper':
-              let person = fieldValues['person']
-              let email = await getPrimaryEmail(person, trx)
-              let address = await getPrimaryAddress(person, trx)
-              let phone = await getPrimaryPhone(person, trx)
-
-              let zip = address.zip
-              await BSDClient.noFailApiRequest('addRSVPToEvent', email, zip, phone, fieldValues['event_id'])
+              if (fieldValues['event_id']) {
+                let address = await getPrimaryAddress(person, trx)
+                let phone = await getPrimaryPhone(person, trx)
+                let zip = address.zip
+                await BSDClient.noFailApiRequest('addRSVPToEvent', email, zip, phone, fieldValues['event_id'])
+              }
               break;
             case 'bsd-form-submitter':
               let bsdFormValues = {}
+              if (email) {
+                fieldValues['Email'] = email
+                let fields = Object.keys(fieldValues)
+                for (let index = 0; index < fields.length; index++) {
+                  let field = fields[index]
+                  let fieldId = field;
+                  // Field is not a numeric id
+                  if (!(/^\d+$/.test(field))) {
+                    let fieldObj = await knex('bsd_survey_fields')
+                      .select('signup_form_field_id')
+                      .where('signup_form_id', survey.signup_form_id)
+                      .where('label', field)
+                      .transacting(trx)
+                      .first()
+                    if (!fieldObj)
+                      fieldObj = await knex('bsd_survey_fields')
+                        .where('signup_form_id', survey.signup_form_id)
+                        .where('label', 'ilike', `[${field}]%`)
+                        .transacting(trx)
+                        .first()
 
+                    if (fieldObj)
+                      fieldId = fieldObj.signup_form_field_id
+                    else
+                      fieldId = null
+                  }
+                  if (fieldId)
+                    bsdFormValues[fieldId] = fieldValues[field]
+                }
+                await BSDClient.noFailApiRequest('processSignup', survey.signup_form_id, bsdFormValues)
+              }
+              else
+                log.error(`Could not find an e-mail address for constituent: ${localIntervieweeId}`)
+              break;
           }
         }
       }
@@ -1016,10 +1052,9 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
           underlyingSurvey = await knex.insertAndFetch('bsd_surveys', model, {transaction: trx, idField: 'signup_form_id'})
           let fieldInsertionPromises = BSDSurveyFieldsResponse.map((field) => {
             let model = modelFromBSDResponse(field, 'bsd_survey_fields')
-            console.log(model)
             return knex('bsd_survey_fields').insert(model)
           })
-          console.log(fieldInsertionPromises)
+
           await Promise.all(fieldInsertionPromises);
         } catch (err) {
           if (err && err.response && err.response.statusCode === 409)

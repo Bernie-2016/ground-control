@@ -54,7 +54,8 @@ class CallAssignment extends React.Component {
       padding: '15px 15px 15px 15px'
     },
     submitButton: {
-
+      marginTop: 20,
+      marginBottom: 20
     }
   }
 
