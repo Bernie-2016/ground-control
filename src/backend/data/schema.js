@@ -524,16 +524,14 @@ const GraphQLPerson = new GraphQLObjectType({
 
         let query = knex('bsd_events')
           .whereRaw(`ST_DWithin(bsd_events.geom, st_transform(st_setsrid(st_makepoint(${address.longitude}, ${address.latitude}), 4326), 900913), ${within * 1000})`)
-//          .where('start_dt', '>', new Date())
-//          .where('flag_approval', false)
-//          .whereNot('is_searchable', 0)
+          .where('start_dt', '>', new Date())
+          .where('flag_approval', false)
+          .whereNot('is_searchable', 0)
 
-        log.info(query.toString())
-//        if (eventTypes)
-//          query = query.whereIn('event_type_id', eventTypes.map((type) => type.event_type_id))
+        if (eventTypes)
+          query = query.whereIn('event_type_id', eventTypes.map((type) => type.event_type_id))
 
-        let events = await query;
-        return events
+        return query
       }
     }
   }),
