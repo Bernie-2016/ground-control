@@ -169,7 +169,8 @@ class AdminEventsSection extends React.Component {
       lineHeight: '18px',
     }}
     >
-      {data[rowIndex]['node'] ? data[rowIndex]['node'][col]['name'] : ''}
+      name: {data[rowIndex]['node'] ? data[rowIndex]['node'][col]['name'] : ''}<br/>
+      id: {data[rowIndex]['node'] ? data[rowIndex]['node'][col]['id'] : ''}
     </Cell>
   )
 
@@ -339,7 +340,7 @@ class AdminEventsSection extends React.Component {
             menuItems={filterOptions}
             selectedIndex={filterOptionsIndex}
             onChange={(event, value) => {
-              this._handleRequestFiltersChange('flagApproval', !(value));
+              this._handleRequestFiltersChange({flagApproval: !(value)});
             }}
             menuItemStyle={BernieText.menuItem}
             style={{marginRight: '0'}}
@@ -366,7 +367,7 @@ class AdminEventsSection extends React.Component {
               return <MenuItem index={index} key={index} primaryText={item.abbreviation} />
             })}
           </IconMenu>*/}
-          <div
+          {/*<div
             style={{ position: 'relative', top: '20px', display: 'inline' }}
           >
             <label htmlFor="stateSelect" style={{ display: 'inline', marginRight: '0.5em', fontSize: '0.8em' }}>Filter by State</label>
@@ -375,7 +376,7 @@ class AdminEventsSection extends React.Component {
               onChange={(event) => {
                 let updatedValue = event.target.value;
                 if (updatedValue == 'none'){updatedValue = null}
-                this._handleRequestFiltersChange('venueState', updatedValue);
+                this._handleRequestFiltersChange({'venueState': updatedValue});
               }}
             >
               <option value='none'>--</option>
@@ -383,7 +384,7 @@ class AdminEventsSection extends React.Component {
                 return <option key={index} value={item.abbreviation}>{item.name}</option>
               })}
             </select>
-          </div>
+          </div>*/}
           {/*<IconButton
             iconClassName="material-icons"
             tooltipPosition="bottom-center"
@@ -394,12 +395,15 @@ class AdminEventsSection extends React.Component {
               this._handleRequestRefresh();
             }}
           >refresh</IconButton>*/}
-          {/*<RaisedButton
-            label="Search Events"
+          <RaisedButton
+            label="More Filters"
+            labelPosition="after"
             onTouchTap={() => {
               this.setState({showFiltersDialog: true});
             }}
-          />*/}
+          >
+            <FontIcon className="material-icons" style={{position: 'relative', top: '6px', left: '6px'}}>filter_list</FontIcon>
+          </RaisedButton>
         </ToolbarGroup>
         <ToolbarGroup key={1} float="right">
           <RaisedButton
@@ -527,10 +531,26 @@ class AdminEventsSection extends React.Component {
   renderFiltersModal() {
     let standardActions = [
       { text: 'Cancel' },
+      { text: 'Clear',
+        onTouchTap: () => {
+          this._handleRequestFiltersChange({}, true);
+          this.setState({showFiltersDialog: false});
+        }
+      },
       { text: 'Update Filters',
         onTouchTap: () => {
-          console.log(this.refs);
-          // this.refs.eventEdit.refs.component.submit()
+          let filtersArray = jQuery(this.refs.eventSearchForm).serializeArray();
+          let filtersObject = {};
+          filtersArray.forEach((filter) => {
+            if (filter.value && filter.value != 'none'){
+              filtersObject[filter.name] = String(filter.value);
+            }
+            else {
+              delete filtersObject[filter.name];
+            }
+          });
+          this._handleRequestFiltersChange(filtersObject, true);
+          this.setState({showFiltersDialog: false});
         },
         ref: 'submit'
       }
@@ -538,15 +558,34 @@ class AdminEventsSection extends React.Component {
 
     const labelStyle = { display: 'inline', marginRight: '0.5em', fontSize: '0.8em' };
 
+    const FilterInput = ({name, label}) => (
+      <div>
+        <label htmlFor={name} style={labelStyle}>{label}: </label>
+        <input
+          name={name}
+          defaultValue={this.props.relay.variables.filters[name]}
+          // onChange={updateFilters}
+        />
+      </div>
+    );
+
+    const filterInputs = [
+      {name: 'venueZip', label: 'Zip Code'},
+      {name: 'eventIdObfuscated', label: 'Event ID'},
+      {name: 'eventTypeId', label: 'Event Type ID'}
+    ];
+
     let updateFilters = (event) => {
       let updatedValue = event.target.value;
-      if (updatedValue == 'none'){updatedValue = null}
-      this._handleRequestFiltersChange(event.target.name, updatedValue);
+      if (updatedValue == 'none'){updatedValue = null};
+      let updatedFilters = {};
+      updatedFilters[event.target.name] = updatedValue;
+      this._handleRequestFiltersChange(updatedFilters);
     };
 
     return (
       <Dialog
-        title='Search Events'
+        title='Event Filters'
         actions={standardActions}
         open={this.state.showFiltersDialog}
         onRequestClose={() => {
@@ -558,13 +597,16 @@ class AdminEventsSection extends React.Component {
       >
       <form
         ref='eventSearchForm'
-        onSubmit={console.log(this)}
+        onSubmit={(e, data) => {
+          e.preventDefault();
+          console.log('form submitted', data);
+        }}
       >
         <label htmlFor="venueState" style={labelStyle}>State: </label>
         <select
           name='venueState'
-          value={this.props.relay.variables.filters.venueState}
-          onChange={updateFilters}
+          defaultValue={this.props.relay.variables.filters.venueState}
+          // onChange={updateFilters}
         >
           <option value='none'>--</option>
           {states.map((item, index) => {
@@ -574,12 +616,11 @@ class AdminEventsSection extends React.Component {
 
         <br/>
 
-        <label htmlFor="venueZip" style={labelStyle}>Zip Code: </label>
-        <input
-          name='venueZip'
-          value={this.props.relay.variables.filters.venueZip}
-          onChange={updateFilters}
-        />
+        {filterInputs.map((input, index) => {
+          return <FilterInput name={input.name} label={input.label} key={index}/>
+        })}
+        
+
       </form>
       </Dialog>
     )
@@ -684,12 +725,17 @@ class AdminEventsSection extends React.Component {
     this.forceUpdate()
   }
 
-  _handleRequestFiltersChange = (prop, value) => {
-    let newVar = {}
-    newVar[prop] = value;
+  _handleRequestFiltersChange = (newVars, force) => {
     let oldVars = this.props.relay.variables.filters;
-
-    this.props.relay.setVariables(Object.assign(oldVars, newVar));
+    if (force){
+      if (!newVars.hasOwnProperty('flagApproval')){
+        newVars['flagApproval'] = oldVars['flagApproval'];
+      }
+      this.props.relay.setVariables({filters: newVars});
+    }
+    else {
+      this.props.relay.setVariables(Object.assign(oldVars, newVars));
+    }
     this.setState({selectedRows: []});
   }
 
@@ -884,7 +930,7 @@ class AdminEventsSection extends React.Component {
             cell={
               <this.EventTypeCell data={events} col="eventType" />
             }
-            width={120}
+            width={150}
         />
         </ColumnGroup>
         <ColumnGroup
