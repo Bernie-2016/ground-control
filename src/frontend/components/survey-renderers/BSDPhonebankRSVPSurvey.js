@@ -64,8 +64,8 @@ class BSDPhonebankRSVPSurvey extends React.Component {
     }
   }
 
-  selectDefaultMarker() {
-    let markers = this.markers()
+  selectDefaultMarker(dateFilter) {
+    let markers = this.markers(dateFilter)
     markers.sort((marker1, marker2) => {
       if (marker1.key === 'home')
         return 1
@@ -229,7 +229,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
     return desc.trim();
   }
 
-  markers() {
+  markers(dateFilter) {
     let center = this.intervieweeHomeCoords();
     let homeIcon = {
       path: 'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z',
@@ -249,9 +249,11 @@ class BSDPhonebankRSVPSurvey extends React.Component {
       }
     ];
 
+    let filter = dateFilter || this.state.dateFilter
+
     this.props.interviewee.nearbyEvents.forEach((event) => {
-      if(this.state.dateFilter != 'upcoming'){
-        if(!moment().add(this.state.dateFilter.split('_')[0], 'days').isSame(this.momentWithOffset(event.startDate, event.localUTCOffset), 'day')){
+      if(filter != 'upcoming') {
+        if(!moment().utcOffset(event.localUTCOffset).add(filter.split('_')[0], 'days').isSame(this.momentWithOffset(event.startDate, event.localUTCOffset), 'day')) {
           return;
         }
       }
@@ -336,7 +338,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
 
     // comically large for test purposes
     // 10 or 14 would be well suited for the real world I think.
-    for(let dayCount = 0; dayCount < 300; dayCount++){
+    for(let dayCount = 0; dayCount < 300; dayCount++) {
       let label = '';
       if(dayCount == 0){
         label = 'Today, '
@@ -344,15 +346,13 @@ class BSDPhonebankRSVPSurvey extends React.Component {
         label = 'Tomorrow, '
       }
 
-      let date = moment().add(dayCount, 'days')
-
       // make sure we have events to accommodate that day.
       this.props.interviewee.nearbyEvents.forEach((event) => {
+        let date = moment().utcOffset(event.localUTCOffset).add(dayCount, 'days')
         if(this.momentWithOffset(event.startDate, event.localUTCOffset).isSame(date, 'day')){
           options[dayCount + "_days"] = label + date.format(WEEKDAY_DATE_FORMAT)
         }
       })
-
     }
 
     return options
@@ -366,6 +366,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
           this.setState({
             dateFilter: value
           })
+          this.selectDefaultMarker(value)
         }}
         clearable={false}
         value={this.state.dateFilter}
