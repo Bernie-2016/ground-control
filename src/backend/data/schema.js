@@ -329,10 +329,10 @@ const GraphQLUser = new GraphQLObjectType({
         else {
           let callAssignment = await rootValue.loaders.bsdCallAssignments.load(localId)
           let allOffsets = [-10, -9, -8, -7, -6, -5, -4]
-          let validOffsets = []
+          let validOffsets = [-5]
           allOffsets.forEach((offset) => {
             let time = moment().utcOffset(offset)
-            if (time.hours() >= 9 && time.hours() <= 21)
+            if (time.hours() >= 9 && time.hours() < 21)
               validOffsets.push(offset)
           })
           if (validOffsets.length === 0)
