@@ -399,8 +399,8 @@ const GraphQLUser = new GraphQLObjectType({
             .first()
 
           let latLng = null
-          if (userAddress)
-            query = query.whereNot('bsd_people.cons_id', userAddress.cons_id)
+//          if (userAddress)
+//            query = query.whereNot('bsd_people.cons_id', userAddress.cons_id)
 
           // Only use geo sorting when the caller is in a timezone that is valid.  Otherwise it's super slow
           if (userAddress && validOffsets.indexOf(userAddress.timezone_offset) !== -1 && userAddress.latitude && userAddress.longitude)
