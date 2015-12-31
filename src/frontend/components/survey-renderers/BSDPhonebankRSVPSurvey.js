@@ -432,7 +432,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
   render() {
     let signupYesText = <div>Great! I've signed you up and you should be receiving an e-mail with all the details soon!</div>
     let signupNoText = <div>That's ok.  If you change your mind, you can always head to <strong>map.berniesanders.com</strong> to sign up.  And if you are interested, sign up to host a phone bank there and we'll make sure people in your area find out about it!</div>
-    let callTeamYesText = <div>Thanks! You should get an e-mail shortly with information in it about how to get involved.</div>
+    let callTeamYesText = <div>Thanks!</div>
     let callTeamNoText = <div>No worries. I understand that calling isn't everyone's thing. You can still get involved in other ways if you let us know at <strong>berniesanders.com/volunteer</strong>.</div>
     return (
       <div style={BernieText.default}>
