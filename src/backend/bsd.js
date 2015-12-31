@@ -24,7 +24,7 @@ export default class BSD {
     try {
       return await this[method](...args);
     } catch (e) {
-      log.error(e.message, e.stack);
+      log.error(e.toString(), e.message, e.stack);
       await knex('bsd_audits').insert({
         class: 'BSDClient',
         method: method,
@@ -56,6 +56,15 @@ export default class BSD {
       groupObj[key] = this.cleanField(group[key]);
     })
     return groupObj;
+  }
+
+  createSurveyFormFieldObject(formField) {
+    let formFieldObj = {}
+    formFieldObj['signup_form_field_id'] = formField['$']['id'];
+    Object.keys(formField).forEach((key) => {
+      formFieldObj[key] = this.cleanField(formField[key])
+    })
+    return formFieldObj;
   }
 
   createSurveyObject(survey) {
@@ -165,6 +174,24 @@ export default class BSD {
     return this.createGroupObject(group);
   }
 
+  async processSignup(formId, formFieldValues) {
+    let fields = ''
+
+    Object.keys(formFieldValues).forEach((key) => {
+      let val = formFieldValues[key]
+      if (val === true)
+        val = 'Yes'
+      else if (val === false)
+        val = 'No'
+      else if (val === null)
+        val = ''
+      fields = fields + `<signup_form_field id="${key}">${val}</signup_form_field>`
+    })
+    let params = `<?xml version="1.0" encoding="utf-8"?><api><signup_form id="${formId}">${fields}</signup_form></api>`;
+
+    let response = await this.sendXML('/signup/process_signup', params, 'POST');
+  }
+
   async getForm(formId) {
     let response = await this.request('signup/get_form', {signup_form_id: formId}, 'GET');
 
@@ -176,6 +203,21 @@ export default class BSD {
       survey = survey[0];
 
     return this.createSurveyObject(survey);
+  }
+
+  async listFormFields(formId) {
+    let response = await this.request('signup/list_form_fields', {signup_form_id: formId})
+    response = await parseStringPromise(response);
+    let formFields = response.api.signup_form_field;
+    let formFieldsObjects = formFields.map((field) => {
+      let formFieldObj = this.createSurveyFormFieldObject(field)
+      formFieldObj['signup_form_id'] = formId
+      // To make this consistent with other responses
+      formFieldObj['modified_dt'] = formFieldObj['create_dt']
+      return formFieldObj
+    })
+
+    return formFieldsObjects;
   }
 
   createBundleString(bundles) {
@@ -255,7 +297,7 @@ export default class BSD {
     constituent['password'] = password;
 
     // set the constituent password asynchronously
-    this.setConstituentPassword(email, password);
+    await this.setConstituentPassword(email, password);
     return constituent;
 
     function randString(x){

@@ -142,7 +142,10 @@ class BSDSurvey extends React.Component {
     )
 
     return (
-      <div style={this.styles.container}>
+      <div style={{
+        ...this.styles.container,
+        ...this.props.style
+      }}>
         {loading}
         {frame}
       </div>
@@ -159,6 +162,11 @@ export default Relay.createContainer(BSDSurvey, {
     `,
     interviewee: () => Relay.QL`
       fragment on Person {
+        email
+      }
+    `,
+    currentUser: () => Relay.QL`
+      fragment on User {
         email
       }
     `

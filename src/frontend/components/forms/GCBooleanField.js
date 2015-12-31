@@ -7,9 +7,14 @@ export default class GCBooleanField extends React.Component {
     label: {
       ...BernieText.inputLabel
     },
+    button: {
+      border: '1px solid ' + BernieColors.lightBlue,
+      marginRight: 5
+    },
     selectedButton: {
       color: BernieColors.lightBlue,
-      backgroundColor: BernieColors.blue
+      backgroundColor: BernieColors.blue,
+      marginRight: 5
     },
   }
   render() {
@@ -31,6 +36,7 @@ export default class GCBooleanField extends React.Component {
       <FlatButton
         label="Yes"
         secondary={true}
+        style={this.styles.button}
         onTouchTap={(event) => {this.props.onChange(true)}}
       />
     )
@@ -38,6 +44,7 @@ export default class GCBooleanField extends React.Component {
       <FlatButton
         label="No"
         secondary={true}
+        style={this.styles.button}
         onTouchTap={(event) => {this.props.onChange(false)}}
       />
     )
@@ -58,10 +65,10 @@ export default class GCBooleanField extends React.Component {
         <div style={labelStyle}>
           {this.props.label}
         </div>
-        <br />
-        {yesButton}
-        {noButton}
-        <br />
+        <div style={{marginTop: 10}}>
+          {yesButton}
+          {noButton}
+        </div>
         {error}
       </div>
     )

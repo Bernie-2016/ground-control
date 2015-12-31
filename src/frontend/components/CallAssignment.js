@@ -11,6 +11,7 @@ import GCForm from './forms/GCForm';
 import Form from 'react-formal';
 import SubmitCallSurvey from '../mutations/SubmitCallSurvey'
 import CallStatsBar from './CallStatsBar'
+import MutationHandler from './MutationHandler';
 
 class CallAssignment extends React.Component {
   styles = {
@@ -35,6 +36,7 @@ class CallAssignment extends React.Component {
     },
     surveyFrame: {
       borderTop: 'solid 1px ' + BernieColors.lightGray,
+      paddingTop: 30
     },
     questions: {
       paddingTop: 15,
@@ -52,14 +54,9 @@ class CallAssignment extends React.Component {
       padding: '15px 15px 15px 15px'
     },
     submitButton: {
-
+      marginTop: 20,
+      marginBottom: 20
     }
-  }
-
-  clearState() {
-    this.setState({
-      globalErrorMessage: null,
-    })
   }
 
   state = {
@@ -67,7 +64,6 @@ class CallAssignment extends React.Component {
     reasonNotCompleted: null,
     sentText: null,
     leftVoicemail: null,
-    globalErrorMessage: null,
     showInstructions: true
   }
 
@@ -185,18 +181,7 @@ class CallAssignment extends React.Component {
   }
 
   submitCallSurvey(surveyFields) {
-    this.clearState();
-    let onSuccess = () => {
-     window.location.reload()
-    }
-
-    let onFailure = (transaction) => {
-      this.clearState();
-      this.setState({globalErrorMessage: 'Something went wrong trying to submit your survey. Try again in a bit.'})
-      log.error(transaction.getError());
-    }
-
-    let callSurveyMutation = new SubmitCallSurvey({
+    this.refs.mutationHandler.send({
       currentUser: this.props.currentUser,
       completed: this.state.completed,
       callAssignmentId: this.props.callAssignment.id,
@@ -206,9 +191,7 @@ class CallAssignment extends React.Component {
       reasonNotCompleted: this.state.reasonNotCompleted,
       sentText: this.state.sentText,
       surveyFieldValues: JSON.stringify(surveyFields)
-    });
-    Relay.Store.update(callSurveyMutation, {onFailure, onSuccess})
-      ;
+    })
   }
 
   submitHandler(formValue) {
@@ -270,6 +253,7 @@ class CallAssignment extends React.Component {
           ref='survey'
           survey={this.props.callAssignment.survey}
           interviewee={this.props.currentUser.intervieweeForCallAssignment}
+          currentUser={this.props.currentUser}
           onSubmitted={(surveyFields) => this.submitCallSurvey(surveyFields)} />
       </div>
     )
@@ -299,6 +283,14 @@ class CallAssignment extends React.Component {
       )
     return (
       <div>
+        <MutationHandler
+          ref='mutationHandler'
+          mutationClass={SubmitCallSurvey}
+          defaultErrorMessage='Something went wrong trying to submit your survey. Try again in a bit.'
+          onSuccess = {() => {
+            window.location.reload()
+          }}
+          />
         <CallStatsBar callsMade={this.props.currentUser.allCallsMade} callsCompleted={this.props.currentUser.completedCallsMade} />
         <div style={this.styles.container}>
           {this.renderInstructions()}
@@ -310,7 +302,6 @@ class CallAssignment extends React.Component {
           <div style={this.styles.questions}>
             <GCForm
               schema={this.formSchema}
-              globalError={this.state.globalErrorMessage}
               onSubmit={() => this.submitHandler()}
               value={this.state}
               onChange={(formValue) => {
@@ -320,7 +311,7 @@ class CallAssignment extends React.Component {
               <div style={this.styles.callAssignmentQuestions}>
                 <Form.Field
                   name='completed'
-                  label='Were you able to complete the call?'
+                  label='Did the person pick up and answer all your questions?'
                   labelStyle={{
                     ...BernieText.secondaryTitle,
                     fontWeight: 600,
@@ -385,6 +376,7 @@ export default Relay.createContainer(CallAssignment, {
           }
           ${SurveyRenderer.getFragment('interviewee')}
         }
+        ${SurveyRenderer.getFragment('currentUser')}
       }
     `
   }
