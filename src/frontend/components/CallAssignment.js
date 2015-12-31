@@ -11,6 +11,7 @@ import GCForm from './forms/GCForm';
 import Form from 'react-formal';
 import SubmitCallSurvey from '../mutations/SubmitCallSurvey'
 import CallStatsBar from './CallStatsBar'
+import MutationHandler from './MutationHandler';
 
 class CallAssignment extends React.Component {
   styles = {
@@ -57,18 +58,11 @@ class CallAssignment extends React.Component {
     }
   }
 
-  clearState() {
-    this.setState({
-      globalErrorMessage: null,
-    })
-  }
-
   state = {
     completed: true,
     reasonNotCompleted: null,
     sentText: null,
     leftVoicemail: null,
-    globalErrorMessage: null,
     showInstructions: true
   }
 
@@ -186,18 +180,7 @@ class CallAssignment extends React.Component {
   }
 
   submitCallSurvey(surveyFields) {
-    this.clearState();
-    let onSuccess = () => {
-     window.location.reload()
-    }
-
-    let onFailure = (transaction) => {
-      this.clearState();
-      this.setState({globalErrorMessage: 'Something went wrong trying to submit your survey. Try again in a bit.'})
-      log.error(transaction.getError());
-    }
-
-    let callSurveyMutation = new SubmitCallSurvey({
+    this.refs.mutationHandler.send({
       currentUser: this.props.currentUser,
       completed: this.state.completed,
       callAssignmentId: this.props.callAssignment.id,
@@ -207,9 +190,7 @@ class CallAssignment extends React.Component {
       reasonNotCompleted: this.state.reasonNotCompleted,
       sentText: this.state.sentText,
       surveyFieldValues: JSON.stringify(surveyFields)
-    });
-    Relay.Store.update(callSurveyMutation, {onFailure, onSuccess})
-      ;
+    })
   }
 
   submitHandler(formValue) {
@@ -301,6 +282,14 @@ class CallAssignment extends React.Component {
       )
     return (
       <div>
+        <MutationHandler
+          ref='mutationHandler'
+          mutationClass={SubmitCallSurvey}
+          defaultErrorMessage='Something went wrong trying to submit your survey. Try again in a bit.'
+          onSuccess = {() => {
+            window.location.reload()
+          }}
+          />
         <CallStatsBar callsMade={this.props.currentUser.allCallsMade} callsCompleted={this.props.currentUser.completedCallsMade} />
         <div style={this.styles.container}>
           {this.renderInstructions()}
@@ -312,7 +301,6 @@ class CallAssignment extends React.Component {
           <div style={this.styles.questions}>
             <GCForm
               schema={this.formSchema}
-              globalError={this.state.globalErrorMessage}
               onSubmit={() => this.submitHandler()}
               value={this.state}
               onChange={(formValue) => {

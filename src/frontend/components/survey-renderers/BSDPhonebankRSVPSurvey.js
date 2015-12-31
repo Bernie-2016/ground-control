@@ -438,6 +438,13 @@ class BSDPhonebankRSVPSurvey extends React.Component {
     return (
       <div style={BernieText.default}>
         <div style={{marginBottom: 0}}>
+          <div style={{
+            ...BernieText.title,
+            fontSize: '1.4em',
+            color: BernieColors.darkGray
+          }}>
+          Call Script
+          </div>
           <p>Hi <strong>{this.props.interviewee.firstName || ''}</strong>, my name is {this.props.currentUser.firstName || '_______'} and I'm a volunteer with the Bernie Sanders campaign. I'm calling you because you signed up at some point to help out with the Bernie Sanders campaign.  Right now, we are trying to get as many volunteers as possible to show up to phone bank parties that other volunteers are hosting.  These phone banks are events where volunteers get together to contact voters in the early states.  It's an incredibly crucial part of our strategy to get Senator Sanders elected as president because we've seen that when volunteers talk to voters, Bernie starts doing better.
           </p>
           <p style={this.styles.paragraph}>

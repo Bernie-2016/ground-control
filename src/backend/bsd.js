@@ -24,7 +24,7 @@ export default class BSD {
     try {
       return await this[method](...args);
     } catch (e) {
-      log.error(e.message, e.stack);
+      log.error(e.toString(), e.message, e.stack);
       await knex('bsd_audits').insert({
         class: 'BSDClient',
         method: method,
