@@ -1123,8 +1123,19 @@ let RootQuery = new GraphQLObjectType({
         return rootValue.loaders.bsdCallAssignments.load(localId)
       }
     },
+    event: {
+      type: GraphQLEvent,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLString) }
+      },
+      resolve: async (root, {id}, {rootValue}) => {
+        authRequired(rootValue)
+        let localId = fromGlobalId(id).id
+        return rootValue.loaders.bsdEvents.load(localId)
+      }
+    },
     node: nodeField
-  }),
+  })
 })
 
 export let Schema = new GraphQLSchema({

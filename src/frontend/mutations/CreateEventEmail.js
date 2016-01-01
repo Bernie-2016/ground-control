@@ -1,6 +1,6 @@
 import Relay from 'react-relay'
 
-export default class CreateCallAssignment extends Relay.Mutation {
+export default class CreateEventEmail extends Relay.Mutation {
   static fragments = {
     listContainer: () => Relay.QL`
       fragment on ListContainer {

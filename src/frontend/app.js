@@ -8,6 +8,7 @@ import {Redirect, IndexRoute, IndexRedirect, Route, Router} from 'react-router';
 import ReactRouterRelay from 'react-router-relay';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import AdminDashboard from './components/AdminDashboard';
+import AdminEventEmailCreationForm from './components/AdminEventEmailCreationForm'
 import AdminEventsSection from './components/AdminEventsSection';
 import AdminCallAssignmentsSection from './components/AdminCallAssignmentsSection';
 import AdminCallAssignmentCreationForm from './components/AdminCallAssignmentCreationForm';
@@ -86,8 +87,12 @@ const CallAssignmentQueries = {
 };
 
 const CurrentUserQueries = {
-  currentUser: () => Relay.QL`query { currentUser}`
+  currentUser: () => Relay.QL`query { currentUser }`
 };
+
+const EventQueries = {
+  event: () => Relay.QL`query { event(id: $id) }`
+}
 
 let history = createHistory();
 
@@ -116,6 +121,11 @@ ReactDOM.render(
           queries={CallAssignmentQueries}
         />
       </Route>
+      <Route
+        path='events/:id/emails/create'
+        component={AdminEventEmailCreationForm}
+        queries={EventQueries}
+      />
       <Route
         path='events'
         component={AdminEventsSection}
