@@ -15,6 +15,13 @@ export default class PlivoDialer extends React.Component {
     useTelLinkFallback: false
   }
 
+  number() {
+    let number = this.props.number;
+    if (number[0] !== '1')
+      number = '1' + number;
+    return number.slice(0, 11)
+  }
+
   registerCallbacks() {
     Plivo.onWebrtcNotSupported = () => {
       this.setState({useTelLinkFallback: true})
@@ -64,7 +71,7 @@ export default class PlivoDialer extends React.Component {
 
   callPhone(number) {
     if (this.state.useTelLinkFallback) {
-      window.open(`tel:+1${number}`)
+      window.open(`tel:+${number}`)
     } else {
       Plivo.conn.call(number)
     }
@@ -75,9 +82,7 @@ export default class PlivoDialer extends React.Component {
   }
 
   formatPhoneNumber(number) {
-    let sliceStart = 0;
-    if (number.length === 11 && number[0] === '1')
-      sliceStart = 1
+    let sliceStart = 1;
     return '(' + number.slice(sliceStart, sliceStart + 3) + ') ' + number.slice(sliceStart + 3, sliceStart + 6) + '-' + number.slice(sliceStart + 6)
   }
 
@@ -100,7 +105,7 @@ export default class PlivoDialer extends React.Component {
   }
 
   render() {
-    let formattedNumber = this.formatPhoneNumber(this.props.number)
+    let formattedNumber = this.formatPhoneNumber(this.number())
     let plivoCallInProgress = this.state.plivoCallInProgress
     let plivoStatusText = this.state.plivoStatusText
 
@@ -115,7 +120,7 @@ export default class PlivoDialer extends React.Component {
 
     let touchAction = plivoCallInProgress ?
       this.hangupPhone.bind(this)
-      : this.callPhone.bind(this, this.props.number)
+      : this.callPhone.bind(this, this.number())
 
     let backgroundColor = plivoCallInProgress ?
       BernieColors.red
