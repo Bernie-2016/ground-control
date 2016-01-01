@@ -3,12 +3,5 @@
   "libs": [
     "browser",
     "jquery"
-  ],
-  "loadEagerly": [
-    "src/**/*.js"
-  ],
-  "plugins": {
-    "node": {},
-    "node-express": {}
-  }
+  ]
 }
