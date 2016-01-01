@@ -402,9 +402,9 @@ const GraphQLUser = new GraphQLObjectType({
           if (userAddress)
             query = query.whereNot('bsd_people.cons_id', userAddress.cons_id)
 
-          // Only use geo sorting when the caller is in a timezone that is valid.  Otherwise it's super slow
-          if (userAddress && validOffsets.indexOf(userAddress.timezone_offset) !== -1 && userAddress.latitude && userAddress.longitude)
-            query = query.orderByRaw(`"bsd_addresses"."geom" <-> st_transform(st_setsrid(st_makepoint(${userAddress.longitude}, ${userAddress.latitude}), 4326), 900913)`)
+          // No geo sort for now, still seeing timeouts in production probably from this
+//          if (userAddress && validOffsets.indexOf(userAddress.timezone_offset) !== -1 && userAddress.latitude && userAddress.longitude)
+//            query = query.orderByRaw(`"bsd_addresses"."geom" <-> st_transform(st_setsrid(st_makepoint(${userAddress.longitude}, ${userAddress.latitude}), 4326), 900913)`)
 
           log.info(`Running query: ${query}`)
           let person = await query
