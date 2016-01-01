@@ -109,11 +109,9 @@ function eventFromAPIFields(fields) {
   Object.keys(fields).forEach((fieldName) => {
     let newFieldName = eventFieldFromAPIField(fieldName)
     event[newFieldName] = fields[fieldName]
-    console.log(newFieldName)
-    if (newFieldName === 'start_dt') {
-      console.log("here")
+
+    if (newFieldName === 'start_dt')
       event[newFieldName] = event[newFieldName].toISOString()
-    }
   })
 
   let idFields = ['event_id', 'creator_cons_id', 'event_type_id'];
@@ -332,7 +330,15 @@ const GraphQLUser = new GraphQLObjectType({
       type: GraphQLCallAssignmentConnection,
       args: connectionArgs,
       resolve: async (user, {first}) => {
-        let assignments = await knex('bsd_call_assignments').limit(first)
+        let assignments = await knex.union([
+          knex('bsd_call_assignments')
+          .where('caller_group', null),
+          knex('bsd_call_assignments')
+          .select('bsd_call_assignments.*')
+          .innerJoin('user_user_groups', 'bsd_call_assignments.caller_group', 'user_user_groups.user_group_id')
+          .where('user_user_groups.user_id', user.id)
+        ])
+
         return connectionFromArray(assignments, {first})
       }
     },
@@ -1071,7 +1077,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
     instructions: { type: GraphQLString },
     startDate: { type: GraphQLDate },
     endDate: { type: GraphQLDate },
-
+    callerGroupId: { type: GraphQLString }
   },
   outputFields: {
     listContainer: {
@@ -1079,7 +1085,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
       resolve: () => SharedListContainer
     }
   },
-  mutateAndGetPayload: async ({name, intervieweeGroup, surveyId, renderer, processors, instructions}, {rootValue}) => {
+  mutateAndGetPayload: async ({name, intervieweeGroup, surveyId, renderer, processors, instructions, startDate, endDate, callerGroupId}, {rootValue}) => {
     adminRequired(rootValue)
     let groupText = intervieweeGroup
     let group = null
@@ -1187,11 +1193,17 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
             }, {transaction: trx})
       }
 
+      startDate = startDate || new Date()
+      callerGroupId = callerGroupId ? fromGlobalId(callerGroupId).id : null
+
       return knex.insertAndFetch('bsd_call_assignments', {
           name: name,
           instructions: instructions,
           interviewee_group: group.id,
-          gc_bsd_survey_id: survey.id
+          gc_bsd_survey_id: survey.id,
+          start_dt: startDate,
+          end_dt: endDate,
+          caller_group: callerGroupId
         }, {transaction: trx});
     })
   }
