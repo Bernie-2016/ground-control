@@ -539,7 +539,13 @@ export default class BSD {
   }
 
   async requestWrapper(options) {
-    if (process.env.NODE_ENV === 'development' && options.method === 'POST') {
+    // These are methods for which we don't want to make a call to BSD when we are in dev
+    let mockBSDMethodsInDev = ['/page/graph/addrsvp', '/event/update_event', '/event/delete_event']
+
+    if (process.env.NODE_ENV === 'development'
+      && mockBSDMethodsInDev.reduce(
+          (prevVal, method) => prevVal || options.uri.search(method) !== -1
+        , false)) {
       log.debug(`Would have made BSD API call with options: ${JSON.stringify(options)}`)
       return {
         statusCode: 200,
