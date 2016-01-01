@@ -144,7 +144,7 @@ class AdminEventsSection extends React.Component {
         lineHeight: '18px',
       }}
       >
-        {displayString.replace(/(<([^>]+)>)|\\n/ig, "")}
+        <div dangerouslySetInnerHTML={{__html: displayString.replace(/(<([^>]+)>)|\\n/ig, "")}}/>
       </Cell>
     )
   }
@@ -161,7 +161,7 @@ class AdminEventsSection extends React.Component {
     </Cell>
   )
 
-  EventTypeCell = ({rowIndex, data, col, ...props}) => (
+  EventTypeCell = ({rowIndex, data, col, attr, ...props}) => (
     <Cell {...props}
     style={{
       fontFamily: 'Roboto',
@@ -169,8 +169,7 @@ class AdminEventsSection extends React.Component {
       lineHeight: '18px',
     }}
     >
-      name: {data[rowIndex]['node'] ? data[rowIndex]['node'][col]['name'] : ''}<br/>
-      id: {data[rowIndex]['node'] ? data[rowIndex]['node'][col]['id'] : ''}
+      {data[rowIndex]['node'] ? data[rowIndex]['node'][col][attr] : ''}
     </Cell>
   )
 
@@ -928,10 +927,18 @@ class AdminEventsSection extends React.Component {
             flexGrow={1}
             header={<this.SortControllerCell content="Event Type" attribute="eventTypeId" />}
             cell={
-              <this.EventTypeCell data={events} col="eventType" />
+              <this.EventTypeCell data={events} col="eventType" attr="name" />
             }
-            width={150}
-        />
+            width={130}
+          />
+          <Column
+            flexGrow={1}
+            header={<this.SortControllerCell content="Event Type ID" attribute="eventTypeId" />}
+            cell={
+              <this.EventTypeCell data={events} col="eventType" attr="id" />
+            }
+            width={130}
+          />
         </ColumnGroup>
         <ColumnGroup
           header={<this.HeaderCell content="Time" />}>
