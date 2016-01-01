@@ -616,7 +616,7 @@ class AdminEventsSection extends React.Component {
         {filterInputs.map((input, index) => {
           return <FilterInput name={input.name} label={input.label} key={index}/>
         })}
-        
+
 
       </form>
       </Dialog>

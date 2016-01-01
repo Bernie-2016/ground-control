@@ -47,7 +47,11 @@ class GraphQLError extends Error {
   }
 }
 
-const authRequired = (session) => {
+function interpretDateAsUTC(date) {
+  return moment.tz(moment(date).format('YYYY-MM-DD HH:mm:ss'), 'UTC').toDate()
+}
+
+function authRequired (session) {
   if (!session.user) {
     throw new GraphQLError({
       status: 401,
@@ -56,7 +60,7 @@ const authRequired = (session) => {
   }
 }
 
-const adminRequired = (session) => {
+function adminRequired(session) {
   authRequired(session)
   if (!session.user || !session.user.is_admin) {
     throw new GraphQLError({
@@ -486,7 +490,7 @@ const GraphQLPerson = new GraphQLObjectType({
     gender: { type: GraphQLString },
     birthDate: {
       type: CustomGraphQLDateType,
-      resolve: (person) => person.birth_dt
+      resolve: (person) => interpretDateAsUTC(person.birth_dt)
     },
     title: { type: GraphQLString },
     employer: { type: GraphQLString },
@@ -655,13 +659,13 @@ const GraphQLEvent = new GraphQLObjectType({
     startDate: {
       type: CustomGraphQLDateType,
       resolve: (event) => {
-        return moment.tz(moment(event.start_dt).format('YYYY-MM-DD HH:mm:ss'), 'UTC').toDate()
+        return interpretDateAsUTC(event.start_dt)
       }
     },
     createDate: {
       type: CustomGraphQLDateType,
       resolve: (event) => {
-        return moment.tz(moment(event.create_dt).format('YYYY-MM-DD HH:mm:ss'), 'UTC').toDate()
+        return interpretDateAsUTC(event.create_dt)
       }
     },
     duration: { type: GraphQLInt },
@@ -799,7 +803,7 @@ const GraphQLEventInput = new GraphQLInputObjectType({
     venueCountry: { type: GraphQLString },
     venueDirections: { type: GraphQLString },
     localTimezone: { type: GraphQLString },
-    startDate: { type: CustomGraphQLDateType },
+    startDate: { type: GraphQLString }, // This should be CustomGraphQLDateType, but it's broken until a PR gets merged in to the graphql-custome-datetype repo
     duration: { type: GraphQLInt },
     capacity: { type: GraphQLInt },
     attendeeVolunteerShow: { type: GraphQLInt },
@@ -1052,9 +1056,10 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
           let model = modelFromBSDResponse(BSDSurveyResponse, 'bsd_surveys')
           let BSDSurveyFieldsResponse = await BSDClient.listFormFields(surveyId)
           underlyingSurvey = await knex.insertAndFetch('bsd_surveys', model, {transaction: trx, idField: 'signup_form_id'})
-          let fieldInsertionPromises = BSDSurveyFieldsResponse.map((field) => {
+          let fieldInsertionPromises = BSDSurveyFieldsResponse.map(async (field) => {
             let model = modelFromBSDResponse(field, 'bsd_survey_fields')
-            return knex('bsd_survey_fields').insert(model)
+            let dbField = await knex('bsd_survey_fields').where('signup_form_field_id', model.signup_form_field_id).first()
+            return dbField || knex('bsd_survey_fields').insert(model)
           })
 
           await Promise.all(fieldInsertionPromises);
