@@ -65,10 +65,11 @@ const adminRequired = (session) => {
 }
 
 // We should move these into model-helpers or something
-function modelFromBSDSurvey(BSDObject, type) {
+function modelFromBSDResponse(BSDObject, type) {
   let modelKeys = {
     'bsd_surveys': ['signup_form_id', 'signup_form_slug', 'modified_dt', 'create_dt'],
-    'bsd_groups': ['cons_group_id', 'name', 'description', 'modified_dt', 'create_dt']
+    'bsd_groups': ['cons_group_id', 'name', 'description', 'modified_dt', 'create_dt'],
+    'bsd_survey_fields': ['signup_form_field_id', 'modified_dt', 'create_dt', 'signup_form_id', 'format', 'label', 'display_order', 'is_shown', 'is_required', 'description']
   }
   let keys = modelKeys[type]
   let model = {}
@@ -270,6 +271,20 @@ const GraphQLUser = new GraphQLObjectType({
   description: 'User of ground control',
   fields: () => ({
     id: globalIdField('User'),
+    email: { type: GraphQLString },
+    firstName: {
+      type: GraphQLString,
+      resolve: async (user) => {
+        let name = await knex('bsd_emails')
+          .select('bsd_people.firstname')
+          .innerJoin('bsd_people', 'bsd_emails.cons_id', 'bsd_people.cons_id')
+          .where('email', user.email)
+          .first()
+        if (name)
+          return name['firstname']
+        return null;
+      }
+    },
     callAssignments: {
       type: GraphQLCallAssignmentConnection,
       args: connectionArgs,
@@ -517,8 +532,7 @@ const GraphQLPerson = new GraphQLObjectType({
         if (eventTypes)
           query = query.whereIn('event_type_id', eventTypes.map((type) => type.event_type_id))
 
-        let events = await query;
-        return events
+        return query
       }
     }
   }),
@@ -919,20 +933,65 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
         .first()
 
       let fieldValues = JSON.parse(surveyFieldValues)
+
       fieldValues['person'] = await knex('bsd_people')
         .transacting(trx)
         .where('cons_id', localIntervieweeId)
         .first()
 
-      if (completed && survey.processors.length > 0 ) {
-        if (fieldValues['event_id']) {
-          let person = fieldValues['person']
-          let email = await getPrimaryEmail(person, trx)
-          let address = await getPrimaryAddress(person, trx)
-          let phone = await getPrimaryPhone(person, trx)
+      let person = fieldValues['person']
+      let email = await getPrimaryEmail(person, trx)
+      let processorsLength = survey.processors.length
 
-          let zip = address.zip
-          await BSDClient.noFailApiRequest('addRSVPToEvent', email, zip, phone, fieldValues['event_id'])
+      if (completed && processorsLength > 0) {
+        for (let index = 0; index < processorsLength; index++) {
+          let processor = survey.processors[index];
+          switch (processor) {
+            case 'bsd-event-rsvper':
+              if (fieldValues['event_id']) {
+                let address = await getPrimaryAddress(person, trx)
+                let phone = await getPrimaryPhone(person, trx)
+                let zip = address.zip
+                await BSDClient.noFailApiRequest('addRSVPToEvent', email, zip, phone, fieldValues['event_id'])
+              }
+              break;
+            case 'bsd-form-submitter':
+              let bsdFormValues = {}
+              if (email) {
+                fieldValues['Email'] = email
+                let fields = Object.keys(fieldValues)
+                for (let index = 0; index < fields.length; index++) {
+                  let field = fields[index]
+                  let fieldId = field;
+                  // Field is not a numeric id
+                  if (!(/^\d+$/.test(field))) {
+                    let fieldObj = await knex('bsd_survey_fields')
+                      .select('signup_form_field_id')
+                      .where('signup_form_id', survey.signup_form_id)
+                      .where('label', field)
+                      .transacting(trx)
+                      .first()
+                    if (!fieldObj)
+                      fieldObj = await knex('bsd_survey_fields')
+                        .where('signup_form_id', survey.signup_form_id)
+                        .where('label', 'ilike', `[${field}]%`)
+                        .transacting(trx)
+                        .first()
+
+                    if (fieldObj)
+                      fieldId = fieldObj.signup_form_field_id
+                    else
+                      fieldId = null
+                  }
+                  if (fieldId)
+                    bsdFormValues[fieldId] = fieldValues[field]
+                }
+                await BSDClient.noFailApiRequest('processSignup', survey.signup_form_id, bsdFormValues)
+              }
+              else
+                log.error(`Could not find an e-mail address for constituent: ${localIntervieweeId}`)
+              break;
+          }
         }
       }
 
@@ -988,8 +1047,15 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
       if (!underlyingSurvey) {
         try {
           let BSDSurveyResponse = await BSDClient.getForm(surveyId)
-          let model = modelFromBSDSurvey(BSDSurveyResponse, 'bsd_surveys')
+          let model = modelFromBSDResponse(BSDSurveyResponse, 'bsd_surveys')
+          let BSDSurveyFieldsResponse = await BSDClient.listFormFields(surveyId)
           underlyingSurvey = await knex.insertAndFetch('bsd_surveys', model, {transaction: trx, idField: 'signup_form_id'})
+          let fieldInsertionPromises = BSDSurveyFieldsResponse.map((field) => {
+            let model = modelFromBSDResponse(field, 'bsd_survey_fields')
+            return knex('bsd_survey_fields').insert(model)
+          })
+
+          await Promise.all(fieldInsertionPromises);
         } catch (err) {
           if (err && err.response && err.response.statusCode === 409)
             throw new GraphQLError({
@@ -1016,7 +1082,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
         if (!underlyingGroup) {
           try {
             let BSDGroupResponse = await BSDClient.getConstituentGroup(groupText)
-            let model = modelFromBSDSurvey(BSDGroupResponse, 'bsd_groups')
+            let model = modelFromBSDResponse(BSDGroupResponse, 'bsd_groups')
             underlyingGroup = await knex.insertAndFetch('bsd_groups', model, {transaction: trx, idField: 'cons_group_id'})
           } catch (err) {
             if (err && err.response && err.response.statusCode === 409)

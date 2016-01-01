@@ -16,6 +16,8 @@ export default class AdminCallAssignmentCreationForm extends React.Component {
   }
 
   surveyProcessors = {
+    'bsd-form-submitter': 'Save form data in BSD',
+    'send-call-team-invite': 'Send interviewees an e-mail to the call team',
     'bsd-event-rsvper': 'Create event RSVPs'
   }
 

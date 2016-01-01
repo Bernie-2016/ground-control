@@ -23,6 +23,7 @@ class SurveyRenderer extends React.Component {
       <Survey
         survey={this.props.survey}
         interviewee={this.props.interviewee}
+        currentUser={this.props.currentUser}
         ref='survey'
         onSubmitted={this.props.onSubmitted}
       />
@@ -37,13 +38,18 @@ export default Relay.createContainer(SurveyRenderer, {
       fragment on Survey {
         renderer
         ${BSDSurvey.getFragment('survey')}
-        ${BSDPhonebankRSVPSurvey.getFragment('survey')}
       }
     `,
     interviewee: () => Relay.QL`
       fragment on Person {
         ${BSDSurvey.getFragment('interviewee')}
         ${BSDPhonebankRSVPSurvey.getFragment('interviewee')}
+      }
+    `,
+    currentUser: () => Relay.QL`
+      fragment on User {
+        ${BSDPhonebankRSVPSurvey.getFragment('currentUser')}
+        ${BSDSurvey.getFragment('currentUser')}
       }
     `
   }
