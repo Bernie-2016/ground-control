@@ -35,6 +35,19 @@ class AdminEventEmailCreationForm extends React.Component {
     senderMessage: yup.string().required()
   })
 
+  getRandomSubarray(arr, size) {
+    let shuffled = arr.slice(0), i = arr.length, temp, index
+
+    while (i--) {
+      index = Math.floor((i + 1) * Math.random())
+      temp = shuffled[index]
+      shuffled[index] = shuffled[i]
+      shuffled[i] = temp
+    }
+
+    return shuffled.slice(0, size)
+  }
+
 //    <Paper zDepth={1} style={this.styles.detailsContainer}>
 //<EventPreview
 //event={this.props.event}
@@ -42,6 +55,9 @@ class AdminEventEmailCreationForm extends React.Component {
 //</Paper>
 
   render() {
+    let nearbyPeopleCount = this.props.event.nearbyPeople.length
+    let nearbyPeopleSample = this.getRandomSubarray(this.props.event.nearbyPeople, 10)
+
     return (
       <div>
         <MutationHandler ref='mutationHandler'
@@ -50,9 +66,14 @@ class AdminEventEmailCreationForm extends React.Component {
         <div style={BernieText.title}>
           Send Event Email
         </div>
-        <p>
-          Email nearby potential attendees, encouraging them to come out.
-        </p>
+        <div>
+          <p>This will email {nearbyPeopleCount} people, including:</p>
+          <ul>
+            {nearbyPeopleSample.map( (person, i) => {
+              return <li key={`person${i}`}>{person.firstName} {person.lastName} {person.email}</li>
+            })}
+          </ul>
+        </div>
         <br />
 
         <Paper zDepth={1} style={this.styles.formContainer}>
@@ -132,6 +153,11 @@ export default Relay.createContainer(AdminEventEmailCreationForm, {
         localUTCOffset
         longitude
         name
+        nearbyPeople {
+          firstName
+          lastName
+          email
+        }
         publicPhone
         rsvpEmailReminderHours
         rsvpUseReminderEmail

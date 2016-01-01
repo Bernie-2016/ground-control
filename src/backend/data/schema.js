@@ -442,6 +442,10 @@ const GraphQLAddress = new GraphQLObjectType({
   description: 'An address',
   fields: () => ({
     id: globalIdField('Address', (obj) => obj.cons_addr_id),
+    personId: {
+      type: GraphQLInt,
+      resolve: (address) => address.cons_id
+    },
     addr1: { type: GraphQLString },
     addr2: { type: GraphQLString },
     addr3: { type: GraphQLString },
@@ -458,6 +462,13 @@ const GraphQLAddress = new GraphQLObjectType({
       resolve: async (address) => {
         let tz = TZLookup(address.latitude, address.longitude)
         return moment().tz(tz).format('Z')
+      }
+    },
+    people: {
+      type: new GraphQLList(GraphQLPerson),
+      resolve: async (address, _, {rootValue}) => {
+        log.info("BROTHER", address.cons_id)
+        return knex('bsd_people').where('cons_id', address.cons_id)
       }
     }
   }),
@@ -712,6 +723,31 @@ const GraphQLEvent = new GraphQLObjectType({
         return knex.count(knex('bsd_event_attendees').where('event_id', event.id), 'event_attendee_id')
       }
     },
+    nearbyPeople: {
+      type: new GraphQLList(GraphQLPerson),
+      resolve: async(event, _, {rootValue}) => {
+        let addresses = await knex('bsd_addresses')
+                              .whereRaw(`st_dwithin(bsd_addresses.geom, st_transform(st_setsrid(st_makepoint(${event.longitude}, ${event.latitude}), 4326), 900913), 50000)`)
+                              .orderByRaw(`bsd_addresses.geom <-> st_transform(st_setsrid(st_makepoint(${event.longitude}, ${event.latitude}), 4326), 900913)`)
+                              .limit(500)
+
+        let people = await addresses.map((address) => rootValue.loaders.bsdPeople.load(address.cons_id))
+        let peopleWithEmail = []
+
+        // angels weep, JavaScript
+        for (let i = 0; i < people.length; i++) {
+          let person = await people[i]
+          let email = await getPrimaryEmail(person, null)
+
+          if (email)
+            peopleWithEmail.push(person)
+
+          i++
+        }
+
+        return peopleWithEmail
+      }
+    }
   }),
   interfaces: [nodeInterface]
 })
