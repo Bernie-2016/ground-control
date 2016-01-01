@@ -9,10 +9,9 @@ import {
   GraphQLString,
   GraphQLID,
   GraphQLEnumType,
-  GraphQLFloat
+  GraphQLFloat,
+  GraphQLScalarType
 } from 'graphql'
-
-import CustomGraphQLDateType from 'graphql-custom-datetype'
 
 import {
   connectionArgs,
@@ -110,6 +109,11 @@ function eventFromAPIFields(fields) {
   Object.keys(fields).forEach((fieldName) => {
     let newFieldName = eventFieldFromAPIField(fieldName)
     event[newFieldName] = fields[fieldName]
+    console.log(newFieldName)
+    if (newFieldName === 'start_dt') {
+      console.log("here")
+      event[newFieldName] = event[newFieldName].toISOString()
+    }
   })
 
   let idFields = ['event_id', 'creator_cons_id', 'event_type_id'];
@@ -223,6 +227,39 @@ let {nodeInterface, nodeField} = nodeDefinitions(
     return null
   }
 )
+
+const GraphQLDate = new GraphQLScalarType({
+  name: 'Date',
+  serialize (value) {
+    if (!(value instanceof Date)) {
+      throw new Error('Field error: value is not an instance of Date')
+    }
+    if (isNaN(value.getTime())) {
+      throw new Error('Field error: value is an invalid Date')
+    }
+    return value.toJSON()
+  },
+  parseValue (value) {
+    const date = new Date(value)
+    if (isNaN(date.getTime())) {
+      throw new Error('Field error: value is an invalid Date')
+    }
+    return date
+  },
+  parseLiteral (ast) {
+    if (ast.kind !== Kind.STRING) {
+      throw new GraphQLError('Query error: Can only parse strings to dates but got a: ' + ast.kind, [ast])
+    }
+    let result = new Date(ast.value)
+    if (isNaN(result.getTime())) {
+      throw new GraphQLError('Query error: Invalid date', [ast])
+    }
+    if (ast.value !== result.toJSON()) {
+      throw new GraphQLError('Query error: Invalid date format, only accepts: YYYY-MM-DDTHH:MM:SS.SSSZ', [ast])
+    }
+    return result
+  }
+})
 
 const GraphQLListContainer = new GraphQLObjectType({
   name: 'ListContainer',
@@ -489,7 +526,7 @@ const GraphQLPerson = new GraphQLObjectType({
     suffix: { type: GraphQLString },
     gender: { type: GraphQLString },
     birthDate: {
-      type: CustomGraphQLDateType,
+      type: GraphQLDate,
       resolve: (person) => interpretDateAsUTC(person.birth_dt)
     },
     title: { type: GraphQLString },
@@ -657,13 +694,13 @@ const GraphQLEvent = new GraphQLObjectType({
       }
     },
     startDate: {
-      type: CustomGraphQLDateType,
+      type: GraphQLDate,
       resolve: (event) => {
         return interpretDateAsUTC(event.start_dt)
       }
     },
     createDate: {
-      type: CustomGraphQLDateType,
+      type: GraphQLDate,
       resolve: (event) => {
         return interpretDateAsUTC(event.create_dt)
       }
@@ -803,7 +840,7 @@ const GraphQLEventInput = new GraphQLInputObjectType({
     venueCountry: { type: GraphQLString },
     venueDirections: { type: GraphQLString },
     localTimezone: { type: GraphQLString },
-    startDate: { type: GraphQLString }, // This should be CustomGraphQLDateType, but it's broken until a PR gets merged in to the graphql-custome-datetype repo
+    startDate: { type: GraphQLDate }, // This should be CustomGraphQLDateType, but it's broken until a PR gets merged in to the graphql-custome-datetype repo
     duration: { type: GraphQLInt },
     capacity: { type: GraphQLInt },
     attendeeVolunteerShow: { type: GraphQLInt },
@@ -1031,7 +1068,10 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
     surveyId: { type: new GraphQLNonNull(GraphQLInt) },
     renderer: { type: new GraphQLNonNull(GraphQLString) },
     processors: { type: new GraphQLList(GraphQLString) },
-    instructions: { type: GraphQLString }
+    instructions: { type: GraphQLString },
+    startDate: { type: GraphQLDate },
+    endDate: { type: GraphQLDate },
+
   },
   outputFields: {
     listContainer: {
