@@ -9,15 +9,14 @@ import yup from 'yup'
 import MutationHandler from './MutationHandler'
 
 export default class AdminCallAssignmentCreationForm extends React.Component {
-  surveyRenderers =
-  {
-    'BSDSurvey': 'Simple BSD survey renderer',
-    'BSDPhonebankRSVPSurvey': 'BSD survey + events'
+  surveyRenderers = {
+    'BSDSurvey': 'BSD survey renderer',
+    'PhonebankRSVPSurvey': 'Phonebank RSVP survey renderer'
   }
 
   surveyProcessors = {
     'bsd-form-submitter': 'Save form data in BSD',
-    'send-call-team-invite': 'Send interviewees an e-mail to the call team',
+    'send-call-team-invite': 'Invite interviewees to the call team via E-mail',
     'bsd-event-rsvper': 'Create event RSVPs'
   }
 

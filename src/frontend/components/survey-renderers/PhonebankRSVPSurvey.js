@@ -11,7 +11,7 @@ import GCSelectField from '../forms/GCSelectField';
 import GCBooleanField from '../forms/GCBooleanField';
 
 const WEEKDAY_DATE_FORMAT = 'dddd, MMMM Do';
-class BSDPhonebankRSVPSurvey extends React.Component {
+class PhonebankRSVPSurvey extends React.Component {
   static propTypes = {
     onSubmitted : React.PropTypes.func,
     initialValues: React.PropTypes.object,
@@ -499,7 +499,7 @@ class BSDPhonebankRSVPSurvey extends React.Component {
   }
 }
 
-export default Relay.createContainer(BSDPhonebankRSVPSurvey, {
+export default Relay.createContainer(PhonebankRSVPSurvey, {
   initialVariables: {
     type: 'phonebank'
   },

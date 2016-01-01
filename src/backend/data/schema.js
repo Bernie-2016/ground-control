@@ -12,6 +12,8 @@ import {
   GraphQLFloat
 } from 'graphql'
 
+import CustomGraphQLDateType from 'graphql-custom-datetype'
+
 import {
   connectionArgs,
   connectionDefinitions,
@@ -402,9 +404,9 @@ const GraphQLUser = new GraphQLObjectType({
           if (userAddress)
             query = query.whereNot('bsd_people.cons_id', userAddress.cons_id)
 
-          // Only use geo sorting when the caller is in a timezone that is valid.  Otherwise it's super slow
-          if (userAddress && validOffsets.indexOf(userAddress.timezone_offset) !== -1 && userAddress.latitude && userAddress.longitude)
-            query = query.orderByRaw(`"bsd_addresses"."geom" <-> st_transform(st_setsrid(st_makepoint(${userAddress.longitude}, ${userAddress.latitude}), 4326), 900913)`)
+          // No geo sort for now, still seeing timeouts in production probably from this
+//          if (userAddress && validOffsets.indexOf(userAddress.timezone_offset) !== -1 && userAddress.latitude && userAddress.longitude)
+//            query = query.orderByRaw(`"bsd_addresses"."geom" <-> st_transform(st_setsrid(st_makepoint(${userAddress.longitude}, ${userAddress.latitude}), 4326), 900913)`)
 
           log.info(`Running query: ${query}`)
           let person = await query
@@ -483,7 +485,7 @@ const GraphQLPerson = new GraphQLObjectType({
     suffix: { type: GraphQLString },
     gender: { type: GraphQLString },
     birthDate: {
-      type: GraphQLString,
+      type: CustomGraphQLDateType,
       resolve: (person) => person.birth_dt
     },
     title: { type: GraphQLString },
@@ -651,15 +653,15 @@ const GraphQLEvent = new GraphQLObjectType({
       }
     },
     startDate: {
-      type: GraphQLInt,
+      type: CustomGraphQLDateType,
       resolve: (event) => {
-        return moment.tz(moment(event.start_dt).format('YYYY-MM-DD HH:mm:ss'), 'UTC').unix()
+        return moment.tz(moment(event.start_dt).format('YYYY-MM-DD HH:mm:ss'), 'UTC').toDate()
       }
     },
     createDate: {
-      type: GraphQLInt,
+      type: CustomGraphQLDateType,
       resolve: (event) => {
-        return moment.tz(moment(event.create_dt).format('YYYY-MM-DD HH:mm:ss'), 'UTC').unix()
+        return moment.tz(moment(event.create_dt).format('YYYY-MM-DD HH:mm:ss'), 'UTC').toDate()
       }
     },
     duration: { type: GraphQLInt },
@@ -797,7 +799,7 @@ const GraphQLEventInput = new GraphQLInputObjectType({
     venueCountry: { type: GraphQLString },
     venueDirections: { type: GraphQLString },
     localTimezone: { type: GraphQLString },
-    startDate: { type: GraphQLString },
+    startDate: { type: CustomGraphQLDateType },
     duration: { type: GraphQLInt },
     capacity: { type: GraphQLInt },
     attendeeVolunteerShow: { type: GraphQLInt },

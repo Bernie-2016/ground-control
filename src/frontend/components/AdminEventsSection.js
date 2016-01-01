@@ -32,11 +32,6 @@ const KeyboardActionsInfo = () => (
   </div>
 )
 
-const momentWithOffset = (startDate, utcOffset) => {
-  startDate = startDate * 1000
-  return moment(startDate).utcOffset(utcOffset)
-}
-
 class AdminEventsSection extends React.Component {
   constructor(props) {
     super(props)
@@ -181,6 +176,9 @@ class AdminEventsSection extends React.Component {
   DateCell = ({rowIndex, data, col, ...props}) => {
     let utcOffset = col === 'startDate' ? data[rowIndex]['node']['localUTCOffset'] : 0
     let timezone = col === 'startDate' ? data[rowIndex]['node']['localTimezone'] : 'UTC'
+    let offsetDate = moment(data[rowIndex]['node'][col]).utcOffset(utcOffset)
+    let formattedDate = offsetDate.format('l LT')
+
     return (
       <Cell {...props}
       style={{
@@ -189,7 +187,7 @@ class AdminEventsSection extends React.Component {
         lineHeight: '18px'
       }}
       >
-        {momentWithOffset(data[rowIndex]['node'][col], utcOffset).format('l LT')}<br/>
+        {formattedDate}<br/>
         {timezone}
       </Cell>
     )
