@@ -4,13 +4,20 @@ import {BernieColors, BernieText} from './styles/bernie-css'
 import {Paper} from 'material-ui'
 import GCForm from './forms/GCForm'
 import Form from 'react-formal'
+import EventPreview from './EventPreview'
 import MutationHandler from './MutationHandler'
 import CreateEventEmail from '../mutations/CreateEventEmail'
 import yup from 'yup'
 
 class AdminEventEmailCreationForm extends React.Component {
   styles = {
+    detailsContainer: {
+      float: 'left',
+      width: 380
+    },
+
     formContainer: {
+      float: 'left',
       width: 380,
       paddingLeft: 15,
       paddingRight: 15,
@@ -28,6 +35,12 @@ class AdminEventEmailCreationForm extends React.Component {
     senderMessage: yup.string().required()
   })
 
+//    <Paper zDepth={1} style={this.styles.detailsContainer}>
+//<EventPreview
+//event={this.props.event}
+///>
+//</Paper>
+
   render() {
     return (
       <div>
@@ -41,22 +54,7 @@ class AdminEventEmailCreationForm extends React.Component {
           Email nearby potential attendees, encouraging them to come out.
         </p>
         <br />
-        <div>
-          <h3>Event Details</h3>
-          <dl>
-            <dt>Name</dt>
-            <dd>{this.props.event.name}</dd>
 
-            <dt>Description</dt>
-            <dd>{this.props.event.description}</dd>
-
-            <dt>Venue</dt>
-            <dd>
-              {this.props.event.venueName}<br />
-              {this.props.event.venueCity}, {this.props.event.venueState}
-            </dd>
-          </dl>
-        </div>
         <Paper zDepth={1} style={this.styles.formContainer}>
           <GCForm
             schema={this.formSchema}
@@ -106,15 +104,46 @@ export default Relay.createContainer(AdminEventEmailCreationForm, {
   fragments: {
     event: () => Relay.QL`
       fragment on Event {
-        id
-        name
+        attendeesCount
+        attendeeVolunteerMessage
+        attendeeVolunteerShow
+        capacity
+        contactPhone
+        createDate
         description
-        venueName
-        venueCity
-        venueState
+        duration
+        eventIdObfuscated
+        eventType {
+          id
+          name
+        }
+        flagApproval
         host {
+          id
+          firstName
+          lastName
           email
         }
+        hostReceiveRsvpEmails
+        id
+        isSearchable
+        latitude
+        localTimezone
+        localUTCOffset
+        longitude
+        name
+        publicPhone
+        rsvpEmailReminderHours
+        rsvpUseReminderEmail
+        startDate
+        venueAddr1
+        venueAddr2
+        venueCity
+        venueCountry
+        venueDirections
+        venueName
+        venueState
+        venueZip
       }
     `
   }
