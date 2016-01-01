@@ -340,7 +340,7 @@ const GraphQLUser = new GraphQLObjectType({
           if (validOffsets.length === 0)
             return null
 
-          let group = await rootValue.loaders.gcBsdGroups.load(callAssignment.gc_bsd_group_id)
+          let group = await rootValue.loaders.gcBsdGroups.load(callAssignment.interviewee_group)
 
           let previousCallsSubquery = knex('bsd_calls')
             .select('interviewee_id')
@@ -743,7 +743,7 @@ const GraphQLCallAssignment = new GraphQLObjectType({
     query: {
       type: GraphQLString,
       resolve: async (assignment, _, {rootValue}) => {
-        let group = await rootValue.loaders.gcBsdGroups.load(assignment.gc_bsd_group_id)
+        let group = await rootValue.loaders.gcBsdGroups.load(assignment.interviewee_group)
         if (group.cons_group_id) {
           return 'BSD Constituent Group: ' + group.cons_group_id
         }
@@ -1145,7 +1145,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
       return knex.insertAndFetch('bsd_call_assignments', {
           name: name,
           instructions: instructions,
-          gc_bsd_group_id: group.id,
+          interviewee_group: group.id,
           gc_bsd_survey_id: survey.id
         }, {transaction: trx});
     })
