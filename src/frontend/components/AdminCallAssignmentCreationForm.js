@@ -13,6 +13,7 @@ export default class AdminCallAssignmentCreationForm extends React.Component {
   {
     'BSDSurvey': 'BSD survey renderer',
     'PhonebankRSVPSurvey': 'Phonebank RSVP survey renderer',
+    'SingleEventRSVPSurvey': 'Single event RSVP survey renderer',
   }
 
   surveyProcessors = {

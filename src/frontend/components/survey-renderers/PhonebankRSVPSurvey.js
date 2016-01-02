@@ -14,7 +14,6 @@ const WEEKDAY_DATE_FORMAT = 'dddd, MMMM Do';
 class PhonebankRSVPSurvey extends React.Component {
   static propTypes = {
     onSubmitted : React.PropTypes.func,
-    initialValues: React.PropTypes.object,
     survey: React.PropTypes.object
   }
 
