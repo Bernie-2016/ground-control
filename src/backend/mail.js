@@ -26,7 +26,7 @@ Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
     case '&&':
       return (v1 && v2) ? options.fn(this) : options.inverse(this)
     case '||':
-      return (v1 || v2) ? options.fn(this) : options.inverse(this);
+      return (v1 || v2) ? options.fn(this) : options.inverse(this)
     default:
       return options.inverse(this)
   }
@@ -39,7 +39,7 @@ const senderAddress = 'Team Bernie<info@berniesanders.com>'
 
 export default class MG {
   constructor(apiKey, domain) {
-    this.mailgun = Mailgun({apiKey: apiKey, domain: domain});
+    this.mailgun = Mailgun({apiKey: apiKey, domain: domain})
   }
 
   async sendEventConfirmation(form, constituent, event_types, debugging) {
@@ -54,18 +54,18 @@ export default class MG {
 
     form.event_dates.sort((a, b) => {
         return a.date.localeCompare(b.date)
-    });
+    })
 
     // Get the event type name
     event_types.forEach((type) => {
       if (type.event_type_id == form.event_type_id) {
-        form.event_type_name = type.name;
+        form.event_type_name = type.name
       }
     })
 
     constituent.cons_email.forEach((email) => {
       if (email.is_primary == '1'){
-        constituent['email'] = email.email;
+        constituent['email'] = email.email
       }
     })
 
