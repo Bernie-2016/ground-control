@@ -13,6 +13,9 @@ class AdminEventEmailCreationForm extends React.Component {
   styles = {
     detailsContainer: {
       float: 'left',
+      marginLeft: '2rem',
+      marginTop: '1rem',
+      padding: 30,
       width: 380
     },
 
@@ -25,6 +28,11 @@ class AdminEventEmailCreationForm extends React.Component {
       paddingBottom: 15,
       marginTop: 15,
       border: 'solid 1px ' + BernieColors.lightGray
+    },
+
+    pageContainer: {
+      marginLeft: '7rem',
+      marginTop: '1rem'
     }
   }
 
@@ -59,22 +67,13 @@ class AdminEventEmailCreationForm extends React.Component {
     let nearbyPeopleSample = this.getRandomSubarray(this.props.event.nearbyPeople, 10)
 
     return (
-      <div>
+      <div style={this.styles.pageContainer}>
         <MutationHandler ref='mutationHandler'
                          successMessage='Event email sent!'
                          mutationClass={CreateEventEmail} />
         <div style={BernieText.title}>
           Send Event Email
         </div>
-        <div>
-          <p>This will email {nearbyPeopleCount} people, including:</p>
-          <ul>
-            {nearbyPeopleSample.map( (person, i) => {
-              return <li key={`person${i}`}>{person.firstName} {person.lastName} {person.email}</li>
-            })}
-          </ul>
-        </div>
-        <br />
 
         <Paper zDepth={1} style={this.styles.formContainer}>
           <GCForm
@@ -115,6 +114,16 @@ class AdminEventEmailCreationForm extends React.Component {
             <br />
             <Form.Button type='submit' label='Send!' fullWidth={true} />
           </GCForm>
+        </Paper>
+
+        <Paper zDepth={1} style={this.styles.detailsContainer}>
+          <p>This email will be sent to <strong>{nearbyPeopleCount} people</strong>, including:</p>
+          <br />
+          <ul>
+            {nearbyPeopleSample.map( (person, i) => {
+              return <li key={`person${i}`}>{person.firstName || person.lastName} &lt;{person.email}&gt;</li>
+            })}
+          </ul>
         </Paper>
       </div>
     )
