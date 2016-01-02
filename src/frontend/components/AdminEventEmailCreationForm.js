@@ -6,12 +6,20 @@ import GCForm from './forms/GCForm'
 import Form from 'react-formal'
 import EventPreview from './EventPreview'
 import MutationHandler from './MutationHandler'
-import CreateEventEmail from '../mutations/CreateEventEmail'
+import CreateAdminEventEmail from '../mutations/CreateAdminEventEmail'
 import yup from 'yup'
 
 class AdminEventEmailCreationForm extends React.Component {
   styles = {
     detailsContainer: {
+      float: 'left',
+      marginLeft: '2rem',
+      marginTop: '1rem',
+      padding: 10,
+      width: 380
+    },
+
+    recipientInfoContainer: {
       float: 'left',
       marginLeft: '2rem',
       marginTop: '1rem',
@@ -56,26 +64,21 @@ class AdminEventEmailCreationForm extends React.Component {
     return shuffled.slice(0, size)
   }
 
-//    <Paper zDepth={1} style={this.styles.detailsContainer}>
-//<EventPreview
-//event={this.props.event}
-///>
-//</Paper>
-
   render() {
     let nearbyPeopleCount = this.props.event.nearbyPeople.length
     let nearbyPeopleSample = this.getRandomSubarray(this.props.event.nearbyPeople, 10)
+    let recipientIds = this.props.event.nearbyPeople.map((person) => person.id)
 
     return (
       <div style={this.styles.pageContainer}>
         <MutationHandler ref='mutationHandler'
                          successMessage='Event email sent!'
-                         mutationClass={CreateEventEmail} />
+                         mutationClass={CreateAdminEventEmail} />
         <div style={BernieText.title}>
           Send Event Email
         </div>
 
-        <Paper zDepth={1} style={this.styles.formContainer}>
+        <Paper zDepth={2} style={this.styles.formContainer}>
           <GCForm
             schema={this.formSchema}
             defaultValue={{
@@ -84,6 +87,7 @@ class AdminEventEmailCreationForm extends React.Component {
             onSubmit={(formValue) => {
               this.refs.mutationHandler.send({
                 listContainer: this.props.listContainer,
+                recipientIds: recipientIds,
                 ...formValue
               })
             }}
@@ -116,7 +120,7 @@ class AdminEventEmailCreationForm extends React.Component {
           </GCForm>
         </Paper>
 
-        <Paper zDepth={1} style={this.styles.detailsContainer}>
+        <Paper zDepth={1} style={this.styles.recipientInfoContainer}>
           <p>This email will be sent to <strong>{nearbyPeopleCount} people</strong>, including:</p>
           <br />
           <ul>
@@ -125,6 +129,10 @@ class AdminEventEmailCreationForm extends React.Component {
             })}
           </ul>
         </Paper>
+
+        <Paper zDepth={1} style={this.styles.detailsContainer}>
+          <EventPreview event={this.props.event} />
+        </Paper>
       </div>
     )
   }
@@ -132,6 +140,11 @@ class AdminEventEmailCreationForm extends React.Component {
 
 export default Relay.createContainer(AdminEventEmailCreationForm, {
   fragments: {
+    listContainer: () => Relay.QL`
+      fragment on ListContainer {
+        ${CreateAdminEventEmail.getFragment('listContainer')},
+      }
+    `,
     event: () => Relay.QL`
       fragment on Event {
         attendeesCount
@@ -163,6 +176,7 @@ export default Relay.createContainer(AdminEventEmailCreationForm, {
         longitude
         name
         nearbyPeople {
+          id
           firstName
           lastName
           email

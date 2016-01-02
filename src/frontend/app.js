@@ -124,7 +124,10 @@ ReactDOM.render(
       <Route
         path='events/:id/emails/create'
         component={AdminEventEmailCreationForm}
-        queries={EventQueries}
+        queries={{
+          ...ListContainerQueries,
+          ...EventQueries
+        }}
       />
       <Route
         path='events'

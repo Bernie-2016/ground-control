@@ -1053,6 +1053,47 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
   }
 })
 
+const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
+  name: 'CreateAdminEventEmail',
+  inputFields: {
+    hostEmail: { type: new GraphQLNonNull(GraphQLString) },
+    senderEmail: { type: new GraphQLNonNull(GraphQLString) },
+    hostMessage: { type: new GraphQLNonNull(GraphQLString) },
+    senderMessage: { type: new GraphQLNonNull(GraphQLString) },
+    recipientIds: { type: new GraphQLList(GraphQLString) }
+  },
+  outputFields: {
+    listContainer: {
+      type: GraphQLListContainer,
+      resolve: () => SharedListContainer
+    }
+  },
+  mutateAndGetPayload: async ({hostEmail, senderEmail, hostMessage, senderMessage, recipientIds}, {rootValue}) => {
+    adminRequired(rootValue)
+
+    let comms = []
+
+    knex.transaction(async (trx) => {
+      for (let i = 0; i < recipientIds.length; i++) {
+        let personId = fromGlobalId(recipientIds[i]).id
+
+        let comm = await knex.insertAndFetch(
+          'communications',
+          {
+            person_id: personId,
+            type: 'EMAIL'
+          },
+          {transaction: trx}
+        )
+
+        comms.push(comm)
+      }
+    })
+
+    return comms
+  }
+})
+
 const GraphQLCreateCallAssignment = mutationWithClientMutationId({
   name: 'CreateCallAssignment',
   inputFields: {
@@ -1193,6 +1234,7 @@ let RootMutation = new GraphQLObjectType({
     submitCallSurvey: GraphQLSubmitCallSurvey,
     createCallAssignment: GraphQLCreateCallAssignment,
     deleteEvents: GraphQLDeleteEvents,
+    createAdminEventEmail: GraphQLCreateAdminEventEmail
   })
 })
 
