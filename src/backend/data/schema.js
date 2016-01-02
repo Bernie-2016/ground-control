@@ -741,8 +741,6 @@ const GraphQLEvent = new GraphQLObjectType({
 
           if (email)
             peopleWithEmail.push(person)
-
-          i++
         }
 
         return peopleWithEmail
