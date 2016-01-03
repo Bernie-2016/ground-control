@@ -232,6 +232,7 @@ let {nodeInterface, nodeField} = nodeDefinitions(
 const GraphQLDate = new GraphQLScalarType({
   name: 'Date',
   serialize (value) {
+    log.debug("Serializing:", value)
     if (!(value instanceof Date)) {
       throw new Error('Field error: value is not an instance of Date')
     }
