@@ -179,7 +179,8 @@ app.use('/graphql', graphQLHTTP((request) => {
 app.post('/log', wrap(async (req, res) => {
   let parsedURL = url.parse(req.url, true)
   let logs = req.body.logs
-  logs.forEach((message) => {
+
+  logs.forEach( (message) => {
     let app = message[0]
     let method = message[1]
     let client = parsedURL.query.client_id ? parsedURL.query.client_id : ''
@@ -191,10 +192,10 @@ app.post('/log', wrap(async (req, res) => {
     }
 
     message.forEach((logEntry) => {
-      if (typeof logEntry === 'object')
+      if (typeof logEntry === 'object') {
         writeLog(JSON.stringify(logEntry))
-      else {
-        logEntry.split('\n').forEach((line) => {
+      } else {
+        logEntry.split('\n').forEach( (line) => {
           writeLog(line)
         })
       }
@@ -230,35 +231,33 @@ app.post('/events/create', wrap(async (req, res) => {
   let form = req.body
 
   // Flag event as needing approval if user is not authenticated
-  if (!req.user){
+  if (!req.user) {
     form['flag_approval'] = 1
   }
 
   // constituent object not being returned right now
   let constituent = await BSDClient.getConstituentByEmail(form.cons_email)
 
-  if (!constituent){
+  if (!constituent) {
     constituent = await BSDClient.createConstituent(form.cons_email)
   }
 
   let event_types = await BSDClient.getEventTypes()
-
-  let result = await BSDClient.createEvents(constituent.id, form, event_types, eventCreationCallback)
+  await BSDClient.createEvents(constituent.id, form, event_types, eventCreationCallback)
 
   // send event creation confirmation email
   function eventCreationCallback(status){
   	res.json(status)
+
   	if (status == 'success'){
-      if (form['event_type_id'] == 31){
+      if (form['event_type_id'] == 31) {
         // Send phone bank specific email
         Mailgun.sendPhoneBankConfirmation(form, constituent)
-      }
-  		else {
+      } else {
         // Send generic email
         Mailgun.sendEventConfirmation(form, constituent, event_types)
       }
-  	}
-    else {
+  	} else {
       clientLogger['error']('Event Creation Error:', status)
     }
   }
