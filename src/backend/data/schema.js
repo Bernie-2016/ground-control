@@ -951,6 +951,7 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
       let assignedCall = await knex('bsd_assigned_calls')
         .transacting(trx)
         .where('caller_id', caller.id)
+        .where('call_assignment_id', localCallAssignmentId)
         .first()
 
       let assignedCallInfo = {

@@ -8,6 +8,10 @@ class SingleEventRSVPSurvey extends React.Component {
     survey: React.PropTypes.object
   }
 
+  checkForm() {
+    return true
+  }
+
   submit() {
     if (this.checkForm())
       this.props.onSubmitted({
