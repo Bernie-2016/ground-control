@@ -235,6 +235,7 @@ const GraphQLDate = new GraphQLScalarType({
       throw new Error('Field error: value is not an instance of Date')
     }
     if (isNaN(value.getTime())) {
+      log.debug('in serialize', value)
       throw new Error('Field error: value is an invalid Date')
     }
     return value.toJSON()
@@ -242,6 +243,7 @@ const GraphQLDate = new GraphQLScalarType({
   parseValue (value) {
     const date = new Date(value)
     if (isNaN(date.getTime())) {
+      log.debug('in parse value', value, date)
       throw new Error('Field error: value is an invalid Date')
     }
     return date
