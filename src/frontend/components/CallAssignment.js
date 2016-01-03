@@ -4,7 +4,6 @@ import {BernieText, BernieColors} from './styles/bernie-css';
 import {Paper, List, ListItem, RaisedButton} from 'material-ui';
 import PlivoDialer from './PlivoDialer'
 import SideBarLayout from './SideBarLayout';
-import SurveyRenderer from './SurveyRenderer';
 import moment from 'moment';
 import yup from 'yup'
 import GCForm from './forms/GCForm';
@@ -12,6 +11,12 @@ import Form from 'react-formal';
 import SubmitCallSurvey from '../mutations/SubmitCallSurvey'
 import CallStatsBar from './CallStatsBar'
 import MutationHandler from './MutationHandler';
+
+const SurveyRenderers = {
+  'BSDSurvey': require('./survey-renderers/BSDSurvey'),
+  'PhonebankRSVPSurvey': require('./survey-renderers/PhonebankRSVPSurvey'),
+  'SingleEventRSVPSurvey': require('./survey-renderers/SingleEventRSVPSurvey')
+}
 
 class CallAssignment extends React.Component {
   styles = {
@@ -244,12 +249,14 @@ class CallAssignment extends React.Component {
         </div>
       )
 
+    let Survey = SurveyRenderers[this.props.callAssignment.renderer];
+
     let survey = (
       <div style={{
         ...this.styles.surveyFrame,
         display: this.state.completed ? 'block' : 'none'
       }}>
-        <SurveyRenderer
+        <Survey
           ref='survey'
           survey={this.props.callAssignment.survey}
           interviewee={this.props.currentUser.intervieweeForCallAssignment}
@@ -343,8 +350,9 @@ export default Relay.createContainer(CallAssignment, {
         name
         instructions
         survey {
-          ${SurveyRenderer.getFragment('survey')}
+          ${SurveyRenderers.BSDSurvey.getFragment('survey')}
         }
+        renderer
       }
     `,
     currentUser: () => Relay.QL`
@@ -374,9 +382,13 @@ export default Relay.createContainer(CallAssignment, {
             latitude
             longitude
           }
-          ${SurveyRenderer.getFragment('interviewee')}
+          ${SurveyRenderers.BSDSurvey.getFragment('interviewee')}
+          ${SurveyRenderers.PhonebankRSVPSurvey.getFragment('interviewee')}
+          ${SurveyRenderers.SingleEventRSVPSurvey.getFragment('interviewee')}
         }
-        ${SurveyRenderer.getFragment('currentUser')}
+        ${SurveyRenderers.PhonebankRSVPSurvey.getFragment('currentUser')}
+        ${SurveyRenderers.BSDSurvey.getFragment('currentUser')}
+        ${SurveyRenderers.SingleEventRSVPSurvey.getFragment('currentUser')}
       }
     `
   }

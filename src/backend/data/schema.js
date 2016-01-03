@@ -781,6 +781,7 @@ const GraphQLCallAssignment = new GraphQLObjectType({
       type: GraphQLSurvey,
       resolve: (assignment, _, {rootValue}) => rootValue.loaders.gcBsdSurveys.load(assignment.gc_bsd_survey_id)
     },
+    renderer: { type: GraphQLString },
     callsMade: {
       type: GraphQLInt,
       resolve: async (callAssignment) => {
@@ -822,7 +823,6 @@ const GraphQLSurvey = new GraphQLObjectType({
         return url.resolve('https://' + process.env.BSD_HOST, '/page/s/' + slug)
       }
     },
-    renderer: { type: GraphQLString }
   }),
   interfaces: [nodeInterface]
 })
@@ -1122,7 +1122,6 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
 
       survey = await knex.insertAndFetch('gc_bsd_surveys', {
           signup_form_id: surveyId,
-          renderer: renderer,
           processors: processors
         }, {transaction: trx})
 
@@ -1198,6 +1197,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
 
       return knex.insertAndFetch('bsd_call_assignments', {
           name: name,
+          renderer: renderer,
           instructions: instructions,
           interviewee_group: group.id,
           gc_bsd_survey_id: survey.id,

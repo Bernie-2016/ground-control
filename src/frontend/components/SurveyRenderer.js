@@ -1,8 +1,6 @@
 import React from 'react';
 import Relay from 'react-relay';
-import BSDSurvey from './survey-renderers/BSDSurvey'
-import PhonebankRSVPSurvey from './survey-renderers/PhonebankRSVPSurvey'
-import SingleEventRSVPSurvey from './survey-renderers/SingleEventRSVPSurvey'
+
 
 class SurveyRenderer extends React.Component {
   static propTypes = {
