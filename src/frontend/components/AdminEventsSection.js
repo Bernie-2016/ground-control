@@ -636,7 +636,6 @@ class AdminEventsSection extends React.Component {
         {filterInputs.map((input, index) => {
           return <FilterInput name={input.name} label={input.label} key={index}/>
         })}
-
       </form>
       </Dialog>
     )
@@ -892,7 +891,7 @@ class AdminEventsSection extends React.Component {
   }
 
   _handleRowClick = (clickEvent, targetRowIndex) => {
-    this._handleEventPreviewOpen(targetRowIndex, 1)
+    this._handleEventPreviewOpen(targetRowIndex, 0)
   }
 
   _masterCheckBoxChecked = (checkEvent, checked) => {
@@ -976,14 +975,6 @@ class AdminEventsSection extends React.Component {
             }
             width={130}
           />
-          <Column
-            flexGrow={1}
-            header={<this.SortControllerCell content="Event Type ID" attribute="eventTypeId" />}
-            cell={
-              <this.EventTypeCell data={events} col="eventType" attr="id" />
-            }
-            width={130}
-          />
         </ColumnGroup>
         <ColumnGroup
           header={<this.HeaderCell content="Time" />}>
@@ -1012,7 +1003,7 @@ class AdminEventsSection extends React.Component {
             flexGrow={1}
             header={<this.SortControllerCell content="Description" attribute="description" />}
             cell={<this.NoHTMLCell data={events} col="description" />}
-            width={250}
+            width={450}
           />
           <Column
             header={<this.SortControllerCell content="Duration" attribute="duration" />}
@@ -1040,6 +1031,14 @@ class AdminEventsSection extends React.Component {
             cell={<this.TextCell data={events} col="eventIdObfuscated" />}
             width={100}
             align='center'
+          />
+          <Column
+            flexGrow={1}
+            header={<this.SortControllerCell content="Event Type ID" attribute="eventTypeId" />}
+            cell={
+              <this.EventTypeCell data={events} col="eventType" attr="id" />
+            }
+            width={130}
           />
         </ColumnGroup>
         <ColumnGroup

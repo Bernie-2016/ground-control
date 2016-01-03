@@ -9,10 +9,9 @@ import {
   GraphQLString,
   GraphQLID,
   GraphQLEnumType,
-  GraphQLFloat
+  GraphQLFloat,
+  GraphQLScalarType
 } from 'graphql'
-
-import CustomGraphQLDateType from 'graphql-custom-datetype'
 
 import {
   connectionArgs,
@@ -49,7 +48,11 @@ class GraphQLError extends Error {
   }
 }
 
-const authRequired = (session) => {
+function interpretDateAsUTC(date) {
+  return moment.tz(moment(date).format('YYYY-MM-DD HH:mm:ss'), 'UTC').toDate()
+}
+
+function authRequired (session) {
   if (!session.user) {
     throw new GraphQLError({
       status: 401,
@@ -58,7 +61,7 @@ const authRequired = (session) => {
   }
 }
 
-const adminRequired = (session) => {
+function adminRequired(session) {
   authRequired(session)
   if (!session.user || !session.user.is_admin) {
     throw new GraphQLError({
@@ -108,6 +111,11 @@ function eventFromAPIFields(fields) {
   Object.keys(fields).forEach((fieldName) => {
     let newFieldName = eventFieldFromAPIField(fieldName)
     event[newFieldName] = fields[fieldName]
+    console.log(newFieldName)
+    if (newFieldName === 'start_dt') {
+      console.log("here")
+      event[newFieldName] = event[newFieldName].toISOString()
+    }
   })
 
   let idFields = ['event_id', 'creator_cons_id', 'event_type_id'];
@@ -221,6 +229,37 @@ let {nodeInterface, nodeField} = nodeDefinitions(
     return null
   }
 )
+
+const GraphQLDate = new GraphQLScalarType({
+  name: 'Date',
+  serialize (value) {
+    if (value === null)
+      return null
+    if (!(value instanceof Date)) {
+      throw new Error('Field error: value is not an instance of Date')
+    }
+
+    return value.toJSON()
+  },
+  parseValue (value) {
+    const date = new Date(value)
+
+    return date
+  },
+  parseLiteral (ast) {
+    if (ast.kind !== Kind.STRING) {
+      throw new GraphQLError('Query error: Can only parse strings to dates but got a: ' + ast.kind, [ast])
+    }
+    let result = new Date(ast.value)
+    if (isNaN(result.getTime())) {
+      throw new GraphQLError('Query error: Invalid date', [ast])
+    }
+    if (ast.value !== result.toJSON()) {
+      throw new GraphQLError('Query error: Invalid date format, only accepts: YYYY-MM-DDTHH:MM:SS.SSSZ', [ast])
+    }
+    return result
+  }
+})
 
 const GraphQLListContainer = new GraphQLObjectType({
   name: 'ListContainer',
@@ -498,8 +537,8 @@ const GraphQLPerson = new GraphQLObjectType({
     suffix: { type: GraphQLString },
     gender: { type: GraphQLString },
     birthDate: {
-      type: CustomGraphQLDateType,
-      resolve: (person) => person.birth_dt
+      type: GraphQLDate,
+      resolve: (person) => interpretDateAsUTC(person.birth_dt)
     },
     title: { type: GraphQLString },
     employer: { type: GraphQLString },
@@ -666,15 +705,15 @@ const GraphQLEvent = new GraphQLObjectType({
       }
     },
     startDate: {
-      type: CustomGraphQLDateType,
+      type: GraphQLDate,
       resolve: (event) => {
-        return moment.tz(moment(event.start_dt).format('YYYY-MM-DD HH:mm:ss'), 'UTC').toDate()
+        return interpretDateAsUTC(event.start_dt)
       }
     },
     createDate: {
-      type: CustomGraphQLDateType,
+      type: GraphQLDate,
       resolve: (event) => {
-        return moment.tz(moment(event.create_dt).format('YYYY-MM-DD HH:mm:ss'), 'UTC').toDate()
+        return interpretDateAsUTC(event.create_dt)
       }
     },
     duration: { type: GraphQLInt },
@@ -835,7 +874,7 @@ const GraphQLEventInput = new GraphQLInputObjectType({
     venueCountry: { type: GraphQLString },
     venueDirections: { type: GraphQLString },
     localTimezone: { type: GraphQLString },
-    startDate: { type: CustomGraphQLDateType },
+    startDate: { type: GraphQLDate }, // This should be CustomGraphQLDateType, but it's broken until a PR gets merged in to the graphql-custome-datetype repo
     duration: { type: GraphQLInt },
     capacity: { type: GraphQLInt },
     attendeeVolunteerShow: { type: GraphQLInt },
@@ -1118,7 +1157,10 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
     surveyId: { type: new GraphQLNonNull(GraphQLInt) },
     renderer: { type: new GraphQLNonNull(GraphQLString) },
     processors: { type: new GraphQLList(GraphQLString) },
-    instructions: { type: GraphQLString }
+    instructions: { type: GraphQLString },
+    startDate: { type: GraphQLDate },
+    endDate: { type: GraphQLDate },
+
   },
   outputFields: {
     listContainer: {
@@ -1143,9 +1185,10 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
           let model = modelFromBSDResponse(BSDSurveyResponse, 'bsd_surveys')
           let BSDSurveyFieldsResponse = await BSDClient.listFormFields(surveyId)
           underlyingSurvey = await knex.insertAndFetch('bsd_surveys', model, {transaction: trx, idField: 'signup_form_id'})
-          let fieldInsertionPromises = BSDSurveyFieldsResponse.map((field) => {
+          let fieldInsertionPromises = BSDSurveyFieldsResponse.map(async (field) => {
             let model = modelFromBSDResponse(field, 'bsd_survey_fields')
-            return knex('bsd_survey_fields').insert(model)
+            let dbField = await knex('bsd_survey_fields').where('signup_form_field_id', model.signup_form_field_id).first()
+            return dbField || knex('bsd_survey_fields').insert(model)
           })
 
           await Promise.all(fieldInsertionPromises);

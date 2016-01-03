@@ -10,7 +10,6 @@ import InfoHeader from './InfoHeader'
 import {USTimeZones} from './data/USTimeZones';
 
 const momentWithOffset = (startDate, utcOffset) => {
-  startDate = startDate * 1000
   return moment(startDate).utcOffset(utcOffset)
 };
 
