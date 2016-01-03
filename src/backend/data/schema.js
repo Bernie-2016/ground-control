@@ -232,7 +232,8 @@ let {nodeInterface, nodeField} = nodeDefinitions(
 const GraphQLDate = new GraphQLScalarType({
   name: 'Date',
   serialize (value) {
-    log.debug("Serializing:", value)
+    if (value === null)
+      return value
     if (!(value instanceof Date)) {
       throw new Error('Field error: value is not an instance of Date')
     }
@@ -243,6 +244,8 @@ const GraphQLDate = new GraphQLScalarType({
     return value.toJSON()
   },
   parseValue (value) {
+    if (value === null)
+      return value
     const date = new Date(value)
     if (isNaN(date.getTime())) {
       log.debug('in parse value', value, date)
