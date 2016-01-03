@@ -847,7 +847,7 @@ class AdminEventsSection extends React.Component {
   }
 
   _handleRowClick = (clickEvent, targetRowIndex) => {
-    this._handleEventPreviewOpen(targetRowIndex, 1);
+    this._handleEventPreviewOpen(targetRowIndex, 0);
   }
 
   _masterCheckBoxChecked = (checkEvent, checked) => {
