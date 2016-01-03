@@ -47,6 +47,10 @@ class GraphQLError extends Error {
 }
 
 function interpretDateAsUTC(date) {
+  log.debug('Interpreting date', date)
+  log.debug('Moment of date', moment(date).format('YYYY-MM-DD HH:mm:ss'))
+  log.debug('Timezone conversion', moment.tz(moment(date).format('YYYY-MM-DD HH:mm:ss'), 'UTC'))
+  log.debug('Date conversion', moment.tz(moment(date).format('YYYY-MM-DD HH:mm:ss'), 'UTC').toDate())
   return moment.tz(moment(date).format('YYYY-MM-DD HH:mm:ss'), 'UTC').toDate()
 }
 
