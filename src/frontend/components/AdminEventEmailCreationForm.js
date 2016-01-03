@@ -48,7 +48,8 @@ class AdminEventEmailCreationForm extends React.Component {
     hostEmail: yup.string().email().required(),
     senderEmail: yup.string().email().required(),
     hostMessage: yup.string().required(),
-    senderMessage: yup.string().required()
+    senderMessage: yup.string().required(),
+    toolPassword: yup.string().required()
   })
 
   getRandomSubarray(arr, size) {
@@ -84,11 +85,11 @@ class AdminEventEmailCreationForm extends React.Component {
             defaultValue={{
               hostEmail: this.props.event.host.email
             }}
-            onSubmit={(formValue) => {
+            onSubmit={(formValues) => {
               this.refs.mutationHandler.send({
                 listContainer: this.props.listContainer,
                 recipientIds: recipientIds,
-                ...formValue
+                ...formValues
               })
             }}
           >
@@ -116,6 +117,10 @@ class AdminEventEmailCreationForm extends React.Component {
             />
             <br />
             <br />
+            <Form.Field
+              name='toolPassword'
+              label="Password for this tool (ask an admin)"
+            />
             <Form.Button type='submit' label='Send!' fullWidth={true} />
           </GCForm>
         </Paper>

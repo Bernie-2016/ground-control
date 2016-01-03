@@ -1101,7 +1101,8 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
     senderEmail: { type: new GraphQLNonNull(GraphQLString) },
     hostMessage: { type: new GraphQLNonNull(GraphQLString) },
     senderMessage: { type: new GraphQLNonNull(GraphQLString) },
-    recipientIds: { type: new GraphQLList(GraphQLString) }
+    recipientIds: { type: new GraphQLList(GraphQLString) },
+    toolPassword: { type: new GraphQLNonNull(GraphQLString) }
   },
   outputFields: {
     listContainer: {
@@ -1109,8 +1110,17 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
       resolve: () => SharedListContainer
     }
   },
-  mutateAndGetPayload: async ({hostEmail, senderEmail, hostMessage, senderMessage, recipientIds}, {rootValue}) => {
+  mutateAndGetPayload: async ({hostEmail, senderEmail, hostMessage, senderMessage, recipientIds, toolPassword}, {rootValue}) => {
     adminRequired(rootValue)
+
+    // TODO: remove this goofy protection when the tool is ready
+    // for all admins to use it.
+    if (toolPassword !== 'solidarity') {
+      throw new GraphQLError({
+        status: 401,
+        message: 'Incorrect password for this tool.'
+      })
+    }
 
     let comms = []
 

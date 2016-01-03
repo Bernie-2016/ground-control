@@ -40,7 +40,8 @@ export default class CreateAdminEventEmail extends Relay.Mutation {
       senderEmail: this.props.senderEmail,
       hostMessage: this.props.hostMessage,
       senderMessage: this.props.senderMessage,
-      recipientIds: this.props.recipientIds
+      recipientIds: this.props.recipientIds,
+      toolPassword: this.props.toolPassword
     }
   }
 }
