@@ -124,4 +124,25 @@ export default class MG {
       return await this.mailgun.messages().send(message)
     }
   }
+
+  async sendAdminEventInvite(data, debugging) {
+    let template = new EmailTemplate(templateDir + '/admin-event-invitation')
+    let content = await template.render(data)
+
+    let message = {
+      from: data.senderAddress,
+      'h:Reply-To': data.hostAddress,
+      //to: data.recipientAddress,
+      subject: 'Fwd: HELP! I need more people to come to my phonebank',
+      text: content.text
+    }
+
+    log.info("Sending Mailgun message", message)
+
+    if (debugging) {
+      return message
+    } else {
+      return await this.mailgun.messages().send(message)
+    }
+  }
 }

@@ -33,7 +33,9 @@ import BSDClient from '../bsd-instance'
 import knex from './knex'
 import humps from 'humps'
 import log from '../log'
+import MG from '../mail'
 
+const Mailgun = new MG(process.env.MAILGUN_KEY, process.env.MAILGUN_DOMAIN)
 const EVERYONE_GROUP = 'everyone'
 
 class GraphQLError extends Error {
@@ -1076,6 +1078,20 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
     knex.transaction(async (trx) => {
       for (let i = 0; i < recipientIds.length; i++) {
         let personId = fromGlobalId(recipientIds[i]).id
+        let person = await rootValue.loaders.bsdPeople.load(personId)
+        let recipientEmail = await getPrimaryEmail(person)
+
+        // TODO error handling
+        await Mailgun.sendAdminEventInvite(
+          {
+            hostAddress: hostEmail,
+            senderAddress: senderEmail,
+            hostMessage: hostMessage,
+            senderMessage: senderMessage,
+            recipientAddress: recipientEmail
+          },
+          true      // debugging on or off?
+        )
 
         let comm = await knex.insertAndFetch(
           'communications',
