@@ -957,7 +957,7 @@ class AdminEventsSection extends React.Component {
             flexGrow={1}
             header={<this.SortControllerCell content="Description" attribute="description" />}
             cell={<this.NoHTMLCell data={events} col="description" />}
-            width={300}
+            width={450}
           />
           <Column
             header={<this.SortControllerCell content="Duration" attribute="duration" />}
