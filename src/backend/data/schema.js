@@ -508,7 +508,6 @@ const GraphQLAddress = new GraphQLObjectType({
     people: {
       type: new GraphQLList(GraphQLPerson),
       resolve: async (address, _, {rootValue}) => {
-        log.info("BROTHER", address.cons_id)
         return knex('bsd_people').where('cons_id', address.cons_id)
       }
     }

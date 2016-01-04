@@ -48,7 +48,7 @@ export default class MutationHandler extends React.Component {
       }
 
       if (!errorMessage) {
-        log.error(error)
+        log.error('Failure in MutationHandler', error)
         errorMessage = defaultMessage
       }
 

@@ -835,7 +835,6 @@ class AdminEventsSection extends React.Component {
   _handleEventEmail = (eventIndex) => {
     let events = this.props.listContainer.events.edges
     let eventId = events[eventIndex].node.id
-    console.log(events[eventIndex])
 
     this.props.history.push(`/admin/events/${eventId}/emails/create`)
   }
