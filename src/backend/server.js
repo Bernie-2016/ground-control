@@ -44,14 +44,14 @@ const oneWeekInMillis = 604800000
 
 const sessionStore = new KnexSessionStore({
   knex: knex,
-  tablename: 'sessions',
+  tablename: 'sessions'
 })
 
 function isAuthenticated(req, res, next) {
   if (req.user)
     return next()
 
-  res.redirect('/signup');
+  res.redirect('/signup')
 }
 
 passport.use('signup', new LocalStrategy(
@@ -67,10 +67,12 @@ passport.use('signup', new LocalStrategy(
 
     if (!user) {
       let hashedPassword = await hash(password)
-      let newUser = await knex.insertAndFetch('users', {
+      let newUser = await knex.insertAndFetch('users',
+        {
           email: email.toLowerCase(),
           password: hashedPassword
         })
+
       return done(null, newUser)
     } else if (!await compare(password, user.password)) {
       return done(null, false, { message: 'Incorrect password.' })
@@ -97,6 +99,7 @@ function dataLoaderCreator(tablename, idField) {
   return new DataLoader(async (keys) => {
     // This way it works with strings passed in as well
     let rows = await knex(tablename).whereIn(idField, keys)
+
     return keys.map((key) => {
       return rows.find((row) => row[idField].toString() === key.toString())
     })
@@ -108,7 +111,8 @@ class QueryLoader {
     let promises = queries.map((query) => {
       knex.raw(query)
     })
-    return Promise.all(promises);
+
+    return Promise.all(promises)
   }
 
   constructor() {
@@ -137,7 +141,7 @@ let createLoaders = () => {
     bsdEventTypes: dataLoaderCreator('bsd_event_types', 'event_type_id'),
     bsdEvents: dataLoaderCreator('bsd_events', 'event_id'),
     bsdAddresses: dataLoaderCreator('bsd_addresses', 'cons_addr_id'),
-    gcBsdGroups: dataLoaderCreator('gc_bsd_groups', 'id'),
+    gcBsdGroups: dataLoaderCreator('gc_bsd_groups', 'id')
   }
 }
 
@@ -159,7 +163,7 @@ app.use('/graphql', graphQLHTTP((request) => {
   return {
     rootValue: {
       user: request.user,
-      loaders: createLoaders(),
+      loaders: createLoaders()
     },
     schema: Schema
   }
@@ -170,7 +174,6 @@ app.post('/log', wrap(async (req, res) => {
   let logs = req.body.logs
 
   logs.forEach( (message) => {
-    let app = message[0]
     let method = message[1]
     let client = parsedURL.query.client_id ? parsedURL.query.client_id : ''
 
@@ -197,7 +200,7 @@ app.post('/log', wrap(async (req, res) => {
 app.post('/signup',
   passport.authenticate('signup'),
   wrap(async (req, res) => {
-    res.send('Successfully signed in');
+    res.send('Successfully signed in')
   })
 )
 
@@ -235,10 +238,10 @@ app.post('/events/create', wrap(async (req, res) => {
   await BSDClient.createEvents(constituent.id, form, event_types, eventCreationCallback)
 
   // send event creation confirmation email
-  function eventCreationCallback(status){
+  function eventCreationCallback(status) {
   	res.json(status)
 
-  	if (status == 'success'){
+  	if (status == 'success') {
       if (form['event_type_id'] == 31) {
         // Send phone bank specific email
         Mailgun.sendPhoneBankConfirmation(form, constituent)
