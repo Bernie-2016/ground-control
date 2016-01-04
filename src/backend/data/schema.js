@@ -429,7 +429,7 @@ const GraphQLUser = new GraphQLObjectType({
             query = query
               .from('bsd_person_gc_bsd_groups as bsd_people')
               .where('gc_bsd_group_id', group.id)
-              .orderBy('bsd_person_gc_bsd_groups.id')
+              .orderBy('bsd_people.id')
           else
             query = query
               .from('bsd_people')
@@ -791,6 +791,12 @@ const GraphQLCallAssignment = new GraphQLObjectType({
     id: globalIdField('CallAssignment'),
     name: { type: GraphQLString },
     instructions: { type: GraphQLString },
+    endDate: {
+      type: GraphQLDate,
+      resolve: (assignment) => {
+        return moment(assignment.end_dt).toDate()
+      }
+    },
     survey: {
       type: GraphQLSurvey,
       resolve: (assignment, _, {rootValue}) => rootValue.loaders.gcBsdSurveys.load(assignment.gc_bsd_survey_id)

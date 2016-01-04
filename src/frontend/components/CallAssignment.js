@@ -234,6 +234,14 @@ class CallAssignment extends React.Component {
   }
 
   render() {
+    let endDate = this.props.callAssignment.endDate
+
+    if (endDate !== null && moment(endDate).isAfter(moment().add(1, 'days')))
+      return (
+        <div style={this.styles.container}>
+          This call assignment is done!
+        </div>
+      )
     if (this.props.currentUser.intervieweeForCallAssignment === null)
       return (
         <div style={{
@@ -355,6 +363,7 @@ export default Relay.createContainer(CallAssignment, {
     callAssignment: () => Relay.QL`
       fragment on CallAssignment {
         id
+        endDate
         name
         instructions
         survey {
