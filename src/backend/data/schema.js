@@ -320,7 +320,7 @@ const GraphQLUser = new GraphQLObjectType({
           .select('cons_id')
           .where('email', user.email)
           .first()
-        return relatedPerson ? rootValue.loaders.bsdPeople.load(relatedPerson.id) : null
+        return relatedPerson ? rootValue.loaders.bsdPeople.load(relatedPerson.cons_id) : null
       }
     },
     firstName: {
@@ -389,6 +389,9 @@ const GraphQLUser = new GraphQLObjectType({
           let callAssignment = await rootValue.loaders.bsdCallAssignments.load(localId)
           let allOffsets = [-10, -9, -8, -7, -6, -5, -4]
           let validOffsets = []
+          // So that I can program late at night
+          if (process.env.NODE_ENV === 'development')
+            validOffsets = allOffsets
           allOffsets.forEach((offset) => {
             let time = moment().utcOffset(offset)
             if (time.hours() >= 9 && time.hours() <= 21)
@@ -804,6 +807,7 @@ const GraphQLCallAssignment = new GraphQLObjectType({
         let eventId = await knex('gc_bsd_events').where('gc_bsd_events.turn_out_assignment', assignment.id)
           .select('event_id')
           .first()
+
         return eventId ? rootValue.loaders.bsdEvents.load(eventId.event_id) : null
       }
     },

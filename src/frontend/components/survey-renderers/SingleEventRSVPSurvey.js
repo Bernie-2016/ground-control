@@ -1,6 +1,8 @@
 import React from 'react';
 import Relay from 'react-relay';
-import {BernieText} from '../styles/bernie-css';
+import moment from 'moment';
+import {BernieText, BernieColors} from '../styles/bernie-css';
+import GCBooleanField from '../forms/GCBooleanField';
 
 class SingleEventRSVPSurvey extends React.Component {
   static propTypes = {
@@ -9,27 +11,56 @@ class SingleEventRSVPSurvey extends React.Component {
   }
 
   checkForm() {
-    return true
+    if (this.state.signupQuestion === null) {
+      this.setState({errors: {signupQuestion: 'This field is required'}})
+      return false
+    }
+    return true;
   }
 
   submit() {
     if (this.checkForm())
       this.props.onSubmitted({
-        event_id: this.props.eventId
+        event_id: this.state.signupQuestion ? this.props.eventId : null
       })
   }
 
+  // Some of this should get put into some sort of shared component
+  styles = {
+    question: {
+      ...BernieText.secondaryTitle,
+      fontWeight: 600,
+      marginTop: 20,
+      color: BernieColors.blue,
+      fontSize: '1em',
+      letterSpacing: '0em'
+    }
+  }
+
+  state = {
+    signupQuestion: null,
+    errors: {}
+  }
+
   render() {
+    let relatedEvent = this.props.callAssignment.relatedEvent
+    let relatedPerson = this.props.currentUser.relatedPerson
+
     return (
       <div>
         <div style={BernieText.default}>
-          Hi {this.props.interviewee.firstName}, my name is {this.props.currentUser.firstName} and I'm a volunteer with the Bernie Sanders campaign. I'm calling you to invite you to a {this.props.callAssignment.relatedEvent.eventType.name} on {moment(this.props.callAssignment.relatedEvent.startDate).utcOffset(this.props.callAssignment.relatedEvent.localUTCOffset).format('dddd, MMMM Do')} at {this.props.callAssignment.relatedEvent.venueAddr1}{this.currentUser.relatedPerson && this.props.callAssignment.relatedEvent.host.id === this.currentUser.relatedPerson.id ? ' that I am hosting' : ''}. [Event type specific info].
+          Hi {this.props.interviewee.firstName}, my name is {this.props.currentUser.firstName} and I'm a volunteer with the Bernie Sanders campaign. I'm calling you to invite you to a {relatedEvent.eventType.name} on {moment(relatedEvent.startDate).utcOffset(relatedEvent.localUTCOffset).format('dddd, MMMM Do')} at {relatedEvent.venueAddr1}{relatedPerson && relatedEvent.host.id === relatedPerson.id ? ' that I am hosting' : ''}. [Event type specific info].
         </div>
         <GCBooleanField
           errorText={this.state.errors.signupQuestion}
           label="Can I sign you up for this event?"
           labelStyle={this.styles.question}
           value={this.state.signupQuestion}
+          onChange={(value) => {
+            this.setState({
+              signupQuestion: value
+            })
+          }}
           />
       </div>
     )
@@ -56,6 +87,9 @@ export default Relay.createContainer(SingleEventRSVPSurvey, {
     currentUser: () => Relay.QL`
       fragment on User {
         firstName
+        relatedPerson {
+          id
+        }
       }
     `,
     interviewee: () => Relay.QL`

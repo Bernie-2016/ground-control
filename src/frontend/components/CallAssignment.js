@@ -265,6 +265,7 @@ class CallAssignment extends React.Component {
         </div>
         <Survey
           ref='survey'
+          callAssignment={this.props.callAssignment}
           survey={this.props.callAssignment.survey}
           interviewee={this.props.currentUser.intervieweeForCallAssignment}
           currentUser={this.props.currentUser}
@@ -360,6 +361,7 @@ export default Relay.createContainer(CallAssignment, {
           ${SurveyRenderers.BSDSurvey.getFragment('survey')}
         }
         renderer
+        ${SurveyRenderers.SingleEventRSVPSurvey.getFragment('callAssignment')}
       }
     `,
     currentUser: () => Relay.QL`
