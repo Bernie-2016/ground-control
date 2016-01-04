@@ -268,8 +268,9 @@ class AdminEventsSection extends React.Component {
 
       <IconButton
         title="email"
+        disabled={data[rowIndex].node.flagApproval === true}
         onTouchTap={() => {
-          this._handleEventEmail([rowIndex]);
+          this._handleEventEmail([rowIndex])
         }}
         >
           <FontIcon className="material-icons" hoverColor={BernieColors.blue}>email</FontIcon>
