@@ -21,7 +21,7 @@ class SingleEventRSVPSurvey extends React.Component {
   submit() {
     if (this.checkForm())
       this.props.onSubmitted({
-        event_id: this.state.signupQuestion ? this.props.eventId : null
+        event_id: this.state.signupQuestion ? this.props.callAssignment.relatedEvent.eventIdObfuscated : null
       })
   }
 
@@ -72,6 +72,7 @@ export default Relay.createContainer(SingleEventRSVPSurvey, {
     callAssignment: () => Relay.QL`
       fragment on CallAssignment {
         relatedEvent {
+          eventIdObfuscated
           host {
             id
           }

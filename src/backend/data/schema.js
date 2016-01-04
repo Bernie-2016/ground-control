@@ -1021,6 +1021,7 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
           let processor = survey.processors[index];
           switch (processor) {
             case 'bsd-event-rsvper':
+              log.debug("HERE")
               if (fieldValues['event_id']) {
                 let address = await getPrimaryAddress(person, trx)
                 let phone = await getPrimaryPhone(person, trx)
