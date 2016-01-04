@@ -1194,12 +1194,10 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
           })
 
         if (query !== EVERYONE_GROUP) {
+          let limitedQuery = query
           if (query.indexOf('order by') === -1)
-            throw new GraphQLError({
-              status: 400,
-              message: 'You must order by some column. This is how we prioritize who to call first.'
-            })
-          let limitedQuery = `${query} limit 1 offset 0`
+            limitedQuery = limitedQuery + ' order by cons_id'
+          limitedQuery = `${limitedQuery} limit 1 offset 0`
           try {
             await knex.raw(limitedQuery)
           } catch (ex) {

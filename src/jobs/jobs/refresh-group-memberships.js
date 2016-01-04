@@ -54,8 +54,12 @@ export let job = async () => {
         let query = (group.query === 'everyone') ? 'SELECT * FROM bsd_person_gc_bsd_groups' : group.query
 
         do {
+          let shouldRandomize = query.indexOf('order by') === -1
+          let limitedRawQuery = query
+          if (shouldRandomize)
+            limitedRawQuery = limitedRawQuery + 'ORDER BY cons_id'
           limitedQuery = knex
-            .raw(`${query} LIMIT ${limit} OFFSET ${offset}`)
+            .raw(`${limitedRawQuery} LIMIT ${limit} OFFSET ${offset}`)
             .transacting(trx)
           log.info('Running query: ' + limitedQuery.toString())
           results = await limitedQuery
@@ -69,7 +73,8 @@ export let job = async () => {
             }
           })
 
-          peopleToInsert = shuffleArray(peopleToInsert)
+          if (shouldRandomize)
+            peopleToInsert = shuffleArray(peopleToInsert)
 
           if (peopleToInsert.length > 0) {
             log.info('Inserting data...')
