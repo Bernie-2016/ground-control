@@ -10,7 +10,6 @@ import GCSelectField from './forms/GCSelectField'
 import InfoHeader from './InfoHeader'
 
 const momentWithOffset = (startDate, utcOffset) => {
-  startDate = startDate * 1000
   return moment(startDate).utcOffset(utcOffset)
 };
 
