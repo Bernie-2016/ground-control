@@ -431,7 +431,7 @@ class AdminEventsSection extends React.Component {
             label="Delete"
             primary={true}
             disabled={(this.state.selectedRows.length == 0)}
-                onTouchTap={() => {
+            onTouchTap={() => {
               this._handleEventDeletion(this.state.selectedRows);
             }}
           />
