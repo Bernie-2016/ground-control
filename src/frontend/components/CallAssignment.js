@@ -256,6 +256,13 @@ class CallAssignment extends React.Component {
         ...this.styles.surveyFrame,
         display: this.state.completed ? 'block' : 'none'
       }}>
+        <div style={{
+            ...BernieText.title,
+            fontSize: '1.8em',
+            color: BernieColors.lightBlue
+          }}>
+          Call Script
+        </div>
         <Survey
           ref='survey'
           survey={this.props.callAssignment.survey}

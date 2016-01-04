@@ -313,6 +313,16 @@ const GraphQLUser = new GraphQLObjectType({
   fields: () => ({
     id: globalIdField('User'),
     email: { type: GraphQLString },
+    relatedPerson: {
+      type: GraphQLPerson,
+      resolve: async (user, _, {rootValue}) => {
+        let relatedPerson = await knex('bsd_emails')
+          .select('cons_id')
+          .where('email', user.email)
+          .first()
+        return relatedPerson ? rootValue.loaders.bsdPeople.load(relatedPerson.id) : null
+      }
+    },
     firstName: {
       type: GraphQLString,
       resolve: async (user) => {
@@ -786,6 +796,15 @@ const GraphQLCallAssignment = new GraphQLObjectType({
       type: GraphQLInt,
       resolve: async (callAssignment) => {
         return knex.count(knex('bsd_calls').where('call_assignment_id', callAssignment.id), 'id')
+      }
+    },
+    relatedEvent: {
+      type: GraphQLEvent,
+      resolve: async (assignment, _, {rootValue}) => {
+        let eventId = await knex('gc_bsd_events').where('gc_bsd_events.turn_out_assignment', assignment.id)
+          .select('event_id')
+          .first()
+        return eventId ? rootValue.loaders.bsdEvents.load(eventId.event_id) : null
       }
     },
     query: {
