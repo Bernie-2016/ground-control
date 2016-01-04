@@ -236,10 +236,15 @@ class CallAssignment extends React.Component {
   render() {
     let endDate = this.props.callAssignment.endDate
 
-    if (endDate !== null && moment(endDate).isAfter(moment().add(1, 'days')))
+    if (endDate !== null && moment(endDate).isBefore(moment().add(1, 'days')))
       return (
-        <div style={this.styles.container}>
-          This call assignment is done!
+        <div style={{
+          marginTop: 40,
+          marginLeft: 40
+        }}>
+          <div style={BernieText.default}>
+            This call assignment is done!
+          </div>
         </div>
       )
     if (this.props.currentUser.intervieweeForCallAssignment === null)

@@ -46,6 +46,17 @@ class GraphQLError extends Error {
   }
 }
 
+function activeCallAssignments(query) {
+  return query
+    .where('end_dt', '>', moment().add(1, 'days').toDate())
+    .orWhere('end_dt', 'is', null)
+}
+
+function inactiveCallAssignments(query) {
+  return query
+    .where('end_dt', '<', moment().add(1, 'days').toDate())
+}
+
 function interpretDateAsUTC(date) {
   return moment.tz(moment(date).format('YYYY-MM-DD HH:mm:ss'), 'UTC').toDate()
 }
@@ -295,9 +306,17 @@ const GraphQLListContainer = new GraphQLObjectType({
     },
     callAssignments: {
       type: GraphQLCallAssignmentConnection,
-      args: connectionArgs,
-      resolve: async (root, {first}, {rootValue}) => {
-        let assignments = await knex('bsd_call_assignments').limit(first)
+      args: {
+        ...connectionArgs,
+        active: { type: GraphQLBoolean }
+      },
+      resolve: async (root, {first, active}, {rootValue}) => {
+        let query = knex('bsd_call_assignments').limit(first)
+        if (active === true)
+          query = activeCallAssignments(query)
+        else if (active === false)
+          query = inactiveCallAssignments(query)
+        let assignments = await query
         return connectionFromArray(assignments, {first})
       }
     },
@@ -336,15 +355,29 @@ const GraphQLUser = new GraphQLObjectType({
     },
     callAssignments: {
       type: GraphQLCallAssignmentConnection,
-      args: connectionArgs,
-      resolve: async (user, {first}) => {
-        let assignments = await knex.union([
-          knex('bsd_call_assignments')
-          .where('caller_group', null),
-          knex('bsd_call_assignments')
+      args: {
+        ...connectionArgs,
+        active: { type: GraphQLBoolean }
+      },
+      resolve: async (user, {first, active}) => {
+        let nullQuery = knex('bsd_call_assignments')
+          .where('caller_group', null)
+        let callerQuery = knex('bsd_call_assignments')
           .select('bsd_call_assignments.*')
           .innerJoin('user_user_groups', 'bsd_call_assignments.caller_group', 'user_user_groups.user_group_id')
           .where('user_user_groups.user_id', user.id)
+        // This is duplicated code from the other callAssignments resolve method
+        if (active === true) {
+          nullQuery = activeCallAssignments(nullQuery)
+          callerQuery = activeCallAssignments(callerQuery)
+        }
+        else if (active === false) {
+          nullQuery = inactiveCallAssignments(nullQuery)
+          callerQuery = inactiveCallAssignments(callerQuery)
+        }
+
+        let assignments = await knex.union([
+          nullQuery, callerQuery
         ])
 
         return connectionFromArray(assignments, {first})
