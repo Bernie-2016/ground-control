@@ -429,6 +429,7 @@ const GraphQLUser = new GraphQLObjectType({
             query = query
               .from('bsd_person_gc_bsd_groups as bsd_people')
               .where('gc_bsd_group_id', group.id)
+              .orderBy('bsd_person_gc_bsd_groups.id')
           else
             query = query
               .from('bsd_people')
@@ -1193,7 +1194,12 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
           })
 
         if (query !== EVERYONE_GROUP) {
-          let limitedQuery = `${query} order by cons_id limit 1 offset 0`
+          if (query.indexOf('order by') === -1)
+            throw new GraphQLError({
+              status: 400,
+              message: 'You must order by some column. This is how we prioritize who to call first.'
+            })
+          let limitedQuery = `${query} limit 1 offset 0`
           try {
             await knex.raw(limitedQuery)
           } catch (ex) {

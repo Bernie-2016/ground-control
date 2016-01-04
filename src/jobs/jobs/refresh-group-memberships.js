@@ -55,7 +55,7 @@ export let job = async () => {
 
         do {
           limitedQuery = knex
-            .raw(`${query} ORDER BY cons_id LIMIT ${limit} OFFSET ${offset}`)
+            .raw(`${query} LIMIT ${limit} OFFSET ${offset}`)
             .transacting(trx)
           log.info('Running query: ' + limitedQuery.toString())
           results = await limitedQuery

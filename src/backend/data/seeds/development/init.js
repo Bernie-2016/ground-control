@@ -52,7 +52,6 @@ exports.seed = async function(knex, Promise) {
   }
 
   let data = {
-    'users': [],
     'bsd_people': [],
     'bsd_addresses' : [],
     'bsd_events' : [],
