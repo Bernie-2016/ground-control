@@ -55,11 +55,14 @@ export let job = async () => {
 
         do {
           let shouldRandomize = query.indexOf('order by') === -1
+          let shouldLimit = query.indexOf('limit') === -1
           let limitedRawQuery = query
           if (shouldRandomize)
             limitedRawQuery = limitedRawQuery + 'ORDER BY cons_id'
+          if (shouldLimit)
+            limitedRawQuery = `${limitedRawQuery} ' LIMIT ${limit} OFFSET ${offset}`
           limitedQuery = knex
-            .raw(`${limitedRawQuery} LIMIT ${limit} OFFSET ${offset}`)
+            .raw(limitedRawQuery)
             .transacting(trx)
           log.info('Running query: ' + limitedQuery.toString())
           results = await limitedQuery
@@ -83,7 +86,7 @@ export let job = async () => {
           }
 
           offset = offset + limit
-        } while(results.rows.length > 0)
+        } while(results.rows.length > 0 && shouldLimit)
       })
       await Promise.all(promises)
     })

@@ -7,6 +7,10 @@
     {
       "cron": "00 */5 * * * *",
       "job": "./jobs/refresh-group-memberships.js"
+    },
+    {
+      "cron": "00 */30 * * * *",
+      "job": "./jobs/generate-event-call-assignments.js"
     }
   ]
 }

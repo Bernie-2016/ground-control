@@ -49,7 +49,7 @@ class GraphQLError extends Error {
 function activeCallAssignments(query) {
   return query
     .where('end_dt', '>', moment().add(1, 'days').toDate())
-    .orWhere('end_dt', 'is', null)
+    .orWhere('end_dt', null)
 }
 
 function inactiveCallAssignments(query) {
