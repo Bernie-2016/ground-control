@@ -1118,18 +1118,9 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
 
     let adminEmails = [
       'saikat@berniesanders.com',
-      'pebs222@aol.com',
-      'helpdesk@berniesanders.com',
       'jacob@jacoblegrone.com',
-      'jon.c.culver@gmail.com',
-      'elijahbrowning@gmail.com',
-      'zackmalitz@berniesanders.com',
       'sambriggs@berniesanders.com',
-      'cole.m.edwards@gmail.com',
       'al3x@al3x.net',
-      'kenneth@berniesanders.com',
-      'melissabyrne@berniesanders.com',
-      'pinkyweitzman@berniesanders.com',
       'zack@berniesanders.com'
     ]
 
