@@ -130,7 +130,9 @@ class AdminEventEmailCreationForm extends React.Component {
           <br />
           <ul>
             {nearbyPeopleSample.map( (person, i) => {
-              return <li key={`person${i}`}>{person.firstName || person.lastName} &lt;{person.email}&gt;</li>
+              return <li key={`person${i}`}>
+                {person.firstName || person.lastName} <tt>&lt;{person.email}&gt;</tt>
+              </li>
             })}
           </ul>
         </Paper>
