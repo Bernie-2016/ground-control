@@ -1118,24 +1118,12 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
 
     let comms = []
 
-    let adminEmails = [
-      'saikat@berniesanders.com',
-      'jacob@jacoblegrone.com',
-      'sambriggs@berniesanders.com',
-      'alexpayne@berniesanders.com',
-      'zack@berniesanders.com',
-      'al3x@al3x.net'
-    ]
-
     await knex.transaction(async (trx) => {
-      //for (let i = 0; i < recipientIds.length; i++) {
-      //  let personId = fromGlobalId(recipientIds[i]).id
-      //  let person = await rootValue.loaders.bsdPeople.load(personId)
-      //  let recipientEmail = await getPrimaryEmail(person)
-      for (let i = 0; i < adminEmails.length; i++) {
-        let adminEmail = adminEmails[i]
+      for (let i = 0; i < recipientIds.length; i++) {
+       let personId = fromGlobalId(recipientIds[i]).id
+       let person = await rootValue.loaders.bsdPeople.load(personId)
+       let recipientEmail = await getPrimaryEmail(person)
 
-        // TODO error handling
         await Mailgun.sendAdminEventInvite(
           {
             hostAddress: hostEmail,
@@ -1148,16 +1136,14 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
           false      // debugging on or off?
         )
 
-        let comm = null
-
-        // let comm = await knex.insertAndFetch(
-        //   'communications',
-        //   {
-        //     person_id: personId,
-        //     type: 'EMAIL'
-        //   },
-        //   {transaction: trx}
-        // )
+        let comm = await knex.insertAndFetch(
+          'communications',
+          {
+            person_id: personId,
+            type: 'EMAIL'
+          },
+          {transaction: trx}
+        )
 
         comms.push(comm)
       }
