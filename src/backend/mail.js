@@ -36,24 +36,35 @@ Handlebars.registerPartial('header', headerHTML)
 Handlebars.registerPartial('footer', footerHTML)
 
 const senderAddress = 'Team Bernie<info@berniesanders.com>'
+const inDevEnv = (process.env.NODE_ENV === 'development')
 
 export default class MG {
   constructor(apiKey, domain) {
     this.mailgun = Mailgun({apiKey: apiKey, domain: domain})
   }
 
+  async send(message, debugging) {
+    log.info("Sending email via Mailgun", message)
+
+    if (inDevEnv || debugging) {
+      return message
+    } else {
+      return await this.mailgun.messages().send(message)
+    }
+  }
+
   async sendEventConfirmation(form, constituent, event_types, debugging) {
-    if (form.capacity =='0') {
+    if (form.capacity === '0') {
       form.capacity = 'unlimited'
     }
 
     // Sort event dates by date
-    if (typeof form.event_dates == 'string') {
+    if (typeof form.event_dates === 'string') {
       form.event_dates = JSON.parse(form.event_dates)
     }
 
     form.event_dates.sort((a, b) => {
-        return a.date.localeCompare(b.date)
+      return a.date.localeCompare(b.date)
     })
 
     // Get the event type name
@@ -85,18 +96,12 @@ export default class MG {
       html: content.html
     }
 
-    log.debug(message)
-
-    if (debugging) {
-      return message
-    } else {
-      return await this.mailgun.messages().send(message)
-    }
+    return await send(message, debugging)
   }
 
   async sendPhoneBankConfirmation(form, constituent, debugging) {
     constituent.cons_email.forEach((email) => {
-      if (email.is_primary == '1') {
+      if (email.is_primary === '1') {
         constituent['email'] = email.email
       }
     })
@@ -118,11 +123,7 @@ export default class MG {
       html: content.html
     }
 
-    if (debugging) {
-      return message
-    } else {
-      return await this.mailgun.messages().send(message)
-    }
+    return await send(message, debugging)
   }
 
   async sendAdminEventInvite(data, debugging) {
@@ -137,12 +138,6 @@ export default class MG {
       text: content.text
     }
 
-    log.info("Sending Mailgun message", message)
-
-    if (debugging) {
-      return message
-    } else {
-      return await this.mailgun.messages().send(message)
-    }
+    return await send(message, debugging)
   }
 }
