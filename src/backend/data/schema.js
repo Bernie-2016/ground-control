@@ -766,24 +766,20 @@ const GraphQLEvent = new GraphQLObjectType({
     nearbyPeople: {
       type: new GraphQLList(GraphQLPerson),
       resolve: async(event, _, {rootValue}) => {
-        let addresses = await knex('bsd_addresses')
-                              .whereRaw(`st_dwithin(bsd_addresses.geom, st_transform(st_setsrid(st_makepoint(${event.longitude}, ${event.latitude}), 4326), 900913), 50000)`)
-                              .orderByRaw(`bsd_addresses.geom <-> st_transform(st_setsrid(st_makepoint(${event.longitude}, ${event.latitude}), 4326), 900913)`)
-                              .limit(500)
+        let addresses =
+          await knex('bsd_addresses')
+            .join('bsd_people', 'bsd_addresses.cons_id', 'bsd_people.cons_id')
+            .join('bsd_emails', 'bsd_people.cons_id', 'bsd_emails.cons_id')
+            .join('bsd_phones', 'bsd_people.cons_id', 'bsd_phones.cons_id')
+            .where('bsd_addresses.is_primary', true)
+            .where('bsd_emails.is_primary', true)
+            .where('bsd_phones.is_primary', true)
+            .whereRaw(`st_dwithin(bsd_addresses.geom, st_transform(st_setsrid(st_makepoint(${event.longitude}, ${event.latitude}), 4326), 900913), 50000)`)
+            .orderByRaw(`bsd_addresses.geom <-> st_transform(st_setsrid(st_makepoint(${event.longitude}, ${event.latitude}), 4326), 900913)`)
+            .orderBy('bsd_people.create_dt')
+            .limit(500)
 
-        let people = await addresses.map((address) => rootValue.loaders.bsdPeople.load(address.cons_id))
-        let peopleWithEmail = []
-
-        // angels weep, JavaScript
-        for (let i = 0; i < people.length; i++) {
-          let person = await people[i]
-          let email = await getPrimaryEmail(person, null)
-
-          if (email)
-            peopleWithEmail.push(person)
-        }
-
-        return peopleWithEmail
+        return await addresses.map((address) => rootValue.loaders.bsdPeople.load(address.cons_id))
       }
     }
   }),
