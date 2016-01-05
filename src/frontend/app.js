@@ -47,18 +47,21 @@ Minilog
 window.log = Minilog('client');
 
 window.onerror = (msg, file, line, col, error) => {
+  let message = msg || error.message || 'Uncaught exception'
+  Rollbar.error(message, error)
+
   StackTrace
   .fromError(error)
-  .then((stack) => {
-    log.error('Uncaught exception!', error.message, stack);
+  .then((stacktraces) => {
+    log.error('Uncaught exception!', error.message, stacktraces)
     setTimeout(() => {
-        alert('Whoops! Something went wrong. We\'re looking into it, but in the meantime please refresh your browser.');
-        document.location.reload(true);
-    }, 2000);
+      alert('Whoops! Something went wrong. We\'re looking into it, but in the meantime please refresh your browser.')
+      document.location.reload(true)
+    }, 2000)
   })
-  .catch((stack) => {
-    log.error(stack);
-  });
+  .catch((err) => {
+    log.error(err)
+  })
 };
 
 injectTapEventPlugin();

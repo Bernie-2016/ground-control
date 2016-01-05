@@ -15,6 +15,7 @@ import passport from 'passport'
 import LocalStrategy  from 'passport-local'
 import url from 'url'
 import Minilog from 'minilog'
+import rollbar from 'rollbar'
 import {compare, hash} from './bcrypt-promise'
 import knex from './data/knex'
 import KnexSessionStoreFactory from 'connect-session-knex'
@@ -92,6 +93,13 @@ passport.deserializeUser(wrap(async (id, done) => {
 }))
 
 const app = express()
+
+app.use(rollbar.errorHandler(process.env.ROLLBAR_ACCESS_TOKEN))
+
+rollbar.handleUncaughtExceptions(
+  process.env.ROLLBAR_ACCESS_TOKEN,
+  { exitOnUncaughtException: true }
+)
 
 app.enable('trust proxy') // don't rate limit heroku
 
