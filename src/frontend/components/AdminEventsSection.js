@@ -461,6 +461,7 @@ class AdminEventsSection extends React.Component {
       eventIDs: eventsToDelete
     })
 
+    this.setState({showEventPreview: false})
     this._handleDeleteModalRequestClose()
     this._deselectRows({indexesToRemove: this.state.indexesMarkedForDeletion})
   }
