@@ -977,15 +977,21 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
   },
   mutateAndGetPayload: async ({callAssignmentId, intervieweeId, completed, leftVoicemail, sentText, reasonNotCompleted, surveyFieldValues}, {rootValue}) => {
     authRequired(rootValue)
+
     let caller = rootValue.user
     let localIntervieweeId = fromGlobalId(intervieweeId).id
     let localCallAssignmentId = fromGlobalId(callAssignmentId).id
+
     return knex.transaction(async (trx) => {
       // To ensure that the assigned call exists
       let assignedCall = await knex('bsd_assigned_calls')
         .transacting(trx)
         .where('caller_id', caller.id)
         .first()
+
+      if (!assignedCall) {
+        throw new Error(`No assigned call found when caller ${caller.id} submitted call survey for interviwee ${localIntervieweeId}`)
+      }
 
       let assignedCallInfo = {
         callerId: assignedCall.caller_id,
@@ -1028,7 +1034,8 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
 
       if (completed && processorsLength > 0) {
         for (let index = 0; index < processorsLength; index++) {
-          let processor = survey.processors[index];
+          let processor = survey.processors[index]
+
           switch (processor) {
             case 'bsd-event-rsvper':
               if (fieldValues['event_id']) {
@@ -1037,15 +1044,18 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
                 let zip = address.zip
                 await BSDClient.noFailApiRequest('addRSVPToEvent', email, zip, phone, fieldValues['event_id'])
               }
-              break;
+              break
             case 'bsd-form-submitter':
               let bsdFormValues = {}
+
               if (email) {
                 fieldValues['Email'] = email
                 let fields = Object.keys(fieldValues)
+
                 for (let index = 0; index < fields.length; index++) {
                   let field = fields[index]
-                  let fieldId = field;
+                  let fieldId = field
+
                   // Field is not a numeric id
                   if (!(/^\d+$/.test(field))) {
                     let fieldObj = await knex('bsd_survey_fields')
@@ -1054,6 +1064,7 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
                       .where('label', field)
                       .transacting(trx)
                       .first()
+
                     if (!fieldObj)
                       fieldObj = await knex('bsd_survey_fields')
                         .where('signup_form_id', survey.signup_form_id)
@@ -1061,19 +1072,22 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
                         .transacting(trx)
                         .first()
 
-                    if (fieldObj)
+                    if (fieldObj) {
                       fieldId = fieldObj.signup_form_field_id
-                    else
+                    } else {
                       fieldId = null
+                    }
                   }
+
                   if (fieldId)
                     bsdFormValues[fieldId] = fieldValues[field]
                 }
+
                 await BSDClient.noFailApiRequest('processSignup', survey.signup_form_id, bsdFormValues)
-              }
-              else
+              } else {
                 log.error(`Could not find an e-mail address for constituent: ${localIntervieweeId}`)
-              break;
+              }
+              break
           }
         }
       }
