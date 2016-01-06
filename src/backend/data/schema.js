@@ -569,7 +569,7 @@ const GraphQLPerson = new GraphQLObjectType({
           .orderBy('create_dt', 'desc')
           .first()
 
-        return lastCall.create_dt
+        return lastCall ? lastCall.create_dt : null
       }
     },
     nearbyEvents: {
