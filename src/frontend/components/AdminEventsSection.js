@@ -581,15 +581,28 @@ class AdminEventsSection extends React.Component {
         <input
           name={name}
           defaultValue={this.props.relay.variables.filters[name]}
-          // onChange={updateFilters}
         />
+      </div>
+    );
+
+    const FilterSelect = ({name, label, options, optionName='name', optionValue='value'}) => (
+      <div>
+        <label htmlFor={name} style={labelStyle}>{label}: </label>
+        <select
+          name={name}
+          defaultValue={this.props.relay.variables.filters[name]}
+        >
+          <option value='none'>--</option>
+          {options.map((item, index) => {
+            return <option key={index} value={item[optionValue]}>{item[optionName]}</option>
+          })}
+        </select>
       </div>
     );
 
     const filterInputs = [
       {name: 'venueZip', label: 'Zip Code'},
       {name: 'eventIdObfuscated', label: 'Event ID'},
-      {name: 'eventTypeId', label: 'Event Type ID'}
     ];
 
     let updateFilters = (event) => {
@@ -620,21 +633,12 @@ class AdminEventsSection extends React.Component {
         ref='eventSearchForm'
         onSubmit={(e, data) => {
           e.preventDefault();
-          console.log('form submitted', data);
         }}
       >
-        <label htmlFor="venueState" style={labelStyle}>State: </label>
-        <select
-          name='venueState'
-          defaultValue={this.props.relay.variables.filters.venueState}
-          // onChange={updateFilters}
-        >
-          <option value='none'>--</option>
-          {states.map((item, index) => {
-            return <option key={index} value={item.abbreviation}>{item.name}</option>
-          })}
-        </select>
-        <br/>
+
+        <FilterSelect name='venueState' label='State' options={states} optionValue='abbreviation' />
+
+        <FilterSelect name='eventTypeId' label='Event Type' options={this.props.listContainer.eventTypes} optionValue='id' />
 
         {filterInputs.map((input, index) => {
           return <FilterInput name={input.name} label={input.label} key={index}/>
@@ -913,7 +917,7 @@ class AdminEventsSection extends React.Component {
   }
 
   render() {
-    let events = this.props.listContainer.events.edges
+    let events = this.props.listContainer.events.edges;
 
     return (
     <div>
@@ -1035,14 +1039,6 @@ class AdminEventsSection extends React.Component {
             width={100}
             align='center'
           />
-          <Column
-            flexGrow={1}
-            header={<this.SortControllerCell content="Event Type ID" attribute="eventTypeId" />}
-            cell={
-              <this.EventTypeCell data={events} col="eventType" attr="id" />
-            }
-            width={130}
-          />
         </ColumnGroup>
         <ColumnGroup
           header={<this.HeaderCell content="Event Host" />}>
@@ -1119,6 +1115,10 @@ export default Relay.createContainer(AdminEventsSection, {
         ${EventEdit.getFragment('listContainer')}
         ${DeleteEvents.getFragment('listContainer')}
         ${EditEvents.getFragment('listContainer')}
+        eventTypes {
+          id
+          name
+        }
         events(
           first: $numEvents
           filterOptions: $filters
