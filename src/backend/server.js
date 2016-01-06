@@ -101,7 +101,19 @@ rollbar.handleUncaughtExceptions(
   { exitOnUncaughtException: true }
 )
 
-app.enable('trust proxy') // don't rate limit heroku
+// don't rate limit heroku
+app.enable('trust proxy')
+
+// redirect to CloudFlare SSL in prod if needed
+if (process.env.NODE_ENV === 'production') {
+  app.use((req, res, next) => {
+    if (req.headers['cf-visitor'] === '{"scheme":"http"}') {
+      return res.redirect(['https://', req.get('Host'), req.url].join(''))
+    }
+
+    next()
+  })
+}
 
 function dataLoaderCreator(tablename, idField) {
   return new DataLoader(async (keys) => {
