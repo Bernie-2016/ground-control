@@ -112,10 +112,6 @@ function eventFromAPIFields(fields) {
     let newFieldName = eventFieldFromAPIField(fieldName)
     event[newFieldName] = fields[fieldName]
     console.log(newFieldName)
-    if (newFieldName === 'start_dt') {
-      console.log("here")
-      event[newFieldName] = event[newFieldName].toISOString()
-    }
   })
 
   let idFields = ['event_id', 'creator_cons_id', 'event_type_id'];
