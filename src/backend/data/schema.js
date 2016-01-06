@@ -435,6 +435,7 @@ const GraphQLUser = new GraphQLObjectType({
             .where('bsd_addresses.is_primary', true)
             .where('bsd_phones.is_primary', true)
             .where('bsd_emails.is_primary', true)
+            .whereNot('bsd_addresses.latitude', 0)
             .limit(1)
             .first()
 
