@@ -343,8 +343,8 @@ const GraphQLUser = new GraphQLObjectType({
         completed: { type: GraphQLBoolean }
       },
       resolve: async (user, {forAssignmentId, completed}) => {
-        let query = knex('bsd_calls')
-          .where('caller_id', user.id)
+        let query = knex('bsd_calls').where('caller_id', user.id)
+
         if (forAssignmentId) {
           let localId = fromGlobalId(forAssignmentId).id
           query = query.where('call_assignment_id', localId)
@@ -352,7 +352,8 @@ const GraphQLUser = new GraphQLObjectType({
 
         if (typeof completed !== 'undefined')
           query = query.where('completed', completed)
-        return knex.count(query, 'id');
+
+        return knex.count(query, 'id')
       }
     },
     intervieweeForCallAssignment: {
@@ -558,6 +559,17 @@ const GraphQLPerson = new GraphQLObjectType({
       type: GraphQLAddress,
       resolve: async (person, _, {rootValue}) => {
         return getPrimaryAddress(person)
+      }
+    },
+    lastCalled: {
+      type: GraphQLString,
+      resolve: async (person) => {
+        let lastCall = await knex('bsd_calls')
+          .where('interviewee_id', person.cons_id)
+          .orderBy('create_dt', 'desc')
+          .limit(1)
+
+        return lastCall.create_dt
       }
     },
     nearbyEvents: {
