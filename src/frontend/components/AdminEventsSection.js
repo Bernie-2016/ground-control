@@ -259,6 +259,7 @@ class AdminEventsSection extends React.Component {
 
       <IconButton
         title="approve"
+        disabled={this.props.relay.variables.filters.flagApproval === false}
         onTouchTap={() => {
           this._handleEventConfirmation([rowIndex]);
         }}
@@ -440,7 +441,7 @@ class AdminEventsSection extends React.Component {
             label="Approve Selected"
             style={{marginLeft: 0}}
             secondary={true}
-            disabled={(this.state.selectedRows.length == 0)}
+            disabled={(this.state.selectedRows.length == 0 || this.props.relay.variables.filters.flagApproval === false)}
             onTouchTap={() => {
           this._handleEventConfirmation(this.state.selectedRows);
         }}
@@ -664,6 +665,7 @@ class AdminEventsSection extends React.Component {
       <FlatButton
         label={(this.state.previewTabIndex == 0) ? 'Approve' : (this.state.approveOnUpdate ? 'Update and Approve' : 'Update')}
         key="3"
+        disabled={this.props.relay.variables.filters.flagApproval === false}
         secondary={true}
         onTouchTap={() => {
           this.refs.eventEdit.refs.component.submit()
