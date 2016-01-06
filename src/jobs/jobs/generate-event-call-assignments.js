@@ -12,7 +12,7 @@ export let job = async () => {
     await knex.transaction(async (trx) => {
       let eventsToUpdate = await knex('bsd_events')
         .innerJoin('bsd_emails', 'bsd_events.creator_cons_id', 'bsd_emails.cons_id')
-        .leftOuterJoin('gc_bsd_events', 'bsd_events.event_id', 'gc_bsd_events.event_id')
+        .innerJoin('gc_bsd_events', 'bsd_events.event_id', 'gc_bsd_events.event_id')
         .where('bsd_events.start_dt', '>', new Date())
         .where('gc_bsd_events.turn_out_assignment', null)
         .transacting(trx)
@@ -22,13 +22,16 @@ export let job = async () => {
         .transacting(trx)
         .first()
 
+      if (!turnOutSurvey)
+        log.error('Did not run call assignments job because there is no turn out survey to use')
+
       let numEvents = eventsToUpdate.length
       for (let index = 0; index < numEvents; index++) {
         let event = eventsToUpdate[index]
         let query = knex('bsd_addresses')
           .where('is_primary', true)
-          .whereRaw(`st_dwithin(bsd_addresses.geom, ${event.geom}, 50000)`)
-          .orderByRaw(`bsd_addresses.geom <-> ${event.geom}`)
+          .whereRaw(`st_dwithin(bsd_addresses.geom, '${event.geom}', 50000)`)
+          .orderByRaw(`bsd_addresses.geom <-> '${event.geom}'`)
           .transacting(trx)
           .limit(1500)
 
@@ -70,7 +73,13 @@ export let job = async () => {
           caller_group: userGroup.id,
           renderer: 'SingleEventRSVPSurvey'
         }
-        await knex.insertAndFetch('bsd_call_assignments', callAssignment, {transaction: trx})
+        callAssignment = await knex.insertAndFetch('bsd_call_assignments', callAssignment, {transaction: trx})
+        await knex('gc_bsd_events')
+          .where('event_id', event.event_id)
+          .update({
+            turn_out_assignment: callAssignment.id
+          })
+          .transacting(trx)
       }
 
       log.info('Done creating call assignments for events')

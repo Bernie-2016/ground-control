@@ -64,7 +64,6 @@ export let job = async () => {
           limitedQuery = knex
             .raw(limitedRawQuery)
             .transacting(trx)
-          log.info('Running query: ' + limitedQuery.toString())
           results = await limitedQuery
 
           let peopleToInsert = results.rows.map((result) => {
@@ -80,7 +79,7 @@ export let job = async () => {
             peopleToInsert = shuffleArray(peopleToInsert)
 
           if (peopleToInsert.length > 0) {
-            log.info('Inserting data...')
+
             await knex.bulkInsert('bsd_person_gc_bsd_groups', peopleToInsert, {transaction: trx})
             log.info('Done inserting ' + peopleToInsert.length + ' rows for group ' + group.id)
           }
