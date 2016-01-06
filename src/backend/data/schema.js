@@ -776,6 +776,7 @@ const GraphQLEvent = new GraphQLObjectType({
       resolve: async(event, _, {rootValue}) => {
         let addresses =
           await knex('bsd_addresses')
+            .whereNot({latitude: 0, longitude: 0})
             .join('bsd_people', 'bsd_addresses.cons_id', 'bsd_people.cons_id')
             .join('bsd_emails', 'bsd_people.cons_id', 'bsd_emails.cons_id')
             .join('bsd_phones', 'bsd_people.cons_id', 'bsd_phones.cons_id')
