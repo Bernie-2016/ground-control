@@ -567,7 +567,7 @@ const GraphQLPerson = new GraphQLObjectType({
         let lastCall = await knex('bsd_calls')
           .where('interviewee_id', person.cons_id)
           .orderBy('create_dt', 'desc')
-          .limit(1)
+          .first()
 
         return lastCall.create_dt
       }
