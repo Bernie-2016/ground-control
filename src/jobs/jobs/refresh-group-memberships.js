@@ -39,6 +39,7 @@ export let job = async () => {
     })
 
     await knex.transaction(async (trx) => {
+      let groupCount = groups.length;
       let promises = groups.map(async (group) => {
         if (group.query !== 'everyone') {
           await knex('bsd_person_gc_bsd_groups')
@@ -46,7 +47,12 @@ export let job = async () => {
             .del()
             .transacting(trx)
         }
+      })
+      await Promise.all(promises)
 
+      // We do this instead of a promises map because the map takes too much memory and can kill the process
+      for (let i = 0; i < groupCount; i++) {
+        let group = groups[i]
         let results = null
         let limit = 100000
         let offset = 0
@@ -55,12 +61,12 @@ export let job = async () => {
 
         do {
           let shouldRandomize = query.indexOf('order by') === -1
-          let shouldLimit = query.indexOf('limit') === -1
+          var shouldLimit = query.indexOf('limit') === -1
           let limitedRawQuery = query
           if (shouldRandomize)
-            limitedRawQuery = limitedRawQuery + 'ORDER BY cons_id'
+            limitedRawQuery = limitedRawQuery + ' ORDER BY cons_id'
           if (shouldLimit)
-            limitedRawQuery = `${limitedRawQuery} ' LIMIT ${limit} OFFSET ${offset}`
+            limitedRawQuery = `${limitedRawQuery}  LIMIT ${limit} OFFSET ${offset}`
           limitedQuery = knex
             .raw(limitedRawQuery)
             .transacting(trx)
@@ -79,15 +85,13 @@ export let job = async () => {
             peopleToInsert = shuffleArray(peopleToInsert)
 
           if (peopleToInsert.length > 0) {
-
             await knex.bulkInsert('bsd_person_gc_bsd_groups', peopleToInsert, {transaction: trx})
             log.info('Done inserting ' + peopleToInsert.length + ' rows for group ' + group.id)
           }
 
           offset = offset + limit
         } while(results.rows.length > 0 && shouldLimit)
-      })
-      await Promise.all(promises)
+      }
     })
 
     log.info('Done refreshing groups')
