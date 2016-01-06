@@ -288,7 +288,6 @@ class PhonebankRSVPSurvey extends React.Component {
   }
 
   intervieweeHomeCoords() {
-    console.log(this.props.interviewee);
     return {
       lat: this.props.interviewee.address.latitude,
       lng: this.props.interviewee.address.longitude
