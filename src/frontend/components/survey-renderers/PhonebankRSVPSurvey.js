@@ -189,13 +189,15 @@ class PhonebankRSVPSurvey extends React.Component {
             fontWeight: 600,
             fontSize: '1.0em'
           }}>
-            {marker.name}
+            <a href={marker.link} target="_blank">
+              {marker.name}
+            </a>
           </div>
           <div style={{
             ...BernieText.default,
             fontSize: '1.0em'
           }}>
-            <div><a href={marker.link} target="_blank">{marker.venueName}</a></div>
+            <div>{marker.venueName}</div>
             <div>{marker.addr1}</div>
             <div>{marker.addr2}</div>
             <div>Attendance: {attendance}</div>
