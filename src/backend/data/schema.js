@@ -359,7 +359,7 @@ const GraphQLUser = new GraphQLObjectType({
       },
       resolve: async (user, {callAssignmentId}, {rootValue}) => {
         let localId = fromGlobalId(callAssignmentId).id
-        
+
         let assignedCall = await knex('bsd_assigned_calls').where({
           'caller_id': user.id,
           'call_assignment_id': localId
@@ -436,10 +436,6 @@ const GraphQLUser = new GraphQLObjectType({
             .whereNotIn('bsd_people.cons_id', assignedCallsSubquery)
             .whereNotIn('bsd_addresses.state_cd', ['IA', 'NH', 'NV', 'SC'])
             .whereIn('zip_codes.timezone_offset', validOffsets)
-            .whereNotNull('bsd_addresses.latitude')
-            .whereNotNull('bsd_addresses.longitude')
-            .whereNot('bsd_addresses.latitude', 0)
-            .whereNot('bsd_addresses.longitude', 0)
             .where('bsd_addresses.is_primary', true)
             .where('bsd_phones.is_primary', true)
             .where('bsd_emails.is_primary', true)
