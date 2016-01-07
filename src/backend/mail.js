@@ -3,8 +3,9 @@ import {EmailTemplate} from 'email-templates'
 import Handlebars from 'handlebars'
 import path from 'path'
 import fs from 'fs'
-import log from './log'
+import Minilog from 'minilog'
 
+const clientLogger = Minilog('client')
 const templateDir = path.resolve(__dirname, './email-templates')
 const headerHTML = fs.readFileSync(templateDir + '/header.hbs', {encoding: 'utf-8'})
 const footerHTML = fs.readFileSync(templateDir + '/footer.hbs', {encoding: 'utf-8'})
@@ -44,7 +45,7 @@ export default class MG {
   }
 
   async send(message, debugging) {
-    log.info("Sending email via Mailgun", message)
+    clientLogger.info("Sending email via Mailgun", message)
 
     if (inDevEnv || debugging) {
       return message
@@ -96,7 +97,7 @@ export default class MG {
       html: content.html
     }
 
-    return await send(message, debugging)
+    return await this.send(message, debugging)
   }
 
   async sendPhoneBankConfirmation(form, constituent, debugging) {
@@ -123,7 +124,7 @@ export default class MG {
       html: content.html
     }
 
-    return await send(message, debugging)
+    return await this.send(message, debugging)
   }
 
   async sendAdminEventInvite(data, debugging) {
@@ -138,6 +139,6 @@ export default class MG {
       text: content.text
     }
 
-    return await send(message, debugging)
+    return await this.send(message, debugging)
   }
 }
