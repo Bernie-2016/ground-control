@@ -1,3 +1,4 @@
 {
-    "extra_head": "<script src='/webpack-dev-server.js'></script>"
+  "env": "development",
+  "extra_head": "<script src='/webpack-dev-server.js'></script>"
 }

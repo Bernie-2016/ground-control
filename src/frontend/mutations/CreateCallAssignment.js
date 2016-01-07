@@ -1,4 +1,4 @@
-import Relay from 'react-relay';
+import Relay from 'react-relay'
 
 export default class CreateCallAssignment extends Relay.Mutation {
   static fragments = {
@@ -6,13 +6,13 @@ export default class CreateCallAssignment extends Relay.Mutation {
       fragment on ListContainer {
         id
       }
-    `,
-  };
+    `
+  }
 
   getMutation() {
     return Relay.QL`
       mutation{ createCallAssignment }
-    `;
+    `
   }
 
   getFatQuery() {
@@ -23,7 +23,7 @@ export default class CreateCallAssignment extends Relay.Mutation {
           callAssignments
         },
       }
-    `;
+    `
   }
 
   getConfigs() {
@@ -32,7 +32,7 @@ export default class CreateCallAssignment extends Relay.Mutation {
       fieldIDs: {
         listContainer: this.props.listContainer.id
       }
-    }];
+    }]
   }
 
   getVariables() {

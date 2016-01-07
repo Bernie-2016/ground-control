@@ -570,6 +570,19 @@ export default class BSD {
     return this.requestWrapper(options)
   }
 
+  async makeRawRequestWithBody(callPath, params, method) {
+    let finalURL = this.generateBSDURL(callPath);
+    let options = {
+      uri: finalURL,
+      method: method,
+      body: params,
+      resolveWithFullResponse: true,
+      json: true
+    }
+
+    return this.requestWrapper(options)
+  }
+
   async makeRawXMLRequest(callPath, params, method) {
     let finalURL = this.generateBSDURL(callPath);
     let options = {
@@ -584,6 +597,14 @@ export default class BSD {
 
   async request(callPath, params, method) {
     let response = await this.makeRawRequest(callPath, params, method);
+    if (response.statusCode === 202)
+      return this.getDeferredResult(response.body);
+    else
+      return response.body;
+  }
+
+  async sendDataInBody(callPath, params, method) {
+    let response = await this.makeRawRequestWithBody(callPath, params, method);
     if (response.statusCode === 202)
       return this.getDeferredResult(response.body);
     else

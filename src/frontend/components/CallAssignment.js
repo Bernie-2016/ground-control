@@ -143,6 +143,15 @@ class CallAssignment extends React.Component {
   renderIntervieweeInfo() {
     let interviewee = this.props.currentUser.intervieweeForCallAssignment
     let name = this.intervieweeName()
+    let localTime = moment().utcOffset(interviewee.address.localUTCOffset).format('h:mm a')
+
+    let lastCalled = () => {
+      if (interviewee.lastCalled) {
+        return moment(interviewee.lastCalled).utcOffset(interviewee.address.localUTCOffset).fromNow()
+      } else {
+        return 'never'
+      }
+    }
 
     let sideBar = (
       <div>
@@ -167,7 +176,8 @@ class CallAssignment extends React.Component {
     let content = (
       <div style={BernieText.default}>
         Location: {location}<br />
-        Local Time: {moment().utcOffset(interviewee.address.localUTCOffset).format('h:mm a')}<br />
+        Local Time: {localTime}<br />
+        Last called: {lastCalled()}<br />
       </div>
     )
 
@@ -397,6 +407,7 @@ export default Relay.createContainer(CallAssignment, {
           occupation
           phone
           email
+          lastCalled
           address {
             city
             state

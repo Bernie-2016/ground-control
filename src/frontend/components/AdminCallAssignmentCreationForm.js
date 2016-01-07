@@ -1,16 +1,15 @@
-import React from 'react';
-import Relay from 'react-relay';
+import React from 'react'
+import Relay from 'react-relay'
 import {BernieColors, BernieText} from './styles/bernie-css'
-import {Paper} from 'material-ui';
-import GCForm from './forms/GCForm';
-import Form from 'react-formal';
-import CreateCallAssignment from '../mutations/CreateCallAssignment';
-import yup from 'yup';
-import MutationHandler from './MutationHandler';
+import {Paper} from 'material-ui'
+import GCForm from './forms/GCForm'
+import Form from 'react-formal'
+import CreateCallAssignment from '../mutations/CreateCallAssignment'
+import yup from 'yup'
+import MutationHandler from './MutationHandler'
 
 export default class AdminCallAssignmentCreationForm extends React.Component {
-  surveyRenderers =
-  {
+  surveyRenderers = {
     'BSDSurvey': 'BSD survey renderer',
     'PhonebankRSVPSurvey': 'Phonebank RSVP survey renderer',
     'SingleEventRSVPSurvey': 'Single event RSVP survey renderer',
@@ -116,5 +115,5 @@ export default Relay.createContainer(AdminCallAssignmentCreationForm, {
         ${CreateCallAssignment.getFragment('listContainer')},
       }
     `
-  },
+  }
 });

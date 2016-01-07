@@ -15,7 +15,7 @@ import passport from 'passport'
 import LocalStrategy  from 'passport-local'
 import url from 'url'
 import Minilog from 'minilog'
-import rateLimit from 'express-rate-limit'
+import rollbar from 'rollbar'
 import {compare, hash} from './bcrypt-promise'
 import knex from './data/knex'
 import KnexSessionStoreFactory from 'connect-session-knex'
@@ -41,18 +41,18 @@ const Mailgun = new MG(process.env.MAILGUN_KEY, process.env.MAILGUN_DOMAIN)
 const BSDClient = new BSD(process.env.BSD_HOST, process.env.BSD_API_ID, process.env.BSD_API_SECRET)
 const port = process.env.PORT
 const publicPath = path.resolve(__dirname, '../frontend/public')
-const limiter = rateLimit({windowMs: 10000, max: 50})
+const oneWeekInMillis = 604800000
 
 const sessionStore = new KnexSessionStore({
   knex: knex,
-  tablename: 'sessions',
+  tablename: 'sessions'
 })
 
 function isAuthenticated(req, res, next) {
   if (req.user)
     return next()
 
-  res.redirect('/signup');
+  res.redirect('/signup')
 }
 
 passport.use('signup', new LocalStrategy(
@@ -68,6 +68,7 @@ passport.use('signup', new LocalStrategy(
 
     if (!user || user.password === null) {
       let hashedPassword = await hash(password)
+
       if (!user) {
         let newUser = await knex.insertAndFetch('users', {
             email: email.toLowerCase(),
@@ -100,25 +101,32 @@ passport.deserializeUser(wrap(async (id, done) => {
 
 const app = express()
 
-app.enable('trust proxy') // don't rate limit heroku
+app.use(rollbar.errorHandler(process.env.ROLLBAR_ACCESS_TOKEN))
 
-// List the routes that need to be rate limited
-let rateLimitRoutes = [
-  "/graphql",
-  "/log",
-  "/signup",
-  "/events"
-]
+rollbar.handleUncaughtExceptions(
+  process.env.ROLLBAR_ACCESS_TOKEN,
+  { exitOnUncaughtException: true }
+)
 
-// Rate limit the routes
-//rateLimitRoutes.forEach((route) => {
-//  app.use(route,limiter)
-//})
+// don't rate limit heroku
+app.enable('trust proxy')
+
+// redirect to CloudFlare SSL in prod if needed
+if (process.env.NODE_ENV === 'production') {
+  app.use((req, res, next) => {
+    if (req.headers['cf-visitor'] === '{"scheme":"http"}') {
+      return res.redirect(['https://', req.get('Host'), req.url].join(''))
+    }
+
+    next()
+  })
+}
 
 function dataLoaderCreator(tablename, idField) {
   return new DataLoader(async (keys) => {
     // This way it works with strings passed in as well
     let rows = await knex(tablename).whereIn(idField, keys)
+
     return keys.map((key) => {
       return rows.find((row) => row[idField].toString() === key.toString())
     })
@@ -130,7 +138,8 @@ class QueryLoader {
     let promises = queries.map((query) => {
       knex.raw(query)
     })
-    return Promise.all(promises);
+
+    return Promise.all(promises)
   }
 
   constructor() {
@@ -159,7 +168,7 @@ let createLoaders = () => {
     bsdEventTypes: dataLoaderCreator('bsd_event_types', 'event_type_id'),
     bsdEvents: dataLoaderCreator('bsd_events', 'event_id'),
     bsdAddresses: dataLoaderCreator('bsd_addresses', 'cons_addr_id'),
-    gcBsdGroups: dataLoaderCreator('gc_bsd_groups', 'id'),
+    gcBsdGroups: dataLoaderCreator('gc_bsd_groups', 'id')
   }
 }
 
@@ -167,6 +176,9 @@ app.use(express.static(publicPath))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(session({
+  cookie: {
+    maxAge: oneWeekInMillis
+  },
   resave: false,
   saveUninitialized: false,
   secret: process.env.SESSION_SECRET,
@@ -178,7 +190,7 @@ app.use('/graphql', graphQLHTTP((request) => {
   return {
     rootValue: {
       user: request.user,
-      loaders: createLoaders(),
+      loaders: createLoaders()
     },
     schema: Schema
   }
@@ -187,8 +199,8 @@ app.use('/graphql', graphQLHTTP((request) => {
 app.post('/log', wrap(async (req, res) => {
   let parsedURL = url.parse(req.url, true)
   let logs = req.body.logs
-  logs.forEach((message) => {
-    let app = message[0]
+
+  logs.forEach( (message) => {
     let method = message[1]
     let client = parsedURL.query.client_id ? parsedURL.query.client_id : ''
 
@@ -199,10 +211,10 @@ app.post('/log', wrap(async (req, res) => {
     }
 
     message.forEach((logEntry) => {
-      if (typeof logEntry === 'object')
+      if (typeof logEntry === 'object') {
         writeLog(JSON.stringify(logEntry))
-      else {
-        logEntry.split('\n').forEach((line) => {
+      } else {
+        logEntry.split('\n').forEach( (line) => {
           writeLog(line)
         })
       }
@@ -215,7 +227,7 @@ app.post('/log', wrap(async (req, res) => {
 app.post('/signup',
   passport.authenticate('signup'),
   wrap(async (req, res) => {
-    res.send('Successfully signed in');
+    res.send('Successfully signed in')
   })
 )
 
@@ -238,35 +250,33 @@ app.post('/events/create', wrap(async (req, res) => {
   let form = req.body
 
   // Flag event as needing approval if user is not authenticated
-  if (!req.user){
+  if (!req.user) {
     form['flag_approval'] = 1
   }
 
   // constituent object not being returned right now
   let constituent = await BSDClient.getConstituentByEmail(form.cons_email)
 
-  if (!constituent){
+  if (!constituent) {
     constituent = await BSDClient.createConstituent(form.cons_email)
   }
 
   let event_types = await BSDClient.getEventTypes()
-
-  let result = await BSDClient.createEvents(constituent.id, form, event_types, eventCreationCallback)
+  await BSDClient.createEvents(constituent.id, form, event_types, eventCreationCallback)
 
   // send event creation confirmation email
-  function eventCreationCallback(status){
+  function eventCreationCallback(status) {
   	res.json(status)
-  	if (status == 'success'){
-      if (form['event_type_id'] == 31){
+
+  	if (status == 'success') {
+      if (form['event_type_id'] == 31) {
         // Send phone bank specific email
         Mailgun.sendPhoneBankConfirmation(form, constituent)
-      }
-  		else {
+      } else {
         // Send generic email
         Mailgun.sendEventConfirmation(form, constituent, event_types)
       }
-  	}
-    else {
+  	} else {
       clientLogger['error']('Event Creation Error:', status)
     }
   }

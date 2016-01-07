@@ -1,16 +1,17 @@
-import React from 'react';
+import React from 'react'
 import Relay from 'react-relay'
 import {BernieColors, BernieText} from '../styles/bernie-css'
 import Form from 'react-formal'
-import {GoogleMapLoader, GoogleMap, Marker} from 'react-google-maps';
-import {FlatButton, Paper} from 'material-ui';
-import moment from 'moment';
-import FontIcon from 'material-ui/lib/font-icon';
+import {GoogleMapLoader, GoogleMap, Marker} from 'react-google-maps'
+import {FlatButton, Paper} from 'material-ui'
+import moment from 'moment'
+import FontIcon from 'material-ui/lib/font-icon'
 import SideBarLayout from '../SideBarLayout'
-import GCSelectField from '../forms/GCSelectField';
-import GCBooleanField from '../forms/GCBooleanField';
+import GCSelectField from '../forms/GCSelectField'
+import GCBooleanField from '../forms/GCBooleanField'
 
-const WEEKDAY_DATE_FORMAT = 'dddd, MMMM Do';
+const WEEKDAY_DATE_FORMAT = 'dddd, MMMM Do'
+
 class PhonebankRSVPSurvey extends React.Component {
   static propTypes = {
     onSubmitted : React.PropTypes.func,
@@ -18,24 +19,28 @@ class PhonebankRSVPSurvey extends React.Component {
   }
 
   submit() {
-    if (this.checkForm())
+    if (this.checkForm()) {
       this.props.onSubmitted({
         event_id: this.state.selectedEventId,
         join_call_team: this.state.joinCallTeam
       })
+    }
   }
 
   // This is hacky, but using a GCForm or React Formal inside this survey seems to not work
   checkForm() {
     let errors = {}
+
     if (this.state.signupQuestion === null)
       errors['signupQuestion'] = 'This field is required'
+
     if (this.state.joinCallTeam === null)
       errors['joinCallTeam'] = 'This field is required'
 
-    this.setState({errors: errors});
+    this.setState({errors: errors})
+
     if (Object.keys(errors).length === 0)
-      return true;
+      return true
 
     return false
   }
@@ -125,12 +130,19 @@ class PhonebankRSVPSurvey extends React.Component {
   renderSelectedEvent() {
     if (!this.state.selectedEventId)
       return <div></div>
-    let event = this.props.interviewee.nearbyEvents.find((event) => event.eventIdObfuscated === this.state.selectedEventId)
+
+    let event = this.props.interviewee.nearbyEvents.find((event) => {
+      event.eventIdObfuscated === this.state.selectedEventId
+    })
+
+    let selectedOnDate = this.momentWithOffset(event.startDate, event.localUTCOffset).format('MMM D')
+
     let content = (
       <div>
-        Selected <strong>{event.name}</strong> on <strong>{this.momentWithOffset(event.startDate, event.localUTCOffset).format('MMM D')}</strong>.
+        Selected <strong>{event.name}</strong> on <strong>{selectedOnDate}</strong>.
       </div>
     )
+
     // We will eventually factor out the map into its own form component that can be controlled via value. If it is uncontrolled, it can show select and deselect buttons.  Otherwise it will just be selected/deselected via the parent
     /*    let sideBar = (
           <div>
@@ -138,7 +150,9 @@ class PhonebankRSVPSurvey extends React.Component {
           </div>
         )
     */
+
     let sideBar = <div></div>
+
     return (
       <Paper zDepth={0} style={{
         padding: '10px 10px 10px 10px',
@@ -153,10 +167,12 @@ class PhonebankRSVPSurvey extends React.Component {
   }
 
   renderMarkerDescription(marker) {
-    let description = <div></div>
     if (!marker)
-      return <div></div>;
+      return <div></div>
+
+    let description = <div></div>
     let borderColor = this.state.selectedEventId === marker.eventId ? BernieColors.blue : BernieColors.green
+
     if (marker.key === 'home')
       description = (
         <div>
@@ -169,11 +185,18 @@ class PhonebankRSVPSurvey extends React.Component {
           </div>
         </div>
       )
-    let button = <div></div>;
+
+    let button = <div></div>
+
     if (marker.key !== 'home') {
       let attendance = marker.attendeesCount
+
       if (marker.capacity)
         attendance = attendance + '/' + marker.capacity
+
+      let markerStartDate = this.
+        momentWithOffset(marker.startDate, marker.localUTCOffset).format('dddd, MMMM Do — h:mm A')
+
       description = (
         <div>
           <div style={{
@@ -181,8 +204,7 @@ class PhonebankRSVPSurvey extends React.Component {
             color: BernieColors.gray,
             fontSize: '1.0em'
           }}>
-            {this.
-              momentWithOffset(marker.startDate, marker.localUTCOffset).format('dddd, MMMM Do — h:mm A')}
+            {markerStartDate}
           </div>
           <div style={{
             ...BernieText.default,
@@ -220,17 +242,20 @@ class PhonebankRSVPSurvey extends React.Component {
 
   getEventAddr2(event) {
     let desc = ''
+
     if (event.venueAddr2)
-      desc = desc + ' ' + event.venueAddr2;
+      desc = desc + ' ' + event.venueAddr2
     if (event.venueCity)
-      desc = desc + ' ' + event.venueCity;
+      desc = desc + ' ' + event.venueCity
     if (event.venueState)
       desc = desc + ', ' + event.venueState
-    return desc.trim();
+
+    return desc.trim()
   }
 
   markers(dateFilter) {
-    let center = this.intervieweeHomeCoords();
+    let center = this.intervieweeHomeCoords()
+
     let homeIcon = {
       path: 'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z',
       fillColor: BernieColors.blue,
@@ -238,7 +263,8 @@ class PhonebankRSVPSurvey extends React.Component {
       scale: 1,
       strokeColor: BernieColors.blue,
       strokeWeight: 2
-    };
+    }
+
     let markers = [
       {
         position: center,
@@ -247,16 +273,19 @@ class PhonebankRSVPSurvey extends React.Component {
         name: 'Interviewee home',
         icon: homeIcon
       }
-    ];
+    ]
 
     let filter = dateFilter || this.state.dateFilter
 
     this.props.interviewee.nearbyEvents.forEach((event) => {
-      if(filter != 'upcoming') {
-        if(!moment().utcOffset(event.localUTCOffset).add(filter.split('_')[0], 'days').isSame(this.momentWithOffset(event.startDate, event.localUTCOffset), 'day')) {
-          return;
-        }
+      if (filter != 'upcoming') {
+        let today = moment().utcOffset(event.localUTCOffset).add(filter.split('_')[0], 'days')
+        let eventStartDate = this.momentWithOffset(event.startDate, event.localUTCOffset)
+
+        if (!today.isSame(eventStartDate, 'day'))
+          return
       }
+
       let marker = {
         position: {
           lat: event.latitude,
@@ -276,15 +305,17 @@ class PhonebankRSVPSurvey extends React.Component {
         link: event.link,
         icon: null
       }
+
       if (this.state.selectedEventId && marker.eventId === this.state.selectedEventId) {
         marker.icon = 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|147FD7'
-      }
-      else if (this.state.clickedMarker && marker.eventId === this.state.clickedMarker.eventId) {
+      } else if (this.state.clickedMarker && marker.eventId === this.state.clickedMarker.eventId) {
         // FIXME - the hex code is BernieColors.green hardcoded
         marker.icon = 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|4acc66'
       }
+
       markers.push(marker)
     })
+
     return markers
   }
 
@@ -296,8 +327,8 @@ class PhonebankRSVPSurvey extends React.Component {
   }
 
   renderMap() {
-    let markers = this.markers();
-    let center = this.intervieweeHomeCoords();
+    let markers = this.markers()
+    let center = this.intervieweeHomeCoords()
 
     return (
       <div style={{height: '100%', width: '100%'}}>
@@ -324,7 +355,7 @@ class PhonebankRSVPSurvey extends React.Component {
                   {...marker}
                   onClick={this.handleMarkerClick.bind(this, marker)}
                 />
-              );
+              )
             })}
           </GoogleMap>
         }
@@ -333,23 +364,26 @@ class PhonebankRSVPSurvey extends React.Component {
     )
   }
 
-  getDateChoices(){
+  getDateChoices() {
     let options = {"upcoming": "All Upcoming Events"}
 
     // comically large for test purposes
     // 10 or 14 would be well suited for the real world I think.
     for(let dayCount = 0; dayCount < 300; dayCount++) {
-      let label = '';
-      if(dayCount == 0){
+      let label = ''
+
+      if (dayCount == 0) {
         label = 'Today, '
-      } else if(dayCount == 1){
+      } else if(dayCount == 1) {
         label = 'Tomorrow, '
       }
 
       // make sure we have events to accommodate that day.
       this.props.interviewee.nearbyEvents.forEach((event) => {
         let date = moment().utcOffset(event.localUTCOffset).add(dayCount, 'days')
-        if(this.momentWithOffset(event.startDate, event.localUTCOffset).isSame(date, 'day')){
+        let eventStartDate = this.momentWithOffset(event.startDate, event.localUTCOffset)
+
+        if (eventStartDate.isSame(date, 'day')) {
           options[dayCount + "_days"] = label + date.format(WEEKDAY_DATE_FORMAT)
         }
       })
@@ -384,6 +418,7 @@ class PhonebankRSVPSurvey extends React.Component {
         Show events on date:
       </div>
     )
+
     return (
       <SideBarLayout
         content={content}
@@ -404,14 +439,16 @@ class PhonebankRSVPSurvey extends React.Component {
   }
 
   renderAdditionalEvents() {
-    let eventCount = this.props.interviewee.nearbyEvents.length - 1;
+    let eventCount = this.props.interviewee.nearbyEvents.length - 1
     let text = <span></span>
+
     if (eventCount > 0) {
       text = (
         <span>There {eventCount > 1 ? 'are' : 'is'} also <strong>{eventCount-1}</strong> other phone bank{eventCount > 1 ? 's' : ''} being held near you over the next month if that date doesn't work. <strong>[Click the event date filter below to find a date that works for them and click on a pin on the map to get its description]</strong>.
         </span>
       )
     }
+
     return text
   }
 
@@ -422,6 +459,7 @@ class PhonebankRSVPSurvey extends React.Component {
         <div style={this.styles.paragraph}><strong>[If no]</strong> {no}</div>
       </div>
     )
+
     return (
       <div style={{marginTop: 20}}>
         {questionValue === true ? yes : (questionValue === false) ? no : both}
@@ -431,16 +469,24 @@ class PhonebankRSVPSurvey extends React.Component {
 
   render() {
     let signupYesText = <div>Great! I've signed you up and you should be receiving an e-mail with all the details soon!</div>
+
     let signupNoText = <div>That's ok.  If you change your mind, you can always head to <strong>map.berniesanders.com</strong> to sign up.  And if you are interested, sign up to host a phone bank there and we'll make sure people in your area find out about it!</div>
+
     let callTeamYesText = <div>Thanks!</div>
+
     let callTeamNoText = <div>No worries. I understand that calling isn't everyone's thing. You can still get involved in other ways if you let us know at <strong>berniesanders.com/volunteer</strong>.</div>
+
+    let eventDate = this.state.clickedMarker ? this.momentWithOffset(this.state.clickedMarker.startDate, this.state.clickedMarker.localUTCOffset).format(WEEKDAY_DATE_FORMAT) : '[event date]'
+
+    let eventAddress = this.state.clickedMarker ? this.state.clickedMarker.addr1 : '[event address]'
+
     return (
       <div style={BernieText.default}>
         <div style={{marginBottom: 0}}>
           <div>Hi <strong>{this.props.interviewee.firstName || ''}</strong>, my name is {this.props.currentUser.firstName || '_______'} and I'm a volunteer with the Bernie Sanders campaign. I'm calling you because you signed up at some point to help out with the Bernie Sanders campaign.  Right now, we are trying to get as many volunteers as possible to show up to phone bank parties that other volunteers are hosting.  These phone banks are events where volunteers get together to contact voters in the early states.  It's an incredibly crucial part of our strategy to get Senator Sanders elected as president because we've seen that when volunteers talk to voters, Bernie starts doing better.
           </div>
           <div style={this.styles.paragraph}>
-          I see that there is a phone bank being held near you on <strong>{this.state.clickedMarker ? this.momentWithOffset(this.state.clickedMarker.startDate, this.state.clickedMarker.localUTCOffset).format(WEEKDAY_DATE_FORMAT) : '[event date]'}</strong> at <strong>{this.state.clickedMarker ? this.state.clickedMarker.addr1 : '[event address]'}</strong>.  {this.renderAdditionalEvents()}
+            I see that there is a phone bank being held near you on <strong>{eventDate}</strong> at <strong>{eventAddress}</strong>.  {this.renderAdditionalEvents()}
           </div>
           <GCBooleanField
             errorText={this.state.errors.signupQuestion}
@@ -449,10 +495,12 @@ class PhonebankRSVPSurvey extends React.Component {
             value={this.state.signupQuestion}
             onChange={(value) => {
               let selectedEventId = null
-              if (this.state.clickedMarker === null)
+
+              if (this.state.clickedMarker === null) {
                 log.error(`No clicked marker when selecting event -- Interviewee: ${this.props.interviewee.email}: Nearby events count: ${this.props.interviewee.nearbyEvents.length}`)
-              else
+              } else {
                 selectedEventId = value ? this.state.clickedMarker.eventId : null
+              }
 
               this.setState({
                 signupQuestion: value,
@@ -533,4 +581,3 @@ export default Relay.createContainer(PhonebankRSVPSurvey, {
     `
   }
 })
-
