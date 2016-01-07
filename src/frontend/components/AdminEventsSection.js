@@ -1105,6 +1105,20 @@ class AdminEventsSection extends React.Component {
             width={120}
             align='center'
           />
+          <Column
+            header={<this.SortControllerCell content="Latitude" attribute="latitude" />}
+            cell={<this.TextCell data={events} col="latitude" />}
+            flexGrow={1}
+            width={150}
+            align='center'
+          />
+          <Column
+            header={<this.SortControllerCell content="Longitude" attribute="longitude" />}
+            cell={<this.TextCell data={events} col="longitude" />}
+            flexGrow={1}
+            width={150}
+            align='center'
+          />
         </ColumnGroup>
       </Table>
     </div>
