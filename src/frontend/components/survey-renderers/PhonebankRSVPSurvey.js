@@ -131,8 +131,8 @@ class PhonebankRSVPSurvey extends React.Component {
     if (!this.state.selectedEventId)
       return <div></div>
 
-    let event = this.props.interviewee.nearbyEvents.find((event) => {
-      event.eventIdObfuscated === this.state.selectedEventId
+    let event = this.props.interviewee.nearbyEvents.find((anEvent) => {
+      return anEvent.eventIdObfuscated === this.state.selectedEventId
     })
 
     let selectedOnDate = this.momentWithOffset(event.startDate, event.localUTCOffset).format('MMM D')
