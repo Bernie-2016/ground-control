@@ -122,6 +122,18 @@ class AdminEventsSection extends React.Component {
     </Cell>
   )
 
+  EventLinkCell = ({rowIndex, data, col, ...props}) => (
+    <Cell {...props}
+    style={{
+      fontFamily: 'Roboto',
+      fontSize: '13px',
+      lineHeight: '18px'
+    }}
+    >
+      <a href={'https://secure.berniesanders.com/page/event/detail/' + data[rowIndex]['node'][col]} target="_blank">{data[rowIndex]['node'][col]}</a>
+    </Cell>
+  )
+
   TextCell = ({rowIndex, data, col, ...props}) => (
     <Cell {...props}
     style={{
@@ -983,10 +995,18 @@ class AdminEventsSection extends React.Component {
           />
         </ColumnGroup>
         <ColumnGroup
-          header={<this.HeaderCell content="Event Type" />}>
+          header={<this.HeaderCell content="Event" />}
+        >
           <Column
             flexGrow={1}
-            header={<this.SortControllerCell content="Event Type" attribute="eventTypeId" />}
+            header={<this.HeaderCell content="ID" />}
+            cell={<this.EventLinkCell data={events} col="eventIdObfuscated" />}
+            width={100}
+            align='center'
+          />
+          <Column
+            flexGrow={1}
+            header={<this.SortControllerCell content="Type" attribute="eventTypeId" />}
             cell={
               <this.EventTypeCell data={events} col="eventType" attr="name" />
             }
@@ -996,13 +1016,13 @@ class AdminEventsSection extends React.Component {
         <ColumnGroup
           header={<this.HeaderCell content="Time" />}>
           <Column
-            header={<this.SortControllerCell content="Date of event" attribute="startDate" />}
+            header={<this.SortControllerCell content="Event Date" attribute="startDate" />}
             cell={<this.DateCell data={events} col="startDate" />}
             flexGrow={1}
             width={170}
           />
           <Column
-            header={<this.SortControllerCell content="Date created" attribute="Date" />}
+            header={<this.SortControllerCell content="Create Date" attribute="Date" />}
             cell={<this.DateCell data={events} col="createDate" />}
             flexGrow={1}
             width={170}
@@ -1039,13 +1059,6 @@ class AdminEventsSection extends React.Component {
             flexGrow={1}
             header={<this.HeaderCell content="RSVPs" />}
             cell={<this.TextCell data={events} col="attendeesCount" />}
-            width={100}
-            align='center'
-          />
-          <Column
-            flexGrow={1}
-            header={<this.HeaderCell content="ID" />}
-            cell={<this.TextCell data={events} col="eventIdObfuscated" />}
             width={100}
             align='center'
           />
