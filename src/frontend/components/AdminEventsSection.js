@@ -575,12 +575,13 @@ class AdminEventsSection extends React.Component {
 
     const labelStyle = { display: 'inline', marginRight: '0.5em', fontSize: '0.8em' }
 
-    const FilterInput = ({name, label}) => (
+    const FilterInput = ({name, label, type='text'}) => (
       <div>
         <label htmlFor={name} style={labelStyle}>{label}: </label>
         <input
           name={name}
           defaultValue={this.props.relay.variables.filters[name]}
+          type={type}
         />
       </div>
     );
@@ -603,6 +604,8 @@ class AdminEventsSection extends React.Component {
     const filterInputs = [
       {name: 'venueZip', label: 'Zip Code'},
       {name: 'eventIdObfuscated', label: 'Event ID'},
+      {name: 'latitude', label: 'Latitude', type: 'number'},
+      {name: 'longitude', label: 'Longitude', type: 'number'},
     ];
 
     let updateFilters = (event) => {
@@ -641,7 +644,7 @@ class AdminEventsSection extends React.Component {
         <FilterSelect name='eventTypeId' label='Event Type' options={this.props.listContainer.eventTypes} optionValue='id' />
 
         {filterInputs.map((input, index) => {
-          return <FilterInput name={input.name} label={input.label} key={index}/>
+          return <FilterInput name={input.name} label={input.label} type={input.type} key={index} />
         })}
       </form>
       </Dialog>

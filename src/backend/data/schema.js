@@ -891,6 +891,8 @@ const GraphQLEventInput = new GraphQLInputObjectType({
     localTimezone: { type: GraphQLString },
     startDate: { type: GraphQLDate }, // This should be CustomGraphQLDateType, but it's broken until a PR gets merged in to the graphql-custome-datetype repo
     duration: { type: GraphQLInt },
+    latitude: { type: GraphQLInt },
+    longitude: { type: GraphQLInt },
     capacity: { type: GraphQLInt },
     attendeeVolunteerShow: { type: GraphQLInt },
     attendeeVolunteerMessage: { type: GraphQLString },
