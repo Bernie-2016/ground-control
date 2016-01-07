@@ -267,8 +267,9 @@ class EventEdit extends React.Component {
         />
 
         <InfoHeader content='Event Host' />
-        {`${event.host.firstName} ${event.host.lastName}`}<br />
-        {`${event.host.email}`}<br />
+        {(event.host && event.host.firstName && event.host.lastName) ? `${event.host.firstName} ${event.host.lastName}` : 'no host name available'}<br />
+        {(event.host && event.host.email) ? `${event.host.email}` : 'no host email available'}<br/>
+
         <Form.Field
           name="contactPhone"
           type="phone"
