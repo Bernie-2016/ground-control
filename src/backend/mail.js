@@ -54,14 +54,15 @@ export default class MG {
   }
 
   async sendEventConfirmation(form, constituent, event_types, debugging) {
-
-    console.log(form);
     if (form.capacity === '0') {
       form.capacity = 'unlimited'
     }
 
     // Sort event dates by date
-    form.event_dates = JSON.parse(form.event_dates)
+    if (typeof form.event_dates === 'string') {
+      form.event_dates = JSON.parse(form.event_dates)
+    }
+
     form.event_dates.sort((a, b) => {
       return a.date.localeCompare(b.date)
     })
