@@ -602,8 +602,15 @@ class AdminEventsSection extends React.Component {
     );
 
     const filterInputs = [
-      {name: 'venueZip', label: 'Zip Code'},
       {name: 'eventIdObfuscated', label: 'Event ID'},
+      {name: 'name', label: 'Event Name'},
+      {name: 'eventTypeId', label: 'Event Type', type: 'select', options: this.props.listContainer.eventTypes, optionValue: 'id'},
+      {name: 'contactPhone', label: 'Host Contact Phone'},
+      {name: 'venueName', label: 'Venue Name'},
+      {name: 'localTimezone', label: 'Timezone'},
+      {name: 'venueState', label: 'State', type: 'select', options: states, optionValue: 'abbreviation'},
+      {name: 'venueCity', label: 'City'},
+      {name: 'venueZip', label: 'Zip Code'},
       {name: 'latitude', label: 'Latitude', type: 'number'},
       {name: 'longitude', label: 'Longitude', type: 'number'},
     ];
@@ -638,13 +645,13 @@ class AdminEventsSection extends React.Component {
           e.preventDefault();
         }}
       >
-
-        <FilterSelect name='venueState' label='State' options={states} optionValue='abbreviation' />
-
-        <FilterSelect name='eventTypeId' label='Event Type' options={this.props.listContainer.eventTypes} optionValue='id' />
-
         {filterInputs.map((input, index) => {
-          return <FilterInput name={input.name} label={input.label} type={input.type} key={index} />
+          if (input.type == 'select'){
+            return <FilterSelect name={input.name} label={input.label} options={input.options} optionValue={input.optionValue} optionName={input.optionName} key={index} />
+          }
+          else {
+            return <FilterInput name={input.name} label={input.label} type={input.type} key={index} />
+          }
         })}
       </form>
       </Dialog>
