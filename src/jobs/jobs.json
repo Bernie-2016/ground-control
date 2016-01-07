@@ -9,7 +9,7 @@
       "job": "./jobs/refresh-group-memberships.js"
     },
     {
-      "cron": "00 */10 * * * *",
+      "cron": "00 */7 * * * *",
       "job": "./jobs/generate-event-call-assignments.js"
     },
     {
