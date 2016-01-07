@@ -359,22 +359,26 @@ const GraphQLUser = new GraphQLObjectType({
       },
       resolve: async (user, {callAssignmentId}, {rootValue}) => {
         let localId = fromGlobalId(callAssignmentId).id
+        
         let assignedCall = await knex('bsd_assigned_calls').where({
           'caller_id': user.id,
           'call_assignment_id': localId
         }).first()
+
         if (assignedCall) {
           return rootValue.loaders.bsdPeople.load(assignedCall.interviewee_id)
-        }
-        else {
+        } else {
           let callAssignment = await rootValue.loaders.bsdCallAssignments.load(localId)
           let allOffsets = [-10, -9, -8, -7, -6, -5, -4]
           let validOffsets = []
+
           allOffsets.forEach((offset) => {
             let time = moment().utcOffset(offset)
+
             if (time.hours() >= 9 && time.hours() <= 21)
               validOffsets.push(offset)
           })
+
           if (validOffsets.length === 0)
             return null
 
@@ -398,18 +402,18 @@ const GraphQLUser = new GraphQLObjectType({
             })
 
           let query = knex.select('bsd_people.cons_id')
-          if (group.cons_group_id)
+
+          if (group.cons_group_id) {
             query = query
               .from('bsd_person_bsd_groups as bsd_people')
               .where('bsd_people.cons_group_id', group.cons_group_id)
-
-          else if (group.query && group.query !== EVERYONE_GROUP)
+          } else if (group.query && group.query !== EVERYONE_GROUP) {
             query = query
               .from('bsd_person_gc_bsd_groups as bsd_people')
               .where('gc_bsd_group_id', group.id)
-          else
-            query = query
-              .from('bsd_people')
+          } else {
+            query = query.from('bsd_people')
+          }
 
           let assignedCallsSubquery = knex('bsd_assigned_calls')
             .select('interviewee_id')
@@ -432,31 +436,38 @@ const GraphQLUser = new GraphQLObjectType({
             .whereNotIn('bsd_people.cons_id', assignedCallsSubquery)
             .whereNotIn('bsd_addresses.state_cd', ['IA', 'NH', 'NV', 'SC'])
             .whereIn('zip_codes.timezone_offset', validOffsets)
+            .whereNotNull('bsd_addresses.latitude')
+            .whereNotNull('bsd_addresses.longitude')
+            .whereNot('bsd_addresses.latitude', 0)
+            .whereNot('bsd_addresses.longitude', 0)
             .where('bsd_addresses.is_primary', true)
             .where('bsd_phones.is_primary', true)
             .where('bsd_emails.is_primary', true)
             .limit(1)
             .first()
 
-          let latLng = null
           if (userAddress)
             query = query.whereNot('bsd_people.cons_id', userAddress.cons_id)
 
           // No geo sort for now, still seeing timeouts in production probably from this
-//          if (userAddress && validOffsets.indexOf(userAddress.timezone_offset) !== -1 && userAddress.latitude && userAddress.longitude)
-//            query = query.orderByRaw(`"bsd_addresses"."geom" <-> st_transform(st_setsrid(st_makepoint(${userAddress.longitude}, ${userAddress.latitude}), 4326), 900913)`)
+          // if (userAddress && validOffsets.indexOf(userAddress.timezone_offset) !== -1 && userAddress.latitude && userAddress.longitude)
+          // query = query.orderByRaw(`"bsd_addresses"."geom" <-> st_transform(st_setsrid(st_makepoint(${userAddress.longitude}, ${userAddress.latitude}), 4326), 900913)`)
 
           log.info(`Running query: ${query}`)
+
           let person = await query
           let timestamp = new Date()
+
           if (person) {
             // Do this check again to avoid race conditions
             let assignedCall = await knex('bsd_assigned_calls').where({
               'caller_id': user.id,
               'call_assignment_id': localId
             }).first()
+
             if (assignedCall)
               return rootValue.loaders.bsdPeople.load(assignedCall.interviewee_id)
+
             await knex('bsd_assigned_calls')
               .insert({
                 caller_id: user.id,
@@ -464,10 +475,12 @@ const GraphQLUser = new GraphQLObjectType({
                 call_assignment_id: localId,
                 create_dt: timestamp,
                 modified_dt: timestamp
-              })
+            })
+
             return rootValue.loaders.bsdPeople.load(person.cons_id)
           }
-          return null;
+
+          return null
         }
       }
     }
