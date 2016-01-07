@@ -86,7 +86,6 @@ export let job = async () => {
 
           if (peopleToInsert.length > 0) {
             await knex.bulkInsert('bsd_person_gc_bsd_groups', peopleToInsert, {transaction: trx})
-            log.info('Done inserting ' + peopleToInsert.length + ' rows for group ' + group.id)
           }
 
           offset = offset + limit

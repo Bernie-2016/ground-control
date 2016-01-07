@@ -66,13 +66,21 @@ passport.use('signup', new LocalStrategy(
       .where('email', email.toLowerCase())
       .first()
 
-    if (!user) {
+    if (!user || user.password === null) {
       let hashedPassword = await hash(password)
-      let newUser = await knex.insertAndFetch('users', {
-          email: email.toLowerCase(),
-          password: hashedPassword
-        })
-      return done(null, newUser)
+      if (!user) {
+        let newUser = await knex.insertAndFetch('users', {
+            email: email.toLowerCase(),
+            password: hashedPassword
+          })
+        return done(null, newUser)
+      }
+      else {
+        await knex('users')
+          .where('email', email.toLowerCase())
+          .update({password: hashedPassword})
+        return done(null, user)
+      }
     } else if (!await compare(password, user.password)) {
       return done(null, false, { message: 'Incorrect password.' })
     }
