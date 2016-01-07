@@ -112,7 +112,7 @@ export default class MG {
       user: constituent
     }
 
-    let template = new EmailTemplate(templateDir + '/event-create-confirmation')
+    let template = new EmailTemplate(templateDir + '/phone-bank-instructions')
     let content = await template.render(data)
 
     let message = {
