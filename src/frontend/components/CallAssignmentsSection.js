@@ -94,7 +94,7 @@ export default Relay.createContainer(CallAssignmentsSection, {
       fragment on User {
         allCallsMade:callsMade
         completedCallsMade:callsMade(completed:true)
-        callAssignments(first:50) {
+        callAssignments(first:50, active:true) {
           ${CallAssignmentList.getFragment('callAssignments')}
         }
       }

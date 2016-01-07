@@ -11,7 +11,8 @@ import MutationHandler from './MutationHandler'
 export default class AdminCallAssignmentCreationForm extends React.Component {
   surveyRenderers = {
     'BSDSurvey': 'BSD survey renderer',
-    'PhonebankRSVPSurvey': 'Phonebank RSVP survey renderer'
+    'PhonebankRSVPSurvey': 'Phonebank RSVP survey renderer',
+    'SingleEventRSVPSurvey': 'Single event RSVP survey renderer',
   }
 
   surveyProcessors = {

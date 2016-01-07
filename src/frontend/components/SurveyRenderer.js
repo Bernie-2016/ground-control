@@ -1,7 +1,6 @@
 import React from 'react';
 import Relay from 'react-relay';
-import BSDSurvey from './survey-renderers/BSDSurvey'
-import PhonebankRSVPSurvey from './survey-renderers/PhonebankRSVPSurvey'
+
 
 class SurveyRenderer extends React.Component {
   static propTypes = {
@@ -10,7 +9,8 @@ class SurveyRenderer extends React.Component {
 
   renderers = {
     'BSDSurvey': BSDSurvey,
-    'PhonebankRSVPSurvey': PhonebankRSVPSurvey
+    'PhonebankRSVPSurvey': PhonebankRSVPSurvey,
+    'SingleEventRSVPSurvey': SingleEventRSVPSurvey
   }
 
   submit() {
@@ -44,12 +44,14 @@ export default Relay.createContainer(SurveyRenderer, {
       fragment on Person {
         ${BSDSurvey.getFragment('interviewee')}
         ${PhonebankRSVPSurvey.getFragment('interviewee')}
+        ${SingleEventRSVPSurvey.getFragment('interviewee')}
       }
     `,
     currentUser: () => Relay.QL`
       fragment on User {
         ${PhonebankRSVPSurvey.getFragment('currentUser')}
         ${BSDSurvey.getFragment('currentUser')}
+        ${SingleEventRSVPSurvey.getFragment('currentUser')}
       }
     `
   }

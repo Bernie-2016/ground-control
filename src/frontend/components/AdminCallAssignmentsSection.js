@@ -37,7 +37,7 @@ export default Relay.createContainer(AdminCallAssignmentAdmin, {
   fragments: {
     listContainer: () => Relay.QL`
       fragment on ListContainer {
-        callAssignments(first:50) {
+        callAssignments(first:50, active:true) {
           ${CallAssignmentList.getFragment('callAssignments')}
         }
       }

@@ -48,6 +48,17 @@ class GraphQLError extends Error {
   }
 }
 
+function activeCallAssignments(query) {
+  return query
+    .where('end_dt', '>', moment().add(1, 'days').toDate())
+    .orWhere('end_dt', null)
+}
+
+function inactiveCallAssignments(query) {
+  return query
+    .where('end_dt', '<', moment().add(1, 'days').toDate())
+}
+
 function interpretDateAsUTC(date) {
   return moment.tz(moment(date).format('YYYY-MM-DD HH:mm:ss'), 'UTC').toDate()
 }
@@ -111,7 +122,9 @@ function eventFromAPIFields(fields) {
   Object.keys(fields).forEach((fieldName) => {
     let newFieldName = eventFieldFromAPIField(fieldName)
     event[newFieldName] = fields[fieldName]
-    console.log(newFieldName)
+
+    if (newFieldName === 'start_dt')
+      event[newFieldName] = event[newFieldName].toISOString()
   })
 
   let idFields = ['event_id', 'creator_cons_id', 'event_type_id'];
@@ -295,9 +308,17 @@ const GraphQLListContainer = new GraphQLObjectType({
     },
     callAssignments: {
       type: GraphQLCallAssignmentConnection,
-      args: connectionArgs,
-      resolve: async (root, {first}, {rootValue}) => {
-        let assignments = await knex('bsd_call_assignments').limit(first)
+      args: {
+        ...connectionArgs,
+        active: { type: GraphQLBoolean }
+      },
+      resolve: async (root, {first, active}, {rootValue}) => {
+        let query = knex('bsd_call_assignments').limit(first)
+        if (active === true)
+          query = activeCallAssignments(query)
+        else if (active === false)
+          query = inactiveCallAssignments(query)
+        let assignments = await query
         return connectionFromArray(assignments, {first})
       }
     },
@@ -311,6 +332,16 @@ const GraphQLUser = new GraphQLObjectType({
   fields: () => ({
     id: globalIdField('User'),
     email: { type: GraphQLString },
+    relatedPerson: {
+      type: GraphQLPerson,
+      resolve: async (user, _, {rootValue}) => {
+        let relatedPerson = await knex('bsd_emails')
+          .select('cons_id')
+          .where('email', user.email)
+          .first()
+        return relatedPerson ? rootValue.loaders.bsdPeople.load(relatedPerson.cons_id) : null
+      }
+    },
     firstName: {
       type: GraphQLString,
       resolve: async (user) => {
@@ -326,9 +357,31 @@ const GraphQLUser = new GraphQLObjectType({
     },
     callAssignments: {
       type: GraphQLCallAssignmentConnection,
-      args: connectionArgs,
-      resolve: async (user, {first}) => {
-        let assignments = await knex('bsd_call_assignments').limit(first)
+      args: {
+        ...connectionArgs,
+        active: { type: GraphQLBoolean }
+      },
+      resolve: async (user, {first, active}) => {
+        let nullQuery = knex('bsd_call_assignments')
+          .where('caller_group', null)
+        let callerQuery = knex('bsd_call_assignments')
+          .select('bsd_call_assignments.*')
+          .innerJoin('user_user_groups', 'bsd_call_assignments.caller_group', 'user_user_groups.user_group_id')
+          .where('user_user_groups.user_id', user.id)
+        // This is duplicated code from the other callAssignments resolve method
+        if (active === true) {
+          nullQuery = activeCallAssignments(nullQuery)
+          callerQuery = activeCallAssignments(callerQuery)
+        }
+        else if (active === false) {
+          nullQuery = inactiveCallAssignments(nullQuery)
+          callerQuery = inactiveCallAssignments(callerQuery)
+        }
+
+        let assignments = await knex.union([
+          nullQuery, callerQuery
+        ])
+
         return connectionFromArray(assignments, {first})
       }
     },
@@ -371,6 +424,9 @@ const GraphQLUser = new GraphQLObjectType({
           let callAssignment = await rootValue.loaders.bsdCallAssignments.load(localId)
           let allOffsets = [-10, -9, -8, -7, -6, -5, -4]
           let validOffsets = []
+          // So that I can program late at night
+          if (process.env.NODE_ENV === 'development')
+            validOffsets = allOffsets
 
           allOffsets.forEach((offset) => {
             let time = moment().utcOffset(offset)
@@ -382,7 +438,7 @@ const GraphQLUser = new GraphQLObjectType({
           if (validOffsets.length === 0)
             return null
 
-          let group = await rootValue.loaders.gcBsdGroups.load(callAssignment.gc_bsd_group_id)
+          let group = await rootValue.loaders.gcBsdGroups.load(callAssignment.interviewee_group)
 
           let previousCallsSubquery = knex('bsd_calls')
             .select('interviewee_id')
@@ -411,6 +467,7 @@ const GraphQLUser = new GraphQLObjectType({
             query = query
               .from('bsd_person_gc_bsd_groups as bsd_people')
               .where('gc_bsd_group_id', group.id)
+              .orderBy('bsd_people.id')
           } else {
             query = query.from('bsd_people')
           }
@@ -816,20 +873,37 @@ const GraphQLCallAssignment = new GraphQLObjectType({
     id: globalIdField('CallAssignment'),
     name: { type: GraphQLString },
     instructions: { type: GraphQLString },
+    endDate: {
+      type: GraphQLDate,
+      resolve: (assignment) => {
+        return moment(assignment.end_dt).toDate()
+      }
+    },
     survey: {
       type: GraphQLSurvey,
       resolve: (assignment, _, {rootValue}) => rootValue.loaders.gcBsdSurveys.load(assignment.gc_bsd_survey_id)
     },
+    renderer: { type: GraphQLString },
     callsMade: {
       type: GraphQLInt,
       resolve: async (callAssignment) => {
         return knex.count(knex('bsd_calls').where('call_assignment_id', callAssignment.id), 'id')
       }
     },
+    relatedEvent: {
+      type: GraphQLEvent,
+      resolve: async (assignment, _, {rootValue}) => {
+        let eventId = await knex('gc_bsd_events').where('gc_bsd_events.turn_out_assignment', assignment.id)
+          .select('event_id')
+          .first()
+
+        return eventId ? rootValue.loaders.bsdEvents.load(eventId.event_id) : null
+      }
+    },
     query: {
       type: GraphQLString,
       resolve: async (assignment, _, {rootValue}) => {
-        let group = await rootValue.loaders.gcBsdGroups.load(assignment.gc_bsd_group_id)
+        let group = await rootValue.loaders.gcBsdGroups.load(assignment.interviewee_group)
         if (group.cons_group_id) {
           return 'BSD Constituent Group: ' + group.cons_group_id
         }
@@ -861,7 +935,6 @@ const GraphQLSurvey = new GraphQLObjectType({
         return url.resolve('https://' + process.env.BSD_HOST, '/page/s/' + slug)
       }
     },
-    renderer: { type: GraphQLString }
   }),
   interfaces: [nodeInterface]
 })
@@ -994,6 +1067,7 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
       let assignedCall = await knex('bsd_assigned_calls')
         .transacting(trx)
         .where('caller_id', caller.id)
+        .where('call_assignment_id', localCallAssignmentId)
         .first()
 
       if (!assignedCall) {
@@ -1197,7 +1271,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
     instructions: { type: GraphQLString },
     startDate: { type: GraphQLDate },
     endDate: { type: GraphQLDate },
-
+    callerGroupId: { type: GraphQLString }
   },
   outputFields: {
     listContainer: {
@@ -1205,7 +1279,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
       resolve: () => SharedListContainer
     }
   },
-  mutateAndGetPayload: async ({name, intervieweeGroup, surveyId, renderer, processors, instructions}, {rootValue}) => {
+  mutateAndGetPayload: async ({name, intervieweeGroup, surveyId, renderer, processors, instructions, startDate, endDate, callerGroupId}, {rootValue}) => {
     adminRequired(rootValue)
     let groupText = intervieweeGroup
     let group = null
@@ -1242,7 +1316,6 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
 
       survey = await knex.insertAndFetch('gc_bsd_surveys', {
           signup_form_id: surveyId,
-          renderer: renderer,
           processors: processors
         }, {transaction: trx})
 
@@ -1290,7 +1363,10 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
           })
 
         if (query !== EVERYONE_GROUP) {
-          let limitedQuery = `${query} order by cons_id limit 1 offset 0`
+          let limitedQuery = query
+          if (query.indexOf('order by') === -1)
+            limitedQuery = limitedQuery + ' order by cons_id'
+          limitedQuery = `${limitedQuery} limit 1 offset 0`
           try {
             await knex.raw(limitedQuery)
           } catch (ex) {
@@ -1313,11 +1389,18 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
             }, {transaction: trx})
       }
 
+      startDate = startDate || new Date()
+      callerGroupId = callerGroupId ? fromGlobalId(callerGroupId).id : null
+
       return knex.insertAndFetch('bsd_call_assignments', {
           name: name,
+          renderer: renderer,
           instructions: instructions,
-          gc_bsd_group_id: group.id,
-          gc_bsd_survey_id: survey.id
+          interviewee_group: group.id,
+          gc_bsd_survey_id: survey.id,
+          start_dt: startDate,
+          end_dt: endDate,
+          caller_group: callerGroupId
         }, {transaction: trx});
     })
   }

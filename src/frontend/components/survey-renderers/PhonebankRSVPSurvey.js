@@ -15,7 +15,6 @@ const WEEKDAY_DATE_FORMAT = 'dddd, MMMM Do'
 class PhonebankRSVPSurvey extends React.Component {
   static propTypes = {
     onSubmitted : React.PropTypes.func,
-    initialValues: React.PropTypes.object,
     survey: React.PropTypes.object
   }
 
@@ -132,8 +131,8 @@ class PhonebankRSVPSurvey extends React.Component {
     if (!this.state.selectedEventId)
       return <div></div>
 
-    let event = this.props.interviewee.nearbyEvents.find((event) => {
-      event.eventIdObfuscated === this.state.selectedEventId
+    let event = this.props.interviewee.nearbyEvents.find((anEvent) => {
+      return anEvent.eventIdObfuscated === this.state.selectedEventId
     })
 
     let selectedOnDate = this.momentWithOffset(event.startDate, event.localUTCOffset).format('MMM D')
@@ -212,13 +211,15 @@ class PhonebankRSVPSurvey extends React.Component {
             fontWeight: 600,
             fontSize: '1.0em'
           }}>
-            {marker.name}
+            <a href={marker.link} target="_blank">
+              {marker.name}
+            </a>
           </div>
           <div style={{
             ...BernieText.default,
             fontSize: '1.0em'
           }}>
-            <div><a href={marker.link} target="_blank">{marker.venueName}</a></div>
+            <div>{marker.venueName}</div>
             <div>{marker.addr1}</div>
             <div>{marker.addr2}</div>
             <div>Attendance: {attendance}</div>
@@ -482,15 +483,7 @@ class PhonebankRSVPSurvey extends React.Component {
     return (
       <div style={BernieText.default}>
         <div style={{marginBottom: 0}}>
-          <div style={{
-            ...BernieText.title,
-            fontSize: '1.4em',
-            color: BernieColors.lightBlue
-          }}>
-            Call Script
-          </div>
-          <div>
-            Hi <strong>{this.props.interviewee.firstName || ''}</strong>, my name is {this.props.currentUser.firstName || '_______'} and I'm a volunteer with the Bernie Sanders campaign. I'm calling you because you signed up at some point to help out with the Bernie Sanders campaign.  Right now, we are trying to get as many volunteers as possible to show up to phone bank parties that other volunteers are hosting.  These phone banks are events where volunteers get together to contact voters in the early states.  It's an incredibly crucial part of our strategy to get Senator Sanders elected as president because we've seen that when volunteers talk to voters, Bernie starts doing better.
+          <div>Hi <strong>{this.props.interviewee.firstName || ''}</strong>, my name is {this.props.currentUser.firstName || '_______'} and I'm a volunteer with the Bernie Sanders campaign. I'm calling you because you signed up at some point to help out with the Bernie Sanders campaign.  Right now, we are trying to get as many volunteers as possible to show up to phone bank parties that other volunteers are hosting.  These phone banks are events where volunteers get together to contact voters in the early states.  It's an incredibly crucial part of our strategy to get Senator Sanders elected as president because we've seen that when volunteers talk to voters, Bernie starts doing better.
           </div>
           <div style={this.styles.paragraph}>
             I see that there is a phone bank being held near you on <strong>{eventDate}</strong> at <strong>{eventAddress}</strong>.  {this.renderAdditionalEvents()}
