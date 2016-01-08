@@ -441,8 +441,10 @@ export default class BSD {
       else if (apiKeys.indexOf(key) !== -1)
         inputs[key] = event[key]
     })
-    if (Object.keys(eventDate).length > 0)
+    if (Object.keys(eventDate).length > 0) {
+      eventDate['event_id'] = event.event_id
       inputs['days'] = [eventDate]
+    }
     return inputs
   }
 
