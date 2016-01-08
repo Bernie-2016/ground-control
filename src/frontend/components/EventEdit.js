@@ -5,9 +5,13 @@ import GCForm from './forms/GCForm';
 import Form from 'react-formal';
 import yup from 'yup';
 import moment from 'moment';
+import ReactQuill from 'react-quill';
 import {Card, CardActions, CardExpandable, CardTitle, CardHeader, CardText, FlatButton, TextField, DropDownMenu, SelectField, DatePicker, TimePicker, Checkbox} from 'material-ui';
 import InfoHeader from './InfoHeader'
 import {USTimeZones} from './data/USTimeZones';
+
+require('react-quill/node_modules/quill/dist/quill.base.css');
+require('react-quill/node_modules/quill/dist/quill.snow.css');
 
 const momentWithOffset = (startDate, utcOffset) => {
   return moment(startDate).utcOffset(utcOffset)
@@ -151,6 +155,7 @@ class EventEdit extends React.Component {
         schema={eventSchema}
         defaultValue={eventSchema.default()}
         onSubmit={ (data) => {
+          data.description = this.refs.quill.getEditorContents();
           data.duration = data.duration.h * 60 + data.duration.m;
           data.isSearchable = Number(data.isSearchable);
           this.props.onSubmit(data)
@@ -170,14 +175,10 @@ class EventEdit extends React.Component {
           label='Event Name'
           fullWidth={true}
         />
-        <br />
+        <br /><br />
 
-        <Form.Field
-          name='description'
-          label='Event Description'
-          multiLine={true}
-          fullWidth={true}
-        />
+        <label>Event Description</label>
+        <ReactQuill defaultValue={event.description} theme="snow" ref="quill" />
 
         <InfoHeader content='Event Date & Time' />
 
