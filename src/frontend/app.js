@@ -47,6 +47,11 @@ Minilog
 window.log = Minilog('client');
 
 window.onerror = (msg, file, line, col, error) => {
+  if (!error) {
+    log.error('Uncaught exception with null error object')
+    return
+  }
+
   let message = msg || error.message || 'Uncaught exception'
   Rollbar.error(message, error)
 
