@@ -1023,7 +1023,7 @@ class AdminEventsSection extends React.Component {
             width={170}
           />
           <Column
-            header={<this.SortControllerCell content="Create Date" attribute="Date" />}
+            header={<this.SortControllerCell content="Create Date" attribute="createDate" />}
             cell={<this.DateCell data={events} col="createDate" />}
             flexGrow={1}
             width={170}
