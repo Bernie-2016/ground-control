@@ -8,6 +8,7 @@ import moment from 'moment-timezone'
 
 export let job = async () => {
   let now = new Date()
+
   try {
     await knex.transaction(async (trx) => {
       let eventsToUpdate = await knex('bsd_events')
@@ -16,6 +17,7 @@ export let job = async () => {
         .where('bsd_events.start_dt', '>', new Date())
         .where('gc_bsd_events.turn_out_assignment', null)
         .transacting(trx)
+
       let turnOutSurvey = await knex('gc_bsd_surveys')
         .innerJoin('bsd_surveys', 'bsd_surveys.signup_form_id', 'gc_bsd_surveys.signup_form_id')
         .where('bsd_surveys.signup_form_slug', 'turn-out-to-event')
@@ -24,10 +26,13 @@ export let job = async () => {
 
       if (!turnOutSurvey)
         log.error('Did not run call assignments job because there is no turn out survey to use')
+        return
 
       let numEvents = eventsToUpdate.length
+
       for (let index = 0; index < numEvents; index++) {
         let event = eventsToUpdate[index]
+
         let query = knex('bsd_addresses')
           .where('is_primary', true)
           .whereRaw(`st_dwithin(bsd_addresses.geom, '${event.geom}', 50000)`)
@@ -38,17 +43,23 @@ export let job = async () => {
         let intervieweeGroup = {
           query: query.toString(),
         }
-        let group = await knex.insertAndFetch('gc_bsd_groups', intervieweeGroup, {transaction: trx})
+
+        let group = await knex.insertAndFetch('gc_bsd_groups',
+          intervieweeGroup,
+          {transaction: trx})
+
         let user = await knex('users')
           .where('email', event.email)
           .first()
           .transacting(trx)
+
         if (!user) {
-          if (event.email)
+          if (event.email) {
             user = await knex.insertAndFetch('users', {email: event.email,
               password: null}, {transaction: trx})
-          else
+          } else {
             continue
+          }
         }
 
         let userGroup = await knex.insertAndFetch('user_groups', {
@@ -73,7 +84,11 @@ export let job = async () => {
           caller_group: userGroup.id,
           renderer: 'SingleEventRSVPSurvey'
         }
-        callAssignment = await knex.insertAndFetch('bsd_call_assignments', callAssignment, {transaction: trx})
+
+        callAssignment = await knex.insertAndFetch('bsd_call_assignments',
+          callAssignment,
+          {transaction: trx})
+
         await knex('gc_bsd_events')
           .where('event_id', event.event_id)
           .update({
