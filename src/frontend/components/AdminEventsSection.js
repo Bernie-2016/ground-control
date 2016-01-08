@@ -692,7 +692,7 @@ class AdminEventsSection extends React.Component {
       <FlatButton
         label={(this.state.previewTabIndex == 0) ? 'Approve' : (this.state.approveOnUpdate ? 'Update and Approve' : 'Update')}
         key="3"
-        disabled={this.props.relay.variables.filters.flagApproval === false}
+        disabled={this.props.relay.variables.filters.flagApproval === false && this.state.previewTabIndex === 0}
         secondary={true}
         onTouchTap={() => {
           this.refs.eventEdit.refs.component.submit()
