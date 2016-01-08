@@ -178,6 +178,7 @@ class CallAssignment extends React.Component {
         Location: {location}<br />
         Local Time: {localTime}<br />
         Last called: {lastCalled()}<br />
+        Email: <a target='_blank' href={'mailto:' + this.props.currentUser.intervieweeForCallAssignment.email}>{this.props.currentUser.intervieweeForCallAssignment.email}</a>
       </div>
     )
 
