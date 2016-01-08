@@ -1,4 +1,5 @@
 {
+  "enable_rollbar": false,
   "env": "development",
-  "extra_head": "<script src='/webpack-dev-server.js'></script>"
+  "extra_head": "<script src='/webpack-dev-server.js'></script>"  
 }
