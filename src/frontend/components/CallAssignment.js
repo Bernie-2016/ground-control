@@ -140,6 +140,28 @@ class CallAssignment extends React.Component {
     return name === '' ? 'Unknown name' : name
   }
 
+  generateEventsInfoEmailLink() {
+    const userFirstName = this.props.currentUser.firstName;
+    const interviewee = this.props.currentUser.intervieweeForCallAssignment;
+    const name = (interviewee.firstName) ? interviewee.firstName : intervieweeName();
+    const email = interviewee.email;
+    const zip = interviewee.address.zip;
+    const subject = escape('Bernie Phone Call Followup');
+    const message = escape(
+`Hi ${name},
+
+You asked me for more information about upcoming events in your area. You can view and RSVP to campaign events here:
+http://map.berniesanders.com/#zipcode=${zip}&distance=50
+
+We really appreciate your time! Please let me know if you'd ever like more info on how to get involved as a volunteer.
+
+Thanks,
+${userFirstName}`
+    );
+
+    return `mailto:${email}?subject=${subject}&body=${message}`
+  }
+
   renderIntervieweeInfo() {
     let interviewee = this.props.currentUser.intervieweeForCallAssignment
     let name = this.intervieweeName()
@@ -178,7 +200,7 @@ class CallAssignment extends React.Component {
         Location: {location}<br />
         Local Time: {localTime}<br />
         Last called: {lastCalled()}<br />
-        Email: <a target='_blank' href={'mailto:' + this.props.currentUser.intervieweeForCallAssignment.email}>{this.props.currentUser.intervieweeForCallAssignment.email}</a>
+        Email: <a target='_blank' href={this.generateEventsInfoEmailLink()}>{this.props.currentUser.intervieweeForCallAssignment.email}</a>
       </div>
     )
 
@@ -392,6 +414,7 @@ export default Relay.createContainer(CallAssignment, {
     currentUser: () => Relay.QL`
       fragment on User {
         id
+        firstName
         allCallsMade:callsMade(forAssignmentId:$id)
         completedCallsMade:callsMade(forAssignmentId:$id,completed:true)
         intervieweeForCallAssignment(callAssignmentId:$id) {
