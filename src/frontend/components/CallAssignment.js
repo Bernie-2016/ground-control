@@ -153,7 +153,7 @@ class CallAssignment extends React.Component {
 You asked me for more information about upcoming events in your area. You can view and RSVP to campaign events here:
 http://map.berniesanders.com/#zipcode=${zip}&distance=50
 
-We really appreciate your time! Please let me know if you'd ever like more info on how to get involved as a volunteer.
+We really appreciate your time! If you're interested in getting involved further, please feel free to sign up at https://berniesanders.com/phonebank.
 
 Thanks,
 ${userFirstName}`
