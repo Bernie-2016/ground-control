@@ -8,6 +8,7 @@ import {Table, Column, ColumnGroup, Cell} from 'fixed-data-table'
 import {BernieText, BernieColors} from './styles/bernie-css'
 import moment from 'moment'
 import {states} from './data/states'
+import {USTimeZones} from './data/USTimeZones'
 
 import IconMenu from 'material-ui/lib/menus/icon-menu'
 import MenuItem from 'material-ui/lib/menus/menu-item'
@@ -619,7 +620,7 @@ class AdminEventsSection extends React.Component {
       {name: 'eventTypeId', label: 'Event Type', type: 'select', options: this.props.listContainer.eventTypes, optionValue: 'id'},
       {name: 'contactPhone', label: 'Host Contact Phone'},
       {name: 'venueName', label: 'Venue Name'},
-      {name: 'localTimezone', label: 'Timezone'},
+      {name: 'localTimezone', label: 'Timezone', type: 'select', options: USTimeZones},
       {name: 'venueState', label: 'State', type: 'select', options: states, optionValue: 'abbreviation'},
       {name: 'venueCity', label: 'City'},
       {name: 'venueZip', label: 'Zip Code'},
