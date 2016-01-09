@@ -11,6 +11,7 @@ if (process.env.NODE_ENV === 'production')
 var config = {
   entry: './src/frontend/app.js',
   module: {
+    noParse: /node_modules\/quill\/dist\/quill\.js/,
     loaders: [
       { test: /\.json$/, loader: 'json'},
       { test: /\.css$/, loader: "style!css" },
@@ -20,7 +21,7 @@ var config = {
         query: {stage: 0, plugins: ['./webpack/babelRelayPlugin']},
         test: /\.js$/,
       }
-    ]
+    ],
   },
   plugins: plugins,
   output: {
