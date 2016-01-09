@@ -453,7 +453,8 @@ class AdminEventsSection extends React.Component {
 
     this.refs.eventDeletionHandler.send({
       listContainer: this.props.listContainer,
-      eventIDs: eventsToDelete
+      eventIDs: eventsToDelete,
+      hostMessage: this.state.deletionConfirmationMessage
     })
 
     this.setState({showEventPreview: false})
