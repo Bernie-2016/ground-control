@@ -147,7 +147,7 @@ export default class MG {
       from: '<noreply@berniesanders.com>',
       'h:Reply-To': 'Help Desk<help@berniesanders.com>',
       to: data.hostEmail,
-      subject: 'Fwd: HELP! I need more people to come to my phonebank',
+      subject: 'Event Deletion Notice',
       text: data.message
     }
 
