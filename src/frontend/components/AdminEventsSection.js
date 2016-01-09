@@ -50,6 +50,8 @@ class AdminEventsSection extends React.Component {
       previewTabIndex: 0,
       userMessage: '',
       approveOnUpdate: true,
+      deletionConfirmationMessage: null,
+      deletionReasonIndex: null,
       undoAction: function(){console.log('undo')}
     }
 
@@ -461,6 +463,60 @@ class AdminEventsSection extends React.Component {
 
   renderDeleteModal() {
 
+    const signature = `Events Team
+Bernie 2016`;
+    const deleteReasons = [
+      {reason: 'Delete Without Message', message: 0},
+      {
+        reason: 'Event Cancelled by Host',
+        message: `This event has been cancelled by the host.
+
+You can find other events in your area by searching our event map at map.berniesanders.com or by visiting Bernie 2016 event central at http://berniesanders.com/events.
+
+When there, enter your zip code and find events in your area.
+
+Thank you for your support!
+
+${signature}`
+      },
+      {
+        reason: 'Event is a Fundraiser',
+        message: `Thank you for submitting your event to Bernie 2016 Events Central.
+
+Please note we do not approve fundraisers without prior campaign contact.
+
+You can resubmit your event following guidelines at BernieSanders.com/plan.
+
+Thank you again for your support and for helping to spread Bernie’s message!
+
+${signature}`
+      },
+      {
+        // Be sure to keep this as the last option in the array,
+        // it's being referenced below as deleteReasons[deleteReasons.length-1]
+        reason: 'Custom',
+        message: `
+
+${signature}`
+      }
+    ];
+    const deleteReasonMenuItems = deleteReasons.map((item, index) => <MenuItem key={index} value={index} primaryText={item.reason}/>);
+
+    this._handleDeleteModalRequestClose = () => {
+      let updatedStateProps = {
+          showDeleteEventDialog: false,
+          deletionConfirmationMessage: null,
+          deletionReasonIndex: null
+        };
+      if (this.state.activeEventIndex) {
+        updatedStateProps['showEventPreview'] = true;
+      }
+      this.setState(updatedStateProps)
+    }
+
+    let numEvents = this.state.indexesMarkedForDeletion.length;
+    let dialogTitle = `You are about to delete ${numEvents} event${(numEvents > 1) ? 's' : ''}.`;
+
     const standardActions = [
       <FlatButton
         label="Cancel"
@@ -469,37 +525,40 @@ class AdminEventsSection extends React.Component {
       <FlatButton
         label="Delete"
         primary={true}
-        onTouchTap={() => {
-          if (!this.refs.deleteConfirmationInput || this.refs.deleteConfirmationInput.getValue() === 'DELETE')
-            this._deleteEvent()
-        }} />,
+        disabled={(this.state.deletionConfirmationMessage === null || this.state.deletionConfirmationMessage === deleteReasons[deleteReasons.length-1]['message'] || this.state.deletionConfirmationMessage === '')}
+        onTouchTap={this._deleteEvent}
+      />
     ];
 
-    this._handleDeleteModalRequestClose = () => {
-      if (this.state.activeEventIndex) {
-        this.setState({
-          showDeleteEventDialog: false,
-          showEventPreview: true
-        })
-      } else {
-        this.setState({
-          showDeleteEventDialog: false
-        })
-      }
-    }
-
-    let numEvents = this.state.indexesMarkedForDeletion.length;
-    let s = (numEvents > 1) ? 's.' : '.'
-    let dialogTitle = 'You are about to delete ' + numEvents + ' event' + s
-    let textConfirm = (
+    let deleteMessage = (
       <div>
-        <p>Type <span style={{color: BernieColors.red}}>DELETE</span> to confirm.</p>
-        <TextField hintText="TYPE HERE" underlineFocusStyle={{borderColor: BernieColors.red}} ref="deleteConfirmationInput" />
+        <SelectField
+          value={this.state.deletionReasonIndex}
+          floatingLabelText="Reason For Deletion"
+          onChange={(event, index, value) => {
+            this.setState({
+              deletionReasonIndex: value,
+              deletionConfirmationMessage: deleteReasons[value].message
+            })
+          }}
+          style={{cursor: 'pointer'}}
+        >
+        {deleteReasonMenuItems}
+        </SelectField><br />
+        <TextField
+          floatingLabelText="Message for Event Host"
+          value={(this.state.deletionConfirmationMessage === 0) ? '' : this.state.deletionConfirmationMessage}
+          disabled={(this.state.deletionConfirmationMessage === 0 || this.state.deletionConfirmationMessage === null)}
+          onChange={(event) => {
+            this.setState({deletionConfirmationMessage: event.target.value});
+          }}
+          multiLine={true}
+          rowsMax={11}
+          fullWidth={true}
+          ref="deleteConfirmationInput"
+        />
       </div>
     )
-
-    if (numEvents < 5)
-      textConfirm = <div></div>
 
     return (
       <Dialog
@@ -508,7 +567,7 @@ class AdminEventsSection extends React.Component {
         open={this.state.showDeleteEventDialog}
         onRequestClose={this._handleDeleteModalRequestClose}
       >
-      {textConfirm}
+      {deleteMessage}
       </Dialog>
     )
   }
