@@ -311,39 +311,19 @@ class AdminEventsSection extends React.Component {
   )
 
   renderToolbar() {
-    let filterOptions = [
-      { payload: '0', text: 'Pending Approval' },
-      { payload: '1', text: 'Approved Events' }
-      // { payload: '3', text: 'Past Events' }
-    ]
 
-    let filterOptionsIndex = 0
+    const approvalFilterOptions = [
+      {value: 1, 'text': 'Pending Approval'},
+      {value: 0, 'text': 'Approved Events'}
+    ];
+    const approvalFilterMenuItems = approvalFilterOptions.map((item) => <MenuItem value={item.value} key={item.value} primaryText={item.text} />);
 
-    filterOptions.forEach( (option, index) => {
-      if (!(option.payload) == this.props.relay.variables.filters.flagApproval) {
-        filterOptionsIndex = index
-      }
-    })
+    const resultLengthOptions = [ 10, 25, 50, 100];
+    const resultLengthMenuItems = resultLengthOptions.map((value) => <MenuItem value={value} key={value} primaryText={`${value} Events`} />);
 
-    let resultLengthOptions = [
-       { payload: 10, text: '10 Events' },
-       { payload: 25, text: '25 Events' },
-       { payload: 50, text: '50 Events' },
-       { payload: 100, text: '100 Events' }
-       // { payload: 500, text: '500 Events' },
-    ]
-
-    let resultLengthOptionsIndex = 0
-
-    resultLengthOptions.forEach( (option, index) => {
-      if (option.payload == this.props.relay.variables.numEvents) {
-        resultLengthOptionsIndex = index
-      }
-    })
-
-    this._handleEventRequestLengthChange = (event, selectedIndex, menuItem) => {
+    this._handleEventRequestLengthChange = (event, selectedIndex, value) => {
       this.props.relay.setVariables({
-        numEvents: menuItem.payload
+        numEvents: value
       })
 
       // Remove selection of rows that are now beyond the view
@@ -351,7 +331,7 @@ class AdminEventsSection extends React.Component {
       let i = currentSelectedRows.length
 
       while (i--) {
-        if (currentSelectedRows[i] >= menuItem.payload) {
+        if (currentSelectedRows[i] >= value) {
           currentSelectedRows.splice(i, 1)
         }
       }
@@ -365,22 +345,21 @@ class AdminEventsSection extends React.Component {
       <Toolbar>
         <ToolbarGroup key={0} float="left">
           <DropDownMenu
-            menuItems={filterOptions}
-            selectedIndex={filterOptionsIndex}
-            onChange={(event, value) => {
-              this._handleRequestFiltersChange({flagApproval: !(value)});
+            value={this.props.relay.variables.filters.flagApproval ? 1 : 0}
+            onChange={(event, index, value) => {
+              this._handleRequestFiltersChange({flagApproval: (value == 1)});
             }}
-            menuItemStyle={BernieText.menuItem}
-            style={{marginRight: '0'}}
-          />
+          >
+            {approvalFilterMenuItems}
+          </DropDownMenu>
           <DropDownMenu
-            menuItems={resultLengthOptions}
-            selectedIndex={resultLengthOptionsIndex}
-            menuItemStyle={BernieText.menuItem}
+            value={this.props.relay.variables.numEvents}
             onChange={this._handleEventRequestLengthChange}
             autoWidth={false}
             style={{width: '140px', marginRight: '0'}}
-          />
+          >
+            {resultLengthMenuItems}
+          </DropDownMenu>
           {/*IconMenus are just broken right now
           <IconMenu
             iconButtonElement={<FontIcon className="material-icons" hoverColor={BernieColors.blue}>filter_list</FontIcon>}
@@ -481,16 +460,20 @@ class AdminEventsSection extends React.Component {
   }
 
   renderDeleteModal() {
-    let standardActions = [
-      { text: 'Cancel' },
-      { text: 'Delete',
-        onTouchTap: () => {
+
+    const standardActions = [
+      <FlatButton
+        label="Cancel"
+        secondary={true}
+        onTouchTap={this._handleDeleteModalRequestClose} />,
+      <FlatButton
+        label="Delete"
+        primary={true}
+        onTouchTap={() => {
           if (!this.refs.deleteConfirmationInput || this.refs.deleteConfirmationInput.getValue() === 'DELETE')
             this._deleteEvent()
-        },
-        ref: 'submit'
-      }
-    ]
+        }} />,
+    ];
 
     this._handleDeleteModalRequestClose = () => {
       if (this.state.activeEventIndex) {
@@ -531,9 +514,6 @@ class AdminEventsSection extends React.Component {
   }
 
   renderCreateModal() {
-    let standardActions = [
-      { text: 'Cancel' }
-    ]
 
     this._handleCreateModalRequestClose = () => {
       this.setState({
@@ -544,7 +524,6 @@ class AdminEventsSection extends React.Component {
     return (
       <Dialog
         title='Create an Event'
-        actions={standardActions}
         open={this.state.showCreateEventDialog}
         onRequestClose={this._handleCreateModalRequestClose}
         bodyStyle={{paddingBottom: '0'}}
@@ -559,16 +538,26 @@ class AdminEventsSection extends React.Component {
   }
 
   renderFiltersModal() {
-    let standardActions = [
-      { text: 'Cancel' },
-      { text: 'Clear',
-        onTouchTap: () => {
+    const standardActions = [
+      <FlatButton
+        label="Cancel"
+        secondary={true}
+        onTouchTap={() => {
+          this.setState({showFiltersDialog: false});
+        }}
+      />,
+      <FlatButton
+        label="Clear"
+        secondary={true}
+        onTouchTap={() => {
           this._handleRequestFiltersChange({}, true);
           this.setState({showFiltersDialog: false});
-        }
-      },
-      { text: 'Update Filters',
-        onTouchTap: () => {
+        }}
+      />,
+      <FlatButton
+        label="Update Filters"
+        primary={true}
+        onTouchTap={() => {
           let filtersArray = jQuery(this.refs.eventSearchForm).serializeArray();
           let filtersObject = {};
           filtersArray.forEach((filter) => {
@@ -581,10 +570,9 @@ class AdminEventsSection extends React.Component {
           });
           this._handleRequestFiltersChange(filtersObject, true);
           this.setState({showFiltersDialog: false});
-        },
-        ref: 'submit'
-      }
-    ]
+        }}
+      />,
+    ];
 
     const labelStyle = { display: 'inline', marginRight: '0.5em', fontSize: '0.8em' }
 
@@ -712,7 +700,6 @@ class AdminEventsSection extends React.Component {
     return (
       <Dialog
         actions={customActions}
-        actionFocus="submit"
         open={this.state.showEventPreview}
         onRequestClose={this._handlePreviewRequestClose}
         contentStyle={{maxWidth: '1200px', width: '90%'}}
