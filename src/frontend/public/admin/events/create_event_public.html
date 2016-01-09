@@ -1444,6 +1444,10 @@ function fillInAddress() {
   // Get the place details from the autocomplete object.
   var place = autocomplete.getPlace();
 
+  if (! place.address_components) {
+	return;
+  }
+
   for (var component in componentForm) {
   	document.getElementById(component).value = '';
   	document.getElementById(component).disabled = false;
@@ -1461,6 +1465,8 @@ function fillInAddress() {
   document.getElementById('venue_name').placeholder = place.name;
   document.getElementById('street_number').value += " " + document.getElementById('route').value;
   document.getElementById('route').value = "";
+
+  setDefaultEventTimeZone(place);
 }
 // [END region_fillform]
 
@@ -1483,6 +1489,17 @@ function geolocate() {
   }
 }
 // [END region_geolocation]
+
+function setDefaultEventTimeZone(place) {
+	var url = "https://maps.googleapis.com/maps/api/timezone/json?sensor=false&";
+	url += "location=" + place.geometry.location.lat() + "," + place.geometry.location.lng();
+	url += "&timestamp=" + Math.round((new Date().getTime())/1000).toString();
+	$.ajax({url:url}).done(function(response){
+	   if(response.timeZoneId != null){
+		   $("[name=start_tz]").val(response.timeZoneId);
+	   }
+	});
+}
 
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAzu1FR7mpcDYkQdHctmAe2DZSy05XmYcU&signed_in=true&libraries=places&callback=initAutocomplete"
