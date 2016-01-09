@@ -20,6 +20,8 @@ import {compare, hash} from './bcrypt-promise'
 import knex from './data/knex'
 import KnexSessionStoreFactory from 'connect-session-knex'
 import DataLoader from 'dataloader'
+import fs from 'fs'
+import Handlebars from 'handlebars'
 
 log.info('Writing schema...')
 writeSchema()
@@ -42,6 +44,13 @@ const BSDClient = new BSD(process.env.BSD_HOST, process.env.BSD_API_ID, process.
 const port = process.env.PORT
 const publicPath = path.resolve(__dirname, '../frontend/public')
 const oneWeekInMillis = 604800000
+
+
+var handlebars = require("handlebars");
+const templateDir = path.resolve(publicPath, 'admin/events');
+const createEventTemplate = fs.readFileSync(templateDir + '/create_event.hbs', {encoding: 'utf-8'});
+const createEventPage = handlebars.compile(createEventTemplate);
+
 
 const sessionStore = new KnexSessionStore({
   knex: knex,
@@ -239,11 +248,11 @@ app.post('/logout',
 )
 
 app.get('/admin/events/create', isAuthenticated, wrap(async (req, res) => {
-  res.sendFile(publicPath + '/admin/events/create_event.html')
+  res.send(createEventPage({is_public: false}));
 }))
 
 app.get('/events/create', wrap(async (req, res) => {
-  res.sendFile(publicPath + '/admin/events/create_event_public.html')
+  res.send(createEventPage({is_public: true}));
 }))
 
 app.post('/events/create', wrap(async (req, res) => {
