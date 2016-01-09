@@ -143,7 +143,7 @@ class CallAssignment extends React.Component {
   generateEventsInfoEmailLink() {
     const userFirstName = this.props.currentUser.firstName;
     const interviewee = this.props.currentUser.intervieweeForCallAssignment;
-    const name = (interviewee.firstName) ? interviewee.firstName : intervieweeName();
+    const name = (interviewee.firstName) ? interviewee.firstName : this.intervieweeName();
     const email = interviewee.email;
     const zip = interviewee.address.zip;
     const subject = escape('Bernie Phone Call Followup');
