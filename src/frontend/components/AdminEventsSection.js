@@ -450,11 +450,14 @@ class AdminEventsSection extends React.Component {
     let eventsToDelete = this.state.indexesMarkedForDeletion.map(index => {
       return events[index].node.id
     })
+    let deleteMsg = this.state.deletionConfirmationMessage;
+    if (deleteMsg === 0 || deleteMsg === null)
+      deleteMsg = ''
 
     this.refs.eventDeletionHandler.send({
       listContainer: this.props.listContainer,
       eventIDs: eventsToDelete,
-      hostMessage: this.state.deletionConfirmationMessage
+      hostMessage: deleteMsg
     })
 
     this.setState({showEventPreview: false})
@@ -542,7 +545,7 @@ ${signature}`
               deletionConfirmationMessage: deleteReasons[value].message
             })
           }}
-          style={{cursor: 'pointer'}}
+          floatingLabelStyle={{cursor: 'pointer'}}
         >
         {deleteReasonMenuItems}
         </SelectField><br />
@@ -556,6 +559,7 @@ ${signature}`
           multiLine={true}
           rowsMax={11}
           fullWidth={true}
+          inputStyle={{backgroundColor: 'beige'}}
           ref="deleteConfirmationInput"
         />
       </div>
