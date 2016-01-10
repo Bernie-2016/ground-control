@@ -491,7 +491,7 @@ ${signature}`
 
 Please note we do not approve fundraisers without prior campaign contact.
 
-You can resubmit your event following guidelines at BernieSanders.com/plan.
+You can resubmit your event following guidelines at berniesanders.com/plan.
 
 Thank you again for your support and for helping to spread Bernie’s message!
 
