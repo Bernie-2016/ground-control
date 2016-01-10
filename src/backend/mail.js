@@ -47,6 +47,7 @@ export default class MG {
   async send(message, debugging) {
     clientLogger.info("Sending email via Mailgun", message)
 
+    message["o:tracking"] = false
     if (inDevEnv || debugging) {
       return message
     } else {
