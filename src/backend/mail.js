@@ -144,8 +144,7 @@ export default class MG {
 
   async sendHostEventDeletionNotification(data, debugging) {
     let message = {
-      from: '<noreply@berniesanders.com>',
-      'h:Reply-To': 'Help Desk<help@berniesanders.com>',
+      from: 'Help Desk<help@berniesanders.com>',
       to: data.hostEmail,
       subject: 'Event Deletion Notice',
       text: data.message
