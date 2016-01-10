@@ -561,7 +561,7 @@ ${signature}`
           multiLine={true}
           rowsMax={11}
           fullWidth={true}
-          inputStyle={{backgroundColor: 'beige'}}
+          inputStyle={{backgroundColor: 'rgb(250,250,250)'}}
           ref="deleteConfirmationInput"
         />
       </div>
