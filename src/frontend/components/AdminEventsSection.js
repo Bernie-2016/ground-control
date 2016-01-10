@@ -16,6 +16,8 @@ import MutationHandler from './MutationHandler'
 import DeleteEvents from '../mutations/DeleteEvents'
 import EditEvents from '../mutations/EditEvents'
 
+const plurry = (n) => (Math.abs(n) == 1) ? '' : 's';
+
 const keyboardActionStyles = {
   text: {fontSize: '0.9em', top: '-7px', color: BernieColors.gray, cursor: 'default'},
   icon: {cursor: 'default'}
@@ -50,6 +52,8 @@ class AdminEventsSection extends React.Component {
       previewTabIndex: 0,
       userMessage: '',
       approveOnUpdate: true,
+      deletionConfirmationMessage: null,
+      deletionReasonIndex: null,
       undoAction: function(){console.log('undo')}
     }
 
@@ -311,39 +315,19 @@ class AdminEventsSection extends React.Component {
   )
 
   renderToolbar() {
-    let filterOptions = [
-      { payload: '0', text: 'Pending Approval' },
-      { payload: '1', text: 'Approved Events' }
-      // { payload: '3', text: 'Past Events' }
-    ]
 
-    let filterOptionsIndex = 0
+    const approvalFilterOptions = [
+      {value: 1, 'text': 'Pending Approval'},
+      {value: 0, 'text': 'Approved Events'}
+    ];
+    const approvalFilterMenuItems = approvalFilterOptions.map((item) => <MenuItem value={item.value} key={item.value} primaryText={item.text} />);
 
-    filterOptions.forEach( (option, index) => {
-      if (!(option.payload) == this.props.relay.variables.filters.flagApproval) {
-        filterOptionsIndex = index
-      }
-    })
+    const resultLengthOptions = [ 10, 25, 50, 100];
+    const resultLengthMenuItems = resultLengthOptions.map((value) => <MenuItem value={value} key={value} primaryText={`${value} Events`} />);
 
-    let resultLengthOptions = [
-       { payload: 10, text: '10 Events' },
-       { payload: 25, text: '25 Events' },
-       { payload: 50, text: '50 Events' },
-       { payload: 100, text: '100 Events' }
-       // { payload: 500, text: '500 Events' },
-    ]
-
-    let resultLengthOptionsIndex = 0
-
-    resultLengthOptions.forEach( (option, index) => {
-      if (option.payload == this.props.relay.variables.numEvents) {
-        resultLengthOptionsIndex = index
-      }
-    })
-
-    this._handleEventRequestLengthChange = (event, selectedIndex, menuItem) => {
+    this._handleEventRequestLengthChange = (event, selectedIndex, value) => {
       this.props.relay.setVariables({
-        numEvents: menuItem.payload
+        numEvents: value
       })
 
       // Remove selection of rows that are now beyond the view
@@ -351,7 +335,7 @@ class AdminEventsSection extends React.Component {
       let i = currentSelectedRows.length
 
       while (i--) {
-        if (currentSelectedRows[i] >= menuItem.payload) {
+        if (currentSelectedRows[i] >= value) {
           currentSelectedRows.splice(i, 1)
         }
       }
@@ -365,22 +349,21 @@ class AdminEventsSection extends React.Component {
       <Toolbar>
         <ToolbarGroup key={0} float="left">
           <DropDownMenu
-            menuItems={filterOptions}
-            selectedIndex={filterOptionsIndex}
-            onChange={(event, value) => {
-              this._handleRequestFiltersChange({flagApproval: !(value)});
+            value={this.props.relay.variables.filters.flagApproval ? 1 : 0}
+            onChange={(event, index, value) => {
+              this._handleRequestFiltersChange({flagApproval: (value == 1)});
             }}
-            menuItemStyle={BernieText.menuItem}
-            style={{marginRight: '0'}}
-          />
+          >
+            {approvalFilterMenuItems}
+          </DropDownMenu>
           <DropDownMenu
-            menuItems={resultLengthOptions}
-            selectedIndex={resultLengthOptionsIndex}
-            menuItemStyle={BernieText.menuItem}
+            value={this.props.relay.variables.numEvents}
             onChange={this._handleEventRequestLengthChange}
             autoWidth={false}
             style={{width: '140px', marginRight: '0'}}
-          />
+          >
+            {resultLengthMenuItems}
+          </DropDownMenu>
           {/*IconMenus are just broken right now
           <IconMenu
             iconButtonElement={<FontIcon className="material-icons" hoverColor={BernieColors.blue}>filter_list</FontIcon>}
@@ -469,10 +452,14 @@ class AdminEventsSection extends React.Component {
     let eventsToDelete = this.state.indexesMarkedForDeletion.map(index => {
       return events[index].node.id
     })
+    let deleteMsg = this.state.deletionConfirmationMessage;
+    if (deleteMsg === 0 || deleteMsg === null)
+      deleteMsg = ''
 
     this.refs.eventDeletionHandler.send({
       listContainer: this.props.listContainer,
-      eventIDs: eventsToDelete
+      eventIDs: eventsToDelete,
+      hostMessage: deleteMsg
     })
 
     this.setState({showEventPreview: false})
@@ -481,42 +468,104 @@ class AdminEventsSection extends React.Component {
   }
 
   renderDeleteModal() {
-    let standardActions = [
-      { text: 'Cancel' },
-      { text: 'Delete',
-        onTouchTap: () => {
-          if (!this.refs.deleteConfirmationInput || this.refs.deleteConfirmationInput.getValue() === 'DELETE')
-            this._deleteEvent()
-        },
-        ref: 'submit'
+
+    const signature = `Events Team
+Bernie 2016`;
+    const deleteReasons = [
+      {reason: 'Delete Without Message', message: 0},
+      {
+        reason: 'Event Cancelled by Host',
+        message: `This event has been cancelled by the host.
+
+You can find other events in your area by searching our event map at map.berniesanders.com or by visiting Bernie 2016 event central at http://berniesanders.com/events.
+
+When there, enter your zip code and find events in your area.
+
+Thank you for your support!
+
+${signature}`
+      },
+      {
+        reason: 'Event is a Fundraiser',
+        message: `Thank you for submitting your event to Bernie 2016 Events Central.
+
+Please note we do not approve fundraisers without prior campaign contact.
+
+You can resubmit your event following guidelines at berniesanders.com/plan.
+
+Thank you again for your support and for helping to spread Bernie’s message!
+
+${signature}`
+      },
+      {
+        // Be sure to keep this as the last option in the array,
+        // it's being referenced below as deleteReasons[deleteReasons.length-1]
+        reason: 'Custom',
+        message: `
+
+${signature}`
       }
-    ]
+    ];
+    const deleteReasonMenuItems = deleteReasons.map((item, index) => <MenuItem key={index} value={index} primaryText={item.reason}/>);
 
     this._handleDeleteModalRequestClose = () => {
-      if (this.state.activeEventIndex) {
-        this.setState({
+      let updatedStateProps = {
           showDeleteEventDialog: false,
-          showEventPreview: true
-        })
-      } else {
-        this.setState({
-          showDeleteEventDialog: false
-        })
+          deletionConfirmationMessage: null,
+          deletionReasonIndex: null
+        };
+      if (this.state.activeEventIndex) {
+        updatedStateProps['showEventPreview'] = true;
       }
+      this.setState(updatedStateProps)
     }
 
     let numEvents = this.state.indexesMarkedForDeletion.length;
-    let s = (numEvents > 1) ? 's.' : '.'
-    let dialogTitle = 'You are about to delete ' + numEvents + ' event' + s
-    let textConfirm = (
+    let dialogTitle = `You are about to delete ${numEvents} event${plurry(numEvents)}.`;
+
+    const standardActions = [
+      <FlatButton
+        label="Cancel"
+        secondary={true}
+        onTouchTap={this._handleDeleteModalRequestClose} />,
+      <FlatButton
+        label="Delete"
+        primary={true}
+        disabled={(this.state.deletionConfirmationMessage === null || this.state.deletionConfirmationMessage === deleteReasons[deleteReasons.length-1]['message'] || this.state.deletionConfirmationMessage === '')}
+        onTouchTap={this._deleteEvent}
+      />
+    ];
+
+    let deleteMessage = (
       <div>
-        <p>Type <span style={{color: BernieColors.red}}>DELETE</span> to confirm.</p>
-        <TextField hintText="TYPE HERE" underlineFocusStyle={{borderColor: BernieColors.red}} ref="deleteConfirmationInput" />
+        <SelectField
+          value={this.state.deletionReasonIndex}
+          floatingLabelText="Reason For Deletion"
+          onChange={(event, index, value) => {
+            this.setState({
+              deletionReasonIndex: value,
+              deletionConfirmationMessage: deleteReasons[value].message
+            })
+          }}
+          floatingLabelStyle={{cursor: 'pointer'}}
+        >
+        {deleteReasonMenuItems}
+        </SelectField><br />
+        <TextField
+          floatingLabelText="Message for Event Host"
+          value={(this.state.deletionConfirmationMessage === 0) ? '' : this.state.deletionConfirmationMessage}
+          disabled={(this.state.deletionConfirmationMessage === 0 || this.state.deletionConfirmationMessage === null)}
+          onChange={(event) => {
+            this.setState({deletionConfirmationMessage: event.target.value});
+          }}
+          multiLine={true}
+          rowsMax={11}
+          fullWidth={true}
+          inputStyle={{backgroundColor: 'rgb(250,250,250)'}}
+          ref="deleteConfirmationInput"
+        />
       </div>
     )
-
-    if (numEvents < 5)
-      textConfirm = <div></div>
 
     return (
       <Dialog
@@ -525,15 +574,12 @@ class AdminEventsSection extends React.Component {
         open={this.state.showDeleteEventDialog}
         onRequestClose={this._handleDeleteModalRequestClose}
       >
-      {textConfirm}
+      {deleteMessage}
       </Dialog>
     )
   }
 
   renderCreateModal() {
-    let standardActions = [
-      { text: 'Cancel' }
-    ]
 
     this._handleCreateModalRequestClose = () => {
       this.setState({
@@ -544,7 +590,6 @@ class AdminEventsSection extends React.Component {
     return (
       <Dialog
         title='Create an Event'
-        actions={standardActions}
         open={this.state.showCreateEventDialog}
         onRequestClose={this._handleCreateModalRequestClose}
         bodyStyle={{paddingBottom: '0'}}
@@ -559,16 +604,26 @@ class AdminEventsSection extends React.Component {
   }
 
   renderFiltersModal() {
-    let standardActions = [
-      { text: 'Cancel' },
-      { text: 'Clear',
-        onTouchTap: () => {
+    const standardActions = [
+      <FlatButton
+        label="Cancel"
+        secondary={true}
+        onTouchTap={() => {
+          this.setState({showFiltersDialog: false});
+        }}
+      />,
+      <FlatButton
+        label="Clear"
+        secondary={true}
+        onTouchTap={() => {
           this._handleRequestFiltersChange({}, true);
           this.setState({showFiltersDialog: false});
-        }
-      },
-      { text: 'Update Filters',
-        onTouchTap: () => {
+        }}
+      />,
+      <FlatButton
+        label="Update Filters"
+        primary={true}
+        onTouchTap={() => {
           let filtersArray = jQuery(this.refs.eventSearchForm).serializeArray();
           let filtersObject = {};
           filtersArray.forEach((filter) => {
@@ -581,10 +636,9 @@ class AdminEventsSection extends React.Component {
           });
           this._handleRequestFiltersChange(filtersObject, true);
           this.setState({showFiltersDialog: false});
-        },
-        ref: 'submit'
-      }
-    ]
+        }}
+      />,
+    ];
 
     const labelStyle = { display: 'inline', marginRight: '0.5em', fontSize: '0.8em' }
 
@@ -712,7 +766,6 @@ class AdminEventsSection extends React.Component {
     return (
       <Dialog
         actions={customActions}
-        actionFocus="submit"
         open={this.state.showEventPreview}
         onRequestClose={this._handlePreviewRequestClose}
         contentStyle={{maxWidth: '1200px', width: '90%'}}
@@ -946,13 +999,13 @@ class AdminEventsSection extends React.Component {
     <div>
       <MutationHandler
         ref='eventDeletionHandler'
-        successMessage='Event deleted!'
+        successMessage={`${this.state.indexesMarkedForDeletion.length} event${plurry(this.state.indexesMarkedForDeletion.length)} deleted`}
         mutationClass={DeleteEvents}
       />
       <MutationHandler
         ref='eventEditHandler'
         mutationClass={EditEvents}
-        successMessage="Events edited successfully!"
+        successMessage='Event(s) updated successfully'
       />
       {this.renderDeleteModal()}
       {this.renderCreateModal()}

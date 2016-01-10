@@ -18,16 +18,23 @@ export default class MutationHandler extends React.Component {
     }
 
     state = {
-      errorMessage: null,
-      statusMessage: null
+      status: null,
+      message: '',
+      open: false
     }
 
     clearState() {
       this.setState({
-        errorMessage: null,
-        statusMessage: null
+        status: null,
+        message: ''
       })
     }
+
+    handleRequestClose = () => {
+      this.setState({
+        open: false,
+      });
+    };
 
     onFailure(transaction) {
       this.clearState()
@@ -52,7 +59,11 @@ export default class MutationHandler extends React.Component {
         errorMessage = defaultMessage
       }
 
-      this.setState({errorMessage: errorMessage})
+      this.setState({
+        status: 'ERROR',
+        message: errorMessage,
+        open: true
+      })
 
       if (this.props.onFailure)
         this.props.onFailure()
@@ -62,7 +73,11 @@ export default class MutationHandler extends React.Component {
       this.clearState()
 
       if (this.props.successMessage)
-        this.setState({statusMessage: this.props.successMessage})
+        this.setState({
+          status: 'SUCCESS',
+          message: this.props.successMessage,
+          open: true
+        })
 
       if (this.props.onSuccess)
         this.props.onSuccess()
@@ -80,32 +95,25 @@ export default class MutationHandler extends React.Component {
         )
       } catch (ex) {
         log.error(ex.message, ex.stack)
-        this.setState({errorMessage: this.props.defaultErrorMessage})
+        this.setState({
+          status: 'ERROR',
+          message: this.props.defaultErrorMessage,
+          open: true
+        })
       }
     }
 
     render() {
-      let globalSnack = <div></div>
-
-      if (this.state.errorMessage) {
-        globalSnack = <Snackbar
-          message={this.state.errorMessage}
-          autoHideDuration={10000}
-          openOnMount={true}
-          style={{'backgroundColor' : BernieColors.red}}
-          action={null} />
-      } else if (this.state.statusMessage) {
-        globalSnack = <Snackbar
-          message={this.state.statusMessage}
-          autoHideDuration={10000}
-          openOnMount={true}
-          style={{'backgroundColor' : BernieColors.blue}}
-          action={null} />
-      }
-
       return (
         <div>
-          {globalSnack}
+          <Snackbar
+            open={this.state.open}
+            message={this.state.message}
+            bodyStyle={{'backgroundColor' : (this.state.status === 'SUCCESS') ? BernieColors.blue : BernieColors.red}}
+            action={null}
+            autoHideDuration={10000}
+            onRequestClose={this.handleRequestClose}
+          />
         </div>
       )
     }

@@ -1021,7 +1021,8 @@ const GraphQLEditEvents = mutationWithClientMutationId({
 const GraphQLDeleteEvents = mutationWithClientMutationId({
   name: 'DeleteEvents',
   inputFields: {
-    ids: { type: new GraphQLNonNull(new GraphQLList(GraphQLString)) }
+    ids: { type: new GraphQLNonNull(new GraphQLList(GraphQLString)) },
+    hostMessage: { type: GraphQLString }
   },
   outputFields: {
     listContainer: {
@@ -1029,10 +1030,21 @@ const GraphQLDeleteEvents = mutationWithClientMutationId({
       resolve: () => SharedListContainer
     }
   },
-  mutateAndGetPayload: async ({ids}, {rootValue}) => {
+  mutateAndGetPayload: async ({ids, hostMessage}, {rootValue}) => {
     adminRequired(rootValue)
     let localIds = ids.map((id) => fromGlobalId(id).id)
     await BSDClient.deleteEvents(localIds)
+
+    if (hostMessage.length > 0){
+      let hostIds = await knex('bsd_events').select('creator_cons_id').whereIn('event_id', localIds); 
+
+      for (let i = 0; i < hostIds.length; i++) {
+        let person = await rootValue.loaders.bsdPeople.load(hostIds[i].creator_cons_id);
+        let hostEmail = await getPrimaryEmail(person);
+        await Mailgun.sendHostEventDeletionNotification({hostEmail: hostEmail, message: hostMessage})
+      }
+    }
+
     await knex('bsd_events')
       .whereIn('event_id', localIds)
       .del()

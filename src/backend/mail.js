@@ -47,6 +47,7 @@ export default class MG {
   async send(message, debugging) {
     clientLogger.info("Sending email via Mailgun", message)
 
+    message["o:tracking"] = false
     if (inDevEnv || debugging) {
       return message
     } else {
@@ -137,6 +138,17 @@ export default class MG {
       to: data.recipientAddress,
       subject: 'Fwd: HELP! I need more people to come to my phonebank',
       text: content.text
+    }
+
+    return await this.send(message, debugging)
+  }
+
+  async sendHostEventDeletionNotification(data, debugging) {
+    let message = {
+      from: 'Help Desk<help@berniesanders.com>',
+      to: data.hostEmail,
+      subject: 'Event Deletion Notice',
+      text: data.message
     }
 
     return await this.send(message, debugging)
