@@ -16,6 +16,8 @@ import MutationHandler from './MutationHandler'
 import DeleteEvents from '../mutations/DeleteEvents'
 import EditEvents from '../mutations/EditEvents'
 
+const plurry = (n) => (Math.abs(n) == 1) ? '' : 's';
+
 const keyboardActionStyles = {
   text: {fontSize: '0.9em', top: '-7px', color: BernieColors.gray, cursor: 'default'},
   icon: {cursor: 'default'}
@@ -519,7 +521,7 @@ ${signature}`
     }
 
     let numEvents = this.state.indexesMarkedForDeletion.length;
-    let dialogTitle = `You are about to delete ${numEvents} event${(numEvents > 1) ? 's' : ''}.`;
+    let dialogTitle = `You are about to delete ${numEvents} event${plurry(numEvents)}.`;
 
     const standardActions = [
       <FlatButton
@@ -997,13 +999,13 @@ ${signature}`
     <div>
       <MutationHandler
         ref='eventDeletionHandler'
-        successMessage='Event deleted!'
+        successMessage={`${this.state.indexesMarkedForDeletion.length} event${plurry(this.state.indexesMarkedForDeletion.length)} deleted`}
         mutationClass={DeleteEvents}
       />
       <MutationHandler
         ref='eventEditHandler'
         mutationClass={EditEvents}
-        successMessage="Events edited successfully!"
+        successMessage='Event(s) updated successfully'
       />
       {this.renderDeleteModal()}
       {this.renderCreateModal()}
