@@ -23,7 +23,10 @@ var eventTypes = [
 		defaultValues: {
 			name: 'Jan 23rd Bernie Livestream Party',
 			description: 'Bernie has a special message to share with his supporters one week away from the Iowa caucus. Join other volunteers in your area to watch Bernie address all of us live!',
-			date: new Date('January 23 2016 18:00:00')
+			date: {
+				dateTime: new Date('January 23 2016 18:00:00'),
+				timeZone: 'US/Eastern'
+			}
 		},
 		adminOnly: false
 	}
@@ -32,18 +35,22 @@ var eventTypes = [
 (function(){
 	var form = document.getElementById('secondform');	
 
+	form.event_type_id.options[0] = new Option();
 	eventTypes.forEach(function(type){
 		form.event_type_id.options[form.event_type_id.options.length] = new Option(type.name, type.id);
 	});	
 
 	form.event_type_id.selectedIndex = -1;	
 
-	form.event_type_id.addEventListener("change", function(e){
+	$(form.event_type_id).on("change", function(e){
 		setDefaults(e.target.value);
-	}, false);
+	});
 })();
 
 function setDefaults(eventTypeId){
+	var form = document.getElementById('secondform');
+	$(form.start_tz).off("change");
+	
 	var eventType = null;
 	for (var i = 0; i < eventTypes.length; i++) {
 		if (eventTypes[i].id == eventTypeId) {
@@ -55,8 +62,8 @@ function setDefaults(eventTypeId){
 
 	window.location.hash = "type=" + eventType.id;
 	var defaults = eventType.defaultValues;	
-	var form = document.getElementById('secondform');
 
+	clearEvents();
 	form.event_type_id.value = eventType.id;
 	for (var property in defaults) {
 	  if (defaults.hasOwnProperty(property)) {
@@ -74,13 +81,27 @@ function updateFormValue(property, value) {
 			document.getElementById('description').value = CKEDITOR.instances.description.getData();
 	  	break;
 	  case "date":
-	  	var dateMoment = moment(value);
-	  	var currentDates = addEventDate(dateMoment, true);
+	  	var dateMoment = moment(value.dateTime).tz(value.timeZone);
+	  	console.log(dateMoment.format());
+	  	
+	  	setEventDate(dateMoment, true);
+	  	updateEventTime(dateMoment);
 
+	  	$(form.start_tz).on("change", function(e){
+	  		var newDateMoment = dateMoment.tz(e.target.value);
+	  		setEventDate(newDateMoment, true);
+	  		updateEventTime(newDateMoment);
+	  		console.log(newDateMoment.format());
+	  	});
 	    break;
 	  default:
 	    form[property].value = value;
 	}
+}
+
+function setEventDate(dateMoment, auto_generated) {
+	clearEvents();
+	addEventDate(dateMoment, auto_generated);
 }
 
 function addEventDate(dateMoment, auto_generated) {
@@ -123,6 +144,16 @@ function clearEvents(){
 	user_created_events = [];
 	generated_events = [];
 	events_cal.setEvents([]);
+}
+
+function updateEventTime(dateMoment) {
+	var form = document.getElementById('secondform');
+	
+	var hour = Number(dateMoment.format('hh'));
+	hour = (hour == 12) ? '00' : hour;
+	form['start_time[h]'].value = hour;
+	form['start_time[i]'].value = dateMoment.format('mm');
+	form['start_time[a]'].value = dateMoment.format('a');
 }
 
 function getHashValue(key) {

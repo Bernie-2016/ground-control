@@ -77,6 +77,7 @@
     <script src="/admin/events/static/ckeditor/ckeditor.js"></script>
     <script src="/admin/events/static/less.js"></script>
     <script src="/admin/events/static/moment.js"></script>
+    <script src="/admin/events/static/moment-timezone.min.js"></script>
     <script src="/admin/events/static/underscore-min.js"></script>
     <script src="/admin/events/static/clndr.js"></script>
   </head>
@@ -1567,6 +1568,7 @@
           	$.ajax({url:url}).done(function(response){
           	   if(response.timeZoneId != null){
           		   $("[name=start_tz]").val(response.timeZoneId);
+                 $("[name=start_tz]").trigger("change");
           	   }
           	});
           }
