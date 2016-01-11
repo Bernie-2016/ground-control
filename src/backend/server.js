@@ -269,9 +269,7 @@ app.get('/admin/events/create', requireAdmin, wrap(async (req, res) => {
 }))
 
 app.get('/events/create', wrap(async (req, res) => {
-  let template = fs.readFileSync(templateDir + '/create_event.hbs', {encoding: 'utf-8'});
-  let page = handlebars.compile(template);
-  res.send(page({is_public: true}));
+  res.send(createEventPage({is_public: true}));
 }))
 
 app.post('/events/create', wrap(async (req, res) => {
