@@ -290,8 +290,11 @@ app.post('/events/create', wrap(async (req, res) => {
   let constituent = await BSDClient.getConstituentByEmail(form.cons_email)
 
   if (!constituent) {
-    constituent = await BSDClient.createConstituent(form.cons_email)
+    const name = form.cons_name.split(" ");
+    constituent = await BSDClient.createConstituent(form.cons_email, name[0], (name.length > 1) ? name[name.length - 1] : '')
   }
+
+  console.log(constituent);
 
   let event_types = await BSDClient.getEventTypes()
   await BSDClient.createEvents(constituent.id, form, event_types, eventCreationCallback)
