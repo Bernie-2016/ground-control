@@ -26,7 +26,9 @@ var eventTypes = [
 			date: {
 				dateTime: new Date('January 23 2016 18:00:00'),
 				timeZone: 'US/Eastern'
-			}
+			},
+			duration_num: 2,
+			duration_unit: 60
 		},
 		adminOnly: false
 	}
