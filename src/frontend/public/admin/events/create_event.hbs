@@ -73,6 +73,22 @@
 		        float: none !important;
 		    }
 		}
+
+		.event-central.step2 #SKIN .section-wrap#event-message {
+		    max-width: 600px;
+		    margin: 2rem auto;
+			color:white;
+			padding:0.8rem 2.2rem;
+		}
+
+		div#event-message a:link,
+		div#event-message a:visited,
+		div#event-message a:hover,
+		div#event-message a:active {
+			color: #DBE1E6;
+		    text-decoration: underline;
+		}
+
     </style>
     <script src="/admin/events/static/ckeditor/ckeditor.js"></script>
     <script src="/admin/events/static/less.js"></script>
@@ -99,6 +115,11 @@
     <div class="content" style="visibility: visible;">
       <div id="SKIN" class="module_event2 bsd-page bsd-event bsd-event-createdetails">
         <div class="basic container">
+		  <div id="event-message" class="section-wrap" style="display:none;">
+			  Thanks for submitting an <a class="js-created-event-url" href="" target="_blank">event</a> for the Bernie Sanders campaign!<br> 
+			  You should receive a confirmation email with a link to manage your event in a few minutes.
+		  </div>
+			
           <form method="post" name="secondform" id="secondform">
             <div>
               <div class="section-wrap">
@@ -1274,7 +1295,7 @@
           </form>
         </div>
         <script type="text/javascript">
-          var isPublic = {{#if is_public }}true{{else}}false{{/if}};
+		  var isPublic = {{#if is_public }}true{{else}}false{{/if}};
           var $, events_cal;
           var events = [];
           var user_created_events = [];
@@ -1449,17 +1470,20 @@
           			name: "event_dates",
           			value: JSON.stringify(current_events)
           		});
-
+				
+				setHashValue("event_url", null);
+				
           		$.ajax({
           		    dataType: "json",
           		    url: '/events/create',
           		    data: formdata,
           		    type: 'POST',
-          		    success: function(xhr, status){
-          		    	if (xhr == 'success'){
-          		    		// temporary success message, to be replaced with a nice UI update in the future
-          		    		alert('Thanks for submitting an event for the Bernie Sanders campaign! You should receive a confirmation email with a link to manage your event in a few minutes.');
-          		    		window.location.reload();
+          		    success: function(response, textStatus){
+          		    	if (response.status == 'success'){
+							setHashValue("event_url", response.event_url);
+				  		  // Scroll to top where a message will get displayed 
+				  			window.scrollTo(0,0);
+							window.location.reload();
           		    	}
           		    	else {
           		    		alert('There was an error processing your submission. Please try again later or contact help@berniesanders.com.');
@@ -1467,13 +1491,21 @@
           		    	}
           		    },
           		    error: function(i){
-          		      console.log(i);
-          		      alert('There was an error processing your submission. Please try again later or contact help@berniesanders.com.');
+					  console.log(i);
+					  alert('There was an error processing your submission. Please try again later or contact help@berniesanders.com.');
           		      $('#submit_button').removeClass('in-progress');
           		    }
           		});
           	});
-
+			
+			
+			// Show initial modal if we have an event_url in the hash (should have come from previous event creation)
+			var created_event_url = getHashValue("event_url");
+			if (created_event_url) {
+				$(".js-created-event-url").attr("href", created_event_url);
+				$("#event-message").show();
+			}
+			
           });
         </script>
         <script>

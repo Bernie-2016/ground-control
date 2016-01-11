@@ -296,11 +296,11 @@ app.post('/events/create', wrap(async (req, res) => {
   let event_types = await BSDClient.getEventTypes()
   await BSDClient.createEvents(constituent.id, form, event_types, eventCreationCallback)
 
+  
   // send event creation confirmation email
-  function eventCreationCallback(status) {
-  	res.json(status)
-
-  	if (status == 'success') {
+  function eventCreationCallback(status, event_id_obfuscated) {
+    let response_data = {'status' : status};
+    if (status == 'success') {
       if (form['event_type_id'] == 31) {
         // Send phone bank specific email
         // Mailgun.sendPhoneBankConfirmation(form, constituent)
@@ -310,9 +310,11 @@ app.post('/events/create', wrap(async (req, res) => {
         // Send generic email
         Mailgun.sendEventConfirmation(form, constituent, event_types)
       }
+      response_data['event_url'] = 'https://go.berniesanders.com/page/event/detail/' + event_id_obfuscated;
   	} else {
       clientLogger['error']('Event Creation Error:', status)
     }
+	res.json(response_data);
   }
 }))
 

@@ -65,7 +65,7 @@ function setDefaults(eventTypeId){
 	}
 	if (!eventType) {return};	
 
-	window.location.hash = "type=" + eventType.id;
+	setHashValue("type", eventType.id);
 	var defaults = eventType.defaultValues;	
 
 	clearEvents();
@@ -162,4 +162,24 @@ function updateEventTime(dateMoment) {
 function getHashValue(key) {
   var matches = location.hash.match(new RegExp(key+'=([^&]*)'));
   return matches ? matches[1] : null;
+}
+
+function setHashValue(key, value) {
+  var hash = window.location.hash;
+  var re = new RegExp(key + "=.*?(&|#|$)(.*)", "i");
+  var updated_hash = "";
+  if (hash.match(re)) {
+	if (typeof value !== 'undefined' && value !== null) {
+      updated_hash =  hash.replace(re, key + "=" + value + '$1$2');
+    } else {
+	  updated_hash =  hash.replace(re,'');
+    }
+  }
+  else if (typeof value !== 'undefined' && value !== null) {
+	if (hash != "" ) {
+		updated_hash = hash + "&";
+	}
+    updated_hash += key + "=" + value;
+  }
+  window.location.hash = updated_hash;
 }
