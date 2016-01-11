@@ -498,6 +498,49 @@ Thank you again for your support and for helping to spread Bernie’s message!
 ${signature}`
       },
       {
+        reason: 'Event mentions the sale of merchandise',
+        message: `Thank you for submitting your event to Bernie 2016 Events Central.
+
+Please note we do not approve events that feature merchandise sales, neither official nor unofficial merchandise sales are sanctioned by the campaign at your event. This is due to complicated FEC requirements for fundraising.
+
+We recommend you read our guide Organizing with Forming a PAC - this explains a few things related to fundraising and group costs, and refers you to the FEC for all other fundraising questions.
+
+You can resubmit your event following guidelines at BernieSanders.com/plan.
+
+Thank you again for your support and for helping to spread Bernie’s message!
+
+${signature}`
+      },
+      {
+        reason: 'Event mentions ballot / petitions ',
+        message: `Thank you for your interest in helping gather petition signatures to help get Bernie on the ballot! The campaign currently does not need signatures to qualify for the ballot in your state. But don’t worry, there are other ways you can volunteer to help the campaign.
+
+Here are some things you can do:
+	- Host a house party for Bernie (distribute literature, get people signed up, etc.)
+	- Table at farmers markets or local community events.
+	- Talk up Bernie, and distribute Bernie material at Democratic Party meetings, union meetings, or other civic organizations
+	- Write a letter to the editor: "Why I support a Sanders candidacy."  There are helpful talking points at berniesanders.com
+	- Spread the word on social media - be sure to like, follow, and promote the official Bernie 2016 Facebook page, www.facebook.com/berniesanders; follow on Instagram, @berniesanders; and Twitter, @berniesanders
+
+When you’re ready to submit your next event, visit BernieSanders.com/plan.
+
+Thank you again for your support and for helping to spread Bernie’s message!
+
+${signature}`
+      },
+      {
+        reason: 'General Deletion Message',
+        message: `Your event does not meet parameters at BernieSanders.com/plan.
+
+Keep in mind that each event description should include ways that Bernie Supporters can get involved in your event. Please be specific about what you are asking Bernie supporters to do, how they can get involved, and what you might want them to bring with them in support of Bernie.
+
+When in doubt, follow event creation guidelines set forth at BernieSanders.com/plan. When you’re ready, you can re-submit your event there.
+
+Thank you again for your support and for helping to spread Bernie’s message!
+
+${signature}`
+      },
+      {
         // Be sure to keep this as the last option in the array,
         // it's being referenced below as deleteReasons[deleteReasons.length-1]
         reason: 'Custom',
