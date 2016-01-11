@@ -473,7 +473,7 @@ export default class BSD {
     })
 
     if (eventType === null){
-      callback('Event type does not exist in BSD');
+      callback('failure', {'Event Type':['does not exist in BSD']});
       return;
     }
 
@@ -528,12 +528,12 @@ export default class BSD {
       let startTime = newEvent['date'] + ' ' + startHour + ':' + form['start_time']['i'] + ':00'
       params['days'][0]['start_datetime_system'] = startTime;
       let response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'POST');
-      if (response.validation_errors){
-        callback(response.validation_errors);
+	  if (response.validation_errors){
+        callback('failure', response.validation_errors);
       }
       else if (response.event_id_obfuscated && index == array.length - 1){
         // successfully created events
-        callback('success');
+        callback('success', {'event_id_obfuscated' : response.event_id_obfuscated});
       }
     });
 

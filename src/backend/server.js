@@ -265,7 +265,10 @@ app.post('/logout',
 )
 
 app.get('/admin/events/create', isAuthenticated, wrap(async (req, res) => {
-  res.send(createEventPage({is_public: false}));
+  //res.send(createEventPage({is_public: false}));
+  const t = fs.readFileSync(templateDir + '/create_event.hbs', {encoding: 'utf-8'});
+  const p = handlebars.compile(t);
+  res.send(p({is_public: false}));
 }))
 
 app.get('/events/create', wrap(async (req, res) => {
@@ -298,7 +301,7 @@ app.post('/events/create', wrap(async (req, res) => {
 
   
   // send event creation confirmation email
-  function eventCreationCallback(status, event_id_obfuscated) {
+  function eventCreationCallback(status, details) {
     let response_data = {'status' : status};
     if (status == 'success') {
       if (form['event_type_id'] == 31) {
@@ -310,9 +313,10 @@ app.post('/events/create', wrap(async (req, res) => {
         // Send generic email
         Mailgun.sendEventConfirmation(form, constituent, event_types)
       }
-      response_data['event_url'] = 'https://go.berniesanders.com/page/event/detail/' + event_id_obfuscated;
+      response_data['event_url'] = 'https://go.berniesanders.com/page/event/detail/' + details.event_id_obfuscated;
   	} else {
-      clientLogger['error']('Event Creation Error:', status)
+      response_data['validation_errors'] = details;
+      clientLogger['error']('Event Creation Error:', details);
     }
 	res.json(response_data);
   }
