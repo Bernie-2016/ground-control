@@ -443,8 +443,7 @@ const GraphQLUser = new GraphQLObjectType({
           let previousCallsSubquery = knex('bsd_calls')
             .select('interviewee_id')
             .where(function() {
-              this.where('call_assignment_id', localId)
-                .where('completed', true)
+              this.where('completed', true)
                 .where('attempted_at', '>', new Date(new Date() - 14 * 24 * 60 * 60 * 1000))
             })
             .orWhere(function() {
