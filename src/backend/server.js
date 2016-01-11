@@ -264,7 +264,7 @@ app.post('/logout',
   })
 )
 
-app.get('/admin/events/create', requireAdmin, wrap(async (req, res) => {
+app.get('/admin/events/create', isAuthenticated, wrap(async (req, res) => {
   res.send(createEventPage({is_public: false}));
 }))
 
