@@ -75,7 +75,7 @@ function updateFormValue(property, value) {
 	  	break;
 	  case "date":
 	  	var dateMoment = moment(value);
-	  	var currentDates = addEventDate(dateMoment, false);
+	  	var currentDates = addEventDate(dateMoment, true);
 
 	    break;
 	  default:
