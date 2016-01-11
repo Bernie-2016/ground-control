@@ -1274,6 +1274,7 @@
           </form>
         </div>
         <script type="text/javascript">
+          var isPublic = {{#if is_public }}true{{else}}false{{/if}};
           var $, events_cal;
           var events = [];
           var user_created_events = [];
@@ -1572,7 +1573,6 @@
           	   }
           	});
           }
-
 
         </script>
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAzu1FR7mpcDYkQdHctmAe2DZSy05XmYcU&signed_in=true&libraries=places&callback=initAutocomplete"

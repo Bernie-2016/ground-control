@@ -39,6 +39,9 @@ var eventTypes = [
 
 	form.event_type_id.options[0] = new Option();
 	eventTypes.forEach(function(type){
+		if (isPublic && type.adminOnly) {
+			return
+		};
 		form.event_type_id.options[form.event_type_id.options.length] = new Option(type.name, type.id);
 	});	
 
@@ -84,7 +87,6 @@ function updateFormValue(property, value) {
 	  	break;
 	  case "date":
 	  	var dateMoment = moment(value.dateTime).tz(value.timeZone);
-	  	console.log(dateMoment.format());
 	  	
 	  	setEventDate(dateMoment, true);
 	  	updateEventTime(dateMoment);
@@ -93,7 +95,6 @@ function updateFormValue(property, value) {
 	  		var newDateMoment = dateMoment.tz(e.target.value);
 	  		setEventDate(newDateMoment, true);
 	  		updateEventTime(newDateMoment);
-	  		console.log(newDateMoment.format());
 	  	});
 	    break;
 	  default:
