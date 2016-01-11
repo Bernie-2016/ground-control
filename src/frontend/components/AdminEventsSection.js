@@ -512,7 +512,7 @@ Thank you again for your support and for helping to spread Bernie’s message!
 ${signature}`
       },
       {
-        reason: 'Event mentions ballot / petitions ',
+        reason: 'Event mentions ballot / petitions',
         message: `Thank you for your interest in helping gather petition signatures to help get Bernie on the ballot! The campaign currently does not need signatures to qualify for the ballot in your state. But don’t worry, there are other ways you can volunteer to help the campaign.
 
 Here are some things you can do:
@@ -590,6 +590,7 @@ ${signature}`
               deletionConfirmationMessage: deleteReasons[value].message
             })
           }}
+          style={{width: '350px'}}
           floatingLabelStyle={{cursor: 'pointer'}}
         >
         {deleteReasonMenuItems}
