@@ -64,6 +64,23 @@ function isAuthenticated(req, res, next) {
   res.redirect('/signup')
 }
 
+let requireAdmin = async (req, res, next) => {
+  if (req.user){
+    const userIsAdmin = await isAdmin(req.user.id)
+    if (userIsAdmin)
+      return next()
+  }
+
+  res.sendStatus(403)
+}
+
+let isAdmin = async (userId) => {
+  const user = await knex('users').where('id', userId).first();
+  if (user.is_admin)
+    return true
+  return false
+}
+
 passport.use('signup', new LocalStrategy(
   {
     usernameField: 'email',
@@ -247,10 +264,8 @@ app.post('/logout',
   })
 )
 
-app.get('/admin/events/create', isAuthenticated, wrap(async (req, res) => {
-  let template = fs.readFileSync(templateDir + '/create_event.hbs', {encoding: 'utf-8'});
-  let page = handlebars.compile(template);
-  res.send(page({is_public: false}));
+app.get('/admin/events/create', requireAdmin, wrap(async (req, res) => {
+  res.send(createEventPage({is_public: false}));
 }))
 
 app.get('/events/create', wrap(async (req, res) => {
@@ -260,11 +275,17 @@ app.get('/events/create', wrap(async (req, res) => {
 }))
 
 app.post('/events/create', wrap(async (req, res) => {
+  const src = req.headers.referer.split(req.headers.origin)[1];
   let form = req.body
 
-  // Flag event as needing approval if user is not authenticated
-  if (!req.user) {
-    form['flag_approval'] = 1
+  // Flag event as needing approval
+  if (req.user && src === '/admin/events/create') {
+    const userIsAdmin = await isAdmin(req.user.id)
+    if (!userIsAdmin)
+      form['flag_approval'] = '1'
+  }
+  else {
+    form['flag_approval'] = '1'
   }
 
   // constituent object not being returned right now
