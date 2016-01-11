@@ -830,12 +830,20 @@ const GraphQLEvent = new GraphQLObjectType({
         return url.resolve('https://' + process.env.BSD_HOST, '/page/event/detail/' + event.event_id_obfuscated)
       }
     },
+    // attendeesCount: {
+    //   type: GraphQLInt,
+    //   resolve: async (event) => {
+    //     const count = await knex('bsd_event_attendees').where('event_id', event.id).count('event_attendee_id');
+    //     log.debug('Event RSVP Count', count);
+    //     return Number(count[0].count)
+    //   }
+    // },
     attendeesCount: {
       type: GraphQLInt,
       resolve: async (event) => {
-        const count = await knex('bsd_event_attendees').where('event_id', event.id).count('event_attendee_id');
+        const count = await knex('bsd_event_attendees').raw(`SELECT COUNT(event_attendee_id) WHERE event_id = ${event.id}`);
         log.debug('Event RSVP Count', count);
-        return Number(count[0].count)
+        return count[0].count
       }
     },
     nearbyPeople: {
