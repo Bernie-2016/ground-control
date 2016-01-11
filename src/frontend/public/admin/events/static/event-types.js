@@ -1,10 +1,11 @@
 var eventTypes = [
 	{
 		id: 14,
-		name: 'Rally',
+		name: 'Rally (official event)',
 		defaultValues: {
 			name: 'Rally for Bernie',
-			description: ''
+			description: '',
+			is_official: true
 		},
 		adminOnly: true
 	},
@@ -69,6 +70,7 @@ function setDefaults(eventTypeId){
 	var defaults = eventType.defaultValues;	
 
 	clearEvents();
+	updateFormValue('is_official', false);
 	form.event_type_id.value = eventType.id;
 	for (var property in defaults) {
 	  if (defaults.hasOwnProperty(property)) {
@@ -97,6 +99,11 @@ function updateFormValue(property, value) {
 	  		updateEventTime(newDateMoment);
 	  	});
 	    break;
+	  case "is_official":
+	  	if (form.is_official){
+	  		form.is_official.checked = value;
+	  	}
+	  	break;
 	  default:
 	    form[property].value = value;
 	}
