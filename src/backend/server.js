@@ -61,7 +61,7 @@ function isAuthenticated(req, res, next) {
   if (req.user)
     return next()
 
-  res.redirect('/signup')
+  res.redirect('/signup?next=' + req.url)
 }
 
 let requireAdmin = async (req, res, next) => {
