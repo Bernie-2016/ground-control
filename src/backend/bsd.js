@@ -285,8 +285,8 @@ export default class BSD {
     return response
   }
 
-  async createConstituent(email) {
-    let params = '<?xml version="1.0" encoding="utf-8"?><api><cons><cons_email><email>' + email + '</email></cons_email></cons></api>';
+  async createConstituent(email, firstName, lastName) {
+    const params = `<?xml version="1.0" encoding="utf-8"?><api><cons><firstname>${firstName}</firstname><lastname>${lastName}</lastname><cons_email><email>${email}</email></cons_email></cons></api>`;
     let response = await this.sendXML('/cons/set_constituent_data', params, 'POST');
     response = await parseStringPromise(response);
 
