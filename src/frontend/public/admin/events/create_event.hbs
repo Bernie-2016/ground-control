@@ -77,6 +77,7 @@
     <script src="/admin/events/static/ckeditor/ckeditor.js"></script>
     <script src="/admin/events/static/less.js"></script>
     <script src="/admin/events/static/moment.js"></script>
+    <script src="/admin/events/static/moment-timezone.min.js"></script>
     <script src="/admin/events/static/underscore-min.js"></script>
     <script src="/admin/events/static/clndr.js"></script>
   </head>
@@ -110,19 +111,7 @@
                   </div>
                   <div class="field">
                     <div class="select-wrapper" style="float:none;">
-                      <select size="1" name="event_type_id">
-                        <!-- <option value="32">Canvass</option>
-                          <option value="36">Debate Watch Party (Nov 14th)</option>
-                          <option value="17">Flyering and Tabling</option>
-                          <option value="30">Gather ballot access signatures</option>
-                          <option value="18">Making Phone Calls</option> -->
-                        <option value="31">Phonebank</option>
-                        <!-- {{#unless is_public}}<option value="14">Rally</option>{{/unless}} -->
-                        <!-- <option value="22">Registering Voters</option>
-                          <option value="24">Volunteer activity or meeting</option>
-                          <option value="25">Volunteer meeting to get organized or learn more</option>
-                          <option value="1">Test Type 1</option>
-                          <option value="2">Test Type 2</option> -->
+                      <select size="1" name="event_type_id" required>
                       </select>
                     </div>
                   </div>
@@ -132,7 +121,7 @@
                     <label class="form_label">Event Title: </label><span style="color: red;">*</span>
                   </div>
                   <div class="field">
-                    <input size="30" maxlength="128" name="name" type="text" required value="Phone banking for Bernie">
+                    <input size="30" maxlength="128" name="name" type="text" required>
                   </div>
                 </div>
                 <span class="explain">(This should be descriptive, possibly including the name of your city or area)</span>
@@ -152,9 +141,7 @@
                       CKEDITOR.on('instanceReady', function (e) {
                         $('.cke_top').css('background', '#eee');
 
-                        CKEDITOR.instances.description.setData('<p>Join other volunteers in your area to make phone calls for Bernie. This is a great opportunity to meet other Bernie supporters, make calls to voters, and help make a big impact in our campaign for President.</p><p>Please bring a laptop, phone, chargers, and any extra batteries you have.</p>');
-
-                        $('#description').val(CKEDITOR.instances.description.getData());
+                        setDefaults(getHashValue('type'));
 
                       });
                     </script>
@@ -238,7 +225,7 @@
                   </div>
                   <div class="field">
                     <div class="select-wrapper">
-                      <select onchange="BSD.event.internationalization(this)" id="country" name="venue_country">
+                      <select id="country" name="venue_country">
                         <option value=""></option>
                         <option value="AF">Afghanistan</option>
                         <option value="AL">Albania</option>
@@ -1287,7 +1274,12 @@
           </form>
         </div>
         <script type="text/javascript">
-          var $;
+          var $, events_cal;
+          var events = [];
+          var user_created_events = [];
+          var current_events = [];
+          var generated_events = [];
+
           jQuery(document).ready(function() {
 
           	$ = jQuery; // For some reason jQuery is not assigned to $
@@ -1296,12 +1288,7 @@
           	var currentMonth = moment().format('YYYY-MM');
           	var nextMonth    = moment().add(1, 'month').format('YYYY-MM');
 
-          	var events = [];
-          	var user_created_events = [];
-          	var current_events = [];
-          	var generated_events = [];
-
-          	var events_cal = $('#mini-clndr').clndr({
+          	events_cal = $('#mini-clndr').clndr({
           	  template: $('#mini-clndr-template').html(),
           	  events: events,
           	  constraints: {
@@ -1311,37 +1298,10 @@
           	  clickEvents: {
           	    click: function(target) {
           	      if(target.events.length) {
-
-          	      	// An event exists on this day; remove it from the calendar display
-          	        events_cal.removeEvents(function(event){
-          	          return event._clndrStartDateObject.format('YYYY-MM-DD') == target.date.format('YYYY-MM-DD');
-          	        });
-
-          	        // Remove events on this date from the given arrays
-          	        user_created_events = removeEventsOnDate(user_created_events);
-          	        generated_events = removeEventsOnDate(generated_events);
-
-          	        function removeEventsOnDate(array){
-          	        	array = jQuery.grep(array, function(event) {
-          	        	  return event.date != target.date.format('YYYY-MM-DD');
-          	        	});
-          	        	return array;
-          	        }
+                    removeEventDate(target.date)
           	      }
           	      else if(!$(target.element).hasClass('inactive')) {
-
-          	      	// Create an event on this date if date is valid (occuring in the future)
-          	      	var new_events = [{
-          	      	  	date: target.date.format('YYYY-MM-DD'),
-          	      	  	auto_generated: false,
-          	      	  	moment: target.date
-          	      	  }];
-
-          	      	// Push new event to calendar display and user_created_events array
-          	      	user_created_events = $.merge(new_events, user_created_events);
-          	      	events_cal.addEvents(new_events);
-
-          	      	console.log(user_created_events);
+                    addEventDate(target.date, false);
           	      }
           	    }
           	  },
@@ -1608,6 +1568,7 @@
           	$.ajax({url:url}).done(function(response){
           	   if(response.timeZoneId != null){
           		   $("[name=start_tz]").val(response.timeZoneId);
+                 $("[name=start_tz]").trigger("change");
           	   }
           	});
           }
@@ -1626,5 +1587,6 @@
       <p><span class="copyright">© Bernie 2016</span> | <a href="//berniesanders.com/privacy-policy/">Privacy Policy</a></p>
     </footer>
     {{/if}}
+    <script type="text/javascript" src="/admin/events/static/event-types.js"></script>
   </body>
 </html>
