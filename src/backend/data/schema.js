@@ -835,7 +835,7 @@ const GraphQLEvent = new GraphQLObjectType({
       resolve: async (event) => {
         const count = await knex('bsd_event_attendees').count('event_attendee_id as attendee_count').where('event_id', event.id);
         log.debug('Event RSVP Count', count);
-        return count[0].attendee_count
+        return Number(count[0].attendee_count)
       }
     },
     nearbyPeople: {
