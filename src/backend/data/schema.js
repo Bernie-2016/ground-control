@@ -839,11 +839,11 @@ const GraphQLEvent = new GraphQLObjectType({
     //   }
     // },
     attendeesCount: {
-      type: GraphQLInt,
+      type: GraphQLString,
       resolve: async (event) => {
-        const count = await knex('bsd_event_attendees').raw(`SELECT COUNT(event_attendee_id) WHERE event_id = ${event.id}`);
+        const count = await knex.raw(`SELECT COUNT(event_attendee_id) FROM bsd_event_attendees WHERE event_id = ${event.id}`);
         log.debug('Event RSVP Count', count);
-        return count[0].count
+        return count
       }
     },
     nearbyPeople: {
