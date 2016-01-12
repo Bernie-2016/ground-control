@@ -14,7 +14,7 @@ var eventTypes = [
 		name: 'Phonebank',
 		defaultValues: {
 			name: 'Phone banking for Bernie',
-			description: '<p>Join other volunteers in your area to make phone calls for Bernie. This is a great opportunity to meet other Bernie supporters, make calls to voters, and help make a big impact in our campaign for President.</p><p>Please bring a laptop, phone, chargers, and any extra batteries you have.</p>',
+			description: 'Join other volunteers in your area to make phone calls for Bernie. This is a great opportunity to meet other Bernie supporters, make calls to voters, and help make a big impact in our campaign for President. Please bring a laptop, phone, chargers, and any extra batteries you have.',
 		},
 		adminOnly: false
 	},
@@ -23,7 +23,7 @@ var eventTypes = [
 		name: 'Canvass',
 		defaultValues: {
 			name: 'Door knocking for Bernie',
-			description: '<blockquote><p>&ldquo;To win this campaign, all of us must be deeply involved.&rdquo; - Bernie Sanders</p></blockquote><p>You&rsquo;re invited to join your neighbors and supporters to knock on the doors of&nbsp;undecided voters.</p><p>We&rsquo;ll provide you with a script, a list of voters that you&rsquo;ll be talking to, and a map of where to go. We&rsquo;ll also train you to use your time effectively out in the field.</p><p>You&rsquo;ll be able to talk to real people about how this country belongs to all of us, not just the billionaire class. Our victory starts with us knocking on doors together.</p>'
+			description: 'You&rsquo;re invited to join your neighbors and supporters to knock on the doors of&nbsp;undecided voters. We&rsquo;ll provide you with a script, a list of voters that you&rsquo;ll be talking to, and a map of where to go. We&rsquo;ll also train you to use your time effectively out in the field. You&rsquo;ll be able to talk to real people about how this country belongs to all of us, not just the billionaire class. Our victory starts with us knocking on doors together.'
 		},
 		adminOnly: false
 	},
