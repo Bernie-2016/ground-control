@@ -505,7 +505,7 @@ Please note we do not approve events that feature merchandise sales, neither off
 
 We recommend you read our guide Organizing with Forming a PAC - this explains a few things related to fundraising and group costs, and refers you to the FEC for all other fundraising questions.
 
-You can resubmit your event following guidelines at BernieSanders.com/plan.
+You can resubmit your event following guidelines at berniesanders.com/plan.
 
 Thank you again for your support and for helping to spread Bernie’s message!
 
@@ -522,7 +522,7 @@ Here are some things you can do:
 	- Write a letter to the editor: "Why I support a Sanders candidacy."  There are helpful talking points at berniesanders.com
 	- Spread the word on social media - be sure to like, follow, and promote the official Bernie 2016 Facebook page, www.facebook.com/berniesanders; follow on Instagram, @berniesanders; and Twitter, @berniesanders
 
-When you’re ready to submit your next event, visit BernieSanders.com/plan.
+When you’re ready to submit your next event, visit berniesanders.com/plan.
 
 Thank you again for your support and for helping to spread Bernie’s message!
 
@@ -530,11 +530,11 @@ ${signature}`
       },
       {
         reason: 'General Deletion Message',
-        message: `Your event does not meet parameters at BernieSanders.com/plan.
+        message: `Your event does not meet parameters at berniesanders.com/plan.
 
 Keep in mind that each event description should include ways that Bernie Supporters can get involved in your event. Please be specific about what you are asking Bernie supporters to do, how they can get involved, and what you might want them to bring with them in support of Bernie.
 
-When in doubt, follow event creation guidelines set forth at BernieSanders.com/plan. When you’re ready, you can re-submit your event there.
+When in doubt, follow event creation guidelines set forth at berniesanders.com/plan. When you’re ready, you can re-submit your event there.
 
 Thank you again for your support and for helping to spread Bernie’s message!
 
