@@ -465,7 +465,6 @@ export default class BSD {
   }
 
   async createEvents(cons_id, form, event_types, callback) {
-    form['event_type_id'] = '1';
 
     if (form['event_dates'].length > 10){
       callback('failure', {'Number of Events':[`You can only create up to 10 events at a time. ${form['event_dates'].length} were sent.`]});
