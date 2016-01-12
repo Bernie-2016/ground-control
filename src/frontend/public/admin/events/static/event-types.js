@@ -185,10 +185,11 @@ function setHashValue(key, value) {
   var re = new RegExp(key + "=.*?(&|#|$)(.*)", "i");
   var updated_hash = "";
   if (hash.match(re)) {
-	if (typeof value !== 'undefined' && value !== null) {
+		if (typeof value !== 'undefined' && value !== null) {
       updated_hash =  hash.replace(re, key + "=" + value + '$1$2');
-    } else {
-	  updated_hash =  hash.replace(re,'');
+    }
+    else {
+	  	updated_hash =  hash.replace(re,'');
     }
   }
   else if (typeof value !== 'undefined' && value !== null) {
