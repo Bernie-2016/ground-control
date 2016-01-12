@@ -19,6 +19,15 @@ var eventTypes = [
 		adminOnly: false
 	},
 	{
+		id: 32,
+		name: 'Canvass',
+		defaultValues: {
+			name: 'Door knocking for Bernie',
+			description: 'Go door-to-door talking with voters about Bernie.',
+		},
+		adminOnly: false
+	},
+	{
 		id: 44,
 		name: 'Jan. 23rd Nationwide Bernie Address',
 		defaultValues: {
@@ -183,9 +192,9 @@ function setHashValue(key, value) {
     }
   }
   else if (typeof value !== 'undefined' && value !== null) {
-	if (hash != "" ) {
-		updated_hash = hash + "&";
-	}
+		if (hash != "" ) {
+			updated_hash = hash + "&";
+		}
     updated_hash += key + "=" + value;
   }
   window.location.hash = updated_hash;
