@@ -311,31 +311,26 @@ app.post('/events/create', wrap(async (req, res) => {
   }
 
   let event_types = await BSDClient.getEventTypes()
-  await BSDClient.createEvents(constituent.id, form, event_types, eventCreationCallback)
-
+  let result = await BSDClient.createEvents(constituent.id, form, event_types)
+  log.info(result)
   
-  // send event creation confirmation email
-  function eventCreationCallback(status, details) {
-    let response_data = {'status' : status};
-    if (status == 'success') {
-      if (form['event_type_id'] == 31) {
-        // Send phone bank specific email
-        // Mailgun.sendPhoneBankConfirmation(form, details.event_ids, constituent)
-        // re-enable phonebank email after we find a way to track when these have been sent
-        Mailgun.sendEventConfirmation(form, details.event_ids, constituent, event_types)
-      }
-      else {
-        // Send generic email
-        Mailgun.sendEventConfirmation(form, details.event_ids, constituent, event_types)
-      }
-      response_data['event_ids'] = details.event_ids;
-      clientLogger['info']('Event Creation Success:', response_data, req.user);
-  	} else {
-      response_data['validation_errors'] = details;
-      clientLogger['error']('Event Creation Error:', details);
+  if (result.status == 'success') {
+    if (form['event_type_id'] == 31) {
+      // Send phone bank specific email
+      // Mailgun.sendPhoneBankConfirmation(form, result.ids, constituent)
+      // re-enable phonebank email after we find a way to track when these have been sent
+      Mailgun.sendEventConfirmation(form, result.ids, constituent, event_types)
     }
-	res.json(response_data);
+    else {
+      // Send generic email
+      Mailgun.sendEventConfirmation(form, result.ids, constituent, event_types)
+    }
+    clientLogger['info'](`Event Creation Success: ${result.ids} added by ${req.user.email}`);
+	} else {
+    clientLogger['error'](`Event Creation Error: ${result.errors}`);
   }
+
+	res.json(result);
 }))
 
 app.use(fallback('index.html', {

@@ -465,12 +465,12 @@ export default class BSD {
     return response
   }
 
-  async createEvents(cons_id, form, event_types, callback) {
+  async createEvents(cons_id, form, event_types) {
     if (inDevEnv)
       form['event_type_id'] = '1'
 
     if (form['event_dates'].length > 10){
-      callback('failure', {'Number of Events':[`You can only create up to 10 events at a time. ${form['event_dates'].length} were sent.`]});
+      return {status: 'failure', errors: {'Number of Events': [`You can only create up to 10 events at a time. ${form['event_dates'].length} events were received.`]}}
     }
 
     let eventType = null;
@@ -481,8 +481,7 @@ export default class BSD {
     })
 
     if (eventType === null){
-      callback('failure', {'Event Type':['does not exist in BSD']});
-      return;
+      return {status: 'failure', errors: {'Event Type':['does not exist in BSD']}}
     }
 
     // validations
@@ -540,19 +539,19 @@ export default class BSD {
       let response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'POST');
 
       if (response.validation_errors){
-        callback('failure', response.validation_errors);
+        return {status: 'failure', errors: response.validation_errors}
       }
       else if (response.event_id_obfuscated){
         newEventIds.push(response.event_id_obfuscated)
       };
-
-      if (response.event_id_obfuscated && index == form['event_dates'].length - 1){
-        // successfully created events
-        callback('success', {'event_ids' : newEventIds});
-      }
     }
 
-    console.log('event creation call over');
+    if (newEventIds.length > 0){
+      // successfully created events
+      return {status: 'success', ids : newEventIds}
+    }
+
+    return {status: 'failure', errors: {}}
   }
 
   async requestWrapper(options) {

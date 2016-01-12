@@ -1506,7 +1506,6 @@
 
           	$('#secondform').submit(function(e){
           		e.preventDefault();
-              $('#submit_button').blur().addClass('in-progress');
 				      $("#event-success-message, #event-error-message").hide();
 				
           		current_events = $.merge( $.merge( [], user_created_events ), generated_events );
@@ -1514,6 +1513,8 @@
           			alert('Please select a date for your event from the calendar.');
           			return
           		}
+
+              $('#submit_button').blur().addClass('in-progress');
 
               document.getElementById('description').value = CKEDITOR.instances.description.getData();          		
 
@@ -1530,16 +1531,18 @@
           		    type: 'POST',
           		    success: function(response, textStatus){
           		    	if (response.status == 'success'){
-											setHashValue("event_ids", response.event_ids.join(','));
+											setHashValue("event_ids", response.ids.join(','));
                       window.scrollTo(0,0);
 											window.location.reload();
           		    	}
                     else {
 											$('#submit_button').removeClass('in-progress');
 											$("#event-error-message-details").html('');
-											$.each(response.validation_errors, function(k, v) {
-											  $("#event-error-message-details").append("<li>" + k + " : " + v[0] + "</li>");
-											});
+                      if (response.errors){
+                        $.each(response.errors, function(k, v) {
+                          $("#event-error-message-details").append("<li>" + k + " : " + v[0] + "</li>");
+                        });
+                      }
 											$("#event-error-message").show();
                       window.scrollTo(0,0);
           		    	}
@@ -1555,16 +1558,19 @@
 
 			
 			// Show initial modal if we have an event_url in the hash (should have come from previous event creation)
-			var event_ids = getHashValue("event_ids").split(",");
-			if (event_ids && event_ids.length > 0) {
-        for (var i=0; i < event_ids.length; i++){
-          var event_link = 'go.berniesanders.com/page/event/detail/' + event_ids[i];
-          $('#js-created-event-url-list').append(
-            '<li><a class="js-created-event-url" href="https://' + event_link
-            + '" target="_blank">' + event_link + '</a></li>');
+			var event_ids = getHashValue("event_ids");
+      if (event_ids){
+        event_ids = event_ids.split(",")
+        if (event_ids.length > 0) {
+          for (var i=0; i < event_ids.length; i++){
+            var event_link = 'go.berniesanders.com/page/event/detail/' + event_ids[i];
+            $('#js-created-event-url-list').append(
+              '<li><a class="js-created-event-url" href="https://' + event_link
+              + '" target="_blank">' + event_link + '</a></li>');
+          }
+          $("#event-success-message").show();
         }
-				$("#event-success-message").show();
-			}
+      };
 			
           });
         </script>
