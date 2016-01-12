@@ -313,11 +313,13 @@ app.post('/events/create', wrap(async (req, res) => {
         // Mailgun.sendPhoneBankConfirmation(form, constituent)
         // re-enable phonebank email after we find a way to track when these have been sent
         Mailgun.sendEventConfirmation(form, constituent, event_types)
-      } else {
+      }
+      else {
         // Send generic email
         Mailgun.sendEventConfirmation(form, constituent, event_types)
       }
-      response_data['event_id'] = details.event_id_obfuscated;
+      response_data['event_ids'] = details.event_ids;
+      clientLogger['info']('Event Creation Success:', response_data, req.user);
   	} else {
       response_data['validation_errors'] = details;
       clientLogger['error']('Event Creation Error:', details);
