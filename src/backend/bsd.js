@@ -532,10 +532,13 @@ export default class BSD {
     }
 
     let newEventIds = [];
-    form['event_dates'].forEach(async (newEvent, index, array) => {
+    for (let index = 0; index < form['event_dates'].length; index++){
+      let newEvent = form['event_dates'][index];
       let startTime = newEvent['date'] + ' ' + startHour + ':' + form['start_time']['i'] + ':00'
       params['days'][0]['start_datetime_system'] = startTime;
+
       let response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'POST');
+
       if (response.validation_errors){
         callback('failure', response.validation_errors);
       }
@@ -543,13 +546,13 @@ export default class BSD {
         newEventIds.push(response.event_id_obfuscated)
       };
 
-      if (response.event_id_obfuscated && index == array.length - 1){
+      if (response.event_id_obfuscated && index == form['event_dates'].length - 1){
         // successfully created events
         callback('success', {'event_ids' : newEventIds});
       }
-    });
+    }
 
-    return
+    console.log('event creation call over');
   }
 
   async requestWrapper(options) {
