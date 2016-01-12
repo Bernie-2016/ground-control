@@ -61,7 +61,7 @@ function isAuthenticated(req, res, next) {
   if (req.user)
     return next()
 
-  res.redirect('/signup')
+  res.redirect('/signup?next=' + req.url)
 }
 
 let requireAdmin = async (req, res, next) => {
@@ -293,7 +293,8 @@ app.post('/events/create', wrap(async (req, res) => {
   let constituent = await BSDClient.getConstituentByEmail(form.cons_email)
 
   if (!constituent) {
-    constituent = await BSDClient.createConstituent(form.cons_email)
+    const name = form.cons_name.split(" ");
+    constituent = await BSDClient.createConstituent(form.cons_email, name[0], (name.length > 1) ? name[name.length - 1] : '')
   }
 
   let event_types = await BSDClient.getEventTypes()

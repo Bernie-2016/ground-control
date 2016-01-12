@@ -1294,7 +1294,16 @@
                   </div>
                 </div>
                 <div class="label">
-                  <label class="form_label">{{#if is_public }}Personal{{else}}Host{{/if}} Email:</label><span style="color: red;">*</span>
+                  <label class="form_label">Host Name:</label><span style="color: red;">*</span>
+                </div>
+                <div class="field">
+                  <input size="30" name="cons_name" type="text" required>
+                </div>
+                <div class="phone-instruct">
+                  <div class="explain">(First and Last)</div>
+                </div>
+                <div class="label">
+                  <label class="form_label">Host Email:</label><span style="color: red;">*</span>
                 </div>
                 <div class="field">
                   <input size="30" name="cons_email" type="email" required>
@@ -1304,6 +1313,10 @@
                   <div class="explain"> {{#if is_public }}Your{{else}}This{{/if}} email will not be publicly visible.</div>
                 </div>
                 {{#unless is_public }}
+                <div class="checkboxgroup">
+                  <label class="form_label" for="is_official">Mark this as an official campaign event</label>
+                  <input name="is_official" id="is_official" type="checkbox" value="1">
+                </div>
                 <div class="checkboxgroup">
                   <label class="form_label" for="flag_approval">Mark this event as incomplete/needs further review</label>
                   <input name="flag_approval" id="flag_approval" type="checkbox" value="1">
