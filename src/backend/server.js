@@ -281,16 +281,19 @@ app.get('/events/create', wrap(async (req, res) => {
 app.post('/events/create', wrap(async (req, res) => {
   const src = req.headers.referer.split(req.headers.origin)[1];
   let form = req.body
+  form['event_dates'] = JSON.parse(form['event_dates']);
 
   // Flag event as needing approval
   if (req.user && src === '/admin/events/create') {
-    const userIsAdmin = await isAdmin(req.user.id)
-    if (!userIsAdmin && (form['event_type_id'] != 31 || form['event_type_id'] != 44 || form['is_official'] == 1)) // to do: implement proper permissioning
+    // const userIsAdmin = await isAdmin(req.user.id)
+    if ((form['event_type_id'] != 31 && form['event_type_id'] != 44) || form['is_official'] == 1 || form['event_dates'].length > 1) // to do: implement proper permissioning
       form['flag_approval'] = '1'
   }
   else {
     form['flag_approval'] = '1'
   }
+
+  console.log(form);
 
   // constituent object not being returned right now
   let constituent = await BSDClient.getConstituentByEmail(form.cons_email)

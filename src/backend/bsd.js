@@ -466,6 +466,11 @@ export default class BSD {
 
   async createEvents(cons_id, form, event_types, callback) {
     form['event_type_id'] = '1';
+
+    if (form['event_dates'].length > 10){
+      callback('failure', {'Number of Events':[`You can only create up to 10 events at a time. ${form['event_dates'].length} were sent.`]});
+    }
+
     let eventType = null;
     event_types.forEach((type) => {
       if (type.event_type_id == form['event_type_id']){
@@ -524,10 +529,8 @@ export default class BSD {
       startHour = form['start_time']['h'];
     }
 
-    let eventDates = JSON.parse(form['event_dates']);
-
     let newEventIds = [];
-    eventDates.forEach(async (newEvent, index, array) => {
+    form['event_dates'].forEach(async (newEvent, index, array) => {
       let startTime = newEvent['date'] + ' ' + startHour + ':' + form['start_time']['i'] + ':00'
       params['days'][0]['start_datetime_system'] = startTime;
       let response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'POST');
