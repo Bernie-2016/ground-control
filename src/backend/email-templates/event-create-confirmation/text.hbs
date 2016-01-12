@@ -7,6 +7,10 @@ Thank you for creating an event for the Bernie Sanders campaign! The details of 
   {{/if}}
 
   {{event.name}}
+  
+  {{#each eventIds}}
+    https://go.berniesanders.com/page/event/detail/{{this}}
+  {{/each}}
 
   Event Description
   {{event.event_type_name}}

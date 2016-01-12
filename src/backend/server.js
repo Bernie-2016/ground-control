@@ -310,13 +310,13 @@ app.post('/events/create', wrap(async (req, res) => {
     if (status == 'success') {
       if (form['event_type_id'] == 31) {
         // Send phone bank specific email
-        // Mailgun.sendPhoneBankConfirmation(form, constituent)
+        // Mailgun.sendPhoneBankConfirmation(form, details.event_ids, constituent)
         // re-enable phonebank email after we find a way to track when these have been sent
-        Mailgun.sendEventConfirmation(form, constituent, event_types)
+        Mailgun.sendEventConfirmation(form, details.event_ids, constituent, event_types)
       }
       else {
         // Send generic email
-        Mailgun.sendEventConfirmation(form, constituent, event_types)
+        Mailgun.sendEventConfirmation(form, details.event_ids, constituent, event_types)
       }
       response_data['event_ids'] = details.event_ids;
       clientLogger['info']('Event Creation Success:', response_data, req.user);
