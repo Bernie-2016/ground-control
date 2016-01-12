@@ -4,6 +4,7 @@ import Handlebars from 'handlebars'
 import path from 'path'
 import fs from 'fs'
 import Minilog from 'minilog'
+import htmlToText from 'html-to-text'
 
 const clientLogger = Minilog('client')
 const templateDir = path.resolve(__dirname, './email-templates')
@@ -35,7 +36,8 @@ Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
 
 Handlebars.registerPartial('header', headerHTML)
 Handlebars.registerPartial('footer', footerHTML)
-
+// const messageRichTextTemplate = new EmailTemplate(templateDir + '/message.hbs')
+const messageRichTextTemplate = Handlebars.compile(fs.readFileSync(templateDir + '/message.hbs', {encoding: 'utf-8'}));
 const senderAddress = 'Team Bernie<info@berniesanders.com>'
 const inDevEnv = (process.env.NODE_ENV === 'development')
 
@@ -44,18 +46,28 @@ export default class MG {
     this.mailgun = Mailgun({apiKey: apiKey, domain: domain})
   }
 
-  async send(message, debugging) {
+  async send(message, textOptions={wordwrap: 100}) {
+    // Add plaintext version of message if it does not exist
+    if (!message.text){
+      message.text = htmlToText.fromString(message.html, textOptions)
+    };
+
+    // Add header and footer to html messages
+    if (message.html){
+      message.html = messageRichTextTemplate({content: message.html, recipient: message.to});
+    }
+
     clientLogger.info("Sending email via Mailgun", message)
 
     message["o:tracking"] = false
-    if (inDevEnv || debugging) {
+    if (inDevEnv) {
       return message
     } else {
       return await this.mailgun.messages().send(message)
     }
   }
 
-  async sendEventConfirmation(form, eventIds, constituent, eventTypes, debugging) {
+  async sendEventConfirmation(form, eventIds, constituent, eventTypes) {
     if (form.capacity === '0') {
       form.capacity = 'unlimited'
     }
@@ -95,14 +107,13 @@ export default class MG {
       from: senderAddress,
       to: form.cons_email,
       subject: 'Event Creation Confirmation',
-      text: content.text,
       html: content.html
     }
 
-    return await this.send(message, debugging)
+    return await this.send(message)
   }
 
-  async sendPhoneBankConfirmation(form, eventIds, constituent, debugging) {
+  async sendPhoneBankConfirmation(form, eventIds, constituent) {
     constituent.cons_email.forEach((email) => {
       if (email.is_primary === '1') {
         constituent['email'] = email.email
@@ -123,14 +134,13 @@ export default class MG {
       'h:Reply-To': 'help@berniesanders.com',
       to: form.cons_email,
       subject: 'Event Creation Confirmation',
-      text: content.text,
       html: content.html
     }
 
-    return await this.send(message, debugging)
+    return await this.send(message)
   }
 
-  async sendAdminEventInvite(data, debugging) {
+  async sendAdminEventInvite(data) {
     let template = new EmailTemplate(templateDir + '/admin-event-invitation')
     let content = await template.render(data)
 
@@ -142,10 +152,10 @@ export default class MG {
       text: content.text
     }
 
-    return await this.send(message, debugging)
+    return await this.send(message)
   }
 
-  async sendHostEventDeletionNotification(data, debugging) {
+  async sendHostEventDeletionNotification(data) {
     let message = {
       from: 'Help Desk<help@berniesanders.com>',
       to: data.hostEmail,
@@ -153,6 +163,6 @@ export default class MG {
       text: data.message
     }
 
-    return await this.send(message, debugging)
+    return await this.send(message)
   }
 }
