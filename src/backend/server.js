@@ -37,6 +37,7 @@ const wrap = (fn) => {
   }
 }
 
+const inDevEnv = (process.env.NODE_ENV === 'development')
 const clientLogger = Minilog('client')
 const KnexSessionStore = KnexSessionStoreFactory(session)
 const Mailgun = new MG(process.env.MAILGUN_KEY, process.env.MAILGUN_DOMAIN)
@@ -265,16 +266,22 @@ app.post('/logout',
 )
 
 app.get('/admin/events/create', isAuthenticated, wrap(async (req, res) => {
-  // const temp = fs.readFileSync(templateDir + '/create_event.hbs', {encoding: 'utf-8'});
-  // const page = handlebars.compile(temp);
-  // res.send(page({is_public: false}));
+  if (inDevEnv){
+    const temp = fs.readFileSync(templateDir + '/create_event.hbs', {encoding: 'utf-8'});
+    const page = handlebars.compile(temp);
+    res.send(page({is_public: false}));
+    return
+  }
   res.send(createEventPage({is_public: false}));
 }))
 
 app.get('/events/create', wrap(async (req, res) => {
-  // const temp = fs.readFileSync(templateDir + '/create_event.hbs', {encoding: 'utf-8'});
-  // const page = handlebars.compile(temp);
-  // res.send(page({is_public: true}));
+  if (inDevEnv){
+    const temp = fs.readFileSync(templateDir + '/create_event.hbs', {encoding: 'utf-8'});
+    const page = handlebars.compile(temp);
+    res.send(page({is_public: true}));
+    return
+  }
   res.send(createEventPage({is_public: true}));
 }))
 

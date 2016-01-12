@@ -10,6 +10,7 @@ import moment from 'moment-timezone';
 import knex from './data/knex';
 
 const parseStringPromise = Promise.promisify(parseString);
+const inDevEnv = (process.env.NODE_ENV === 'development')
 
 export default class BSD {
   constructor(host, id, secret) {
@@ -465,6 +466,8 @@ export default class BSD {
   }
 
   async createEvents(cons_id, form, event_types, callback) {
+    if (inDevEnv)
+      form['event_type_id'] = '1'
 
     if (form['event_dates'].length > 10){
       callback('failure', {'Number of Events':[`You can only create up to 10 events at a time. ${form['event_dates'].length} were sent.`]});
