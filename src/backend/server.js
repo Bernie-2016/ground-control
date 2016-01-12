@@ -285,7 +285,7 @@ app.post('/events/create', wrap(async (req, res) => {
   // Flag event as needing approval
   if (req.user && src === '/admin/events/create') {
     const userIsAdmin = await isAdmin(req.user.id)
-    if (!userIsAdmin)
+    if (!userIsAdmin && (form['event_type_id'] != 31 || form['event_type_id'] != 44)) // to do: implement proper permissioning
       form['flag_approval'] = '1'
   }
   else {
