@@ -23,7 +23,7 @@ var eventTypes = [
 		name: 'Canvass',
 		defaultValues: {
 			name: 'Door knocking for Bernie',
-			description: 'Go door-to-door talking with voters about Bernie.',
+			description: "<blockquote>&ldquo;To win this campaign, all of us must be deeply involved.&rdquo; - Bernie Sanders</blockquote><p>You&rsquo;re invited to join your neighbors and supporters to knock on the doors of&nbsp;<br />undecided voters.&nbsp;<br /><br />We&rsquo;ll provide you with a script, a list of voters that you&rsquo;ll be talking to, and a map of where to go. We&rsquo;ll also train you to use your time effectively out in the field.&nbsp;<br /><br />You&rsquo;ll be able to talk to real people about how this country belongs to all of us, not just the billionaire class. Our victory starts with us knocking on doors together.</p>",
 		},
 		adminOnly: false
 	},
