@@ -21,15 +21,19 @@ var config = {
         query: {stage: 0, plugins: ['./webpack/babelRelayPlugin']},
         test: /\.js$/,
       }
-    ],
+    ]
   },
   plugins: plugins,
   output: {
     filename: 'app.js',
-    path: './src/frontend/public/assets/js/'},
+    path: './src/frontend/public/assets/js/'
+  }
 }
 
-if (process.env.NODE_ENV === 'development')
-  config['devtool'] = "#inline-source-map"
+if (process.env.NODE_ENV === 'development') {
+  config['devtool'] = "#inline-source-map";
+} else if (process.env.NODE_ENV === 'production') {
+  config['devtool'] = 'source-map';
+}
 
 module.exports = config
