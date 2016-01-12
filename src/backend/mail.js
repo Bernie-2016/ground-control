@@ -55,7 +55,7 @@ export default class MG {
     }
   }
 
-  async sendEventConfirmation(form, constituent, event_types, debugging) {
+  async sendEventConfirmation(form, eventIds, constituent, eventTypes, debugging) {
     if (form.capacity === '0') {
       form.capacity = 'unlimited'
     }
@@ -70,7 +70,7 @@ export default class MG {
     })
 
     // Get the event type name
-    event_types.forEach((type) => {
+    eventTypes.forEach((type) => {
       if (type.event_type_id == form.event_type_id) {
         form.event_type_name = type.name
       }
@@ -84,6 +84,7 @@ export default class MG {
 
     let data = {
       event: form,
+      eventIds,
       user: constituent
     }
 
@@ -101,7 +102,7 @@ export default class MG {
     return await this.send(message, debugging)
   }
 
-  async sendPhoneBankConfirmation(form, constituent, debugging) {
+  async sendPhoneBankConfirmation(form, eventIds, constituent, debugging) {
     constituent.cons_email.forEach((email) => {
       if (email.is_primary === '1') {
         constituent['email'] = email.email
@@ -110,6 +111,7 @@ export default class MG {
 
     let data = {
       event: form,
+      eventIds,
       user: constituent
     }
 

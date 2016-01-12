@@ -15,6 +15,10 @@
 
 	<h1>{{event.name}}</h1>
 
+  {{#each eventIds}}
+    <a href="https://go.berniesanders.com/page/event/detail/{{this}}">go.berniesanders.com/page/event/detail/{{this}}</a>
+  {{/each}}
+
 	<h4>Event Description</h4>
   <p>{{event.event_type_name}}</p>
 	{{{event.description}}}

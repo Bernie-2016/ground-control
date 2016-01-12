@@ -73,6 +73,49 @@
 		        float: none !important;
 		    }
 		}
+
+		.event-central.step2 #SKIN .section-wrap.event-message {
+		    max-width: 600px;
+		    margin: 2rem auto;
+			color:white;
+			padding:0.8rem 2.2rem;
+		}
+
+		div.event-message a:link,
+		div.event-message a:visited,
+		div.event-message a:hover,
+		div.event-message a:active {
+			color: #DBE1E6;
+		    text-decoration: underline;
+		}
+
+		.event-central.step2 #SKIN .section-wrap#event-error-message {
+		    color: #a94442;
+		    background-color: #f2dede;
+		    border-color: #ebccd1;
+		}
+
+    .button {
+      cursor: pointer;
+      border: none;
+      color: rgb(0,100,26);
+      background-color: white;
+      border-radius: 2px;
+      padding: 5px 10px;
+    }
+
+    #js-created-event-url-list {
+      list-style-type: none;
+    }
+
+		div#event-error-message a:link,
+		div#event-error-message a:visited,
+		div#event-error-message a:hover,
+		div#event-error-message a:active {
+			color: #a94442;
+		    text-decoration: underline;
+		}
+
     </style>
     <script src="/admin/events/static/ckeditor/ckeditor.js"></script>
     <script src="/admin/events/static/less.js"></script>
@@ -99,6 +142,22 @@
     <div class="content" style="visibility: visible;">
       <div id="SKIN" class="module_event2 bsd-page bsd-event bsd-event-createdetails">
         <div class="basic container">
+		  <div id="event-success-message" class="section-wrap event-message" style="display:none;">
+			  Thanks for submitting an event for the Bernie Sanders campaign!<br>
+			  <p>You should receive a confirmation email with a link to manage your event in a few minutes.<br>
+        In the mean time, you can view the event here:<br>
+        <ul id="js-created-event-url-list"></ul>
+        <a class="js-created-event-url" href="" target="_blank"></a></p>
+        <button class="button" onclick='$("#event-success-message").hide();setHashValue("event_id", null)'>Close</button>
+		  </div>
+		  
+		  <div id="event-error-message" class="section-wrap event-message" style="display:none;">
+			  There was an error processing your submission. <br>
+			  Please try again later or contact 
+			  <a href="mailto:help@berniesanders.com?Subject=Error%20encountered%20creating%20event" target="_top">help@berniesanders.com</a>
+			  <ul id="event-error-message-details"></ul>
+		  </div>
+			
           <form method="post" name="secondform" id="secondform">
             <div>
               <div class="section-wrap">
@@ -1099,11 +1158,11 @@
                     <label class="form_label">Repeat Duration:</label><span style="color: red;">*</span>
                   </div>
                   <div class="field">
-                    <input size="4" name="repeat_duration_num" id="repeat_duration_num" type="number" value="1" step="1" min="1" max="52">&nbsp;
+                    <input size="4" name="repeat_duration_num" id="repeat_duration_num" type="number" value="1" step="1" min="1" max="6">&nbsp;
                     <div class="select-wrapper">
                       <select name="repeat_duration_unit" id="repeat_duration_unit">
-                        <option value="7">week(s)</option>
-                        <option value="30" selected="selected">month(s)</option>
+                        <option value="7" selected="selected">week(s)</option>
+                        // <option value="30">month(s)</option>
                       </select>
                     </div>
                   </div>
@@ -1287,7 +1346,7 @@
           </form>
         </div>
         <script type="text/javascript">
-          var isPublic = {{#if is_public }}true{{else}}false{{/if}};
+		  var isPublic = {{#if is_public }}true{{else}}false{{/if}};
           var $, events_cal;
           var events = [];
           var user_created_events = [];
@@ -1448,7 +1507,8 @@
 
           	$('#secondform').submit(function(e){
           		e.preventDefault();
-
+				      $("#event-success-message, #event-error-message").hide();
+				
           		current_events = $.merge( $.merge( [], user_created_events ), generated_events );
           		if (current_events.length < 1){
           			alert('Please select a date for your event from the calendar.');
@@ -1462,31 +1522,50 @@
           			name: "event_dates",
           			value: JSON.stringify(current_events)
           		});
-
+				
           		$.ajax({
           		    dataType: "json",
           		    url: '/events/create',
           		    data: formdata,
           		    type: 'POST',
-          		    success: function(xhr, status){
-          		    	if (xhr == 'success'){
-          		    		// temporary success message, to be replaced with a nice UI update in the future
-          		    		alert('Thanks for submitting an event for the Bernie Sanders campaign! You should receive a confirmation email with a link to manage your event in a few minutes.');
-          		    		window.location.reload();
+          		    success: function(response, textStatus){
+          		    	if (response.status == 'success'){
+											setHashValue("event_ids", response.event_ids.join(','));
+                      window.scrollTo(0,0);
+											window.location.reload();
           		    	}
-          		    	else {
-          		    		alert('There was an error processing your submission. Please try again later or contact help@berniesanders.com.');
-          		    		$('#submit_button').removeClass('in-progress');
+                    else {
+											$('#submit_button').removeClass('in-progress');
+											$("#event-error-message-details").html('');
+											$.each(response.validation_errors, function(k, v) {
+											  $("#event-error-message-details").append("<li>" + k + " : " + v[0] + "</li>");
+											});
+											$("#event-error-message").show();
+                      window.scrollTo(0,0);
           		    	}
           		    },
           		    error: function(i){
-          		      console.log(i);
-          		      alert('There was an error processing your submission. Please try again later or contact help@berniesanders.com.');
+					  				console.log(i);
           		      $('#submit_button').removeClass('in-progress');
+										$("#event-error-message").show();
+                    window.scrollTo(0,0);
           		    }
           		});
           	});
 
+			
+			// Show initial modal if we have an event_url in the hash (should have come from previous event creation)
+			var event_ids = getHashValue("event_ids").split(",");
+			if (event_ids && event_ids.length > 0) {
+        for (var i=0; i < event_ids.length; i++){
+          var event_link = 'go.berniesanders.com/page/event/detail/' + event_ids[i];
+          $('#js-created-event-url-list').append(
+            '<li><a class="js-created-event-url" href="https://' + event_link
+            + '" target="_blank">' + event_link + '</a></li>');
+        }
+				$("#event-success-message").show();
+			}
+			
           });
         </script>
         <script>

@@ -19,6 +19,15 @@ var eventTypes = [
 		adminOnly: false
 	},
 	{
+		id: 32,
+		name: 'Canvass',
+		defaultValues: {
+			name: 'Door knocking for Bernie',
+			description: '<blockquote><p>&ldquo;To win this campaign, all of us must be deeply involved.&rdquo; - Bernie Sanders</p></blockquote><p>You&rsquo;re invited to join your neighbors and supporters to knock on the doors of&nbsp;undecided voters.</p><p>We&rsquo;ll provide you with a script, a list of voters that you&rsquo;ll be talking to, and a map of where to go. We&rsquo;ll also train you to use your time effectively out in the field.</p><p>You&rsquo;ll be able to talk to real people about how this country belongs to all of us, not just the billionaire class. Our victory starts with us knocking on doors together.</p>'
+		},
+		adminOnly: false
+	},
+	{
 		id: 44,
 		name: 'Jan. 23rd Nationwide Bernie Address',
 		defaultValues: {
@@ -66,7 +75,7 @@ function setDefaults(eventTypeId){
 	}
 	if (!eventType) {return};	
 
-	window.location.hash = "type=" + eventType.id;
+	setHashValue("type", eventType.id);
 	var defaults = eventType.defaultValues;	
 
 	clearEvents();
@@ -169,4 +178,25 @@ function updateEventTime(dateMoment) {
 function getHashValue(key) {
   var matches = location.hash.match(new RegExp(key+'=([^&]*)'));
   return matches ? matches[1] : null;
+}
+
+function setHashValue(key, value) {
+  var hash = window.location.hash;
+  var re = new RegExp(key + "=.*?(&|#|$)(.*)", "i");
+  var updated_hash = "";
+  if (hash.match(re)) {
+		if (typeof value !== 'undefined' && value !== null) {
+      updated_hash =  hash.replace(re, key + "=" + value + '$1$2');
+    }
+    else {
+	  	updated_hash =  hash.replace(re,'');
+    }
+  }
+  else if (typeof value !== 'undefined' && value !== null) {
+		if (hash != "" ) {
+			updated_hash = hash + "&";
+		}
+    updated_hash += key + "=" + value;
+  }
+  window.location.hash = updated_hash;
 }

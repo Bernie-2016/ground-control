@@ -265,26 +265,35 @@ app.post('/logout',
 )
 
 app.get('/admin/events/create', isAuthenticated, wrap(async (req, res) => {
+  // const temp = fs.readFileSync(templateDir + '/create_event.hbs', {encoding: 'utf-8'});
+  // const page = handlebars.compile(temp);
+  // res.send(page({is_public: false}));
   res.send(createEventPage({is_public: false}));
 }))
 
 app.get('/events/create', wrap(async (req, res) => {
+  // const temp = fs.readFileSync(templateDir + '/create_event.hbs', {encoding: 'utf-8'});
+  // const page = handlebars.compile(temp);
+  // res.send(page({is_public: true}));
   res.send(createEventPage({is_public: true}));
 }))
 
 app.post('/events/create', wrap(async (req, res) => {
   const src = req.headers.referer.split(req.headers.origin)[1];
   let form = req.body
+  form['event_dates'] = JSON.parse(form['event_dates']);
 
   // Flag event as needing approval
   if (req.user && src === '/admin/events/create') {
-    const userIsAdmin = await isAdmin(req.user.id)
-    if (!userIsAdmin)
+    // const userIsAdmin = await isAdmin(req.user.id)
+    if ((form['event_type_id'] != 31 && form['event_type_id'] != 44) || form['is_official'] == 1 || form['event_dates'].length > 1) // to do: implement proper permissioning
       form['flag_approval'] = '1'
   }
   else {
     form['flag_approval'] = '1'
   }
+
+  console.log(form);
 
   // constituent object not being returned right now
   let constituent = await BSDClient.getConstituentByEmail(form.cons_email)
@@ -297,23 +306,28 @@ app.post('/events/create', wrap(async (req, res) => {
   let event_types = await BSDClient.getEventTypes()
   await BSDClient.createEvents(constituent.id, form, event_types, eventCreationCallback)
 
+  
   // send event creation confirmation email
-  function eventCreationCallback(status) {
-  	res.json(status)
-
-  	if (status == 'success') {
+  function eventCreationCallback(status, details) {
+    let response_data = {'status' : status};
+    if (status == 'success') {
       if (form['event_type_id'] == 31) {
         // Send phone bank specific email
-        // Mailgun.sendPhoneBankConfirmation(form, constituent)
+        // Mailgun.sendPhoneBankConfirmation(form, details.event_ids, constituent)
         // re-enable phonebank email after we find a way to track when these have been sent
-        Mailgun.sendEventConfirmation(form, constituent, event_types)
-      } else {
-        // Send generic email
-        Mailgun.sendEventConfirmation(form, constituent, event_types)
+        Mailgun.sendEventConfirmation(form, details.event_ids, constituent, event_types)
       }
+      else {
+        // Send generic email
+        Mailgun.sendEventConfirmation(form, details.event_ids, constituent, event_types)
+      }
+      response_data['event_ids'] = details.event_ids;
+      clientLogger['info']('Event Creation Success:', response_data, req.user);
   	} else {
-      clientLogger['error']('Event Creation Error:', status)
+      response_data['validation_errors'] = details;
+      clientLogger['error']('Event Creation Error:', details);
     }
+	res.json(response_data);
   }
 }))
 

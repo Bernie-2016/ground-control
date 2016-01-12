@@ -465,6 +465,12 @@ export default class BSD {
   }
 
   async createEvents(cons_id, form, event_types, callback) {
+    form['event_type_id'] = '1';
+
+    if (form['event_dates'].length > 10){
+      callback('failure', {'Number of Events':[`You can only create up to 10 events at a time. ${form['event_dates'].length} were sent.`]});
+    }
+
     let eventType = null;
     event_types.forEach((type) => {
       if (type.event_type_id == form['event_type_id']){
@@ -473,7 +479,7 @@ export default class BSD {
     })
 
     if (eventType === null){
-      callback('Event type does not exist in BSD');
+      callback('failure', {'Event Type':['does not exist in BSD']});
       return;
     }
 
@@ -523,18 +529,21 @@ export default class BSD {
       startHour = form['start_time']['h'];
     }
 
-    let eventDates = JSON.parse(form['event_dates']);
-
-    eventDates.forEach(async (newEvent, index, array) => {
+    let newEventIds = [];
+    form['event_dates'].forEach(async (newEvent, index, array) => {
       let startTime = newEvent['date'] + ' ' + startHour + ':' + form['start_time']['i'] + ':00'
       params['days'][0]['start_datetime_system'] = startTime;
       let response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'POST');
       if (response.validation_errors){
-        callback(response.validation_errors);
+        callback('failure', response.validation_errors);
       }
-      else if (response.event_id_obfuscated && index == array.length - 1){
+      else if (response.event_id_obfuscated){
+        newEventIds.push(response.event_id_obfuscated)
+      };
+
+      if (response.event_id_obfuscated && index == array.length - 1){
         // successfully created events
-        callback('success');
+        callback('success', {'event_ids' : newEventIds});
       }
     });
 
