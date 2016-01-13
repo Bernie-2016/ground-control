@@ -147,7 +147,7 @@ class AdminEventsSection extends React.Component {
       <Cell {...props}
       style={cellStyle}
       >
-        <a href={'https://secure.berniesanders.com/page/event/detail/' + data[rowIndex]['node'][col]} target="_blank">{data[rowIndex]['node'][col]}</a>
+        <a href={'https://secure.berniesanders.com/page/event/detail/' + data[rowIndex]['node'][col]} style={linkStyle} target="_blank">{data[rowIndex]['node'][col]}</a>
       </Cell>
     )
   }
