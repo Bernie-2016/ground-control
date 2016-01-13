@@ -770,7 +770,7 @@ ${signature}`
       if (updatedValue == 'true')
         updatedValue = true
       if (updatedValue == 'false')
-        updatedValue == false
+        updatedValue = false
 
       let updatedFilters = {}
       updatedFilters[event.target.name] = updatedValue
