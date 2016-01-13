@@ -88,7 +88,7 @@ export default class EventPreview extends React.Component {
         padding: '0.2rem 0.5rem',
         transform: 'rotate(-2deg)'
       };
-      isOfficial = <span style={officialStyle}></span>
+      isOfficial = <span style={officialStyle}>Official Event</span>
     }
     return (
       <div>
