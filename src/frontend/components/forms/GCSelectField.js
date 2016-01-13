@@ -1,7 +1,8 @@
 import React from 'react';
-import {SelectField, MenuItem} from 'material-ui';
 import {BernieText, BernieColors} from '../styles/bernie-css'
 import GCFormField from './GCFormField';
+import Select from 'react-select';
+require('react-select/dist/react-select.css');
 
 export default class GCSelectField extends GCFormField {
   styles = {
@@ -9,7 +10,26 @@ export default class GCSelectField extends GCFormField {
       paddingBottom: 10,
       ...BernieText.inputLabel,
     },
-  };
+  }
+
+  createMenuItems() {
+    return Object.keys(this.props.choices).map((choice) => {
+      return {
+        label: this.props.choices[choice],
+        value: choice
+      }
+    })
+  }
+
+  getMenuItemIndex(menuItems) {
+    let menuItemIndex = 0;
+    menuItems.forEach((item, index) => {
+      if (item.value == this.props.value){
+        menuItemIndex = index;
+      }
+    });
+    return menuItemIndex
+  }
 
   render() {
     let error = <div></div>;
@@ -25,18 +45,32 @@ export default class GCSelectField extends GCFormField {
       }
     }
 
-    const menuItems = Object.keys(this.props.choices).map((choice, index) => <MenuItem key={index} value={choice} primaryText={this.props.choices[choice]}/>);
-
+    const menuItems = this.createMenuItems();
+    let selectProps = {}
+    Object.keys(this.props).forEach((key) => {
+      if (key !== 'style' && key !== 'onChange' && key !== 'value' && key !== 'label')
+        selectProps[key] = this.props[key]
+    })
     return (
-      <SelectField
-        value={this.props.value}
-        floatingLabelText={this.floatingLabelText()}
-        onChange={(event) => {this.props.onChange(event.target.value)}}
-        floatingLabelStyle={{cursor: 'pointer'}}
-        errorStyle={BernieText.inputError}
-      >
-        {menuItems}
-      </SelectField>
+      <div style={{
+        width: 200,
+        ...this.props.style
+      }}>
+        <div style={labelStyle}>{this.props.label}</div>
+        <Select
+          {...selectProps}
+          labelKey="label"
+          value={this.props.value}
+          options={menuItems}
+          onChange={(element) => {
+            if (element)
+              this.props.onChange(element.value)
+            else
+              this.props.onChange(null)
+          }}
+        />
+        {error}
+      </div>
     )
   }
 }
