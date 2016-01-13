@@ -16,6 +16,8 @@ import MutationHandler from './MutationHandler'
 import DeleteEvents from '../mutations/DeleteEvents'
 import EditEvents from '../mutations/EditEvents'
 
+require('./styles/adminEventsSection.css');
+
 const plurry = (n) => (Math.abs(n) == 1) ? '' : 's';
 
 const keyboardActionStyles = {
@@ -148,6 +150,18 @@ class AdminEventsSection extends React.Component {
     }}
     >
       {data[rowIndex]['node'][col]}
+    </Cell>
+  )
+
+  BooleanCell = ({rowIndex, data, col, ...props}) => (
+    <Cell {...props}
+    style={{
+      fontFamily: 'Roboto',
+      fontSize: '13px',
+      lineHeight: '18px'
+    }}
+    >
+      {(data[rowIndex]['node'][col]) ? 'true' : 'false'}
     </Cell>
   )
 
@@ -1063,6 +1077,7 @@ ${signature}`
         rowsCount={events.length}
         width={this.state.windowWidth}
         height={this.state.windowHeight - 112}
+        rowClassNameGetter={(index) => (events[index].isOfficial) ? 'officialEventRow' : null}
         onRowDoubleClick={this._handleRowClick}
         {...this.props}>
         <ColumnGroup
@@ -1107,6 +1122,14 @@ ${signature}`
             header={<this.SortControllerCell content="Type" attribute="eventTypeId" />}
             cell={
               <this.EventTypeCell data={events} col="eventType" attr="name" />
+            }
+            width={130}
+          />
+          <Column
+            flexGrow={1}
+            header={<this.SortControllerCell content="Type" attribute="isOfficial" />}
+            cell={
+              <this.BooleanCell data={events} col="isOfficial" />
             }
             width={130}
           />
@@ -1277,6 +1300,7 @@ export default Relay.createContainer(AdminEventsSection, {
               }
               eventIdObfuscated
               flagApproval
+              isOfficial
               description
               venueName
               latitude
