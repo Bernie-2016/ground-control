@@ -70,8 +70,10 @@ export default class EventPreview extends React.Component {
     return {__html: div.innerHTML}
   }
 
-  const isOfficial = () => {
-    if (this.props.event.isOfficial){
+    render() {
+    let event = this.props.event
+    let isOfficial = null;
+    if (event.isOfficial){
       const officialStyle = {
         display: 'inline-block',
         border: '2px solid #F55B5B',
@@ -85,19 +87,14 @@ export default class EventPreview extends React.Component {
         marginTop: '0.75rem',
         padding: '0.2rem 0.5rem',
         transform: 'rotate(-2deg)'
-      }
-      return <span style={officialStyle}></span>
+      };
+      isOfficial = <span style={officialStyle}></span>
     }
-    return null
-  }
-
-  render() {
-    let event = this.props.event
     return (
       <div>
         <CardText>
           <h1 style={BernieText.title}>{event.name}</h1>
-          {isOfficial()}
+          {isOfficial}
 
           <InfoHeader content='Event Type' />
           <p>{event.eventType.name}</p>
