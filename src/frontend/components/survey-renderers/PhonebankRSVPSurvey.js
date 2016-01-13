@@ -476,8 +476,11 @@ class PhonebankRSVPSurvey extends React.Component {
 
     let callTeamNoText = <div>No worries. I understand that calling isn't everyone's thing. You can still get involved in other ways if you let us know at <strong>berniesanders.com/volunteer</strong>.</div>
 
-    let markerDateOffset = this.momentWithOffset(this.state.clickedMarker.startDate, this.state.clickedMarker.localUTCOffset)
-    let eventDate = (this.state.clickedMarker && markerDateOffset) ? markerDateOffset.format(WEEKDAY_DATE_FORMAT) : '[event date]'
+    let eventDate = '[event date]'
+    if (this.state.clickedMarker){
+      let markerDateOffset = this.momentWithOffset(this.state.clickedMarker.startDate, this.state.clickedMarker.localUTCOffset)
+      eventDate = (markerDateOffset) ? markerDateOffset.format(WEEKDAY_DATE_FORMAT) : '[event date]'
+    }
 
     let eventAddress = this.state.clickedMarker ? this.state.clickedMarker.addr1 : '[event address]'
 
