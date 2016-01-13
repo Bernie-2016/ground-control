@@ -541,11 +541,11 @@ ${signature}`
         message: `Thank you for your interest in helping gather petition signatures to help get Bernie on the ballot! The campaign currently does not need signatures to qualify for the ballot in your state. But don’t worry, there are other ways you can volunteer to help the campaign.
 
 Here are some things you can do:
-	- Host a house party for Bernie (distribute literature, get people signed up, etc.)
-	- Table at farmers markets or local community events.
-	- Talk up Bernie, and distribute Bernie material at Democratic Party meetings, union meetings, or other civic organizations
-	- Write a letter to the editor: "Why I support a Sanders candidacy."  There are helpful talking points at berniesanders.com
-	- Spread the word on social media - be sure to like, follow, and promote the official Bernie 2016 Facebook page, www.facebook.com/berniesanders; follow on Instagram, @berniesanders; and Twitter, @berniesanders
+  - Host a house party for Bernie (distribute literature, get people signed up, etc.)
+  - Table at farmers markets or local community events.
+  - Talk up Bernie, and distribute Bernie material at Democratic Party meetings, union meetings, or other civic organizations
+  - Write a letter to the editor: "Why I support a Sanders candidacy."  There are helpful talking points at berniesanders.com
+  - Spread the word on social media - be sure to like, follow, and promote the official Bernie 2016 Facebook page, www.facebook.com/berniesanders; follow on Instagram, @berniesanders; and Twitter, @berniesanders
 
 When you’re ready to submit your next event, visit berniesanders.com/plan.
 
@@ -722,6 +722,16 @@ ${signature}`
       </div>
     );
 
+    const booleanOptions = [
+      {
+        name: 'Yes',
+        value: true
+      },
+      {
+        name: 'No',
+        value: false
+      }
+    ];
     const FilterSelect = ({name, label, options, optionName='name', optionValue='value'}) => (
       <div>
         <label htmlFor={name} style={labelStyle}>{label}: </label>
@@ -739,6 +749,7 @@ ${signature}`
 
     const filterInputs = [
       {name: 'eventIdObfuscated', label: 'Event ID'},
+      {name: 'isOfficial', label: 'Official Campaign Event', type: 'select', options: booleanOptions},
       {name: 'name', label: 'Event Name'},
       {name: 'eventTypeId', label: 'Event Type', type: 'select', options: this.props.listContainer.eventTypes, optionValue: 'id'},
       {name: 'contactPhone', label: 'Host Contact Phone'},
