@@ -465,12 +465,12 @@ export default class BSD {
     return response
   }
 
-  async createEvents(cons_id, form, event_types) {
+  async createEvents(cons_id, form, event_types, batchEventLimit=10) {
     if (inDevEnv)
       form['event_type_id'] = '1'
 
-    if (form['event_dates'].length > 10){
-      return {status: 'failure', errors: {'Number of Events': [`You can only create up to 10 events at a time. ${form['event_dates'].length} events were received.`]}}
+    if (form['event_dates'].length > batchEventLimit){
+      return {status: 'failure', errors: {'Number of Events': [`You can only create up to ${batchEventLimit} events at a time. ${form['event_dates'].length} events were received.`]}}
     }
 
     let eventType = null;

@@ -291,16 +291,16 @@ app.post('/events/create', wrap(async (req, res) => {
   form['event_dates'] = JSON.parse(form['event_dates']);
 
   // Flag event as needing approval
+  let batchEventMax = 30;
   if (req.user && src === '/admin/events/create') {
     // const userIsAdmin = await isAdmin(req.user.id)
     if ((form['event_type_id'] != 31 && form['event_type_id'] != 44) || form['is_official'] == 1 || form['event_dates'].length > 1) // to do: implement proper permissioning
       form['flag_approval'] = '1'
   }
   else {
+    batchEventMax = 10;
     form['flag_approval'] = '1'
   }
-
-  console.log(form);
 
   // constituent object not being returned right now
   let constituent = await BSDClient.getConstituentByEmail(form.cons_email)
@@ -311,7 +311,7 @@ app.post('/events/create', wrap(async (req, res) => {
   }
 
   let event_types = await BSDClient.getEventTypes()
-  let result = await BSDClient.createEvents(constituent.id, form, event_types)
+  let result = await BSDClient.createEvents(constituent.id, form, event_types, batchEventMax)
   log.info(result)
   
   if (result.status == 'success') {
