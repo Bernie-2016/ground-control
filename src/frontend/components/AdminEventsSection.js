@@ -766,7 +766,11 @@ ${signature}`
       let updatedValue = event.target.value
 
       if (updatedValue == 'none')
-        {updatedValue = null}
+        updatedValue = null
+      if (updatedValue == 'true')
+        updatedValue = true
+      if (updatedValue == 'false')
+        updatedValue == false
 
       let updatedFilters = {}
       updatedFilters[event.target.name] = updatedValue
@@ -908,10 +912,10 @@ ${signature}`
   }
 
 
-  _handleRequestFiltersChange = (newVars, force) => {
+  _handleRequestFiltersChange = (newVars, doNotPreserveOldFilters) => {
     let oldVars = this.props.relay.variables.filters
 
-    if (force) {
+    if (doNotPreserveOldFilters) {
       if (!newVars.hasOwnProperty('flagApproval')) {
         newVars['flagApproval'] = oldVars['flagApproval']
       }
