@@ -16,6 +16,9 @@ import MutationHandler from './MutationHandler'
 import DeleteEvents from '../mutations/DeleteEvents'
 import EditEvents from '../mutations/EditEvents'
 
+require('fixed-data-table/dist/fixed-data-table.min.css');
+require('./styles/adminEventsSection.css');
+
 const plurry = (n) => (Math.abs(n) == 1) ? '' : 's';
 
 const keyboardActionStyles = {
@@ -127,17 +130,27 @@ class AdminEventsSection extends React.Component {
     </Cell>
   )
 
-  EventLinkCell = ({rowIndex, data, col, ...props}) => (
-    <Cell {...props}
-    style={{
+  EventLinkCell = ({rowIndex, data, col, ...props}) => {
+    let cellStyle = {
       fontFamily: 'Roboto',
       fontSize: '13px',
       lineHeight: '18px'
-    }}
-    >
-      <a href={'https://secure.berniesanders.com/page/event/detail/' + data[rowIndex]['node'][col]} target="_blank">{data[rowIndex]['node'][col]}</a>
-    </Cell>
-  )
+    };
+    let linkStyle={
+      color: BernieColors.darkBlue
+    }
+    if (data[rowIndex]['node'].isOfficial){
+      cellStyle.backgroundColor = BernieColors.lightBlue
+      linkStyle.color = BernieColors.darkRed
+    }
+    return (
+      <Cell {...props}
+      style={cellStyle}
+      >
+        <a href={'https://secure.berniesanders.com/page/event/detail/' + data[rowIndex]['node'][col]} style={linkStyle} target="_blank">{data[rowIndex]['node'][col]}</a>
+      </Cell>
+    )
+  }
 
   TextCell = ({rowIndex, data, col, ...props}) => (
     <Cell {...props}
@@ -148,6 +161,18 @@ class AdminEventsSection extends React.Component {
     }}
     >
       {data[rowIndex]['node'][col]}
+    </Cell>
+  )
+
+  BooleanCell = ({rowIndex, data, col, ...props}) => (
+    <Cell {...props}
+    style={{
+      fontFamily: 'Roboto',
+      fontSize: '13px',
+      lineHeight: '18px'
+    }}
+    >
+      {(data[rowIndex]['node'][col]) ? 'true' : 'false'}
     </Cell>
   )
 
@@ -1063,6 +1088,7 @@ ${signature}`
         rowsCount={events.length}
         width={this.state.windowWidth}
         height={this.state.windowHeight - 112}
+        // rowClassNameGetter={(index) => (events[index].isOfficial) ? 'officialEventRow' : null}
         onRowDoubleClick={this._handleRowClick}
         {...this.props}>
         <ColumnGroup
@@ -1277,6 +1303,7 @@ export default Relay.createContainer(AdminEventsSection, {
               }
               eventIdObfuscated
               flagApproval
+              isOfficial
               description
               venueName
               latitude
