@@ -291,10 +291,10 @@ app.post('/events/create', wrap(async (req, res) => {
   form['event_dates'] = JSON.parse(form['event_dates']);
 
   // Flag event as needing approval
-  let batchEventMax = 30;
+  let batchEventMax = 20;
   if (req.user && src === '/admin/events/create') {
     // const userIsAdmin = await isAdmin(req.user.id)
-    if ((form['event_type_id'] != 31 && form['event_type_id'] != 44) || form['is_official'] == 1 || form['event_dates'].length > 1) // to do: implement proper permissioning
+    if ((form['event_type_id'] != 31 && form['event_type_id'] != 44) || form['is_official'] == 1) // to do: implement proper permissioning
       form['flag_approval'] = '1'
   }
   else {
