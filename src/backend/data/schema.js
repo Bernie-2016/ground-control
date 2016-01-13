@@ -1037,20 +1037,22 @@ const GraphQLDeleteEvents = mutationWithClientMutationId({
 
     if (hostMessage.length > 0){
       const hostIds = await knex('bsd_events').select('creator_cons_id').whereIn('event_id', localIds);
-      const attendeeIds = await knex('bsd_event_attendees').select('event_attendee_id', 'event_id').whereIn('event_id', localIds);
-      const events = await knex('bsd_events').select('event_id_obfuscated', 'name', 'start_dt').whereIn('event_id', localIds);
+      const attendeeIds = await knex('bsd_event_attendees').select('attendee_cons_id', 'event_id').whereIn('event_id', localIds);
+      const events = await knex('bsd_events').select('event_id_obfuscated', 'event_id', 'name', 'start_dt').whereIn('event_id', localIds);
       log.info(attendeeIds, events);
 
       for (let i = 0; i < hostIds.length; i++) {
         let host = await rootValue.loaders.bsdPeople.load(hostIds[i].creator_cons_id);
         let recipient = await getPrimaryEmail(host);
-        await Mailgun.sendEventDeletionNotification({recipient, message: hostMessage, events})
+        if (recipient)
+          await Mailgun.sendEventDeletionNotification({recipient, message: hostMessage, events})
       }
 
       for (let i = 0; i < attendeeIds.length; i++) {
-        let attendee = await rootValue.loaders.bsdPeople.load(attendeeIds[i].event_attendee_id);
+        let attendee = await rootValue.loaders.bsdPeople.load(attendeeIds[i].attendee_cons_id);
         let recipient = await getPrimaryEmail(attendee);
-        await Mailgun.sendEventDeletionNotification({recipient, message: hostMessage, events})
+        if (recipient)
+          await Mailgun.sendEventDeletionNotification({recipient, message: hostMessage, events})
       }
     }
 
