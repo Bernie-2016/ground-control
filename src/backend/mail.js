@@ -155,11 +155,11 @@ export default class MG {
     return await this.send(message)
   }
 
-  async sendHostEventDeletionNotification(data) {
+  async sendEventDeletionNotification(data) {
     let message = {
       from: 'Help Desk<help@berniesanders.com>',
-      to: data.hostEmail,
-      subject: 'Event Deletion Notice',
+      to: data.recipient,
+      subject: `Event Deletion Notice`,
       text: data.message
     }
 
