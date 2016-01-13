@@ -479,7 +479,7 @@ class PhonebankRSVPSurvey extends React.Component {
     let eventDate = '[event date]'
     if (this.state.clickedMarker){
       let markerDateOffset = this.momentWithOffset(this.state.clickedMarker.startDate, this.state.clickedMarker.localUTCOffset)
-      eventDate = (this.state.clickedMarker && markerDateOffset) ? markerDateOffset.format(WEEKDAY_DATE_FORMAT) : '[event date]'
+      eventDate = (markerDateOffset) ? markerDateOffset.format(WEEKDAY_DATE_FORMAT) : '[event date]'
     }
 
     let eventAddress = this.state.clickedMarker ? this.state.clickedMarker.addr1 : '[event address]'
