@@ -325,7 +325,7 @@ app.post('/events/create', wrap(async (req, res) => {
       // Send generic email
       Mailgun.sendEventConfirmation(form, result.ids, constituent, event_types)
     }
-    clientLogger['info'](`Event Creation Success: ${result.ids} added by ${req.user.email}`);
+    clientLogger['info'](`Event Creation Success: ${result.ids.join(' ')} added by ${req.user.email}`);
 	} else {
     clientLogger['error'](`Event Creation Error: ${result.errors}`);
   }
