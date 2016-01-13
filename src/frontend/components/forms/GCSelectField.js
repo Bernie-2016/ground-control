@@ -1,5 +1,5 @@
 import React from 'react';
-import {FlatButton, SelectField} from 'material-ui';
+import {SelectField, MenuItem} from 'material-ui';
 import {BernieText, BernieColors} from '../styles/bernie-css'
 import GCFormField from './GCFormField';
 
@@ -9,26 +9,7 @@ export default class GCSelectField extends GCFormField {
       paddingBottom: 10,
       ...BernieText.inputLabel,
     },
-  }
-
-  createMenuItems() {
-    return Object.keys(this.props.choices).map((choice) => {
-      return {
-        name: this.props.choices[choice],
-        value: choice
-      }
-    })
-  }
-
-  getMenuItemIndex(menuItems) {
-    let menuItemIndex = 0;
-    menuItems.forEach((item, index) => {
-      if (item.value == this.props.value){
-        menuItemIndex = index;
-      }
-    });
-    return menuItemIndex
-  }
+  };
 
   render() {
     let error = <div></div>;
@@ -44,20 +25,18 @@ export default class GCSelectField extends GCFormField {
       }
     }
 
-    const menuItems = this.createMenuItems();
+    const menuItems = Object.keys(this.props.choices).map((choice, index) => <MenuItem key={index} value={choice} primaryText={this.props.choices[choice]}/>);
 
     return (
-    <SelectField
-      // {...this.props}
-      value={this.props.value}
-      displayMember='name'
-      valueMember='value'
-      floatingLabelText={this.floatingLabelText()}
-      errorStyle={BernieText.inputError}
-      menuItems={menuItems}
-      selectedIndex={this.getMenuItemIndex(menuItems)}
-      onChange={(event) => {this.props.onChange(event.target.value)}}
-    />
+      <SelectField
+        value={this.props.value}
+        floatingLabelText={this.floatingLabelText()}
+        onChange={(event) => {this.props.onChange(event.target.value)}}
+        floatingLabelStyle={{cursor: 'pointer'}}
+        errorStyle={BernieText.inputError}
+      >
+        {menuItems}
+      </SelectField>
     )
   }
 }
