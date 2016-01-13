@@ -312,7 +312,6 @@ app.post('/events/create', wrap(async (req, res) => {
 
   let event_types = await BSDClient.getEventTypes()
   let result = await BSDClient.createEvents(constituent.id, form, event_types, batchEventMax)
-  log.info(result)
   
   if (result.status == 'success') {
     if (form['event_type_id'] == 31) {
@@ -327,7 +326,7 @@ app.post('/events/create', wrap(async (req, res) => {
     }
     clientLogger['info'](`Event Creation Success: ${result.ids.join(' ')} [${req.user.email}]`);
 	} else {
-    clientLogger['error'](`Event Creation Error: ${result.errors}`);
+    clientLogger['error'](`Event Creation Error: ${JSON.stringify(result.errors)} [${req.user.email}]`);
   }
 
 	res.json(result);

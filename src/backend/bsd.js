@@ -481,7 +481,7 @@ export default class BSD {
     })
 
     if (eventType === null){
-      return {status: 'failure', errors: {'Event Type':['does not exist in BSD']}}
+      return {status: 'failure', errors: {'Event Type': ['Does not exist in BSD']}}
     }
 
     // validations
@@ -551,7 +551,7 @@ export default class BSD {
       return {status: 'success', ids : newEventIds}
     }
 
-    return {status: 'failure', errors: {}}
+    return {status: 'failure', errors: {error: 'No event ids returned.'}}
   }
 
   async requestWrapper(options) {
