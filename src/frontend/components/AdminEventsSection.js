@@ -572,7 +572,7 @@ ${signature}`
         secondary={true}
         onTouchTap={this._handleDeleteModalRequestClose} />,
       <FlatButton
-        label="Delete"
+        label={(this.state.deletionConfirmationMessage) ? 'Delete & Send Message' : 'Delete'}
         primary={true}
         disabled={(this.state.deletionConfirmationMessage === null || this.state.deletionConfirmationMessage === deleteReasons[deleteReasons.length-1]['message'] || this.state.deletionConfirmationMessage === '')}
         onTouchTap={this._deleteEvent}
@@ -596,7 +596,7 @@ ${signature}`
         {deleteReasonMenuItems}
         </SelectField><br />
         <TextField
-          floatingLabelText="Message for Event Host"
+          floatingLabelText="Message for Event Host & Attendees"
           value={(this.state.deletionConfirmationMessage === 0) ? '' : this.state.deletionConfirmationMessage}
           disabled={(this.state.deletionConfirmationMessage === 0 || this.state.deletionConfirmationMessage === null)}
           onChange={(event) => {
