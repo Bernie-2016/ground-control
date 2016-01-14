@@ -19,7 +19,7 @@ import EditEvents from '../mutations/EditEvents'
 require('fixed-data-table/dist/fixed-data-table.min.css')
 require('./styles/adminEventsSection.css')
 
-const publicEventsRootUrl = process.env.PUBLIC_EVENTS_ROOT_URL
+const publicEventsRootUrl = 'https://secure.berniesanders.com/page/event/detail/'
 
 const plurry = (n) => (Math.abs(n) == 1) ? '' : 's';
 
