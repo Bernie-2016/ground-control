@@ -1560,9 +1560,9 @@
         event_ids = event_ids.split(",")
         if (event_ids.length > 0) {
           for (var i=0; i < event_ids.length; i++){
-            var event_link = 'go.berniesanders.com/page/event/detail/' + event_ids[i];
+            var event_link = '{{events_root_url}}' + event_ids[i];
             $('#js-created-event-url-list').append(
-              '<li><a class="js-created-event-url" href="https://' + event_link
+              '<li><a class="js-created-event-url" href="' + event_link
               + '" target="_blank">' + event_link + '</a></li>');
           }
           $("#event-success-message").show();
