@@ -11,6 +11,7 @@ export let job = async () => {
 
   try {
     await knex.transaction(async (trx) => {
+      log.info('Starting call assignment creation')
       let eventsToUpdate = await knex('bsd_events')
         .innerJoin('bsd_emails', 'bsd_events.creator_cons_id', 'bsd_emails.cons_id')
         .innerJoin('gc_bsd_events', 'bsd_events.event_id', 'gc_bsd_events.event_id')
