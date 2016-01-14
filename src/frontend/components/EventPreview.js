@@ -70,12 +70,31 @@ export default class EventPreview extends React.Component {
     return {__html: div.innerHTML}
   }
 
-  render() {
+    render() {
     let event = this.props.event
+    let isOfficial = null;
+    if (event.isOfficial){
+      const officialStyle = {
+        display: 'inline-block',
+        border: '2px solid #F55B5B',
+        fontSize: '0.9rem',
+        color: '#F55B5B',
+        fontFamily: 'freight-sans-pro',
+        textTransform: 'uppercase',
+        letterSpacing: '0.1em',
+        fontWeight: '600',
+        borderRadius: '3px',
+        marginTop: '0.75rem',
+        padding: '0.2rem 0.5rem',
+        transform: 'rotate(-2deg)'
+      };
+      isOfficial = <span style={officialStyle}>Official Event</span>
+    }
     return (
       <div>
         <CardText>
           <h1 style={BernieText.title}>{event.name}</h1>
+          {isOfficial}
 
           <InfoHeader content='Event Type' />
           <p>{event.eventType.name}</p>

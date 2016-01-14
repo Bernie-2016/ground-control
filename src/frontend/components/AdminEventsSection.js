@@ -16,6 +16,11 @@ import MutationHandler from './MutationHandler'
 import DeleteEvents from '../mutations/DeleteEvents'
 import EditEvents from '../mutations/EditEvents'
 
+require('fixed-data-table/dist/fixed-data-table.min.css')
+require('./styles/adminEventsSection.css')
+
+const publicEventsRootUrl = 'https://secure.berniesanders.com/page/event/detail/'
+
 const plurry = (n) => (Math.abs(n) == 1) ? '' : 's';
 
 const keyboardActionStyles = {
@@ -127,18 +132,6 @@ class AdminEventsSection extends React.Component {
     </Cell>
   )
 
-  EventLinkCell = ({rowIndex, data, col, ...props}) => (
-    <Cell {...props}
-    style={{
-      fontFamily: 'Roboto',
-      fontSize: '13px',
-      lineHeight: '18px'
-    }}
-    >
-      <a href={'https://secure.berniesanders.com/page/event/detail/' + data[rowIndex]['node'][col]} target="_blank">{data[rowIndex]['node'][col]}</a>
-    </Cell>
-  )
-
   TextCell = ({rowIndex, data, col, ...props}) => (
     <Cell {...props}
     style={{
@@ -148,6 +141,18 @@ class AdminEventsSection extends React.Component {
     }}
     >
       {data[rowIndex]['node'][col]}
+    </Cell>
+  )
+
+  BooleanCell = ({rowIndex, data, col, ...props}) => (
+    <Cell {...props}
+    style={{
+      fontFamily: 'Roboto',
+      fontSize: '13px',
+      lineHeight: '18px'
+    }}
+    >
+      {(data[rowIndex]['node'][col]) ? 'true' : 'false'}
     </Cell>
   )
 
@@ -224,95 +229,126 @@ class AdminEventsSection extends React.Component {
     </Cell>
   )
 
-  ActionCell = ({rowIndex, data, col, ...props}) => (
-    <Cell {...props}>
-    <div style={{position: 'relative', left: '-5px'}}>
-      {/*
-        <IconButton
-        title="preview"
-        onTouchTap={function(){
-          this._handleEventPreviewOpen(rowIndex, 0);
-        }.bind(this)}
+  EventIdLinkCell = ({rowIndex, data, ...props}) => {
+    let cellStyle = {
+      fontFamily: 'Roboto',
+      fontSize: '13px',
+      lineHeight: '18px'
+    };
+    let linkStyle={
+      color: BernieColors.darkBlue
+    }
+    if (data[rowIndex]['node'].isOfficial){
+      cellStyle.backgroundColor = BernieColors.lightBlue
+      linkStyle.color = BernieColors.darkRed
+    }
+    return (
+      <Cell {...props}
+      style={cellStyle}
       >
-        <FontIcon className="material-icons" hoverColor={BernieColors.blue}>search</FontIcon>
-      </IconButton>
-      <IconButton
-        title="view public event"
-        onTouchTap={function(){
-          this._handlePublicEventOpen(rowIndex);
-        }.bind(this)}
-      >
-        <FontIcon className="material-icons" hoverColor={BernieColors.blue}>open_in_new</FontIcon>
-      </IconButton>
+        <a href={publicEventsRootUrl + data[rowIndex]['node']['eventIdObfuscated']} style={linkStyle} target="_blank">{data[rowIndex]['node']['eventIdObfuscated']}</a>
+      </Cell>
+    )
+  }
 
-      <IconButton
-        title="edit"
-        onTouchTap={function(){
-          this._handleEventPreviewOpen(rowIndex, 1);
-        }.bind(this)}
-      >
-        <FontIcon className="material-icons" hoverColor={BernieColors.blue}>edit</FontIcon>
-      </IconButton>
-
-      <IconButton
-        title="duplicate"
-        onTouchTap={function(){
-          this._handleEventPreviewOpen(rowIndex, 1);
-        }.bind(this)}
-      >
-        <FontIcon className="material-icons" hoverColor={BernieColors.blue}>content_copy</FontIcon>
-      </IconButton>
-
-      */}
-
-      <IconButton
-        title="delete"
-        onTouchTap={() => {
-          this._handleEventDeletion([rowIndex]);
-        }}
-      >
-        <FontIcon className="material-icons" hoverColor={BernieColors.red}>delete</FontIcon>
-      </IconButton>
-
-      <IconButton
-        title="approve"
-        disabled={this.props.relay.variables.filters.flagApproval === false}
-        onTouchTap={() => {
-          this._handleEventConfirmation([rowIndex]);
-        }}
-      >
-        <FontIcon className="material-icons" hoverColor={BernieColors.blue}>event_available</FontIcon>
-      </IconButton>
-
-      <IconButton
-        title="email"
-        disabled={(data[rowIndex].node.flagApproval === true || data[rowIndex].node.isSearchable === 0)}
-        onTouchTap={() => {
-          this._handleEventEmail([rowIndex])
-        }}
+  ActionCell = ({rowIndex, data, col, ...props}) => {
+    let cellStyle = {};
+    let iconColor = null;
+    if (data[rowIndex]['node'].isOfficial){
+      cellStyle.backgroundColor = BernieColors.lightBlue
+      iconColor = BernieColors.darkRed
+    }
+    return (
+      <Cell {...props} style={cellStyle}>
+      <div style={{position: 'relative', left: '-5px'}}>
+        {/*
+          <IconButton
+          title="preview"
+          onTouchTap={function(){
+            this._handleEventPreviewOpen(rowIndex, 0);
+          }.bind(this)}
         >
-          <FontIcon className="material-icons" hoverColor={BernieColors.blue}>email</FontIcon>
-      </IconButton>
+          <FontIcon className="material-icons" hoverColor={BernieColors.blue}>search</FontIcon>
+        </IconButton>
+        <IconButton
+          title="view public event"
+          onTouchTap={function(){
+            this._handlePublicEventOpen(rowIndex);
+          }.bind(this)}
+        >
+          <FontIcon className="material-icons" hoverColor={BernieColors.blue}>open_in_new</FontIcon>
+        </IconButton>
 
-      {/*
-        IconMenu does not not work inside of fixed-data-table cells because of overflow:hidden on parent divs;
-        The plan is to use https://github.com/tajo/react-portal to overcome this limitation
-      */}
-      {/*
-      <IconMenu
-        iconButtonElement={<FontIcon className="material-icons" hoverColor={BernieColors.blue}>more_vert</FontIcon>}
-        desktop={true}
-        openDirection="bottom-right"
-      >
-        <MenuItem index={0} primaryText="Refresh" leftIcon={<FontIcon className="material-icons">delete</FontIcon>} />
-        <MenuItem index={1} primaryText="Send feedback" leftIcon={<FontIcon className="material-icons">delete</FontIcon>} />
-        <MenuItem index={2} primaryText="Settings" leftIcon={<FontIcon className="material-icons">delete</FontIcon>} />
-      </IconMenu>
-      */}
+        <IconButton
+          title="edit"
+          onTouchTap={function(){
+            this._handleEventPreviewOpen(rowIndex, 1);
+          }.bind(this)}
+        >
+          <FontIcon className="material-icons" hoverColor={BernieColors.blue}>edit</FontIcon>
+        </IconButton>
 
-    </div>
-    </Cell>
-  )
+        <IconButton
+          title="duplicate"
+          onTouchTap={function(){
+            this._handleEventPreviewOpen(rowIndex, 1);
+          }.bind(this)}
+        >
+          <FontIcon className="material-icons" hoverColor={BernieColors.blue}>content_copy</FontIcon>
+        </IconButton>
+
+        */}
+
+        <IconButton
+          title="delete"
+          onTouchTap={() => {
+            this._handleEventDeletion([rowIndex]);
+          }}
+        >
+          <FontIcon className="material-icons" color={iconColor} hoverColor={BernieColors.red}>delete</FontIcon>
+        </IconButton>
+
+        <IconButton
+          title="approve"
+          disabled={this.props.relay.variables.filters.flagApproval === false}
+          onTouchTap={() => {
+            this._handleEventConfirmation([rowIndex]);
+          }}
+        >
+          <FontIcon className="material-icons" color={iconColor} hoverColor={BernieColors.blue}>event_available</FontIcon>
+        </IconButton>
+
+        <IconButton
+          title="email"
+          // disabled={(data[rowIndex].node.flagApproval === true || data[rowIndex].node.isSearchable === 0)}
+          disabled={true} // disabling until we figure out why this causes application crashes
+          onTouchTap={() => {
+            this._handleEventEmail([rowIndex])
+          }}
+          >
+            <FontIcon className="material-icons" color={iconColor} hoverColor={BernieColors.blue}>email</FontIcon>
+        </IconButton>
+
+        {/*
+          IconMenu does not not work inside of fixed-data-table cells because of overflow:hidden on parent divs;
+          The plan is to use https://github.com/tajo/react-portal to overcome this limitation
+        */}
+        {/*
+        <IconMenu
+          iconButtonElement={<FontIcon className="material-icons" hoverColor={BernieColors.blue}>more_vert</FontIcon>}
+          desktop={true}
+          openDirection="bottom-right"
+        >
+          <MenuItem index={0} primaryText="Refresh" leftIcon={<FontIcon className="material-icons">delete</FontIcon>} />
+          <MenuItem index={1} primaryText="Send feedback" leftIcon={<FontIcon className="material-icons">delete</FontIcon>} />
+          <MenuItem index={2} primaryText="Settings" leftIcon={<FontIcon className="material-icons">delete</FontIcon>} />
+        </IconMenu>
+        */}
+
+      </div>
+      </Cell>
+    )
+  }
 
   renderToolbar() {
 
@@ -516,11 +552,11 @@ ${signature}`
         message: `Thank you for your interest in helping gather petition signatures to help get Bernie on the ballot! The campaign currently does not need signatures to qualify for the ballot in your state. But don’t worry, there are other ways you can volunteer to help the campaign.
 
 Here are some things you can do:
-	- Host a house party for Bernie (distribute literature, get people signed up, etc.)
-	- Table at farmers markets or local community events.
-	- Talk up Bernie, and distribute Bernie material at Democratic Party meetings, union meetings, or other civic organizations
-	- Write a letter to the editor: "Why I support a Sanders candidacy."  There are helpful talking points at berniesanders.com
-	- Spread the word on social media - be sure to like, follow, and promote the official Bernie 2016 Facebook page, www.facebook.com/berniesanders; follow on Instagram, @berniesanders; and Twitter, @berniesanders
+  - Host a house party for Bernie (distribute literature, get people signed up, etc.)
+  - Table at farmers markets or local community events.
+  - Talk up Bernie, and distribute Bernie material at Democratic Party meetings, union meetings, or other civic organizations
+  - Write a letter to the editor: "Why I support a Sanders candidacy."  There are helpful talking points at berniesanders.com
+  - Spread the word on social media - be sure to like, follow, and promote the official Bernie 2016 Facebook page, www.facebook.com/berniesanders; follow on Instagram, @berniesanders; and Twitter, @berniesanders
 
 When you’re ready to submit your next event, visit berniesanders.com/plan.
 
@@ -671,13 +707,27 @@ ${signature}`
           let filtersArray = jQuery(this.refs.eventSearchForm).serializeArray();
           let filtersObject = {};
           filtersArray.forEach((filter) => {
-            if (filter.value && filter.value != 'none'){
-              filtersObject[filter.name] = String(filter.value);
+            
+            filtersObject[filter.name] = filter.value;
+
+            if (filtersObject[filter.name] === 'none'){
+              filtersObject[filter.name] = null
+            }
+            else if (filtersObject[filter.name] === 'true'){
+              filtersObject[filter.name] = true
+            }
+            else if (filtersObject[filter.name] === 'false'){
+              filtersObject[filter.name] = false
+            }
+            else if (filtersObject[filter.name]){
+              filtersObject[filter.name] = String(filter.value)
             }
             else {
-              delete filtersObject[filter.name];
+              delete filtersObject[filter.name]
             }
+
           });
+
           this._handleRequestFiltersChange(filtersObject, true);
           this.setState({showFiltersDialog: false});
         }}
@@ -697,6 +747,16 @@ ${signature}`
       </div>
     );
 
+    const booleanOptions = [
+      {
+        name: 'Yes',
+        value: true
+      },
+      {
+        name: 'No',
+        value: false
+      }
+    ];
     const FilterSelect = ({name, label, options, optionName='name', optionValue='value'}) => (
       <div>
         <label htmlFor={name} style={labelStyle}>{label}: </label>
@@ -716,27 +776,19 @@ ${signature}`
       {name: 'eventIdObfuscated', label: 'Event ID'},
       {name: 'name', label: 'Event Name'},
       {name: 'eventTypeId', label: 'Event Type', type: 'select', options: this.props.listContainer.eventTypes, optionValue: 'id'},
+      {name: 'isOfficial', label: 'Official Campaign Event', type: 'select', options: booleanOptions},
+      {name: 'isSearchable', label: 'Public Event', type: 'select', options: booleanOptions},
       {name: 'contactPhone', label: 'Host Contact Phone'},
       {name: 'venueName', label: 'Venue Name'},
       {name: 'localTimezone', label: 'Timezone', type: 'select', options: USTimeZones},
-      {name: 'venueState', label: 'State', type: 'select', options: states, optionValue: 'abbreviation'},
+      {name: 'venueAddr1', label: 'Address Line 1'},
+      {name: 'venueAddr2', label: 'Address Line 2'},
       {name: 'venueCity', label: 'City'},
+      {name: 'venueState', label: 'State', type: 'select', options: states, optionValue: 'abbreviation'},
       {name: 'venueZip', label: 'Zip Code'},
       {name: 'latitude', label: 'Latitude', type: 'number'},
       {name: 'longitude', label: 'Longitude', type: 'number'},
     ];
-
-    let updateFilters = (event) => {
-      let updatedValue = event.target.value
-
-      if (updatedValue == 'none')
-        {updatedValue = null}
-
-      let updatedFilters = {}
-      updatedFilters[event.target.name] = updatedValue
-
-      this._handleRequestFiltersChange(updatedFilters)
-    }
 
     return (
       <Dialog
@@ -872,10 +924,10 @@ ${signature}`
   }
 
 
-  _handleRequestFiltersChange = (newVars, force) => {
-    let oldVars = this.props.relay.variables.filters
+  _handleRequestFiltersChange = (newVars, doNotPreserveOldFilters) => {
+    let oldVars = this.props.relay.variables.filters;
 
-    if (force) {
+    if (doNotPreserveOldFilters) {
       if (!newVars.hasOwnProperty('flagApproval')) {
         newVars['flagApproval'] = oldVars['flagApproval']
       }
@@ -897,12 +949,6 @@ ${signature}`
       previewTabIndex: tabIndex,
       approveOnUpdate: true
     })
-  }
-
-  _handlePublicEventOpen = (eventIndex) => {
-    let events = this.props.listContainer.events.edges
-
-    window.open('https://secure.berniesanders.com/page/event/detail/' + events[eventIndex]['node']['eventIdObfuscated'])
   }
 
   _iterateActiveEvent = (n) => {
@@ -1063,6 +1109,7 @@ ${signature}`
         rowsCount={events.length}
         width={this.state.windowWidth}
         height={this.state.windowHeight - 112}
+        // rowClassNameGetter={(index) => (events[index].isOfficial) ? 'officialEventRow' : null}
         onRowDoubleClick={this._handleRowClick}
         {...this.props}>
         <ColumnGroup
@@ -1098,7 +1145,7 @@ ${signature}`
           <Column
             flexGrow={1}
             header={<this.HeaderCell content="ID" />}
-            cell={<this.EventLinkCell data={events} col="eventIdObfuscated" />}
+            cell={<this.EventIdLinkCell data={events} />}
             width={100}
             align='center'
           />
@@ -1277,6 +1324,7 @@ export default Relay.createContainer(AdminEventsSection, {
               }
               eventIdObfuscated
               flagApproval
+              isOfficial
               description
               venueName
               latitude
