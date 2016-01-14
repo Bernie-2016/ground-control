@@ -249,95 +249,126 @@ class AdminEventsSection extends React.Component {
     </Cell>
   )
 
-  ActionCell = ({rowIndex, data, col, ...props}) => (
-    <Cell {...props}>
-    <div style={{position: 'relative', left: '-5px'}}>
-      {/*
-        <IconButton
-        title="preview"
-        onTouchTap={function(){
-          this._handleEventPreviewOpen(rowIndex, 0);
-        }.bind(this)}
+  EventLinkCell = ({rowIndex, data, col, ...props}) => {
+    let cellStyle = {
+      fontFamily: 'Roboto',
+      fontSize: '13px',
+      lineHeight: '18px'
+    };
+    let linkStyle={
+      color: BernieColors.darkBlue
+    }
+    if (data[rowIndex]['node'].isOfficial){
+      cellStyle.backgroundColor = BernieColors.lightBlue
+      linkStyle.color = BernieColors.darkRed
+    }
+    return (
+      <Cell {...props}
+      style={cellStyle}
       >
-        <FontIcon className="material-icons" hoverColor={BernieColors.blue}>search</FontIcon>
-      </IconButton>
-      <IconButton
-        title="view public event"
-        onTouchTap={function(){
-          this._handlePublicEventOpen(rowIndex);
-        }.bind(this)}
-      >
-        <FontIcon className="material-icons" hoverColor={BernieColors.blue}>open_in_new</FontIcon>
-      </IconButton>
+        <a href={'https://secure.berniesanders.com/page/event/detail/' + data[rowIndex]['node'][col]} style={linkStyle} target="_blank">{data[rowIndex]['node'][col]}</a>
+      </Cell>
+    )
+  }
 
-      <IconButton
-        title="edit"
-        onTouchTap={function(){
-          this._handleEventPreviewOpen(rowIndex, 1);
-        }.bind(this)}
-      >
-        <FontIcon className="material-icons" hoverColor={BernieColors.blue}>edit</FontIcon>
-      </IconButton>
-
-      <IconButton
-        title="duplicate"
-        onTouchTap={function(){
-          this._handleEventPreviewOpen(rowIndex, 1);
-        }.bind(this)}
-      >
-        <FontIcon className="material-icons" hoverColor={BernieColors.blue}>content_copy</FontIcon>
-      </IconButton>
-
-      */}
-
-      <IconButton
-        title="delete"
-        onTouchTap={() => {
-          this._handleEventDeletion([rowIndex]);
-        }}
-      >
-        <FontIcon className="material-icons" hoverColor={BernieColors.red}>delete</FontIcon>
-      </IconButton>
-
-      <IconButton
-        title="approve"
-        disabled={this.props.relay.variables.filters.flagApproval === false}
-        onTouchTap={() => {
-          this._handleEventConfirmation([rowIndex]);
-        }}
-      >
-        <FontIcon className="material-icons" hoverColor={BernieColors.blue}>event_available</FontIcon>
-      </IconButton>
-
-      <IconButton
-        title="email"
-        disabled={(data[rowIndex].node.flagApproval === true || data[rowIndex].node.isSearchable === 0)}
-        onTouchTap={() => {
-          this._handleEventEmail([rowIndex])
-        }}
+  ActionCell = ({rowIndex, data, col, ...props}) => {
+    let cellStyle = {};
+    let iconColor = null;
+    if (data[rowIndex]['node'].isOfficial){
+      cellStyle.backgroundColor = BernieColors.lightBlue
+      iconColor = BernieColors.darkRed
+    }
+    return (
+      <Cell {...props} style={cellStyle}>
+      <div style={{position: 'relative', left: '-5px'}}>
+        {/*
+          <IconButton
+          title="preview"
+          onTouchTap={function(){
+            this._handleEventPreviewOpen(rowIndex, 0);
+          }.bind(this)}
         >
-          <FontIcon className="material-icons" hoverColor={BernieColors.blue}>email</FontIcon>
-      </IconButton>
+          <FontIcon className="material-icons" hoverColor={BernieColors.blue}>search</FontIcon>
+        </IconButton>
+        <IconButton
+          title="view public event"
+          onTouchTap={function(){
+            this._handlePublicEventOpen(rowIndex);
+          }.bind(this)}
+        >
+          <FontIcon className="material-icons" hoverColor={BernieColors.blue}>open_in_new</FontIcon>
+        </IconButton>
 
-      {/*
-        IconMenu does not not work inside of fixed-data-table cells because of overflow:hidden on parent divs;
-        The plan is to use https://github.com/tajo/react-portal to overcome this limitation
-      */}
-      {/*
-      <IconMenu
-        iconButtonElement={<FontIcon className="material-icons" hoverColor={BernieColors.blue}>more_vert</FontIcon>}
-        desktop={true}
-        openDirection="bottom-right"
-      >
-        <MenuItem index={0} primaryText="Refresh" leftIcon={<FontIcon className="material-icons">delete</FontIcon>} />
-        <MenuItem index={1} primaryText="Send feedback" leftIcon={<FontIcon className="material-icons">delete</FontIcon>} />
-        <MenuItem index={2} primaryText="Settings" leftIcon={<FontIcon className="material-icons">delete</FontIcon>} />
-      </IconMenu>
-      */}
+        <IconButton
+          title="edit"
+          onTouchTap={function(){
+            this._handleEventPreviewOpen(rowIndex, 1);
+          }.bind(this)}
+        >
+          <FontIcon className="material-icons" hoverColor={BernieColors.blue}>edit</FontIcon>
+        </IconButton>
 
-    </div>
-    </Cell>
-  )
+        <IconButton
+          title="duplicate"
+          onTouchTap={function(){
+            this._handleEventPreviewOpen(rowIndex, 1);
+          }.bind(this)}
+        >
+          <FontIcon className="material-icons" hoverColor={BernieColors.blue}>content_copy</FontIcon>
+        </IconButton>
+
+        */}
+
+        <IconButton
+          title="delete"
+          onTouchTap={() => {
+            this._handleEventDeletion([rowIndex]);
+          }}
+        >
+          <FontIcon className="material-icons" color={iconColor} hoverColor={BernieColors.red}>delete</FontIcon>
+        </IconButton>
+
+        <IconButton
+          title="approve"
+          disabled={this.props.relay.variables.filters.flagApproval === false}
+          onTouchTap={() => {
+            this._handleEventConfirmation([rowIndex]);
+          }}
+        >
+          <FontIcon className="material-icons" color={iconColor} hoverColor={BernieColors.blue}>event_available</FontIcon>
+        </IconButton>
+
+        <IconButton
+          title="email"
+          // disabled={(data[rowIndex].node.flagApproval === true || data[rowIndex].node.isSearchable === 0)}
+          disabled={true} // disabling until we figure out why this causes application crashes
+          onTouchTap={() => {
+            this._handleEventEmail([rowIndex])
+          }}
+          >
+            <FontIcon className="material-icons" color={iconColor} hoverColor={BernieColors.blue}>email</FontIcon>
+        </IconButton>
+
+        {/*
+          IconMenu does not not work inside of fixed-data-table cells because of overflow:hidden on parent divs;
+          The plan is to use https://github.com/tajo/react-portal to overcome this limitation
+        */}
+        {/*
+        <IconMenu
+          iconButtonElement={<FontIcon className="material-icons" hoverColor={BernieColors.blue}>more_vert</FontIcon>}
+          desktop={true}
+          openDirection="bottom-right"
+        >
+          <MenuItem index={0} primaryText="Refresh" leftIcon={<FontIcon className="material-icons">delete</FontIcon>} />
+          <MenuItem index={1} primaryText="Send feedback" leftIcon={<FontIcon className="material-icons">delete</FontIcon>} />
+          <MenuItem index={2} primaryText="Settings" leftIcon={<FontIcon className="material-icons">delete</FontIcon>} />
+        </IconMenu>
+        */}
+
+      </div>
+      </Cell>
+    )
+  }
 
   renderToolbar() {
 
@@ -696,13 +727,27 @@ ${signature}`
           let filtersArray = jQuery(this.refs.eventSearchForm).serializeArray();
           let filtersObject = {};
           filtersArray.forEach((filter) => {
-            if (filter.value && filter.value != 'none'){
-              filtersObject[filter.name] = String(filter.value);
+            
+            filtersObject[filter.name] = filter.value;
+
+            if (filtersObject[filter.name] === 'none'){
+              filtersObject[filter.name] = null
+            }
+            else if (filtersObject[filter.name] === 'true'){
+              filtersObject[filter.name] = true
+            }
+            else if (filtersObject[filter.name] === 'false'){
+              filtersObject[filter.name] = false
+            }
+            else if (filtersObject[filter.name]){
+              filtersObject[filter.name] = String(filter.value)
             }
             else {
-              delete filtersObject[filter.name];
+              delete filtersObject[filter.name]
             }
+
           });
+
           this._handleRequestFiltersChange(filtersObject, true);
           this.setState({showFiltersDialog: false});
         }}
@@ -749,34 +794,21 @@ ${signature}`
 
     const filterInputs = [
       {name: 'eventIdObfuscated', label: 'Event ID'},
-      {name: 'isOfficial', label: 'Official Campaign Event', type: 'select', options: booleanOptions},
       {name: 'name', label: 'Event Name'},
       {name: 'eventTypeId', label: 'Event Type', type: 'select', options: this.props.listContainer.eventTypes, optionValue: 'id'},
+      {name: 'isOfficial', label: 'Official Campaign Event', type: 'select', options: booleanOptions},
+      {name: 'isSearchable', label: 'Public Event', type: 'select', options: booleanOptions},
       {name: 'contactPhone', label: 'Host Contact Phone'},
       {name: 'venueName', label: 'Venue Name'},
       {name: 'localTimezone', label: 'Timezone', type: 'select', options: USTimeZones},
-      {name: 'venueState', label: 'State', type: 'select', options: states, optionValue: 'abbreviation'},
+      {name: 'venueAddr1', label: 'Address Line 1'},
+      {name: 'venueAddr2', label: 'Address Line 2'},
       {name: 'venueCity', label: 'City'},
+      {name: 'venueState', label: 'State', type: 'select', options: states, optionValue: 'abbreviation'},
       {name: 'venueZip', label: 'Zip Code'},
       {name: 'latitude', label: 'Latitude', type: 'number'},
       {name: 'longitude', label: 'Longitude', type: 'number'},
     ];
-
-    let updateFilters = (event) => {
-      let updatedValue = event.target.value
-
-      if (updatedValue == 'none')
-        updatedValue = null
-      if (updatedValue == 'true')
-        updatedValue = true
-      if (updatedValue == 'false')
-        updatedValue = false
-
-      let updatedFilters = {}
-      updatedFilters[event.target.name] = updatedValue
-
-      this._handleRequestFiltersChange(updatedFilters)
-    }
 
     return (
       <Dialog
@@ -913,7 +945,7 @@ ${signature}`
 
 
   _handleRequestFiltersChange = (newVars, doNotPreserveOldFilters) => {
-    let oldVars = this.props.relay.variables.filters
+    let oldVars = this.props.relay.variables.filters;
 
     if (doNotPreserveOldFilters) {
       if (!newVars.hasOwnProperty('flagApproval')) {
