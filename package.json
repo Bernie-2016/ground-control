@@ -2,7 +2,8 @@
   "name": "ground-control",
   "private": true,
   "engines": {
-    "node": "4.1.1"
+    "node": "4.1.1",
+    "npm": "2.11.3"
   },
   "description": "Every political revolution needs a launch pad.",
   "repository": "Bernie-2016/ground-control",
