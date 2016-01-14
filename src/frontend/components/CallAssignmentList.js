@@ -1,7 +1,7 @@
-import React from 'react';
-import Relay from 'react-relay';
-import {List, ListItem, Styles} from 'material-ui';
-import moment from 'moment';
+import React from 'react'
+import Relay from 'react-relay'
+import {List, ListItem, Styles} from 'material-ui'
+import moment from 'moment'
 
 export class CallAssignmentList extends React.Component {
   static propTypes = {
@@ -11,19 +11,19 @@ export class CallAssignmentList extends React.Component {
 
   renderCallAssignments() {
     return this.props.callAssignments.edges.map(assignment => {
-        let node = assignment.node;
-        let s = node.callsMade === 1 ? '' : 's'
-        let primaryText = node.name
-        let secondaryText = `${node.callsMade} call${s} made by everyone`
-        return (
-          <ListItem
-            key={node.id}
-            primaryText={primaryText}
-            secondaryText={secondaryText}
-            onTouchTap={(e) => this.props.onSelect(node.id)}/>
-        )
-      }
-    );
+      let node = assignment.node;
+      let s = node.callsMade === 1 ? '' : 's'
+      let primaryText = node.name
+      let secondaryText = `${node.callsMade} call${s} made by everyone`
+
+      return (
+        <ListItem
+          key={node.id}
+          primaryText={primaryText}
+          secondaryText={secondaryText}
+          onTouchTap={(e) => this.props.onSelect(node.id)}/>
+      )
+    })
   }
 
   render() {
@@ -31,7 +31,7 @@ export class CallAssignmentList extends React.Component {
       <List subheader={this.props.subheader}>
         {this.renderCallAssignments()}
       </List>
-    );
+    )
   }
 }
 
@@ -49,5 +49,5 @@ export default Relay.createContainer(CallAssignmentList, {
       }
     `
   }
-});
+})
 
