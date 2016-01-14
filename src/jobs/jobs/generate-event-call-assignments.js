@@ -25,9 +25,10 @@ export let job = async () => {
         .transacting(trx)
         .first()
 
-      if (!turnOutSurvey)
+      if (!turnOutSurvey) {
         log.error('Did not run call assignments job because there is no turn out survey to use')
         return
+      }
 
       let numEvents = eventsToUpdate.length
 
