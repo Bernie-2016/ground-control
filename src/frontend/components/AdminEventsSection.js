@@ -16,8 +16,10 @@ import MutationHandler from './MutationHandler'
 import DeleteEvents from '../mutations/DeleteEvents'
 import EditEvents from '../mutations/EditEvents'
 
-require('fixed-data-table/dist/fixed-data-table.min.css');
-require('./styles/adminEventsSection.css');
+require('fixed-data-table/dist/fixed-data-table.min.css')
+require('./styles/adminEventsSection.css')
+
+const publicEventsRootUrl = process.env.PUBLIC_EVENTS_ROOT_URL
 
 const plurry = (n) => (Math.abs(n) == 1) ? '' : 's';
 
@@ -130,28 +132,6 @@ class AdminEventsSection extends React.Component {
     </Cell>
   )
 
-  EventLinkCell = ({rowIndex, data, col, ...props}) => {
-    let cellStyle = {
-      fontFamily: 'Roboto',
-      fontSize: '13px',
-      lineHeight: '18px'
-    };
-    let linkStyle={
-      color: BernieColors.darkBlue
-    }
-    if (data[rowIndex]['node'].isOfficial){
-      cellStyle.backgroundColor = BernieColors.lightBlue
-      linkStyle.color = BernieColors.darkRed
-    }
-    return (
-      <Cell {...props}
-      style={cellStyle}
-      >
-        <a href={'https://secure.berniesanders.com/page/event/detail/' + data[rowIndex]['node'][col]} style={linkStyle} target="_blank">{data[rowIndex]['node'][col]}</a>
-      </Cell>
-    )
-  }
-
   TextCell = ({rowIndex, data, col, ...props}) => (
     <Cell {...props}
     style={{
@@ -249,7 +229,7 @@ class AdminEventsSection extends React.Component {
     </Cell>
   )
 
-  EventLinkCell = ({rowIndex, data, col, ...props}) => {
+  EventIdLinkCell = ({rowIndex, data, ...props}) => {
     let cellStyle = {
       fontFamily: 'Roboto',
       fontSize: '13px',
@@ -266,7 +246,7 @@ class AdminEventsSection extends React.Component {
       <Cell {...props}
       style={cellStyle}
       >
-        <a href={'https://secure.berniesanders.com/page/event/detail/' + data[rowIndex]['node'][col]} style={linkStyle} target="_blank">{data[rowIndex]['node'][col]}</a>
+        <a href={publicEventsRootUrl + data[rowIndex]['node']['eventIdObfuscated']} style={linkStyle} target="_blank">{data[rowIndex]['node']['eventIdObfuscated']}</a>
       </Cell>
     )
   }
@@ -971,12 +951,6 @@ ${signature}`
     })
   }
 
-  _handlePublicEventOpen = (eventIndex) => {
-    let events = this.props.listContainer.events.edges
-
-    window.open('https://secure.berniesanders.com/page/event/detail/' + events[eventIndex]['node']['eventIdObfuscated'])
-  }
-
   _iterateActiveEvent = (n) => {
     // Do not iterate if there are no more events available before/after current event
     let events = this.props.listContainer.events.edges
@@ -1171,7 +1145,7 @@ ${signature}`
           <Column
             flexGrow={1}
             header={<this.HeaderCell content="ID" />}
-            cell={<this.EventLinkCell data={events} col="eventIdObfuscated" />}
+            cell={<this.EventIdLinkCell data={events} />}
             width={100}
             align='center'
           />

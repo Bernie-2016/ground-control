@@ -59,6 +59,7 @@ function startApp() {
   const templateDir = path.resolve(publicPath, 'admin/events');
   const createEventTemplate = fs.readFileSync(templateDir + '/create_event.hbs', {encoding: 'utf-8'});
   const createEventPage = handlebars.compile(createEventTemplate);
+  const publicEventsRootUrl = process.env.PUBLIC_EVENTS_ROOT_URL
 
   const sessionStore = new KnexSessionStore({
     knex: knex,
@@ -275,26 +276,28 @@ function startApp() {
     if (inDevEnv) {
       const temp = fs.readFileSync(templateDir + '/create_event.hbs', { encoding: 'utf-8' });
       const page = handlebars.compile(temp);
-      res.send(page({ is_public: false }));
+      res.send(page({ is_public: false, events_root_url: publicEventsRootUrl }));
       return
     }
-    res.send(createEventPage({ is_public: false }));
+    res.send(createEventPage({ is_public: false, events_root_url: publicEventsRootUrl }));
   }))
 
   app.get('/events/create', wrap(async (req, res) => {
     if (inDevEnv) {
       const temp = fs.readFileSync(templateDir + '/create_event.hbs', { encoding: 'utf-8' });
       const page = handlebars.compile(temp);
-      res.send(page({ is_public: true }));
+      res.send(page({ is_public: true, events_root_url: publicEventsRootUrl }));
       return
     }
-    res.send(createEventPage({ is_public: true }));
+    res.send(createEventPage({ is_public: true, events_root_url: publicEventsRootUrl }));
   }))
 
   app.post('/events/create', wrap(async (req, res) => {
-    const src = req.headers.referer.split(req.headers.origin)[ 1 ];
+    const src = req.headers.referer.split(req.headers.origin)[1];
     let form = req.body
     form[ 'event_dates' ] = JSON.parse(form[ 'event_dates' ]);
+
+    clientLogger[ 'info' ](`Event Create Form Submission to ${src} by ${req.user.email}`, form);
 
     // Flag event as needing approval
     let batchEventMax = 20;

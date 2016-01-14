@@ -8,6 +8,7 @@ import qs from 'querystring';
 import log from './log';
 import moment from 'moment-timezone';
 import knex from './data/knex';
+import htmlToText from 'html-to-text';
 
 const parseStringPromise = Promise.promisify(parseString);
 const inDevEnv = (process.env.NODE_ENV === 'development')
@@ -455,6 +456,9 @@ export default class BSD {
       ...updatedValues,
       ...{event_id_obfuscated, event_type_id, creator_cons_id}
     }
+    
+    updatedValues.description = htmlToText.fromString(updatedValues.description)
+
     let inputs = this.apiInputsFromEvent(updatedValues)
     // BSD API gets mad if we send this in
     delete inputs['event_id']
@@ -494,7 +498,7 @@ export default class BSD {
         flag_approval: form['flag_approval'],
         is_official: form['is_official'],
         name: form['name'],
-        description: form['description'],
+        description: htmlToText.fromString(form['description']),
         venue_name: form['venue_name'],
         venue_zip: form['venue_zip'],
         venue_city: form['venue_city'],
@@ -536,7 +540,7 @@ export default class BSD {
       let startTime = newEvent['date'] + ' ' + startHour + ':' + form['start_time']['i'] + ':00'
       params['days'][0]['start_datetime_system'] = startTime;
 
-      let response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'POST');
+      let response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'GET');
 
       if (response.validation_errors){
         return {status: 'failure', errors: response.validation_errors}
