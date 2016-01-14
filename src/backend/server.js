@@ -296,9 +296,7 @@ function startApp() {
     let form = req.body
     form[ 'event_dates' ] = JSON.parse(form[ 'event_dates' ]);
 
-    clientLogger[ 'info' ](
-      `Event Create Form Submission to ${src} by ${req.user.email}
-      ${JSON.stringify(form)}`);
+    clientLogger.info(`Event Create Form Submission to ${src} by ${req.user.email}`, JSON.stringify(form, null, '\t'));
 
     // Flag event as needing approval
     let batchEventMax = 20;
@@ -334,9 +332,9 @@ function startApp() {
         // Send generic email
         Mailgun.sendEventConfirmation(form, result.ids, constituent, event_types)
       }
-      clientLogger[ 'info' ](`Event Creation Success: ${result.ids.join(' ')} [${req.user.email}]`);
+      clientLogger.info(`Event Creation Success: ${result.ids.join(' ')} [${req.user.email}]`);
     } else {
-      clientLogger[ 'error' ](`Event Creation Error: ${JSON.stringify(result.errors)} [${req.user.email}]`);
+      clientLogger.error(`Event Creation Error: ${JSON.stringify(result.errors)} [${req.user.email}]`);
     }
 
     res.json(result);
