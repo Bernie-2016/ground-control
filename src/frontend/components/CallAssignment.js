@@ -352,7 +352,7 @@ ${userFirstName}`
             window.location.reload()
           }}
           />
-        <CallStatsBar callsMade={this.props.currentUser.allCallsMade} callsCompleted={this.props.currentUser.completedCallsMade} />
+        <CallStatsBar callsMadeCount={this.props.currentUser.allCallsMade} callsCompletedCount={this.props.currentUser.completedCallsMade} />
         <div style={this.styles.container}>
           {this.renderInstructions()}
           <Paper
@@ -415,8 +415,8 @@ export default Relay.createContainer(CallAssignment, {
       fragment on User {
         id
         firstName
-        allCallsMade:callsMade(forAssignmentId:$id)
-        completedCallsMade:callsMade(forAssignmentId:$id,completed:true)
+        allCallsMade:callsMadeCount(forAssignmentId:$id)
+        completedCallsMade:callsMadeCount(forAssignmentId:$id,completed:true)
         intervieweeForCallAssignment(callAssignmentId:$id) {
           id
           prefix

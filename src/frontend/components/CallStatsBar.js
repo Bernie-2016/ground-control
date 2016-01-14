@@ -13,7 +13,7 @@ export default class CallStatsBar extends React.Component {
           fontSize: '1.3rem'
         }}
       >
-        Calls made: <span style={{color: BernieColors.darkRed}}>{this.props.callsMade}</span>
+        Calls made: <span style={{color: BernieColors.darkRed}}>{this.props.callsMadeCount}</span>
       </div>
     )
 
@@ -25,7 +25,7 @@ export default class CallStatsBar extends React.Component {
           fontSize: '1.3rem'
         }}
       >
-        Calls completed: <span style={{color: BernieColors.darkRed}}>{this.props.callsCompleted}</span>
+        Calls completed: <span style={{color: BernieColors.darkRed}}>{this.props.callsCompletedCount}</span>
       </div>
     )
     return (

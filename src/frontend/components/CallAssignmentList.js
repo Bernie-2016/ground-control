@@ -6,7 +6,7 @@ import moment from 'moment';
 export class CallAssignmentList extends React.Component {
   static propTypes = {
     subheader: React.PropTypes.string,
-    onSelect: React.PropTypes.func,
+    onSelect: React.PropTypes.func
   }
 
   renderCallAssignments() {

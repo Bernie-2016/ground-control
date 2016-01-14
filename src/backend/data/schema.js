@@ -372,8 +372,7 @@ const GraphQLUser = new GraphQLObjectType({
         if (active === true) {
           nullQuery = activeCallAssignments(nullQuery)
           callerQuery = activeCallAssignments(callerQuery)
-        }
-        else if (active === false) {
+        } else if (active === false) {
           nullQuery = inactiveCallAssignments(nullQuery)
           callerQuery = inactiveCallAssignments(callerQuery)
         }
@@ -385,7 +384,17 @@ const GraphQLUser = new GraphQLObjectType({
         return connectionFromArray(assignments, {first})
       }
     },
-    callsMade: {
+    previousContacts: {
+      type: new GraphQLList(GraphQLPerson),
+      resolve: async (user, _, {rootValue}) => {
+        let people = await knex('bsd_people')
+          .join('bsd_calls', 'bsd_calls.interviewee_id ', 'bsd_people.cons_id')
+          .where('bsd_calls.caller_id', user.id)
+
+        return await people.map((person) => rootValue.loaders.bsdPeople.load(person.id))
+      }
+    },
+    callsMadeCount: {
       type: GraphQLInt,
       args: {
         forAssignmentId: { type: GraphQLString },
@@ -424,6 +433,7 @@ const GraphQLUser = new GraphQLObjectType({
           let callAssignment = await rootValue.loaders.bsdCallAssignments.load(localId)
           let allOffsets = [-10, -9, -8, -7, -6, -5, -4]
           let validOffsets = []
+
           // So that I can program late at night
           if (process.env.NODE_ENV === 'development')
             validOffsets = allOffsets

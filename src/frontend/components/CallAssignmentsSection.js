@@ -1,13 +1,14 @@
-import React from 'react';
-import Relay from 'react-relay';
+import React from 'react'
+import Relay from 'react-relay'
 import {BernieText, BernieColors} from './styles/bernie-css'
 import Radium from 'radium'
-import {Paper, RaisedButton} from 'material-ui';
-import SideBarLayout from './SideBarLayout';
-import CallAssignmentList from './CallAssignmentList';
-import CallAssignment from './CallAssignment';
-import Signup from './Signup';
-import CallStatsBar from './CallStatsBar';
+import {Paper, RaisedButton} from 'material-ui'
+import SideBarLayout from './SideBarLayout'
+import CallAssignmentList from './CallAssignmentList'
+import CallAssignment from './CallAssignment'
+import Signup from './Signup'
+import CallStatsBar from './CallStatsBar'
+import PreviouslyContactedList from './PreviouslyContactedList'
 
 class CallAssignmentsSection extends React.Component {
   styles = {
@@ -15,20 +16,20 @@ class CallAssignmentsSection extends React.Component {
       paddingLeft: 0,
       paddingTop: 0,
       paddingRight: 0,
-      paddingBottom: 40,
+      paddingBottom: 40
     },
     paragraph: {
       paddingTop: '0.5em',
       paddingBottom: '0.5em',
       paddingLeft: '0.5em',
-      paddingRight: '0.5em',
-    },
+      paddingRight: '0.5em'
+    }
   }
 
   renderStats() {
     return <CallStatsBar
-      callsMade={this.props.currentUser.allCallsMade}
-      callsCompleted={this.props.currentUser.completedCallsMade}
+      callsMadeCount={this.props.currentUser.allCallsMadeCount}
+      callsCompletedCount={this.props.currentUser.completedCallsMadeCount}
     />
   }
 
@@ -39,8 +40,15 @@ class CallAssignmentsSection extends React.Component {
           callAssignments={this.props.currentUser.callAssignments}
           subheader="Active Assignments"
           onSelect={(id) => {
-            this.props.history.push('/call/' + id)
+            this.props.history.push(`/call/${id}`)
           }}
+        />
+        <PreviouslyContactedList
+          previousContacts={this.props.currentUser.previousContacts}
+          subheader="My Contacts"
+          //onSelect={(id) => {
+          //  this.props.history.push(`/call/${id}`)
+          //}}
         />
       </div>
     )
@@ -82,7 +90,6 @@ class CallAssignmentsSection extends React.Component {
           content={content}
           contentViewStyle={this.styles.container}
         />
-
       </div>
     )
   }
@@ -92,12 +99,15 @@ export default Relay.createContainer(CallAssignmentsSection, {
   fragments: {
     currentUser: () => Relay.QL`
       fragment on User {
-        allCallsMade:callsMade
-        completedCallsMade:callsMade(completed:true)
+        previousContacts {
+          ${PreviouslyContactedList.getFragment('previousContacts')}
+        }
+        allCallsMadeCount:callsMadeCount
+        completedCallsMadeCount:callsMadeCount(completed:true)
         callAssignments(first:50, active:true) {
           ${CallAssignmentList.getFragment('callAssignments')}
         }
       }
-    `,
-  },
-});
+    `
+  }
+})

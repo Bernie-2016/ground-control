@@ -39,7 +39,7 @@ export default Relay.createContainer(CallAssignmentsDashboard, {
   fragments: {
     currentUser: () => Relay.QL`
       fragment on User {
-        callsMade
+        callsMadeCount
       }
     `
   }
