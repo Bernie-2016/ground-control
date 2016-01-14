@@ -296,7 +296,9 @@ function startApp() {
     let form = req.body
     form[ 'event_dates' ] = JSON.parse(form[ 'event_dates' ]);
 
-    clientLogger[ 'info' ](`Event Create Form Submission to ${src} by ${req.user.email}`, JSON.stringify(form));
+    clientLogger[ 'info' ](
+      `Event Create Form Submission to ${src} by ${req.user.email}
+      ${JSON.stringify(form)}`);
 
     // Flag event as needing approval
     let batchEventMax = 20;
