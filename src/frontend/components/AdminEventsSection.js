@@ -252,12 +252,14 @@ class AdminEventsSection extends React.Component {
   }
 
   ActionCell = ({rowIndex, data, col, ...props}) => {
-    let cellStyle = {};
-    let iconColor = null;
-    if (data[rowIndex]['node'].isOfficial){
+    let cellStyle = {}
+    let iconColor = null
+
+    if (data[rowIndex]['node'].isOfficial) {
       cellStyle.backgroundColor = BernieColors.lightBlue
       iconColor = BernieColors.darkRed
     }
+
     return (
       <Cell {...props} style={cellStyle}>
       <div style={{position: 'relative', left: '-5px'}}>
@@ -302,7 +304,7 @@ class AdminEventsSection extends React.Component {
         <IconButton
           title="delete"
           onTouchTap={() => {
-            this._handleEventDeletion([rowIndex]);
+            this._handleEventDeletion([rowIndex])
           }}
         >
           <FontIcon className="material-icons" color={iconColor} hoverColor={BernieColors.red}>delete</FontIcon>
@@ -312,7 +314,7 @@ class AdminEventsSection extends React.Component {
           title="approve"
           disabled={this.props.relay.variables.filters.flagApproval === false}
           onTouchTap={() => {
-            this._handleEventConfirmation([rowIndex]);
+            this._handleEventConfirmation([rowIndex])
           }}
         >
           <FontIcon className="material-icons" color={iconColor} hoverColor={BernieColors.blue}>event_available</FontIcon>
@@ -320,8 +322,7 @@ class AdminEventsSection extends React.Component {
 
         <IconButton
           title="email"
-          // disabled={(data[rowIndex].node.flagApproval === true || data[rowIndex].node.isSearchable === 0)}
-          disabled={true} // disabling until we figure out why this causes application crashes
+          disabled={(data[rowIndex].node.flagApproval === true || data[rowIndex].node.isSearchable === 0)}
           onTouchTap={() => {
             this._handleEventEmail([rowIndex])
           }}
@@ -351,15 +352,15 @@ class AdminEventsSection extends React.Component {
   }
 
   renderToolbar() {
-
     const approvalFilterOptions = [
       {value: 1, 'text': 'Pending Approval'},
       {value: 0, 'text': 'Approved Events'}
-    ];
-    const approvalFilterMenuItems = approvalFilterOptions.map((item) => <MenuItem value={item.value} key={item.value} primaryText={item.text} />);
+    ]
 
-    const resultLengthOptions = [ 10, 25, 50, 100];
-    const resultLengthMenuItems = resultLengthOptions.map((value) => <MenuItem value={value} key={value} primaryText={`${value} Events`} />);
+    const approvalFilterMenuItems = approvalFilterOptions.map((item) => <MenuItem value={item.value} key={item.value} primaryText={item.text} />)
+
+    const resultLengthOptions = [ 10, 25, 50, 100]
+    const resultLengthMenuItems = resultLengthOptions.map((value) => <MenuItem value={value} key={value} primaryText={`${value} Events`} />)
 
     this._handleEventRequestLengthChange = (event, selectedIndex, value) => {
       this.props.relay.setVariables({
@@ -707,7 +708,7 @@ ${signature}`
           let filtersArray = jQuery(this.refs.eventSearchForm).serializeArray();
           let filtersObject = {};
           filtersArray.forEach((filter) => {
-            
+
             filtersObject[filter.name] = filter.value;
 
             if (filtersObject[filter.name] === 'none'){
