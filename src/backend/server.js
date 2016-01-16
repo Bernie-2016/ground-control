@@ -293,7 +293,13 @@ function startApp() {
   }))
 
   app.post('/events/create', wrap(async (req, res) => {
-    const src = req.headers.referer.split(req.headers.origin)[1];
+    let src = req.headers.referer.split(req.headers.origin)[1];
+    if (!src){
+      // Sometimes the above results in undefined.
+      // The sourceurl header is set from the client, so we don't necessarily want to trust it.
+      src = req.headers.sourceurl;
+      log.debug('Missing header data', req.headers);
+    };
     let form = req.body
     form[ 'event_dates' ] = JSON.parse(form[ 'event_dates' ]);
 
