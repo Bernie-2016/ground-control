@@ -282,7 +282,7 @@ function startApp() {
     res.send(createEventPage({ is_public: false, events_root_url: publicEventsRootUrl }));
   }))
 
-  app.get('/events/create', wrap(async (req, res) => {
+  app.get('/events/create', isAuthenticated, wrap(async (req, res) => {
     if (inDevEnv) {
       const temp = fs.readFileSync(templateDir + '/create_event.hbs', { encoding: 'utf-8' });
       const page = handlebars.compile(temp);
@@ -293,11 +293,17 @@ function startApp() {
   }))
 
   app.post('/events/create', wrap(async (req, res) => {
-    const src = req.headers.referer.split(req.headers.origin)[1];
+    let src = req.headers.referer.split(req.headers.origin)[1];
+    if (!src){
+      // Sometimes the above results in undefined.
+      // The sourceurl header is set from the client, so we don't necessarily want to trust it.
+      src = req.headers.sourceurl;
+      log.debug('Missing header data', req.headers);
+    };
     let form = req.body
     form[ 'event_dates' ] = JSON.parse(form[ 'event_dates' ]);
 
-    clientLogger[ 'info' ](`Event Create Form Submission to ${src} by ${req.user.email}`, form);
+    clientLogger.info(`Event Create Form Submission to ${src} by ${req.user.email}`, form);
 
     // Flag event as needing approval
     let batchEventMax = 20;
@@ -333,9 +339,9 @@ function startApp() {
         // Send generic email
         Mailgun.sendEventConfirmation(form, result.ids, constituent, event_types)
       }
-      clientLogger[ 'info' ](`Event Creation Success: ${result.ids.join(' ')} [${req.user.email}]`);
+      clientLogger.info(`Event Creation Success: ${result.ids.join(' ')} [${req.user.email}]`);
     } else {
-      clientLogger[ 'error' ](`Event Creation Error: ${JSON.stringify(result.errors)} [${req.user.email}]`);
+      clientLogger.error(`Event Creation Error: ${JSON.stringify(result.errors)} [${req.user.email}]`);
     }
 
     res.json(result);

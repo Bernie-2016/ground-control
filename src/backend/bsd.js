@@ -540,7 +540,7 @@ export default class BSD {
       let startTime = newEvent['date'] + ' ' + startHour + ':' + form['start_time']['i'] + ':00'
       params['days'][0]['start_datetime_system'] = startTime;
 
-      let response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'GET');
+      let response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'POST');
 
       if (response.validation_errors){
         return {status: 'failure', errors: response.validation_errors}

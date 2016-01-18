@@ -854,19 +854,17 @@ const GraphQLEvent = new GraphQLObjectType({
     nearbyPeople: {
       type: new GraphQLList(GraphQLPerson),
       resolve: async(event, _, {rootValue}) => {
-        let addresses =
-          await knex('bsd_addresses')
-            .join('bsd_people', 'bsd_addresses.cons_id', 'bsd_people.cons_id')
-            .join('bsd_emails', 'bsd_people.cons_id', 'bsd_emails.cons_id')
-            .join('bsd_phones', 'bsd_people.cons_id', 'bsd_phones.cons_id')
-            .where('bsd_emails.is_primary', true)
-            .whereNotNull('bsd_phones.phone')
-            .whereRaw(`st_dwithin(bsd_addresses.geom, st_transform(st_setsrid(st_makepoint(${event.longitude}, ${event.latitude}), 4326), 900913), 50000)`)
-            .orderByRaw(`bsd_addresses.geom <-> st_transform(st_setsrid(st_makepoint(${event.longitude}, ${event.latitude}), 4326), 900913)`)
-            .orderBy('bsd_people.create_dt')
-            .limit(500)
-
-        return await addresses.map((address) => rootValue.loaders.bsdPeople.load(address.cons_id))
+        return knex('bsd_addresses')
+          .select('bsd_people.*')
+          .join('bsd_people', 'bsd_addresses.cons_id', 'bsd_people.cons_id')
+          .join('bsd_emails', 'bsd_people.cons_id', 'bsd_emails.cons_id')
+          //.join('bsd_phones', 'bsd_people.cons_id', 'bsd_phones.cons_id')
+          .where('bsd_emails.is_primary', true)
+          //.whereNotNull('bsd_phones.phone')
+          .whereRaw(`st_dwithin(bsd_addresses.geom, st_transform(st_setsrid(st_makepoint(${event.longitude}, ${event.latitude}), 4326), 900913), 50000)`)
+          .orderByRaw(`bsd_addresses.geom <-> st_transform(st_setsrid(st_makepoint(${event.longitude}, ${event.latitude}), 4326), 900913)`)
+          //.orderBy('bsd_people.create_dt')
+          .limit(500)
       }
     }
   }),
