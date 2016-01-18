@@ -282,7 +282,7 @@ function startApp() {
     res.send(createEventPage({ is_public: false, events_root_url: publicEventsRootUrl }));
   }))
 
-  app.get('/events/create', wrap(async (req, res) => {
+  app.get('/events/create', isAuthenticated, wrap(async (req, res) => {
     if (inDevEnv) {
       const temp = fs.readFileSync(templateDir + '/create_event.hbs', { encoding: 'utf-8' });
       const page = handlebars.compile(temp);
