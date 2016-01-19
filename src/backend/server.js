@@ -1,3 +1,4 @@
+import newrelic from 'newrelic'
 import express from 'express'
 import graphQLHTTP from 'express-graphql'
 import {Schema} from './data/schema'
@@ -281,7 +282,7 @@ function startApp() {
     res.send(createEventPage({ is_public: false, events_root_url: publicEventsRootUrl }));
   }))
 
-  app.get('/events/create', wrap(async (req, res) => {
+  app.get('/events/create', isAuthenticated, wrap(async (req, res) => {
     if (inDevEnv) {
       const temp = fs.readFileSync(templateDir + '/create_event.hbs', { encoding: 'utf-8' });
       const page = handlebars.compile(temp);
@@ -292,7 +293,13 @@ function startApp() {
   }))
 
   app.post('/events/create', wrap(async (req, res) => {
-    const src = req.headers.referer.split(req.headers.origin)[1];
+    let src = req.headers.referer.split(req.headers.origin)[1];
+    if (!src){
+      // Sometimes the above results in undefined.
+      // The sourceurl header is set from the client, so we don't necessarily want to trust it.
+      src = req.headers.sourceurl;
+      log.debug('Missing header data', req.headers);
+    };
     let form = req.body
     if (process.env.NODE_ENV === 'development')
       form['event_type_id'] = 1

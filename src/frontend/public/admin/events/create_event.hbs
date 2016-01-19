@@ -220,7 +220,7 @@
                           <select size="1" name="is_searchable">
                             <option value="1">Make Public</option>
                             <option value="0">Make Private</option>
-                            <option value="-2">Use Event Type Default</option>
+                            <!-- <option value="-2">Use Event Type Default</option> -->
                           </select>
                         </div>
                       </div>
@@ -1524,6 +1524,7 @@
           		$.ajax({
           		    dataType: "json",
           		    url: '/events/create',
+                  headers: { sourceurl: window.location.pathname },
           		    data: formdata,
           		    type: 'POST',
           		    success: function(response, textStatus) {

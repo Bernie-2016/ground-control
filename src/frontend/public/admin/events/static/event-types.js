@@ -10,6 +10,15 @@ var eventTypes = [
 		adminOnly: true
 	},
 	{
+		id: 30,
+		name: 'Gather Ballot Access Signatures',
+		defaultValues: {
+			name: 'Bernie Ballot Blast - PA Support Bernie and his Delegates and Collect Petition Signatures',
+			description: 'We only have 3 weeks to get all the needed signatures to get Bernie on the Ballot and get his Delegates nominated for the Democratic Convention.  Sign up for your local events scheduled between January 26th and February 10th.  We can\'t do this without you and you can make the difference in Pennsylvania, one of the most important swing states.  Come join the movement!',
+		},
+		adminOnly: true
+	},
+	{
 		id: 31,
 		name: 'Phonebank',
 		defaultValues: {
@@ -23,7 +32,7 @@ var eventTypes = [
 		name: 'Canvass',
 		defaultValues: {
 			name: 'Door knocking for Bernie',
-			description: 'You&rsquo;re invited to join your neighbors and supporters to knock on the doors of&nbsp;undecided voters. We&rsquo;ll provide you with a script, a list of voters that you&rsquo;ll be talking to, and a map of where to go. We&rsquo;ll also train you to use your time effectively out in the field. You&rsquo;ll be able to talk to real people about how this country belongs to all of us, not just the billionaire class. Our victory starts with us knocking on doors together.'
+			description: 'You\'re invited to join your neighbors and supporters to knock on the doors of undecided voters. We\'ll provide you with a script, a list of voters that you\'ll be talking to, and a map of where to go. We\'ll also train you to use your time effectively out in the field. You\'ll be able to talk to real people about how this country belongs to all of us, not just the billionaire class. Our victory starts with us knocking on doors together.',
 		},
 		adminOnly: false
 	},
