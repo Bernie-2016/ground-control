@@ -67,7 +67,7 @@ export default class MG {
     }
   }
 
-  async sendEventConfirmation(form, eventIds, constituent, eventTypes) {
+  async sendEventConfirmation(form, eventIds, constituent) {
     if (form.capacity === '0') {
       form.capacity = 'unlimited'
     }
@@ -79,13 +79,6 @@ export default class MG {
 
     form.event_dates.sort((a, b) => {
       return a.date.localeCompare(b.date)
-    })
-
-    // Get the event type name
-    eventTypes.forEach((type) => {
-      if (type.event_type_id == form.event_type_id) {
-        form.event_type_name = type.name
-      }
     })
 
     constituent.cons_email.forEach((email) => {

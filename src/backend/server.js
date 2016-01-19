@@ -294,6 +294,8 @@ function startApp() {
   app.post('/events/create', wrap(async (req, res) => {
     const src = req.headers.referer.split(req.headers.origin)[1];
     let form = req.body
+    if (process.env.NODE_ENV === 'development')
+      form['event_type_id'] = 1
 
     clientLogger.info(`Event Create Form Submission to ${src} by ${req.user.email}`, JSON.stringify(form));
 
@@ -309,6 +311,28 @@ function startApp() {
       form[ 'flag_approval' ] = '1'
     }
 
+    form['event_dates'] = JSON.parse(form[ 'event_dates' ]);
+    let dateCount = form['event_dates'].length
+
+    if (dateCount > batchEventMax) {
+      res.status(400).send({errors: {
+        'Number of Events' : [`You can only create up to ${batchEventMax} events at a time. ${form['event_dates'].length} events were received.`]
+      }})
+      return
+    }
+
+    let eventType = await knex('bsd_event_types')
+      .where('event_type_id', form['event_type_id'])
+      .first()
+
+    if (!eventType) {
+      res.status(400).send({
+        errors: {
+          'Event Type': ['Does not exist in BSD']}
+      })
+      return
+    }
+
     // constituent object not being returned right now
     let constituent = await BSDClient.getConstituentByEmail(form.cons_email)
 
@@ -317,28 +341,49 @@ function startApp() {
       constituent = await BSDClient.createConstituent(form.cons_email, name[ 0 ], (name.length > 1) ? name[ name.length - 1 ] : '')
     }
 
-    form['event_dates'] = JSON.parse(form[ 'event_dates' ]);
-    let eventTypes = await knex('bsd_event_types')
-
-    let result = await BSDClient.createEvents(constituent.id, form, event_types, batchEventMax)
-
-    if (result.status == 'success') {
-      if (form[ 'event_type_id' ] == 31) {
-        // Send phone bank specific email
-        // Mailgun.sendPhoneBankConfirmation(form, result.ids, constituent)
-        // re-enable phonebank email after we find a way to track when these have been sent
-        Mailgun.sendEventConfirmation(form, result.ids, constituent, event_types)
-      }
-      else {
-        // Send generic email
-        Mailgun.sendEventConfirmation(form, result.ids, constituent, event_types)
-      }
-      clientLogger[ 'info' ](`Event Creation Success: ${result.ids.join(' ')} [${req.user.email}]`);
-    } else {
-      clientLogger[ 'error' ](`Event Creation Error: ${JSON.stringify(result.errors)} [${req.user.email}]`);
+    form['creator_cons_id'] = constituent.id
+    let startHour = null;
+    if (form['start_time']['a'] == 'pm') {
+      startHour = Number(form['start_time']['h']) + 12;
+    }
+    else {
+      startHour = form['start_time']['h'];
     }
 
-    res.json(result);
+    let createdEventIds = [];
+
+    for (let index = 0; index < dateCount; index++) {
+      let result = null
+      try {
+        result = await BSDClient.createEvent({
+          ...form,
+          'duration' : form['duration_num'] * form['duration_unit'],
+          'capacity' : form['capacity'],
+          'start_datetime_system' : `${form['event_dates'][index]['date']} ${startHour}:${form['start_time']['i']}:00`
+        })
+        createdEventIds.push(result.event_id_obfuscated)
+      } catch(ex) {
+        clientLogger.error(`Event Creation Error: ${ex.message} [${req.user.email}]`);
+        let error = null
+        try {
+          error = JSON.parse(ex.message)
+        } catch (ex) {}
+        if (error) {
+          res.status(400).send({'errors': error})
+          return
+        }
+        else {
+          throw ex
+        }
+      }
+    }
+
+    Mailgun.sendEventConfirmation({...form,
+      event_type_name: eventType.name}, createdEventIds, constituent)
+    clientLogger.info(`Event Creation Success: ${createdEventIds.join(' ')} [${req.user.email}]`);
+    res.send({
+      ids: createdEventIds
+    })
   }))
 
   app.use(fallback('index.html', {

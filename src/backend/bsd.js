@@ -11,7 +11,6 @@ import knex from './data/knex';
 import htmlToText from 'html-to-text';
 
 const parseStringPromise = Promise.promisify(parseString);
-const inDevEnv = (process.env.NODE_ENV === 'development')
 
 export default class BSD {
   constructor(host, id, secret) {
@@ -417,7 +416,7 @@ export default class BSD {
       'pledge_max',
       'pledge_suggest',
       'rsvp_use_default_email_message',
-      'rsvrp_email_message',
+      'rsvp_email_message',
       'rsvp_email_message_html',
       'rsvp_use_reminder_email',
       'rsvp_reminder_email_sent',
@@ -440,6 +439,14 @@ export default class BSD {
       else if (key === 'start_dt') {
         eventDate['start_datetime_system'] = moment(event['start_dt']).tz(event['start_tz']).format('YYYY-MM-DD HH:mm:ss')
       }
+      else if (key === 'start_datetime_system')
+        eventDate['start_datetime_system'] = event['start_datetime_system']
+      else if (key === 'description')
+        inputs['description'] = htmlToText.fromString(inputs['description'])
+      else if (key === 'is_searchable') {
+        console.log(inputs['is_searchable'])
+        inputs['is_searchable'] = inputs['is_searchable'] ? inputs['is_searchable'] : -2
+      }
       else if (key === 'capacity')
         eventDate[key] = event[key]
       else if (key === 'duration')
@@ -456,7 +463,7 @@ export default class BSD {
       else if (apiKeys.indexOf(key) !== -1)
         inputs[key] = event[key]
     })
-    if (Object.keys(eventDate).length > 0) {
+    if (Object.keys(eventDate).length > 0 && !inputs.hasOwnProperty('days')) {
       eventDate['event_id'] = event.event_id
       inputs['days'] = [eventDate]
     }
@@ -466,7 +473,6 @@ export default class BSD {
 
   async updateEvent(event) {
     let inputs = this.apiInputsFromEvent(event)
-    inputs['description'] = htmlToText.fromString(inputs['description'])
 
     // BSD API gets mad if we send this in
     delete inputs['event_id']
@@ -479,7 +485,7 @@ export default class BSD {
 
   async createEvent(event) {
     let params = this.apiInputsFromEvent(event)
-    response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'POST');
+    let response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'GET');
     if (response.validation_errors)
       throw new Error(JSON.stringify(response.validation_errors))
     else
@@ -514,6 +520,8 @@ export default class BSD {
       resolveWithFullResponse: true,
       json: true
     }
+    if (method === 'POST')
+      options['body'] = params
 
     return this.requestWrapper(options)
   }
