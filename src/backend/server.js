@@ -1,4 +1,5 @@
-import newrelic from 'newrelic'
+if (process.env.NODE_ENV === 'production')
+  var newrelic = require('newrelic')
 import express from 'express'
 import graphQLHTTP from 'express-graphql'
 import {Schema} from './data/schema'
