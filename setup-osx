@@ -10,6 +10,7 @@ brew install postgis
 if [ $? -ne 0 ]; then
   echo "Starting up database..."
   /usr/local/bin/pg_ctl -D /usr/local/var/postgres start
+  sleep 2
 fi
 
 /usr/local/bin/dropdb ground_control
@@ -36,4 +37,6 @@ echo "Seeding data..."
 npm run migrate
 npm run seed
 
+/usr/local/bin/pg_ctl -D /usr/local/var/postgres stop
+sleep 2
 echo "\nDone!"
