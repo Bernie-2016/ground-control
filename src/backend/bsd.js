@@ -124,7 +124,8 @@ export default class BSD {
     return consObj;
   }
 
-  generateBSDURL(callPath, {params={}, secure=false}={}) {
+  generateBSDURL(callPath, params, method) {
+    log.debug('call path', callPath)
     if (callPath[0] === '/')
       callPath = callPath.substring(1, callPath.length);
     callPath = url.resolve(this.baseURL.pathname, callPath)
@@ -155,9 +156,18 @@ export default class BSD {
     encryptedMessage.update(signingString);
     let apiMac = encryptedMessage.digest('hex');
     sortedParams.push({api_mac : apiMac});
+
+    if (method === 'POST') {
+      let queryParamKeys = ['api_id', 'api_ts', 'api_mac']
+      sortedParams = queryParamKeys.map((key) => {
+        return sortedParams.find((el) => el.hasOwnProperty(key))
+      })
+    }
+    log.info(sortedParams)
     let encodedQueryString = sortedParams.map((element) => {
-      return querystring.stringify(element)
-    }).join('&');
+        return querystring.stringify(element)
+      }).join('&');
+
     let finalURL = url.parse(url.resolve(url.format(this.baseURL), callPath));
     finalURL.protocol = 'https:';
     finalURL.search = '?' + encodedQueryString;
@@ -191,7 +201,7 @@ export default class BSD {
     })
     let params = `<?xml version="1.0" encoding="utf-8"?><api><signup_form id="${formId}">${fields}</signup_form></api>`;
 
-    let response = await this.sendXML('/signup/process_signup', params, 'POST');
+    let response = await this.request('/signup/process_signup', params, 'POST');
   }
 
   async getForm(formId) {
@@ -273,7 +283,7 @@ export default class BSD {
   async getDeferredResult(deferredId) {
     return new Promise((resolve, reject) => {
       setTimeout(async () => {
-        let response = await this.makeRawRequest('/get_deferred_results', {deferred_id: deferredId}, 'GET');
+        let response = await this.makeRESTRequest('/get_deferred_results', {deferred_id: deferredId}, 'GET');
         if (response.statusCode === 202)
           resolve(this.getDeferredResult(deferredId))
         else
@@ -289,7 +299,7 @@ export default class BSD {
 
   async createConstituent(email, firstName, lastName) {
     const params = `<?xml version="1.0" encoding="utf-8"?><api><cons><firstname>${firstName}</firstname><lastname>${lastName}</lastname><cons_email><email>${email}</email></cons_email></cons></api>`;
-    let response = await this.sendXML('/cons/set_constituent_data', params, 'POST');
+    let response = await this.request('/cons/set_constituent_data', params, 'POST');
     response = await parseStringPromise(response);
 
     let constituent = await this.getConstituentByEmail(email);
@@ -421,6 +431,7 @@ export default class BSD {
       'outreach_page_id',
       'days'
     ]
+
     let inputs = {}
     let eventDate = {}
     Object.keys(event).forEach((key) => {
@@ -433,6 +444,8 @@ export default class BSD {
         eventDate[key] = event[key]
       else if (key === 'duration')
         eventDate[key] = event[key]
+      else if (key === 'contact_phone')
+        inputs[key] = event[key].replace(/\D/g,'')
       else if (key === 'attendee_visibility') {
         inputs[key] = 'NONE'
         if (event[key] === 0)
@@ -447,19 +460,14 @@ export default class BSD {
       eventDate['event_id'] = event.event_id
       inputs['days'] = [eventDate]
     }
+
     return inputs
   }
 
-  async updateEvent(event_id_obfuscated, event_type_id, creator_cons_id, updatedValues) {
+  async updateEvent(event) {
+    let inputs = this.apiInputsFromEvent(event)
+    inputs['description'] = htmlToText.fromString(inputs['description'])
 
-    updatedValues = {
-      ...updatedValues,
-      ...{event_id_obfuscated, event_type_id, creator_cons_id}
-    }
-    
-    updatedValues.description = htmlToText.fromString(updatedValues.description)
-
-    let inputs = this.apiInputsFromEvent(updatedValues)
     // BSD API gets mad if we send this in
     delete inputs['event_id']
     let response = await this.request('/event/update_event', {event_api_version: 2, values: JSON.stringify(inputs)}, 'POST');
@@ -469,93 +477,13 @@ export default class BSD {
     return response
   }
 
-  async createEvents(cons_id, form, event_types, batchEventLimit=10) {
-    if (inDevEnv)
-      form['event_type_id'] = '1'
-
-    if (form['event_dates'].length > batchEventLimit){
-      return {status: 'failure', errors: {'Number of Events': [`You can only create up to ${batchEventLimit} events at a time. ${form['event_dates'].length} events were received.`]}}
-    }
-
-    let eventType = null;
-    event_types.forEach((type) => {
-      if (type.event_type_id == form['event_type_id']){
-        eventType = type;
-      }
-    })
-
-    if (eventType === null){
-      return {status: 'failure', errors: {'Event Type': ['Does not exist in BSD']}}
-    }
-
-    // validations
-    // Remove special characters from phone number
-    let contact_phone = form['contact_phone'].replace(/\D/g,'');
-
-    let params = {
-        event_type_id: form['event_type_id'],
-        creator_cons_id: cons_id,
-        flag_approval: form['flag_approval'],
-        is_official: form['is_official'],
-        name: form['name'],
-        description: htmlToText.fromString(form['description']),
-        venue_name: form['venue_name'],
-        venue_zip: form['venue_zip'],
-        venue_city: form['venue_city'],
-        venue_state_cd: form['venue_state_cd'],
-        venue_addr1: form['venue_addr1'],
-        venue_addr2: form['venue_addr2'],
-        venue_country: form['venue_country'],
-        venue_directions: form['venue_directions'],
-        days: [{
-            duration: form['duration_num'] * form['duration_unit'],
-            capacity: form['capacity']
-        }],
-        local_timezone: form['start_tz'],
-        attendee_volunteer_message: form['attendee_volunteer_message'],
-        is_searchable: (form['is_searchable']) ? form['is_searchable'] : -2, // second value should set to event type default
-        public_phone: form['public_phone'],
-        contact_phone: contact_phone,
-        host_receive_rsvp_emails: form['host_receive_rsvp_emails'],
-        rsvp_use_reminder_email: form['rsvp_use_reminder_email'],
-        rsvp_reminder_hours: form['rsvp_email_reminder_hours']
-    };
-
-    // Add params if supported by event type
-    if (Number(eventType.attendee_volunteer_show) == 1){
-      params['attendee_volunteer_show'] = form['attendee_volunteer_show'];
-    }
-
-    let startHour = null;
-    if (form['start_time']['a'] == 'pm'){
-      startHour = Number(form['start_time']['h']) + 12;
-    }
-    else{
-      startHour = form['start_time']['h'];
-    }
-
-    let newEventIds = [];
-    for (let index = 0; index < form['event_dates'].length; index++){
-      let newEvent = form['event_dates'][index];
-      let startTime = newEvent['date'] + ' ' + startHour + ':' + form['start_time']['i'] + ':00'
-      params['days'][0]['start_datetime_system'] = startTime;
-
-      let response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'POST');
-
-      if (response.validation_errors){
-        return {status: 'failure', errors: response.validation_errors}
-      }
-      else if (response.event_id_obfuscated){
-        newEventIds.push(response.event_id_obfuscated)
-      };
-    }
-
-    if (newEventIds.length > 0){
-      // successfully created events
-      return {status: 'success', ids : newEventIds}
-    }
-
-    return {status: 'failure', errors: {error: 'No event ids returned.'}}
+  async createEvent(event) {
+    let params = this.apiInputsFromEvent(event)
+    response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'POST');
+    if (response.validation_errors)
+      throw new Error(JSON.stringify(response.validation_errors))
+    else
+      return response
   }
 
   async requestWrapper(options) {
@@ -578,8 +506,8 @@ export default class BSD {
     }
   }
 
-  async makeRawRequest(callPath, params, method) {
-    let finalURL = this.generateBSDURL(callPath, {params});
+  async makeRESTRequest(callPath, params, method) {
+    let finalURL = this.generateBSDURL(callPath, params, method);
     let options = {
       uri: finalURL,
       method: method,
@@ -590,21 +518,8 @@ export default class BSD {
     return this.requestWrapper(options)
   }
 
-  async makeRawRequestWithBody(callPath, params, method) {
-    let finalURL = this.generateBSDURL(callPath);
-    let options = {
-      uri: finalURL,
-      method: method,
-      body: params,
-      resolveWithFullResponse: true,
-      json: true
-    }
-
-    return this.requestWrapper(options)
-  }
-
-  async makeRawXMLRequest(callPath, params, method) {
-    let finalURL = this.generateBSDURL(callPath);
+  async makeSOAPRequest(callPath, params, method) {
+    let finalURL = this.generateBSDURL(callPath, params, method);
     let options = {
       uri: finalURL,
       method: method,
@@ -616,23 +531,11 @@ export default class BSD {
   }
 
   async request(callPath, params, method) {
-    let response = await this.makeRawRequest(callPath, params, method);
-    if (response.statusCode === 202)
-      return this.getDeferredResult(response.body);
+    let response = null;
+    if (typeof params === 'string' && params.toLowerCase().indexOf('<?xml') === 0)
+      response = await this.makeSOAPRequest(callPath, params, method)
     else
-      return response.body;
-  }
-
-  async sendDataInBody(callPath, params, method) {
-    let response = await this.makeRawRequestWithBody(callPath, params, method);
-    if (response.statusCode === 202)
-      return this.getDeferredResult(response.body);
-    else
-      return response.body;
-  }
-
-  async sendXML(callPath, params, method) {
-    let response = await this.makeRawXMLRequest(callPath, params, method);
+      response = await this.makeRESTRequest(callPath, params, method);
     if (response.statusCode === 202)
       return this.getDeferredResult(response.body);
     else

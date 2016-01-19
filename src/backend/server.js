@@ -294,9 +294,8 @@ function startApp() {
   app.post('/events/create', wrap(async (req, res) => {
     const src = req.headers.referer.split(req.headers.origin)[1];
     let form = req.body
-    form[ 'event_dates' ] = JSON.parse(form[ 'event_dates' ]);
 
-    clientLogger[ 'info' ](`Event Create Form Submission to ${src} by ${req.user.email}`, JSON.stringify(form));
+    clientLogger.info(`Event Create Form Submission to ${src} by ${req.user.email}`, JSON.stringify(form));
 
     // Flag event as needing approval
     let batchEventMax = 20;
@@ -318,7 +317,9 @@ function startApp() {
       constituent = await BSDClient.createConstituent(form.cons_email, name[ 0 ], (name.length > 1) ? name[ name.length - 1 ] : '')
     }
 
-    let event_types = await BSDClient.getEventTypes()
+    form['event_dates'] = JSON.parse(form[ 'event_dates' ]);
+    let eventTypes = await knex('bsd_event_types')
+
     let result = await BSDClient.createEvents(constituent.id, form, event_types, batchEventMax)
 
     if (result.status == 'success') {
