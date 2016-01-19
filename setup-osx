@@ -10,6 +10,7 @@ brew install postgis
 if [ $? -ne 0 ]; then
   echo "Starting up database..."
   /usr/local/bin/pg_ctl -D /usr/local/var/postgres start
+  sleep 5
 fi
 
 /usr/local/bin/dropdb ground_control
