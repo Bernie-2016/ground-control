@@ -443,11 +443,11 @@ export default class BSD {
       else if (key === 'start_datetime_system')
         eventDate['start_datetime_system'] = event['start_datetime_system']
       else if (key === 'description') {
-        inputs['description'] = htmlToText.fromString(inputs['description'])
+        inputs['description'] = htmlToText.fromString(event['description'])
       }
       else if (key === 'is_searchable') {
         console.log(inputs['is_searchable'])
-        inputs['is_searchable'] = inputs['is_searchable'] ? inputs['is_searchable'] : -2
+        inputs['is_searchable'] = event['is_searchable'] ? event['is_searchable'] : -2
       }
       else if (key === 'capacity')
         eventDate[key] = event[key]
