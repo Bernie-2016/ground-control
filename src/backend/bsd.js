@@ -163,7 +163,7 @@ export default class BSD {
         return sortedParams.find((el) => el.hasOwnProperty(key))
       })
     }
-    log.info(sortedParams)
+
     let encodedQueryString = sortedParams.map((element) => {
         return querystring.stringify(element)
       }).join('&');
@@ -418,7 +418,7 @@ export default class BSD {
       'pledge_suggest',
       'rsvp_use_default_email_message',
       'rsvp_email_message',
-      'rsvp_email_message_html',
+      'rsvrp_email_message_html',
       'rsvp_use_reminder_email',
       'rsvp_reminder_email_sent',
       'rsvp_reminder_hours',
@@ -446,7 +446,6 @@ export default class BSD {
         inputs['description'] = htmlToText.fromString(event['description'])
       }
       else if (key === 'is_searchable') {
-        console.log(inputs['is_searchable'])
         inputs['is_searchable'] = event['is_searchable'] ? event['is_searchable'] : -2
       }
       else if (key === 'capacity')

@@ -374,14 +374,11 @@ function startApp() {
         let error = null
         try {
           error = JSON.parse(ex.message)
-        } catch (ex) {}
-        if (error) {
-          res.status(400).send({'errors': error})
-          return
-        }
-        else {
+        } catch (jsonEx) {
           throw ex
         }
+        res.status(400).send({'errors': error})
+        return
       }
     }
 
