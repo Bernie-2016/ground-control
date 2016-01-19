@@ -124,7 +124,8 @@ export default class BSD {
   }
 
   generateBSDURL(callPath, params, method) {
-    log.debug('call path', callPath)
+    params = method === 'POST' ? {} : {...params}
+
     if (callPath[0] === '/')
       callPath = callPath.substring(1, callPath.length);
     callPath = url.resolve(this.baseURL.pathname, callPath)
@@ -157,7 +158,7 @@ export default class BSD {
     sortedParams.push({api_mac : apiMac});
 
     if (method === 'POST') {
-      let queryParamKeys = ['api_id', 'api_ts', 'api_mac']
+      let queryParamKeys = ['api_id', 'api_ts', 'api_ver', 'api_mac']
       sortedParams = queryParamKeys.map((key) => {
         return sortedParams.find((el) => el.hasOwnProperty(key))
       })
@@ -441,8 +442,9 @@ export default class BSD {
       }
       else if (key === 'start_datetime_system')
         eventDate['start_datetime_system'] = event['start_datetime_system']
-      else if (key === 'description')
+      else if (key === 'description') {
         inputs['description'] = htmlToText.fromString(inputs['description'])
+      }
       else if (key === 'is_searchable') {
         console.log(inputs['is_searchable'])
         inputs['is_searchable'] = inputs['is_searchable'] ? inputs['is_searchable'] : -2
@@ -485,7 +487,7 @@ export default class BSD {
 
   async createEvent(event) {
     let params = this.apiInputsFromEvent(event)
-    let response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'GET');
+    let response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'POST');
     if (response.validation_errors)
       throw new Error(JSON.stringify(response.validation_errors))
     else
@@ -514,14 +516,23 @@ export default class BSD {
 
   async makeRESTRequest(callPath, params, method) {
     let finalURL = this.generateBSDURL(callPath, params, method);
+
     let options = {
       uri: finalURL,
       method: method,
       resolveWithFullResponse: true,
       json: true
     }
-    if (method === 'POST')
-      options['body'] = params
+    if (method === 'POST') {
+      let body = Object.keys(params).sort().map((key) => {
+        let obj = {}
+        obj[key] = params[key]
+        return querystring.stringify(obj)
+      }).join('&')
+
+      options['body'] = body
+      options['headers'] = {'content-type': 'application/x-www-form-urlencoded'}
+    }
 
     return this.requestWrapper(options)
   }
