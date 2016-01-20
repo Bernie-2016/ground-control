@@ -107,6 +107,7 @@ class Jan23HostRecruitmentSurvey extends React.Component {
           country='us'
           placeholder="Address"
           errorText={this.state.errors.address}
+          initialValue={this.state.address}
           onChange={(val) => {
             this.setState({address: val})
           }}
