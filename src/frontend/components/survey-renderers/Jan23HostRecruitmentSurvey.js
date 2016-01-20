@@ -7,6 +7,7 @@ import GCBooleanField from '../forms/GCBooleanField';
 import GCSelectField from '../forms/GCSelectField'
 import GCTextField from '../forms/GCTextField'
 import Geosuggest from 'react-geosuggest'
+import {USTimeZones} from '../data/USTimeZones';
 
 class Jan23HostRecruitmentSurvey extends React.Component {
 
@@ -41,6 +42,7 @@ class Jan23HostRecruitmentSurvey extends React.Component {
       this.props.onSubmitted({
         'already_hosting': this.state.alreadyHosting,
         'has_location': this.state.hasLocation,
+        /*
         'event': {
           'event_type_id': 1,
           'creator_cons_id': this.props.interviewee.id,
@@ -58,6 +60,7 @@ class Jan23HostRecruitmentSurvey extends React.Component {
           'is_searchable': 1,
           'flag_approval': 0,
         }
+        */
       })
   }
 
@@ -70,13 +73,14 @@ class Jan23HostRecruitmentSurvey extends React.Component {
       if (this.state.hasLocation === null) {
         errors = {hasLocation: 'This field is required'}
       }
-      else if (this.state.hasLocation === 'yes') {
+/*      else if (this.state.hasLocation === 'yes') {
         let requiredFields = ['address', 'state', 'city', 'zip']
         requiredFields.forEach((field) => {
           if (this.state[field] === null)
             errors[field] = 'This field is required'
         })
       }
+      */
     }
     this.setState({errors})
     if (Object.keys(errors).length > 0)
@@ -137,11 +141,10 @@ class Jan23HostRecruitmentSurvey extends React.Component {
             }
           }}
         />
-
         <GCTextField
           label='City'
           value={this.state.city}
-          style={{width: 400}}
+          style={{width: 300}}
           errorText={this.state.errors.city}
           onChange={(val) => this.setState({city: val})}
         />
@@ -155,25 +158,43 @@ class Jan23HostRecruitmentSurvey extends React.Component {
         <GCTextField
           label='Zip'
           value={this.state.zip}
-          style={{width: 200}}
+          style={{width: 120}}
           errorText={this.state.errors.zip}
           onChange={(val) => this.setState({zip: val})}
         />
+        <GCSelectField
+          value={this.state.timezone}
+          choices={this.timezoneChoices()}
+          style={{width: 180}}
+          errorText={this.state.errors.timezone}
+          clearable={false}
+          onChange={(val) => this.setState({timezone: val})}
+        />
+
       </div>
     )
+  }
+
+  timezoneChoices() {
+    let choices = {}
+    USTimeZones.forEach((tz) => {
+      choices[tz.value] = tz.name
+    })
+    return choices;
   }
 
   render() {
     let hasLocationYes = (
       <div>
         Great! Let me take down that location now, and your party will be all set up for you!
-        {this.renderLocationFields()}
+        <br /><strong>[Go to <a target="_blank" href="http://organize.berniesanders.com/admin/events/create">the event creation page</a> and create the event for the person]</strong>
         <div style={{paddingTop: 10}}>
         You are all set. Thanks so much for hosting, and have a great day!
         </div>
       </div>
     )
-    let hasLocationNo = <div>No worries! You’ll get an email really soon with a link to modify your event.  If you’re having any trouble updating it, just write to help@berniesanders.com. Thanks, and have a great day!</div>
+    let hasLocationNo = <div>No worries! You’ll get an email really soon with a link to modify your event.  If you’re having any trouble updating it, just write to help@berniesanders.com. Thanks, and have a great day!
+    <br /><strong>[Go to <a target="_blank" href="http://organize.berniesanders.com/admin/events/create">the event creation page</a> and create the event for the person with TBD for location]</strong></div>
     let wontHost = <div>That’s okay. Hopefully someone else hosts in your area and you can attend their event.  You will get an email with your local options or you can always check map.berniesanders.com  Thanks for your time and have a great day.</div>
     let allLocationOptions = (
       <div>
