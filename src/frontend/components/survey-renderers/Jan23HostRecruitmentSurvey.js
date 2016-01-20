@@ -5,6 +5,7 @@ import {BernieText, BernieColors} from '../styles/bernie-css';
 import {Paper} from 'material-ui';
 import GCBooleanField from '../forms/GCBooleanField';
 import GCSelectField from '../forms/GCSelectField'
+import GCTextField from '../forms/GCTextField'
 
 class Jan23HostRecruitmentSurvey extends React.Component {
 
@@ -25,7 +26,11 @@ class Jan23HostRecruitmentSurvey extends React.Component {
   state = {
     errors: {},
     alreadyHosting: null,
-    hasLocation: null
+    hasLocation: null,
+    address: null,
+    state: null,
+    city: null,
+    zip: null
   }
 
   submit() {
@@ -40,7 +45,7 @@ class Jan23HostRecruitmentSurvey extends React.Component {
       this.setState({errors: {alreadyHosting: 'This field is required'}})
       return false
     }
-    else if (this.state.alreadyHosting === true && this.state.haslocation === null)
+    else if (this.state.alreadyHosting === false && this.state.haslocation === null)
       this.setState({errors: {hasLocation: 'This field is required'}})
     return true;
   }
@@ -60,9 +65,38 @@ class Jan23HostRecruitmentSurvey extends React.Component {
     )
   }
 
+  renderLocationFields() {
+    console.log(this.state.address)
+    return (
+      <div>
+        <GCTextField
+          label="Address"
+          value={this.state.address}
+          onChange={(val) => this.setState({address: val})}
+        />
+        <GCTextField
+          label='City'
+          value={this.state.city}
+          onChange={(val) => this.setState({city: val})}
+        />
+        <GCTextField
+          label='State'
+          value={this.state.state}
+          onChange={(val) => this.setState({state: val})}
+        />
+        <GCTextField
+          label='Zip'
+          value={this.state.zip}
+          onChange={(val) => this.setState({zip: val})}
+        />
+      </div>
+    )
+  }
+
   render() {
     let hasLocationYes = <div>
       Great! Let me take down that location now, and your party will be all set up for you!
+      {this.renderLocationFields()}
       </div>
     let hasLocationNo = <div>No worries! You’ll get an email really soon with a link to modify your event.  If you’re having any trouble updating it, just write to help@berniesanders.com. Thanks, and have a great day!</div>
     let wontHost = <div>That’s okay. Hopefully someone else hosts in your area and you can attend their event.  You will get an email with your local options or you can always check map.berniesanders.com  Thanks for your time and have a great day.</div>
