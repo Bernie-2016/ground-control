@@ -508,7 +508,7 @@ export default class BSD {
       log.debug(`Would have made BSD API call with options: ${JSON.stringify(options)}`)
       return {
         statusCode: 200,
-        body: {}
+        body: {'event_id_obfuscated' : 'test'}
       }
     }
     else {
