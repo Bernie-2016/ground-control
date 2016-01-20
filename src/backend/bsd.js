@@ -478,9 +478,11 @@ export default class BSD {
     // BSD API gets mad if we send this in
     delete inputs['event_id']
     let response = await this.request('/event/update_event', {event_api_version: 2, values: JSON.stringify(inputs)}, 'POST');
-    if (response.validation_errors) {
+
+    if (response.validation_errors)
       throw new Error(JSON.stringify(response.validation_errors));
-    }
+    else if (typeof response.event_id_obfuscated === 'undefined')
+      throw new Error(response)
     return response
   }
 
@@ -489,6 +491,8 @@ export default class BSD {
     let response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'POST');
     if (response.validation_errors)
       throw new Error(JSON.stringify(response.validation_errors))
+    else if (typeof response.event_id_obfuscated === 'undefined')
+      throw new Error(response)
     else
       return response
   }
