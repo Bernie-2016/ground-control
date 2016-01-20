@@ -1229,7 +1229,7 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
     senderEmail: { type: new GraphQLNonNull(GraphQLString) },
     hostMessage: { type: new GraphQLNonNull(GraphQLString) },
     senderMessage: { type: new GraphQLNonNull(GraphQLString) },
-    recipientIds: { type: new GraphQLList(GraphQLString) },
+    recipients: { type: new GraphQLList(GraphQLString) },
     toolPassword: { type: new GraphQLNonNull(GraphQLString) }
   },
   outputFields: {
@@ -1238,7 +1238,7 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
       resolve: () => SharedListContainer
     }
   },
-  mutateAndGetPayload: async ({hostEmail, senderEmail, hostMessage, senderMessage, recipientIds, toolPassword}, {rootValue}) => {
+  mutateAndGetPayload: async ({hostEmail, senderEmail, hostMessage, senderMessage, recipients, toolPassword}, {rootValue}) => {
     adminRequired(rootValue)
 
     // TODO: remove this goofy protection when the tool is ready
@@ -1253,10 +1253,10 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
     let comms = []
 
     await knex.transaction(async (trx) => {
-      for (let i = 0; i < recipientIds.length; i++) {
-       let personId = fromGlobalId(recipientIds[i]).id
-       let person = await rootValue.loaders.bsdPeople.load(personId)
-       let recipientEmail = await getPrimaryEmail(person)
+      for (let i = 0; i < recipients.length; i++) {
+        let recipientId = fromGlobalId(recipients[i]).id
+        let recipient = await rootValue.loaders.bsdPeople.load(recipientId)
+        let recipientEmail = await getPrimaryEmail(recipient)
 
         await Mailgun.sendAdminEventInvite(
           {
@@ -1264,8 +1264,7 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
             senderAddress: senderEmail,
             hostMessage: hostMessage,
             senderMessage: senderMessage,
-            //recipientAddress: recipientEmail
-            recipientAddress: adminEmail
+            recipientAddress: recipientEmail
           },
           false      // debugging on or off?
         )
@@ -1273,7 +1272,7 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
         let comm = await knex.insertAndFetch(
           'communications',
           {
-            person_id: personId,
+            person_id: recipientId,
             type: 'EMAIL'
           },
           {transaction: trx}

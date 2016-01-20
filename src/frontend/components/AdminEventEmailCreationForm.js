@@ -68,7 +68,7 @@ class AdminEventEmailCreationForm extends React.Component {
   render() {
     let nearbyPeopleCount = this.props.event.nearbyPeople.length
     let nearbyPeopleSample = this.getRandomSubarray(this.props.event.nearbyPeople, 10)
-    let recipientIds = this.props.event.nearbyPeople.map((person) => person.id)
+    let recipients = this.props.event.nearbyPeople.map((person) => person.id)
 
     return (
       <div style={this.styles.pageContainer}>
@@ -88,7 +88,7 @@ class AdminEventEmailCreationForm extends React.Component {
             onSubmit={(formValues) => {
               this.refs.mutationHandler.send({
                 listContainer: this.props.listContainer,
-                recipientIds: recipientIds,
+                recipients: recipients,
                 ...formValues
               })
             }}
