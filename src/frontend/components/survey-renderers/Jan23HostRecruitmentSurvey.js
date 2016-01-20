@@ -30,23 +30,56 @@ class Jan23HostRecruitmentSurvey extends React.Component {
     address: null,
     state: null,
     city: null,
-    zip: null
+    zip: null,
+    timezone: 'US/Eastern',
+
   }
 
   submit() {
     if (this.checkForm())
       this.props.onSubmitted({
         'already_hosting': this.state.alreadyHosting,
+        'has_location': this.state.hasLocation,
+        'event': {
+          'event_type_id': 1,
+          'creator_cons_id': this.props.interviewee.id,
+          'name': 'Jan 23rd Bernie Livestream Party',
+          'description': 'Bernie has a special message to share with his supporters one week away from the Iowa caucus. Join other volunteers in your area to watch Bernie address all of us live!',
+          'venue_name': `${this.props.interviewee.firstName}'s House`,
+          'venue_addr1': this.state.address,
+          'venue_zip': this.state.zip,
+          'venue_city': this.state.city,
+          'venue_state_cd': this.state.state,
+          'venue_country': 'US',
+          'local_timezone': this.state.timezone,
+          'start_dt': moment('2016-01-23 14:30:00-08:00').toDate(),
+          'capacity': 0,
+          'is_searchable': 1,
+          'flag_approval': 0,
+        }
       })
   }
 
   checkForm() {
+    let errors = {}
     if (this.state.alreadyHosting === null) {
-      this.setState({errors: {alreadyHosting: 'This field is required'}})
-      return false
+      errors = {alreadyHosting: 'This field is required'}
     }
-    else if (this.state.alreadyHosting === false && this.state.haslocation === null)
-      this.setState({errors: {hasLocation: 'This field is required'}})
+    else if (this.state.alreadyHosting === false) {
+      if (this.state.hasLocation === null) {
+        errors = {hasLocation: 'This field is required'}
+      }
+      else if (this.state.hasLocation === 'yes') {
+        let requiredFields = ['address', 'state', 'city', 'zip']
+        requiredFields.forEach((field) => {
+          if (this.state[field] === null)
+            errors[field] = 'This field is required'
+        })
+      }
+    }
+    this.setState({errors})
+    if (Object.keys(errors).length > 0)
+      return false
     return true;
   }
 
@@ -66,27 +99,30 @@ class Jan23HostRecruitmentSurvey extends React.Component {
   }
 
   renderLocationFields() {
-    console.log(this.state.address)
     return (
       <div>
         <GCTextField
           label="Address"
           value={this.state.address}
+          errorText={this.state.errors.address}
           onChange={(val) => this.setState({address: val})}
         />
         <GCTextField
           label='City'
           value={this.state.city}
+          errorText={this.state.errors.city}
           onChange={(val) => this.setState({city: val})}
         />
         <GCTextField
           label='State'
           value={this.state.state}
+          errorText={this.state.errors.state}
           onChange={(val) => this.setState({state: val})}
         />
         <GCTextField
           label='Zip'
           value={this.state.zip}
+          errorText={this.state.errors.zip}
           onChange={(val) => this.setState({zip: val})}
         />
       </div>
@@ -94,10 +130,15 @@ class Jan23HostRecruitmentSurvey extends React.Component {
   }
 
   render() {
-    let hasLocationYes = <div>
-      Great! Let me take down that location now, and your party will be all set up for you!
-      {this.renderLocationFields()}
+    let hasLocationYes = (
+      <div>
+        Great! Let me take down that location now, and your party will be all set up for you!
+        {this.renderLocationFields()}
+        <div style={{paddingTop: 10}}>
+        You are all set. Thanks so much for hosting, and have a great day!
+        </div>
       </div>
+    )
     let hasLocationNo = <div>No worries! You’ll get an email really soon with a link to modify your event.  If you’re having any trouble updating it, just write to help@berniesanders.com. Thanks, and have a great day!</div>
     let wontHost = <div>That’s okay. Hopefully someone else hosts in your area and you can attend their event.  You will get an email with your local options or you can always check map.berniesanders.com  Thanks for your time and have a great day.</div>
     let allLocationOptions = (
@@ -173,6 +214,7 @@ export default Relay.createContainer(Jan23HostRecruitmentSurvey, {
     `,
     interviewee: () => Relay.QL`
       fragment on Person {
+        id
         firstName
       }
     `,
