@@ -39,4 +39,4 @@ npm run seed
 
 /usr/local/bin/pg_ctl -D /usr/local/var/postgres stop
 sleep 2
-echo "\nDone!"
+echo "Done!"
