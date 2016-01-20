@@ -1085,6 +1085,7 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
   mutateAndGetPayload: async ({callAssignmentId, intervieweeId, completed, leftVoicemail, sentText, reasonNotCompleted, surveyFieldValues}, {rootValue}) => {
     authRequired(rootValue)
 
+    console.log('survey fields', surveyFieldValues)
     let caller = rootValue.user
     let localIntervieweeId = fromGlobalId(intervieweeId).id
     let localCallAssignmentId = fromGlobalId(callAssignmentId).id
@@ -1153,6 +1154,7 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
                 await BSDClient.noFailApiRequest('addRSVPToEvent', email, zip, phone, fieldValues['event_id'])
               }
               break
+
             case 'bsd-form-submitter':
               let bsdFormValues = {}
 

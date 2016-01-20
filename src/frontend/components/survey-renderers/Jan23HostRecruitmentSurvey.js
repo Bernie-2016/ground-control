@@ -6,6 +6,7 @@ import {Paper} from 'material-ui';
 import GCBooleanField from '../forms/GCBooleanField';
 import GCSelectField from '../forms/GCSelectField'
 import GCTextField from '../forms/GCTextField'
+import Geosuggest from 'react-geosuggest'
 
 class Jan23HostRecruitmentSurvey extends React.Component {
 
@@ -101,27 +102,59 @@ class Jan23HostRecruitmentSurvey extends React.Component {
   renderLocationFields() {
     return (
       <div>
-        <GCTextField
-          label="Address"
-          value={this.state.address}
+        <Geosuggest
+          ref='address'
+          country='us'
+          placeholder="Address"
           errorText={this.state.errors.address}
-          onChange={(val) => this.setState({address: val})}
+          onChange={(val) => {
+            this.setState({address: val})
+          }}
+          onSuggestSelect={(val) => {
+            let {address, state, city, zip} = this.state
+            let newAddress = ''
+            if (val && val.gmaps && val.gmaps.address_components) {
+              val.gmaps.address_components.forEach((component) => {
+                if (component.types) {
+                  if (component.types[0] === 'street_number')
+                    newAddress = component.long_name + ' ' + newAddress
+                  else if (component.types[0] === 'route')
+                    newAddress = newAddress + component.short_name
+                  else if (component.types[0] === 'locality')
+                    city = component.long_name
+                  else if (component.types[0] === 'administrative_area_level_1')
+                    state = component.short_name
+                  else if (component.types[0] === 'postal_code')
+                    zip = component.short_name
+                }
+              })
+              if (newAddress !== '')
+                address = newAddress
+              let newState = {address, state, city, zip}
+              this.setState(newState)
+              this.refs.address.update(address)
+            }
+          }}
         />
+
         <GCTextField
           label='City'
           value={this.state.city}
+          style={{width: 400}}
           errorText={this.state.errors.city}
           onChange={(val) => this.setState({city: val})}
         />
         <GCTextField
           label='State'
           value={this.state.state}
+          style={{width: 120}}
           errorText={this.state.errors.state}
           onChange={(val) => this.setState({state: val})}
         />
         <GCTextField
           label='Zip'
           value={this.state.zip}
+          style={{width: 200}}
           errorText={this.state.errors.zip}
           onChange={(val) => this.setState({zip: val})}
         />
