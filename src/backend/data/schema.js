@@ -431,7 +431,7 @@ const GraphQLUser = new GraphQLObjectType({
           allOffsets.forEach((offset) => {
             let time = moment().utcOffset(offset)
 
-            if (time.hours() >= 9 && time.hours() <= 21)
+            if (time.hours() >= 9 && time.hours() < 21)
               validOffsets.push(offset)
           })
 
