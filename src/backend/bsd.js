@@ -442,9 +442,6 @@ export default class BSD {
       }
       else if (key === 'start_datetime_system')
         eventDate['start_datetime_system'] = event['start_datetime_system']
-      else if (key === 'description') {
-        inputs['description'] = htmlToText.fromString(event['description'])
-      }
       else if (key === 'is_searchable') {
         inputs['is_searchable'] = event['is_searchable'] ? event['is_searchable'] : -2
       }
