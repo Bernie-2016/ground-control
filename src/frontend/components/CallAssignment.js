@@ -15,7 +15,8 @@ import MutationHandler from './MutationHandler';
 const SurveyRenderers = {
   'BSDSurvey': require('./survey-renderers/BSDSurvey'),
   'PhonebankRSVPSurvey': require('./survey-renderers/PhonebankRSVPSurvey'),
-  'SingleEventRSVPSurvey': require('./survey-renderers/SingleEventRSVPSurvey')
+  'SingleEventRSVPSurvey': require('./survey-renderers/SingleEventRSVPSurvey'),
+  'Jan23HostRecruitmentSurvey': require('./survey-renderers/Jan23HostRecruitmentSurvey')
 }
 
 class CallAssignment extends React.Component {
@@ -440,6 +441,7 @@ export default Relay.createContainer(CallAssignment, {
             latitude
             longitude
           }
+          ${SurveyRenderers.Jan23HostRecruitmentSurvey.getFragment('interviewee')}
           ${SurveyRenderers.BSDSurvey.getFragment('interviewee')}
           ${SurveyRenderers.PhonebankRSVPSurvey.getFragment('interviewee')}
           ${SurveyRenderers.SingleEventRSVPSurvey.getFragment('interviewee')}
@@ -447,6 +449,7 @@ export default Relay.createContainer(CallAssignment, {
         ${SurveyRenderers.PhonebankRSVPSurvey.getFragment('currentUser')}
         ${SurveyRenderers.BSDSurvey.getFragment('currentUser')}
         ${SurveyRenderers.SingleEventRSVPSurvey.getFragment('currentUser')}
+        ${SurveyRenderers.Jan23HostRecruitmentSurvey.getFragment('currentUser')}
       }
     `
   }

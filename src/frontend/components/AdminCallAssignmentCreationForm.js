@@ -13,12 +13,14 @@ export default class AdminCallAssignmentCreationForm extends React.Component {
     'BSDSurvey': 'BSD survey renderer',
     'PhonebankRSVPSurvey': 'Phonebank RSVP survey renderer',
     'SingleEventRSVPSurvey': 'Single event RSVP survey renderer',
+    'Jan23HostRecruitmentSurvey': 'Jan. 23 Livestream host recruitment'
   }
 
   surveyProcessors = {
     'bsd-form-submitter': 'Save form data in BSD',
     'send-call-team-invite': 'Invite interviewees to the call team via E-mail',
-    'bsd-event-rsvper': 'Create event RSVPs'
+    'bsd-event-rsvper': 'Create event RSVPs',
+    'bsd-event-creator': 'Create event'
   }
 
   styles = {

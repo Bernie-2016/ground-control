@@ -431,7 +431,7 @@ const GraphQLUser = new GraphQLObjectType({
           allOffsets.forEach((offset) => {
             let time = moment().utcOffset(offset)
 
-            if (time.hours() >= 9 && time.hours() <= 21)
+            if (time.hours() >= 9 && time.hours() < 21)
               validOffsets.push(offset)
           })
 
@@ -448,7 +448,7 @@ const GraphQLUser = new GraphQLObjectType({
             })
             .orWhere(function() {
               this.whereIn('reason_not_completed', ['NO_PICKUP', 'CALL_BACK', 'NOT_INTERESTED'])
-                .where('attempted_at', '>', new Date(new Date() - 7 * 24 * 60 * 60 * 1000))
+                .where('attempted_at', '>', new Date(new Date() - 24 * 60 * 60 * 1000))
             })
             .orWhereIn('reason_not_completed', ['WRONG_NUMBER', 'DISCONNECTED_NUMBER', 'OTHER_LANGUAGE'])
             .orWhere(function() {
@@ -1085,6 +1085,7 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
   mutateAndGetPayload: async ({callAssignmentId, intervieweeId, completed, leftVoicemail, sentText, reasonNotCompleted, surveyFieldValues}, {rootValue}) => {
     authRequired(rootValue)
 
+    console.log('survey fields', surveyFieldValues)
     let caller = rootValue.user
     let localIntervieweeId = fromGlobalId(intervieweeId).id
     let localCallAssignmentId = fromGlobalId(callAssignmentId).id
@@ -1153,6 +1154,7 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
                 await BSDClient.noFailApiRequest('addRSVPToEvent', email, zip, phone, fieldValues['event_id'])
               }
               break
+
             case 'bsd-form-submitter':
               let bsdFormValues = {}
 
