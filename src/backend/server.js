@@ -1,6 +1,5 @@
 // NOTE: this needs to be the first thing loaded or New Relic won't work
-import newrelic from 'newrelic'
-
+require('newrelic')
 import express from 'express'
 import graphQLHTTP from 'express-graphql'
 import {Schema} from './data/schema'
@@ -307,7 +306,7 @@ function startApp() {
     if (process.env.NODE_ENV === 'development')
       form['event_type_id'] = 1
 
-    clientLogger.info(`Event Create Form Submission to ${src} by ${req.user.email}`, JSON.stringify(form));
+    log.info(`Event Create Form Submission to ${src} by ${req.user.email}`, JSON.stringify(form));
 
     // Flag event as needing approval
     let batchEventMax = 20;
@@ -373,7 +372,7 @@ function startApp() {
         })
         createdEventIds.push(result.event_id_obfuscated)
       } catch(ex) {
-        clientLogger.error(`Event Creation Error: ${ex.message} [${req.user.email}]`);
+        log.error(`Event Creation Error: ${ex.message} [${req.user.email}]`);
         let error = null
         try {
           error = JSON.parse(ex.message)
@@ -387,7 +386,7 @@ function startApp() {
 
     Mailgun.sendEventConfirmation({...form,
       event_type_name: eventType.name}, createdEventIds, constituent)
-    clientLogger.info(`Event Creation Success: ${createdEventIds.join(' ')} [${req.user.email}]`);
+    log.info(`Event Creation Success: ${createdEventIds.join(' ')} [${req.user.email}]`);
     res.send({
       ids: createdEventIds
     })
