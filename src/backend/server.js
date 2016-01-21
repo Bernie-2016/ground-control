@@ -1,4 +1,3 @@
-require('newrelic')
 import express from 'express'
 import graphQLHTTP from 'express-graphql'
 import {Schema} from './data/schema'

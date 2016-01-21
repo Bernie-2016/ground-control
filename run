@@ -1,3 +1,4 @@
 #!/usr/bin/env node
+require('newrelic')
 require('babel/register');
 require(process.argv[2]);
