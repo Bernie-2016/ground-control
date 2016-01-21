@@ -39,7 +39,7 @@ class SingleEventRSVPSurvey extends React.Component {
   }
 
   eventInfo = {
-    'phonebank' : "At this phone bank party, you will get to meet other volunteers and make phone calls into the early primary states. Making these calls is the most effective way for volunteers to get Bernie elected."
+    'phonebank event' : "At this phone bank party, you will get to meet other volunteers and make phone calls into the early primary states. Making these calls is the most effective way for volunteers to get Bernie elected."
   }
 
   state = {
