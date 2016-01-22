@@ -32,6 +32,7 @@ export let job = async () => {
       return Mailgun.sendEventInstructions(event.event_id)
     })
     await Promise.all(promises)
+    log.info('Done sending e-mails!')
   } catch (ex) {
     log.error(ex.message, ex.stack)
   }
