@@ -11,9 +11,10 @@ const Mailgun = new MG(process.env.MAILGUN_KEY, process.env.MAILGUN_DOMAIN)
 
 export let job = async () => {
   let now = new Date()
+  let eventsToEmail = []
   try {
     await knex.transaction(async (trx) => {
-      let eventsToEmail = await knex('gc_bsd_events')
+      eventsToEmail = await knex('gc_bsd_events')
         .select('gc_bsd_events.event_id')
         .innerJoin('bsd_events', 'gc_bsd_events.event_id', 'bsd_events.event_id')
         .where('gc_bsd_events.followup_emailed', false)
