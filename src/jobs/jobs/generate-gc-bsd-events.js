@@ -18,7 +18,7 @@ export let job = async () => {
       eventsToCreate = eventsToCreate.map((event) => {
         return {
           event_id: event.event_id,
-          followup_emailed: false,
+          followup_emailed: true,
           create_dt: now,
           modified_dt: now
         }
