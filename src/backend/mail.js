@@ -154,7 +154,7 @@ export default class MG {
 
     let data = {
       volunteerName: name,
-      callAssignmentId: toGlobalId('CallAssignment', event.event_id),
+      callAssignmentId: toGlobalId('CallAssignment', event.turn_out_assignment),
       sender: eventTypeData.sender
     }
     let template = new EmailTemplate(`${templateDir}/${eventTypeData.template}`)
