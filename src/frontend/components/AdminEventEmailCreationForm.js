@@ -65,10 +65,41 @@ class AdminEventEmailCreationForm extends React.Component {
     return shuffled.slice(0, size)
   }
 
-  render() {
-    let nearbyPeopleCount = this.props.event.nearbyPeople.length
-    let nearbyPeopleSample = this.getRandomSubarray(this.props.event.nearbyPeople, 10)
+  renderRecipientInfo() {
+    let recipientsCount = this.props.event.nearbyPeople.length
+    let recipientsSample = this.getRandomSubarray(this.props.event.nearbyPeople, 10)
     let recipients = this.props.event.nearbyPeople.map((person) => person.id)
+
+    if (recipientsCount === 0) {
+      return (
+        <Paper zDepth={1} style={this.styles.recipientInfoContainer}>
+          <p style={{color: 'red', fontWeight: 'strong'}}>
+            Everyone who would have received this email has previously been contacted using this tool.
+            <br />
+            <br />
+            We don't want to harass people, so this tool is disabled for this event for now.
+          </p>
+      </Paper>
+      )
+    } else {
+      return (
+        <Paper zDepth={1} style={this.styles.recipientInfoContainer}>
+          <p>This email will be sent to <strong>{recipientsCount} people</strong>, including:</p>
+          <br />
+          <ul>
+            {recipientsSample.map( (person, i) => {
+              return <li key={`person${i}`}>
+                {person.firstName || person.lastName} <tt>&lt;{person.email}&gt;</tt>
+              </li>
+            })}
+          </ul>
+        </Paper>
+      )
+    }
+  }
+
+  render() {
+    let disableSubmit = (this.props.event.nearbyPeople.length === 0)
 
     return (
       <div style={this.styles.pageContainer}>
@@ -121,21 +152,11 @@ class AdminEventEmailCreationForm extends React.Component {
               name='toolPassword'
               label="Password for this tool (ask an admin)"
             />
-            <Form.Button type='submit' label='Send!' fullWidth={true} />
+            <Form.Button type='submit' label='Send!' fullWidth={true} disabled={disableSubmit} />
           </GCForm>
         </Paper>
 
-        <Paper zDepth={1} style={this.styles.recipientInfoContainer}>
-          <p>This email will be sent to <strong>{nearbyPeopleCount} people</strong>, including:</p>
-          <br />
-          <ul>
-            {nearbyPeopleSample.map( (person, i) => {
-              return <li key={`person${i}`}>
-                {person.firstName || person.lastName} <tt>&lt;{person.email}&gt;</tt>
-              </li>
-            })}
-          </ul>
-        </Paper>
+        {this.renderRecipientInfo()}
 
         <Paper zDepth={1} style={this.styles.detailsContainer}>
           <EventPreview event={this.props.event} />
