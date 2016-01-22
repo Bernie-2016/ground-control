@@ -50,9 +50,18 @@ class SingleEventRSVPSurvey extends React.Component {
 
   render() {
     let relatedEvent = this.props.callAssignment.relatedEvent
-    let attendance = relatedEvent ? relatedEvent.attendeesCount : 0
+    if (!relatedEvent) {
+      return (
+        <div style={BernieText.default}>
+          <p>Error: no related event found for this call assignment.</p>
+          <p>Let help@berniesanders.com know and move on to another call.</p>
+        </div>
+      )
+    }
+
     let relatedPerson = this.props.currentUser.relatedPerson
 
+    let attendance = relatedEvent.attendeesCount
     if (relatedEvent.capacity)
       attendance = attendance + '/' + relatedEvent.capacity
 
