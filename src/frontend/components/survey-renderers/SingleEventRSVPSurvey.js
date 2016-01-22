@@ -1,9 +1,9 @@
-import React from 'react';
-import Relay from 'react-relay';
-import moment from 'moment';
-import {BernieText, BernieColors} from '../styles/bernie-css';
-import {Paper} from 'material-ui';
-import GCBooleanField from '../forms/GCBooleanField';
+import React from 'react'
+import Relay from 'react-relay'
+import moment from 'moment'
+import {BernieText, BernieColors} from '../styles/bernie-css'
+import {Paper} from 'material-ui'
+import GCBooleanField from '../forms/GCBooleanField'
 
 class SingleEventRSVPSurvey extends React.Component {
   static propTypes = {
@@ -15,8 +15,9 @@ class SingleEventRSVPSurvey extends React.Component {
     if (this.state.signupQuestion === null) {
       this.setState({errors: {signupQuestion: 'This field is required'}})
       return false
+    } else {
+      return true
     }
-    return true;
   }
 
   submit() {
@@ -49,10 +50,12 @@ class SingleEventRSVPSurvey extends React.Component {
 
   render() {
     let relatedEvent = this.props.callAssignment.relatedEvent
+    let attendance = relatedEvent ? relatedEvent.attendeesCount : 0
     let relatedPerson = this.props.currentUser.relatedPerson
-    let attendance = relatedEvent.attendeesCount
+
     if (relatedEvent.capacity)
       attendance = attendance + '/' + relatedEvent.capacity
+
     return (
       <div>
         <div style={BernieText.default}>
@@ -144,6 +147,6 @@ export default Relay.createContainer(SingleEventRSVPSurvey, {
       fragment on Person {
         firstName
       }
-    `,
+    `
   }
 })
