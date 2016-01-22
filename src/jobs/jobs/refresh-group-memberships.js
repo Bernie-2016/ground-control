@@ -27,6 +27,7 @@ export let job = async () => {
         .where(function() {
           this.where('modified_dt', '<', new Date(new Date() - 24 * 60 * 60 * 1000))
             .whereRaw('extract(hour from now()) = 8')
+            .where('active', true)
           })
         .orWhere('modified_dt', knex.column('create_dt'))
         .transacting(trx)
