@@ -25,13 +25,12 @@ export let job = async () => {
         .whereIn('event_id', eventsToEmail.map((event) => event.event_id))
         .update('followup_emailed', true)
         .transacting(trx)
-
-      log.info(`Sending email to ${eventsToEmail.length} events`)
-      let promises = eventsToEmail.map(async (event) => {
-        return Mailgun.sendEventInstructions(event.event_id)
-      })
-      await Promise.all(promises)
     })
+    log.info(`Sending email to ${eventsToEmail.length} events`)
+    let promises = eventsToEmail.map(async (event) => {
+      return Mailgun.sendEventInstructions(event.event_id)
+    })
+    await Promise.all(promises)
   } catch (ex) {
     log.error(ex.message, ex.stack)
   }
