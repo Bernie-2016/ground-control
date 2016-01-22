@@ -68,7 +68,6 @@ class AdminEventEmailCreationForm extends React.Component {
   renderRecipientInfo() {
     let recipientsCount = this.props.event.nearbyPeople.length
     let recipientsSample = this.getRandomSubarray(this.props.event.nearbyPeople, 10)
-    let recipients = this.props.event.nearbyPeople.map((person) => person.id)
 
     if (recipientsCount === 0) {
       return (
@@ -99,6 +98,7 @@ class AdminEventEmailCreationForm extends React.Component {
   }
 
   render() {
+    let recipients = this.props.event.nearbyPeople.map((person) => person.id)
     let disableSubmit = (this.props.event.nearbyPeople.length === 0)
 
     return (
