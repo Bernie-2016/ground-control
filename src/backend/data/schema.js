@@ -1250,9 +1250,7 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
       })
     }
 
-    let comms = []
-
-    await knex.transaction(async (trx) => {
+    knex.transaction(async (trx) => {
       for (let i = 0; i < recipients.length; i++) {
         let recipientId = fromGlobalId(recipients[i]).id
         let recipient = await rootValue.loaders.bsdPeople.load(recipientId)
@@ -1269,7 +1267,7 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
           false      // debugging on or off?
         )
 
-        let comm = await knex.insertAndFetch(
+        await knex.insertAndFetch(
           'communications',
           {
             person_id: recipientId,
@@ -1277,12 +1275,10 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
           },
           {transaction: trx}
         )
-
-        comms.push(comm)
       }
     })
 
-    return comms
+    return []
   }
 })
 
