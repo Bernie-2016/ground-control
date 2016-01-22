@@ -275,7 +275,7 @@ exports.config = {
      * for a query. The raw or obfuscated sql will be included in the
      * transaction trace and a slow query sample will be collected.
      */
-    record_sql: 'off',
+    record_sql: 'raw',
 
     /**
      * This option affects both slow-queries and record_sql for transaction
