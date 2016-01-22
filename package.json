@@ -58,7 +58,7 @@
     "moment": "^2.10.6",
     "moment-timezone": "^0.4.1",
     "mustache": "^2.2.0",
-    "newrelic": "^1.24.1",
+    "newrelic": "^1.25.0",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
     "pg": "^4.4.3",
