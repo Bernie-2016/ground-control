@@ -1,5 +1,5 @@
 // NOTE: this needs to be the first thing loaded or New Relic won't work
-require('newrelic')
+import newrelic from 'newrelic'
 import express from 'express'
 import graphQLHTTP from 'express-graphql'
 import {Schema} from './data/schema'
