@@ -19,6 +19,8 @@ export let job = async () => {
         .innerJoin('bsd_events', 'gc_bsd_events.event_id', 'bsd_events.event_id')
         .where('gc_bsd_events.followup_emailed', false)
         .whereNotNull('gc_bsd_events.turn_out_assignment')
+        .whereNotIn('bsd_events.venue_state_cd', ['NH'])
+//        .whereIn('bsd_events.event_type_id', [31, 44])
         .where('bsd_events.start_dt', '>', now)
         .where('bsd_events.flag_approval', false)
         .transacting(trx)
