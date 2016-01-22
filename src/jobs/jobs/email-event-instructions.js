@@ -20,7 +20,7 @@ export let job = async () => {
         .where('gc_bsd_events.followup_emailed', false)
         .whereNotNull('gc_bsd_events.turn_out_assignment')
         .whereNotIn('bsd_events.venue_state_cd', ['NH'])
-//        .whereIn('bsd_events.event_type_id', [31, 44])
+        .whereNotIn('bsd_events.event_type_id', [22, 24, 25])
         .where('bsd_events.start_dt', '>', now)
         .where('bsd_events.flag_approval', false)
         .transacting(trx)

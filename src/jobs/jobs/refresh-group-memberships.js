@@ -24,7 +24,10 @@ export let job = async () => {
     // This first transaction marks these groups as having been picked up.
     await knex.transaction(async (trx) => {
       groups = await knex('gc_bsd_groups')
-        .where('modified_dt', '<', new Date(new Date() - 24 * 60 * 60 * 1000))
+        .where(function() {
+          this.where('modified_dt', '<', new Date(new Date() - 24 * 60 * 60 * 1000))
+            .whereRaw('extract(hour from now()) = 8')
+          })
         .orWhere('modified_dt', knex.column('create_dt'))
         .transacting(trx)
 
@@ -39,6 +42,7 @@ export let job = async () => {
     })
 
     await knex.transaction(async (trx) => {
+      log.info(`Refreshing ${groups.length} groups...`)
       let groupCount = groups.length;
       let promises = groups.map(async (group) => {
         if (group.query !== 'everyone') {
