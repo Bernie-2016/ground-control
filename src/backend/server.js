@@ -109,12 +109,13 @@ function startApp() {
             email: email.toLowerCase(),
             password: hashedPassword
           })
+
           return done(null, newUser)
-        }
-        else {
+        } else {
           await knex('users')
             .where('email', email.toLowerCase())
             .update({password: hashedPassword})
+
           return done(null, user)
         }
       } else if (!await compare(password, user.password)) {
@@ -295,13 +296,15 @@ function startApp() {
   }))
 
   app.post('/events/create', wrap(async (req, res) => {
-    let src = req.headers.referer.split(req.headers.origin)[1];
-    if (!src){
+    let src = req.headers.referer.split(req.headers.origin)[1]
+
+    if (!src) {
       // Sometimes the above results in undefined.
       // The sourceurl header is set from the client, so we don't necessarily want to trust it.
       src = req.headers.sourceurl;
       log.debug('Missing header data', req.headers);
-    };
+    }
+
     let form = req.body
     if (process.env.NODE_ENV === 'development')
       form['event_type_id'] = 1
@@ -309,24 +312,24 @@ function startApp() {
     log.info(`Event Create Form Submission to ${src} by ${req.user.email}`, JSON.stringify(form));
 
     // Flag event as needing approval
-    let batchEventMax = 20;
+    let batchEventMax = 20
     if (req.user && src === '/admin/events/create') {
       // const userIsAdmin = await isAdmin(req.user.id)
       if ((form[ 'event_type_id' ] != 30 && form[ 'event_type_id' ] != 31 && form[ 'event_type_id' ] != 44) || form[ 'is_official' ] == 1) // to do: implement proper permissioning
         form[ 'flag_approval' ] = '1'
-    }
-    else {
-      batchEventMax = 10;
+    } else {
+      batchEventMax = 10
       form[ 'flag_approval' ] = '1'
     }
 
-    form['event_dates'] = JSON.parse(form[ 'event_dates' ]);
+    form['event_dates'] = JSON.parse(form[ 'event_dates' ])
     let dateCount = form['event_dates'].length
 
     if (dateCount > batchEventMax) {
       res.status(400).send({errors: {
         'Number of Events' : [`You can only create up to ${batchEventMax} events at a time. ${form['event_dates'].length} events were received.`]
       }})
+
       return
     }
 
@@ -335,10 +338,10 @@ function startApp() {
       .first()
 
     if (!eventType) {
-      res.status(400).send({
-        errors: {
-          'Event Type': ['Does not exist in BSD']}
+      res.status(400).send({errors: {
+        'Event Type': ['Does not exist in BSD']}
       })
+
       return
     }
 
@@ -346,23 +349,24 @@ function startApp() {
     let constituent = await BSDClient.getConstituentByEmail(form.cons_email)
 
     if (!constituent) {
-      const name = form.cons_name.split(" ");
+      const name = form.cons_name.split(" ")
       constituent = await BSDClient.createConstituent(form.cons_email, name[ 0 ], (name.length > 1) ? name[ name.length - 1 ] : '')
     }
 
     form['creator_cons_id'] = constituent.id
-    let startHour = null;
+
+    let startHour = null
     if (form['start_time']['a'] == 'pm') {
-      startHour = Number(form['start_time']['h']) + 12;
-    }
-    else {
-      startHour = form['start_time']['h'];
+      startHour = Number(form['start_time']['h']) + 12
+    } else {
+      startHour = form['start_time']['h']
     }
 
-    let createdEventIds = [];
+    let createdEventIds = []
 
     for (let index = 0; index < dateCount; index++) {
       let result = null
+
       try {
         result = await BSDClient.createEvent({
           ...form,
@@ -370,26 +374,36 @@ function startApp() {
           'capacity' : form['capacity'],
           'start_datetime_system' : `${form['event_dates'][index]['date']} ${startHour}:${form['start_time']['i']}:00`
         })
+
         createdEventIds.push(result.event_id_obfuscated)
       } catch(ex) {
-        log.error(`Event Creation Error: ${ex.message} [${req.user.email}]`);
+        log.error(`Event Creation Error: ${ex.message} [${req.user.email}]`)
+
         let error = null
+
         try {
           error = JSON.parse(ex.message)
         } catch (jsonEx) {
           throw ex
         }
+
         res.status(400).send({'errors': error})
         return
       }
     }
 
-    Mailgun.sendEventConfirmation({...form,
-      event_type_name: eventType.name}, createdEventIds, constituent)
-    log.info(`Event Creation Success: ${createdEventIds.join(' ')} [${req.user.email}]`);
-    res.send({
-      ids: createdEventIds
-    })
+    Mailgun.sendEventConfirmation(
+      {
+        ...form,
+        event_type_name: eventType.name
+      },
+      createdEventIds,
+      constituent
+    )
+
+    log.info(`Event Creation Success: ${createdEventIds.join(' ')} [${req.user.email}]`)
+
+    res.send({ids: createdEventIds})
   }))
 
   app.use(fallback('index.html', {
