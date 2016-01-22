@@ -109,20 +109,26 @@ export default class MG {
   }
 
   async sendEventInstructions(eventId) {
-    let event = knex('gc_bsd_events')
+    let event = await knex('gc_bsd_events')
       .innerJoin('bsd_events', 'bsd_events.event_id', 'gc_bsd_events.event_id')
       .innerJoin('bsd_people', 'bsd_events.creator_cons_id', 'bsd_people.cons_id')
       .innerJoin('bsd_emails', 'bsd_events.creator_cons_id', 'bsd_emails.cons_id')
       .where('gc_bsd_events.event_id', eventId)
-      .where('bsd_emails.is_primary', true)
-      .first()
 
+    event = event[0]
+    if (event.length > 1) {
+      event.forEach((e) => {
+        if (e.is_primary)
+          event = e;
+      })
+    }
     if (!event) {
       log.warn(`Not sending e-mail for event ${eventId} -- did not find a corresponding event/creator email address`)
       return
     }
-    let eventType = knex('bsd_event_types')
+    let eventType = await knex('bsd_event_types')
       .where('event_type_id', event.event_type_id)
+      .first()
 
     let eventTypeDetails = {
       'phonebank' : {
