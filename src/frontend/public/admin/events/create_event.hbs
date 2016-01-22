@@ -108,6 +108,10 @@
       list-style-type: none;
     }
 
+    .capitalized {
+      text-transform: capitalize;
+    }
+
 		div#event-error-message a:link,
 		div#event-error-message a:visited,
 		div#event-error-message a:hover,
@@ -1540,7 +1544,13 @@
                       if (response.responseJSON && response.responseJSON.errors) {
                         var errors = response.responseJSON.errors
                         $.each(errors, function(k, v) {
-                          $("#event-error-message-details").append("<li>" + k + " : " + v[0] + "</li>");
+                          switch (k) {
+                            case "is_searchable":
+                              k = "make event public";
+                            default:
+                              k = k.replace(/_/g, ' ');
+                          }
+                          $("#event-error-message-details").append("<li><span class='capitalized'" + k + "</span> : " + v[0] + "</li>");
                         });
                       }
                     window.scrollTo(0,0);
