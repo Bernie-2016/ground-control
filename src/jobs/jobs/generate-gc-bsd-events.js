@@ -25,6 +25,7 @@ export let job = async () => {
       })
 
       await knex.bulkInsert('gc_bsd_events', eventsToCreate, {transaction: trx})
+      log.info(`Created ${eventsToCreate.length} events!`)
     })
     log.info("Done generating gc_bsd_events!")
 
@@ -117,7 +118,7 @@ export let job = async () => {
           .transacting(trx)
       }
 
-      log.info('Done creating call assignments for events')
+      log.info(`Done creating ${eventsToUpdate.length} call assignments for events`)
     })
 
   } catch (ex) {
