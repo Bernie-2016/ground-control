@@ -84,7 +84,6 @@ export default class MutationHandler extends React.Component {
     }
 
     send(args) {
-      throw new Error("Test error")
       this.clearState()
 
       let onFailure = (trans) => this.onFailure(trans)
@@ -95,6 +94,7 @@ export default class MutationHandler extends React.Component {
           new this.props.mutationClass(args), {onFailure, onSuccess}
         )
       } catch (ex) {
+        log.error(ex)
         this.setState({
           status: 'ERROR',
           message: this.props.defaultErrorMessage,
