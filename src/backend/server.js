@@ -1,5 +1,5 @@
 // NOTE: this needs to be the first thing loaded or New Relic won't work
-//import newrelic from 'newrelic'
+import newrelic from 'newrelic'
 import express from 'express'
 import graphQLHTTP from 'express-graphql'
 import {Schema} from './data/schema'
@@ -49,7 +49,6 @@ function startApp() {
   }
 
   const inDevEnv = (process.env.NODE_ENV === 'development')
-  const clientLogger = Minilog('client')
   const KnexSessionStore = KnexSessionStoreFactory(session)
   const Mailgun = new MG(process.env.MAILGUN_KEY, process.env.MAILGUN_DOMAIN)
   const BSDClient = new BSD(process.env.BSD_HOST, process.env.BSD_API_ID, process.env.BSD_API_SECRET)
@@ -230,34 +229,6 @@ function startApp() {
       },
       schema: Schema
     }
-  }))
-
-  app.post('/log', wrap(async (req, res) => {
-    let parsedURL = url.parse(req.url, true)
-    let logs = req.body.logs
-
-    logs.forEach((message) => {
-      let method = message[ 1 ]
-      let client = parsedURL.query.client_id ? parsedURL.query.client_id : ''
-
-      message = message.slice(2)
-      let writeLog = (line) => {
-        let logLine = '(' + client + '): ' + line
-        clientLogger[ method ](logLine)
-      }
-
-      message.forEach((logEntry) => {
-        if (typeof logEntry === 'object') {
-          writeLog(JSON.stringify(logEntry))
-        } else {
-          logEntry.split('\n').forEach((line) => {
-            writeLog(line)
-          })
-        }
-      })
-    })
-
-    res.send('')
   }))
 
   app.post('/signup',

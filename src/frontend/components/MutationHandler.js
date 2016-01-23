@@ -94,7 +94,7 @@ export default class MutationHandler extends React.Component {
           new this.props.mutationClass(args), {onFailure, onSuccess}
         )
       } catch (ex) {
-        log.error(ex.message, ex.stack)
+        log.error(ex)
         this.setState({
           status: 'ERROR',
           message: this.props.defaultErrorMessage,

@@ -1,6 +1,5 @@
 import 'babel/polyfill';
 import jQuery from 'jquery';
-import Minilog from 'minilog';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Relay from 'react-relay';
@@ -34,17 +33,10 @@ import Unauthorized from './components/Unauthorized'
 import Form from 'react-formal';
 import {createHistory} from 'history';
 import GCNetworkLayer from './relay-extensions/GCNetworkLayer'
-import StackTrace from 'stacktrace-js';
+import log from './log'
 
-// Necessary to make minilog work
 window.jQuery = jQuery;
-Minilog
-  .enable()
-  .pipe(new Minilog.backends.jQuery({
-    url: '/log',
-    interval: 1000
-    }));
-window.log = Minilog('client');
+window.log = log;
 
 window.onerror = (msg, file, line, col, error) => {
   if (!error) {
@@ -52,21 +44,11 @@ window.onerror = (msg, file, line, col, error) => {
     return
   }
 
-  let message = msg || error.message || 'Uncaught exception'
-  Rollbar.error(message, error)
-
-  StackTrace
-  .fromError(error)
-  .then((stacktraces) => {
-    log.error('Uncaught exception!', error.message, stacktraces)
-    setTimeout(() => {
-      alert('Whoops! Something went wrong. We\'re looking into it, but in the meantime please refresh your browser.')
-      document.location.reload(true)
-    }, 2000)
-  })
-  .catch((err) => {
-    log.error(err)
-  })
+  log.error(error)
+  setTimeout(() => {
+    alert('Whoops! Something went wrong. We\'re looking into it, but in the meantime please refresh your browser.')
+    document.location.reload(true)
+  }, 2000)
 };
 
 injectTapEventPlugin();
