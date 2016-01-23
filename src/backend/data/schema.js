@@ -441,7 +441,7 @@ const GraphQLUser = new GraphQLObjectType({
           allOffsets.forEach((offset) => {
             let time = moment().utcOffset(offset)
 
-            if (time.hours() >= 9 && time.hours() <= 21)
+            if (time.hours() >= 9 && time.hours() < 21)
               validOffsets.push(offset)
           })
 
@@ -858,12 +858,11 @@ const GraphQLEvent = new GraphQLObjectType({
           .select('bsd_people.*')
           .join('bsd_people', 'bsd_addresses.cons_id', 'bsd_people.cons_id')
           .join('bsd_emails', 'bsd_people.cons_id', 'bsd_emails.cons_id')
-          //.join('bsd_phones', 'bsd_people.cons_id', 'bsd_phones.cons_id')
+          .leftJoin('communications', 'bsd_people.cons_id', 'communications.person_id')
           .where('bsd_emails.is_primary', true)
-          //.whereNotNull('bsd_phones.phone')
+          .whereNull('communications.id')
           .whereRaw(`st_dwithin(bsd_addresses.geom, st_transform(st_setsrid(st_makepoint(${event.longitude}, ${event.latitude}), 4326), 900913), 50000)`)
           .orderByRaw(`bsd_addresses.geom <-> st_transform(st_setsrid(st_makepoint(${event.longitude}, ${event.latitude}), 4326), 900913)`)
-          //.orderBy('bsd_people.create_dt')
           .limit(500)
       }
     }
@@ -1019,7 +1018,7 @@ const GraphQLEditEvents = mutationWithClientMutationId({
 
       log.debug('Updated event: ', event)
 
-      await BSDClient.updateEvent(event.event_id_obfuscated, event.event_type_id, event.creator_cons_id, event)
+      await BSDClient.updateEvent(event)
       await knex('bsd_events')
         .where('event_id', event.event_id)
         .update({
@@ -1163,6 +1162,7 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
                 await BSDClient.noFailApiRequest('addRSVPToEvent', email, zip, phone, fieldValues['event_id'])
               }
               break
+
             case 'bsd-form-submitter':
               let bsdFormValues = {}
 
@@ -1239,7 +1239,7 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
     senderEmail: { type: new GraphQLNonNull(GraphQLString) },
     hostMessage: { type: new GraphQLNonNull(GraphQLString) },
     senderMessage: { type: new GraphQLNonNull(GraphQLString) },
-    recipientIds: { type: new GraphQLList(GraphQLString) },
+    recipients: { type: new GraphQLList(GraphQLString) },
     toolPassword: { type: new GraphQLNonNull(GraphQLString) }
   },
   outputFields: {
@@ -1248,7 +1248,7 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
       resolve: () => SharedListContainer
     }
   },
-  mutateAndGetPayload: async ({hostEmail, senderEmail, hostMessage, senderMessage, recipientIds, toolPassword}, {rootValue}) => {
+  mutateAndGetPayload: async ({hostEmail, senderEmail, hostMessage, senderMessage, recipients, toolPassword}, {rootValue}) => {
     adminRequired(rootValue)
 
     // TODO: remove this goofy protection when the tool is ready
@@ -1260,13 +1260,11 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
       })
     }
 
-    let comms = []
-
-    await knex.transaction(async (trx) => {
-      for (let i = 0; i < recipientIds.length; i++) {
-       let personId = fromGlobalId(recipientIds[i]).id
-       let person = await rootValue.loaders.bsdPeople.load(personId)
-       let recipientEmail = await getPrimaryEmail(person)
+    knex.transaction(async (trx) => {
+      for (let i = 0; i < recipients.length; i++) {
+        let recipientId = fromGlobalId(recipients[i]).id
+        let recipient = await rootValue.loaders.bsdPeople.load(recipientId)
+        let recipientEmail = await getPrimaryEmail(recipient)
 
         await Mailgun.sendAdminEventInvite(
           {
@@ -1274,26 +1272,23 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
             senderAddress: senderEmail,
             hostMessage: hostMessage,
             senderMessage: senderMessage,
-            //recipientAddress: recipientEmail
-            recipientAddress: adminEmail
+            recipientAddress: recipientEmail
           },
           false      // debugging on or off?
         )
 
-        let comm = await knex.insertAndFetch(
+        await knex.insertAndFetch(
           'communications',
           {
-            person_id: personId,
+            person_id: recipientId,
             type: 'EMAIL'
           },
           {transaction: trx}
         )
-
-        comms.push(comm)
       }
     })
 
-    return comms
+    return []
   }
 })
 

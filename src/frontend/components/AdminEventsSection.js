@@ -698,7 +698,6 @@ ${signature}`
         secondary={true}
         onTouchTap={() => {
           this._handleRequestFiltersChange({}, true);
-          this.setState({showFiltersDialog: false});
         }}
       />,
       <FlatButton

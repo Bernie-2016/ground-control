@@ -5,8 +5,10 @@ import path from 'path'
 import fs from 'fs'
 import Minilog from 'minilog'
 import htmlToText from 'html-to-text'
+import knex from './data/knex'
+import {toGlobalId} from 'graphql-relay'
+import log from './log'
 
-const clientLogger = Minilog('client')
 const templateDir = path.resolve(__dirname, './email-templates')
 const headerHTML = fs.readFileSync(templateDir + '/header.hbs', {encoding: 'utf-8'})
 const footerHTML = fs.readFileSync(templateDir + '/footer.hbs', {encoding: 'utf-8'})
@@ -57,7 +59,7 @@ export default class MG {
       message.html = messageRichTextTemplate({content: message.html, recipient: message.to});
     }
 
-    clientLogger.info("Sending email via Mailgun", message)
+    log.info("Sending email via Mailgun", message)
 
     message["o:tracking"] = false
     if (inDevEnv) {
@@ -67,7 +69,7 @@ export default class MG {
     }
   }
 
-  async sendEventConfirmation(form, eventIds, constituent, eventTypes) {
+  async sendEventConfirmation(form, eventIds, constituent) {
     if (form.capacity === '0') {
       form.capacity = 'unlimited'
     }
@@ -79,13 +81,6 @@ export default class MG {
 
     form.event_dates.sort((a, b) => {
       return a.date.localeCompare(b.date)
-    })
-
-    // Get the event type name
-    eventTypes.forEach((type) => {
-      if (type.event_type_id == form.event_type_id) {
-        form.event_type_name = type.name
-      }
     })
 
     constituent.cons_email.forEach((email) => {
@@ -113,27 +108,62 @@ export default class MG {
     return await this.send(message)
   }
 
-  async sendPhoneBankConfirmation(form, eventIds, constituent) {
-    constituent.cons_email.forEach((email) => {
-      if (email.is_primary === '1') {
-        constituent['email'] = email.email
-      }
+  async sendEventInstructions(eventId) {
+    let event = await knex('gc_bsd_events')
+      .innerJoin('bsd_events', 'bsd_events.event_id', 'gc_bsd_events.event_id')
+      .innerJoin('bsd_people', 'bsd_events.creator_cons_id', 'bsd_people.cons_id')
+      .innerJoin('bsd_emails', 'bsd_events.creator_cons_id', 'bsd_emails.cons_id')
+      .where('gc_bsd_events.event_id', eventId)
+
+    event = event[0]
+    if (event.length > 1) {
+      event.forEach((e) => {
+        if (e.is_primary)
+          event = e;
+      })
+    }
+    if (!event) {
+      log.warn(`Not sending e-mail for event ${eventId} -- did not find a corresponding event/creator email address`)
+      return
+    }
+    let eventType = await knex('bsd_event_types')
+      .where('event_type_id', event.event_type_id)
+      .first()
+
+    let eventTypeDetails = {
+      'phonebank' : {
+        template: 'phone-bank-instructions',
+        senderAddress: 'Liam Clive<liamclive@berniesanders.com>',
+        sender: 'Liam Clive',
+        subject: 'Next steps for hosting your phone bank'
+      },
+      'default' : {
+        template: 'generic-event-instructions',
+        senderAddress: 'Saikat Chakrabarti<saikat@berniesanders.com>',
+        sender: 'Saikat Chakrabarti',
+        subject: 'Invite nearby Bernie volunteers to your event'
+      },
+    }
+
+    let name = event.firstname ? event.firstname : "Bernie Volunteer"
+    let eventTypeData = eventTypeDetails['default']
+    Object.keys(eventTypeDetails).forEach((key) => {
+      if (eventType.name.toLowerCase().indexOf(key) !== -1)
+        eventTypeData = eventTypeDetails[key]
     })
 
     let data = {
-      event: form,
-      eventIds,
-      user: constituent
+      volunteerName: name,
+      callAssignmentId: toGlobalId('CallAssignment', event.turn_out_assignment),
+      sender: eventTypeData.sender
     }
-
-    let template = new EmailTemplate(templateDir + '/phone-bank-instructions')
+    let template = new EmailTemplate(`${templateDir}/${eventTypeData.template}`)
     let content = await template.render(data)
-
     let message = {
-      from: senderAddress,
+      from: eventTypeData.senderAddress,
       'h:Reply-To': 'help@berniesanders.com',
-      to: form.cons_email,
-      subject: 'Event Creation Confirmation',
+      to: event.email,
+      subject: eventTypeData.subject,
       html: content.html
     }
 

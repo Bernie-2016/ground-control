@@ -1,6 +1,6 @@
-import React from 'react';
-import {BernieText, BernieColors} from './styles/bernie-css';
-import {FloatingActionButton, FontIcon} from 'material-ui';
+import React from 'react'
+import {BernieText, BernieColors} from './styles/bernie-css'
+import {FloatingActionButton, FontIcon} from 'material-ui'
 
 export default class PlivoDialer extends React.Component {
   static propTypes = {
@@ -16,9 +16,11 @@ export default class PlivoDialer extends React.Component {
   }
 
   number() {
-    let number = this.props.number;
+    let number = this.props.number
+
     if (number[0] !== '1')
-      number = '1' + number;
+      number = '1' + number
+
     return number.slice(0, 11)
   }
 
@@ -27,36 +29,46 @@ export default class PlivoDialer extends React.Component {
       this.setState({useTelLinkFallback: true})
       console.log('PlivoJS says WebRTC not supported by browser, using tel link instead')
     }
+
     Plivo.onFlashNotInstalled = () => {
       this.setState({useTelLinkFallback: true})
       console.log('PlivoJS says Flash not supported by browser, using tel link instead')
     }
+
     Plivo.onReady = () => {
       console.log('PlivoJS is ready to be used')
       Plivo.conn.login(this.props.endpointUsername, this.props.endpointPassword)
     }
+
     Plivo.onMediaPermission = () => {
       console.log('PlivoJS found media access permissions have been granted')
     }
+
     Plivo.onLogin = () => {
       console.log('PlivoJS succesfully logged in')
     }
+
     Plivo.onLoginFailed = () => {
       this.setState({plivoStatusText: "Couldn't make the call. Let help@berniesanders.com know and dial the person manually."})
     }
+
     Plivo.onCalling = () => {
       this.setState({plivoCallInProgress: true})
       this.setState({plivoStatusText: null})
     }
+
     Plivo.onCallRemoteRinging = () => {
       console.log('PlivoJS call ringing')
     }
+
     Plivo.onCallAnswered = () => {
       console.log('PlivoJS call answered')
     }
+
     Plivo.onCallTerminated = () => {
       this.setState({plivoCallInProgress: false})
     }
+
     Plivo.onCallFailed = (cause) => {
       this.setState({plivoCallInProgress: false})
       this.setState({plivoStatusText: `Couldn't connect. ${cause}.`})
@@ -64,9 +76,13 @@ export default class PlivoDialer extends React.Component {
   }
 
   componentDidMount() {
+    if (typeof Plivo === 'undefined') {
+      console.log("Couldn't load Plivo. Probably a network error on the browser side.")
+      return
+    }
+
     this.registerCallbacks()
-    Plivo.init({debug: true,
-                fallback_to_flash: false})
+    Plivo.init({debug: true, fallback_to_flash: false})
   }
 
   callPhone(number) {
@@ -82,7 +98,8 @@ export default class PlivoDialer extends React.Component {
   }
 
   formatPhoneNumber(number) {
-    let sliceStart = 1;
+    let sliceStart = 1
+
     return '(' + number.slice(sliceStart, sliceStart + 3) + ') ' + number.slice(sliceStart + 3, sliceStart + 6) + '-' + number.slice(sliceStart + 6)
   }
 

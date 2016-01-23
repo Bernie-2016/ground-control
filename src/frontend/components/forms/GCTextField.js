@@ -9,6 +9,9 @@ export default class GCTextField extends GCFormField {
       floatingLabelText={this.floatingLabelText()}
       errorStyle={BernieText.inputError}
       hintText={this.props.label}
+      floatingLabelStyle={{
+        zIndex: 0
+      }}
       {...this.props}
       onChange={(event) => {
         this.props.onChange(event.target.value)

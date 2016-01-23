@@ -1,4 +1,5 @@
-import newrelic from 'newrelic'
+// NOTE: this needs to be the first thing loaded or New Relic won't work
+//import newrelic from 'newrelic'
 import express from 'express'
 import graphQLHTTP from 'express-graphql'
 import {Schema} from './data/schema'
@@ -108,12 +109,13 @@ function startApp() {
             email: email.toLowerCase(),
             password: hashedPassword
           })
+
           return done(null, newUser)
-        }
-        else {
+        } else {
           await knex('users')
             .where('email', email.toLowerCase())
             .update({password: hashedPassword})
+
           return done(null, user)
         }
       } else if (!await compare(password, user.password)) {
@@ -282,69 +284,126 @@ function startApp() {
     res.send(createEventPage({ is_public: false, events_root_url: publicEventsRootUrl }));
   }))
 
-  app.get('/events/create', isAuthenticated, wrap(async (req, res) => {
-    if (inDevEnv) {
-      const temp = fs.readFileSync(templateDir + '/create_event.hbs', { encoding: 'utf-8' });
-      const page = handlebars.compile(temp);
-      res.send(page({ is_public: true, events_root_url: publicEventsRootUrl }));
-      return
-    }
-    res.send(createEventPage({ is_public: true, events_root_url: publicEventsRootUrl }));
+  app.get('/events/create', wrap(async (req, res) => {
+    // if (inDevEnv) {
+    //   const temp = fs.readFileSync(templateDir + '/create_event.hbs', { encoding: 'utf-8' });
+    //   const page = handlebars.compile(temp);
+    //   res.send(page({ is_public: true, events_root_url: publicEventsRootUrl }));
+    //   return
+    // }
+    // res.send(createEventPage({ is_public: true, events_root_url: publicEventsRootUrl }));
+    res.redirect('https://go.berniesanders.com/page/event/create')
   }))
 
   app.post('/events/create', wrap(async (req, res) => {
-    let src = req.headers.referer.split(req.headers.origin)[1];
-    if (!src){
+    let src = req.headers.referer.split(req.headers.origin)[1]
+
+    if (!src) {
       // Sometimes the above results in undefined.
       // The sourceurl header is set from the client, so we don't necessarily want to trust it.
       src = req.headers.sourceurl;
       log.debug('Missing header data', req.headers);
-    };
-    let form = req.body
-    form[ 'event_dates' ] = JSON.parse(form[ 'event_dates' ]);
+    }
 
-    clientLogger.info(`Event Create Form Submission to ${src} by ${req.user.email}`, form);
+    let form = req.body
+    if (process.env.NODE_ENV === 'development')
+      form['event_type_id'] = 1
+
+    log.info(`Event Create Form Submission to ${src} by ${req.user.email}`, JSON.stringify(form));
 
     // Flag event as needing approval
-    let batchEventMax = 20;
+    let batchEventMax = 20
     if (req.user && src === '/admin/events/create') {
       // const userIsAdmin = await isAdmin(req.user.id)
-      if ((form[ 'event_type_id' ] != 31 && form[ 'event_type_id' ] != 44) || form[ 'is_official' ] == 1) // to do: implement proper permissioning
+      if ((form[ 'event_type_id' ] != 30 && form[ 'event_type_id' ] != 31 && form[ 'event_type_id' ] != 44) || form[ 'is_official' ] == 1) // to do: implement proper permissioning
         form[ 'flag_approval' ] = '1'
-    }
-    else {
-      batchEventMax = 10;
+    } else {
+      batchEventMax = 10
       form[ 'flag_approval' ] = '1'
+    }
+
+    form['event_dates'] = JSON.parse(form[ 'event_dates' ])
+    let dateCount = form['event_dates'].length
+
+    if (dateCount > batchEventMax) {
+      res.status(400).send({errors: {
+        'Number of Events' : [`You can only create up to ${batchEventMax} events at a time. ${form['event_dates'].length} events were received.`]
+      }})
+
+      return
+    }
+
+    let eventType = await knex('bsd_event_types')
+      .where('event_type_id', form['event_type_id'])
+      .first()
+
+    if (!eventType) {
+      res.status(400).send({errors: {
+        'Event Type': ['Does not exist in BSD']}
+      })
+
+      return
     }
 
     // constituent object not being returned right now
     let constituent = await BSDClient.getConstituentByEmail(form.cons_email)
 
     if (!constituent) {
-      const name = form.cons_name.split(" ");
+      const name = form.cons_name.split(" ")
       constituent = await BSDClient.createConstituent(form.cons_email, name[ 0 ], (name.length > 1) ? name[ name.length - 1 ] : '')
     }
 
-    let event_types = await BSDClient.getEventTypes()
-    let result = await BSDClient.createEvents(constituent.id, form, event_types, batchEventMax)
+    form['creator_cons_id'] = constituent.id
 
-    if (result.status == 'success') {
-      if (form[ 'event_type_id' ] == 31) {
-        // Send phone bank specific email
-        // Mailgun.sendPhoneBankConfirmation(form, result.ids, constituent)
-        // re-enable phonebank email after we find a way to track when these have been sent
-        Mailgun.sendEventConfirmation(form, result.ids, constituent, event_types)
-      }
-      else {
-        // Send generic email
-        Mailgun.sendEventConfirmation(form, result.ids, constituent, event_types)
-      }
-      clientLogger.info(`Event Creation Success: ${result.ids.join(' ')} [${req.user.email}]`);
+    let startHour = null
+    if (form['start_time']['a'] == 'pm') {
+      startHour = Number(form['start_time']['h']) + 12
     } else {
-      clientLogger.error(`Event Creation Error: ${JSON.stringify(result.errors)} [${req.user.email}]`);
+      startHour = form['start_time']['h']
     }
 
-    res.json(result);
+    let createdEventIds = []
+
+    for (let index = 0; index < dateCount; index++) {
+      let result = null
+
+      try {
+        result = await BSDClient.createEvent({
+          ...form,
+          'duration' : form['duration_num'] * form['duration_unit'],
+          'capacity' : form['capacity'],
+          'start_datetime_system' : `${form['event_dates'][index]['date']} ${startHour}:${form['start_time']['i']}:00`
+        })
+
+        createdEventIds.push(result.event_id_obfuscated)
+      } catch(ex) {
+        log.error(`Event Creation Error: ${ex.message} [${req.user.email}]`)
+
+        let error = null
+
+        try {
+          error = JSON.parse(ex.message)
+        } catch (jsonEx) {
+          throw ex
+        }
+
+        res.status(400).send({'errors': error})
+        return
+      }
+    }
+
+    Mailgun.sendEventConfirmation(
+      {
+        ...form,
+        event_type_name: eventType.name
+      },
+      createdEventIds,
+      constituent
+    )
+
+    log.info(`Event Creation Success: ${createdEventIds.join(' ')} [${req.user.email}]`)
+
+    res.send({ids: createdEventIds})
   }))
 
   app.use(fallback('index.html', {

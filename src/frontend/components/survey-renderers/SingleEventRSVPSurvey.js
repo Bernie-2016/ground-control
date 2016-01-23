@@ -1,9 +1,9 @@
-import React from 'react';
-import Relay from 'react-relay';
-import moment from 'moment';
-import {BernieText, BernieColors} from '../styles/bernie-css';
-import {Paper} from 'material-ui';
-import GCBooleanField from '../forms/GCBooleanField';
+import React from 'react'
+import Relay from 'react-relay'
+import moment from 'moment'
+import {BernieText, BernieColors} from '../styles/bernie-css'
+import {Paper} from 'material-ui'
+import GCBooleanField from '../forms/GCBooleanField'
 
 class SingleEventRSVPSurvey extends React.Component {
   static propTypes = {
@@ -15,8 +15,9 @@ class SingleEventRSVPSurvey extends React.Component {
     if (this.state.signupQuestion === null) {
       this.setState({errors: {signupQuestion: 'This field is required'}})
       return false
+    } else {
+      return true
     }
-    return true;
   }
 
   submit() {
@@ -39,7 +40,7 @@ class SingleEventRSVPSurvey extends React.Component {
   }
 
   eventInfo = {
-    'phonebank' : "At this phone bank party, you will get to meet other volunteers and make phone calls into the early primary states. Making these calls is the most effective way for volunteers to get Bernie elected."
+    'phonebank event' : "At this phone bank party, you will get to meet other volunteers and make phone calls into the early primary states. Making these calls is the most effective way for volunteers to get Bernie elected."
   }
 
   state = {
@@ -49,10 +50,21 @@ class SingleEventRSVPSurvey extends React.Component {
 
   render() {
     let relatedEvent = this.props.callAssignment.relatedEvent
+    if (!relatedEvent) {
+      return (
+        <div style={BernieText.default}>
+          <p>Error: no related event found for this call assignment.</p>
+          <p>Let help@berniesanders.com know and move on to another call.</p>
+        </div>
+      )
+    }
+
     let relatedPerson = this.props.currentUser.relatedPerson
+
     let attendance = relatedEvent.attendeesCount
     if (relatedEvent.capacity)
       attendance = attendance + '/' + relatedEvent.capacity
+
     return (
       <div>
         <div style={BernieText.default}>
@@ -144,6 +156,6 @@ export default Relay.createContainer(SingleEventRSVPSurvey, {
       fragment on Person {
         firstName
       }
-    `,
+    `
   }
 })

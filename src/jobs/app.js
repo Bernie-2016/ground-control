@@ -68,7 +68,7 @@ function init_job(job, cb) {
         },
         function job_finished() {},
         true, // start immediately,
-        "America/Chicago" // this shouldn't really matter
+        "US/Eastern" // this shouldn't really matter
       ));
 
     } catch(e) {

@@ -2,7 +2,6 @@ import React from 'react';
 import Relay from 'react-relay';
 import {BernieText, BernieColors} from './styles/bernie-css';
 import {Paper, List, ListItem, RaisedButton} from 'material-ui';
-import PlivoDialer from './PlivoDialer'
 import SideBarLayout from './SideBarLayout';
 import moment from 'moment';
 import yup from 'yup'
@@ -15,7 +14,8 @@ import MutationHandler from './MutationHandler';
 const SurveyRenderers = {
   'BSDSurvey': require('./survey-renderers/BSDSurvey'),
   'PhonebankRSVPSurvey': require('./survey-renderers/PhonebankRSVPSurvey'),
-  'SingleEventRSVPSurvey': require('./survey-renderers/SingleEventRSVPSurvey')
+  'SingleEventRSVPSurvey': require('./survey-renderers/SingleEventRSVPSurvey'),
+  'Jan23HostRecruitmentSurvey': require('./survey-renderers/Jan23HostRecruitmentSurvey')
 }
 
 class CallAssignment extends React.Component {
@@ -162,6 +162,13 @@ ${userFirstName}`
     return `mailto:${email}?subject=${subject}&body=${message}`
   }
 
+
+  formatPhoneNumber(number) {
+    let sliceStart = 1
+
+    return '(' + number.slice(sliceStart, sliceStart + 3) + ') ' + number.slice(sliceStart + 3, sliceStart + 6) + '-' + number.slice(sliceStart + 6)
+  }
+
   renderIntervieweeInfo() {
     let interviewee = this.props.currentUser.intervieweeForCallAssignment
     let name = this.intervieweeName()
@@ -174,7 +181,12 @@ ${userFirstName}`
         return 'never'
       }
     }
+    let phoneNumber = interviewee.phone
+    if (phoneNumber[0] !== '1')
+      phoneNumber = '1' + phoneNumber
 
+    phoneNumber = phoneNumber.slice(0, 11)
+    let formattedNumber = this.formatPhoneNumber(phoneNumber)
     let sideBar = (
       <div>
         <div style={{
@@ -185,10 +197,9 @@ ${userFirstName}`
         }}>
           {name}
           <br />
-          <PlivoDialer number={`${interviewee.phone}`}
-            endpointUsername='bernie2016151225174042'
-            endpointPassword='gUi3BAcj8MOtku1TOeGsjPBNuH21GL'
-          />
+          <a style={{color: BernieColors.darkBlue}} href={`tel:+${phoneNumber}`}>
+            {formattedNumber}
+          </a>
         </div>
       </div>
     )
@@ -440,6 +451,7 @@ export default Relay.createContainer(CallAssignment, {
             latitude
             longitude
           }
+          ${SurveyRenderers.Jan23HostRecruitmentSurvey.getFragment('interviewee')}
           ${SurveyRenderers.BSDSurvey.getFragment('interviewee')}
           ${SurveyRenderers.PhonebankRSVPSurvey.getFragment('interviewee')}
           ${SurveyRenderers.SingleEventRSVPSurvey.getFragment('interviewee')}
@@ -447,6 +459,7 @@ export default Relay.createContainer(CallAssignment, {
         ${SurveyRenderers.PhonebankRSVPSurvey.getFragment('currentUser')}
         ${SurveyRenderers.BSDSurvey.getFragment('currentUser')}
         ${SurveyRenderers.SingleEventRSVPSurvey.getFragment('currentUser')}
+        ${SurveyRenderers.Jan23HostRecruitmentSurvey.getFragment('currentUser')}
       }
     `
   }

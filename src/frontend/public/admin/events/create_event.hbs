@@ -108,6 +108,10 @@
       list-style-type: none;
     }
 
+    .capitalized {
+      text-transform: capitalize;
+    }
+
 		div#event-error-message a:link,
 		div#event-error-message a:visited,
 		div#event-error-message a:hover,
@@ -150,14 +154,14 @@
         <a class="js-created-event-url" href="" target="_blank"></a></p>
         <button class="button" onclick='$("#event-success-message").hide();setHashValue("event_id", null)'>Close</button>
 		  </div>
-		  
+
 		  <div id="event-error-message" class="section-wrap event-message" style="display:none;">
 			  There was an error processing your submission. <br>
-			  Please try again later or contact 
+			  Please try again later or contact
 			  <a href="mailto:help@berniesanders.com?Subject=Error%20encountered%20creating%20event" target="_top">help@berniesanders.com</a>
 			  <ul id="event-error-message-details"></ul>
 		  </div>
-			
+
           <form method="post" name="secondform" id="secondform">
             <div>
               <div class="section-wrap">
@@ -1504,7 +1508,7 @@
           	$('#secondform').submit(function(e){
           		e.preventDefault();
 				      $("#event-success-message, #event-error-message").hide();
-				
+
           		current_events = $.merge( $.merge( [], user_created_events ), generated_events );
           		if (current_events.length < 1){
           			alert('Please select a date for your event from the calendar.');
@@ -1513,48 +1517,48 @@
 
               $('#submit_button').blur().addClass('in-progress');
 
-              document.getElementById('description').value = CKEDITOR.instances.description.getData();          		
+              document.getElementById('description').value = CKEDITOR.instances.description.getData();
 
           		var formdata = $(this).serializeArray();
           		formdata.push({
           			name: "event_dates",
           			value: JSON.stringify(current_events)
           		});
-				
+
           		$.ajax({
           		    dataType: "json",
           		    url: '/events/create',
                   headers: { sourceurl: window.location.pathname },
           		    data: formdata,
           		    type: 'POST',
-          		    success: function(response, textStatus){
-          		    	if (response.status == 'success'){
-											setHashValue("event_ids", response.ids.join(','));
-                      window.scrollTo(0,0);
-											window.location.reload();
-          		    	}
-                    else {
-											$('#submit_button').removeClass('in-progress');
-											$("#event-error-message-details").html('');
-                      if (response.errors){
-                        $.each(response.errors, function(k, v) {
-                          $("#event-error-message-details").append("<li>" + k + " : " + v[0] + "</li>");
-                        });
-                      }
-											$("#event-error-message").show();
-                      window.scrollTo(0,0);
-          		    	}
+          		    success: function(response, textStatus) {
+										setHashValue("event_ids", response.ids.join(','));
+                    window.scrollTo(0,0);
+										window.location.reload();
           		    },
-          		    error: function(i){
-					  				console.log(i);
+          		    error: function(response){
+                    console.log(response)
           		      $('#submit_button').removeClass('in-progress');
 										$("#event-error-message").show();
+                    $("#event-error-message-details").html('');
+                      if (response.responseJSON && response.responseJSON.errors) {
+                        var errors = response.responseJSON.errors
+                        $.each(errors, function(k, v) {
+                          switch (k) {
+                            case "is_searchable":
+                              k = "make event public";
+                            default:
+                              k = k.replace(/_/g, ' ');
+                          }
+                          $("#event-error-message-details").append("<li><span class='capitalized'" + k + "</span> : " + v[0] + "</li>");
+                        });
+                      }
                     window.scrollTo(0,0);
           		    }
           		});
           	});
 
-			
+
 			// Show initial modal if we have an event_url in the hash (should have come from previous event creation)
 			var event_ids = getHashValue("event_ids");
       if (event_ids){
@@ -1569,7 +1573,7 @@
           $("#event-success-message").show();
         }
       };
-			
+
           });
         </script>
         <script>
