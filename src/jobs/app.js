@@ -13,7 +13,7 @@ async.forEach(jobs,init_job,function(e) {
   // are not running. Bring the process down, fix it, and bring it back up.
   if(e) {
     log.error("Failed to initialize cron jobs");
-    log.error(e.stack);
+    log.error(e);
     process.exit(1);
   }
 });

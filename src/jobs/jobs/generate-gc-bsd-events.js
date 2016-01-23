@@ -122,6 +122,6 @@ export let job = async () => {
     })
 
   } catch (ex) {
-    log.error(ex.message, ex.stack)
+    log.error(ex)
   }
 }

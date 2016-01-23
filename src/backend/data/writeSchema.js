@@ -12,8 +12,7 @@ export default async function writeSchema() {
     let result = await (graphql(Schema, introspectionQuery));
     if (result.errors) {
       log.error(
-        'ERROR introspecting schema: ',
-        result.errors
+        `ERROR introspecting schema: ${result.errors}`
       );
     } else {
       fs.writeFileSync(

@@ -12,7 +12,7 @@ module.exports = {};
 // containing throw statements.
 var default_cb = module.exports.default_callback = function default_cb(e) {
   if(e) {
-    log.error(e.stack);
+    log.error(e);
   }
 };
 

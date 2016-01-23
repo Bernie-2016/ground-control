@@ -36,6 +36,6 @@ export let job = async () => {
     await Promise.all(promises)
     log.info('Done sending e-mails!')
   } catch (ex) {
-    log.error(ex.message, ex.stack)
+    log.error(ex)
   }
 }
