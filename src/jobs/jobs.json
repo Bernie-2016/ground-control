@@ -13,7 +13,7 @@
       "job": "./jobs/generate-gc-bsd-events.js"
     },
     {
-      "cron": "00 35 00 * * *",
+      "cron": "00 16 20 * * *",
       "job": "./jobs/expired-call-assignment-cleanup.js"
     },
     {
