@@ -447,7 +447,11 @@ const GraphQLUser = new GraphQLObjectType({
                 .where('attempted_at', '>', new Date(new Date() - 14 * 24 * 60 * 60 * 1000))
             })
             .orWhere(function() {
-              this.whereIn('reason_not_completed', ['NO_PICKUP', 'CALL_BACK', 'NOT_INTERESTED'])
+              this.whereIn('reason_not_completed', ['NOT_INTERESTED'])
+                .where('attempted_at', '>', new Date(new Date() - 21 * 24 * 60 * 60 * 1000))
+            })
+            .orWhere(function() {
+              this.whereIn('reason_not_completed', ['NO_PICKUP', 'CALL_BACK'])
                 .where('attempted_at', '>', new Date(new Date() - 7 * 24 * 60 * 60 * 1000))
             })
             .orWhereIn('reason_not_completed', ['WRONG_NUMBER', 'DISCONNECTED_NUMBER', 'OTHER_LANGUAGE'])
