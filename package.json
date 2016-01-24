@@ -79,7 +79,6 @@
     "request-promise": "^1.0.1",
     "retry": "^0.8.0",
     "rollbar": "^0.5.11",
-    "stacktrace-js": "^1.0.1",
     "style-loader": "^0.13.0",
     "superagent": "^1.4.0",
     "throng": "^1.0.1",
