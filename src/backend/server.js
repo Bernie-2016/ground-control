@@ -25,6 +25,7 @@ import DataLoader from 'dataloader'
 import fs from 'fs'
 import handlebars from 'handlebars'
 import throng from 'throng'
+import compression from 'compression'
 
 const WORKERS = process.env.WEB_CONCURRENCY || 1
 
@@ -185,7 +186,7 @@ function startApp() {
   }
 
   const app = express()
-
+  app.use(compression())
   app.use(rollbar.errorHandler(process.env.ROLLBAR_ACCESS_TOKEN))
 
   rollbar.handleUncaughtExceptions(
@@ -207,7 +208,9 @@ function startApp() {
     })
   }
 
-  app.use(express.static(publicPath))
+  app.use(express.static(publicPath, {
+    maxAge: '180 days'
+  }))
   app.use(bodyParser.json())
   app.use(bodyParser.urlencoded({ extended: true }))
   app.use(session({

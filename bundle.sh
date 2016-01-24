@@ -5,3 +5,4 @@ echo "$DATAVIEW" | mustache - ./src/frontend/index/index.mustache > ./src/fronte
 
 mkdir -p ./src/frontend/public/assets/js
 webpack --config ./webpack/config.js
+node ./version.js
