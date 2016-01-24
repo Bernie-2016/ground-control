@@ -274,7 +274,12 @@ function startApp() {
   }))
 
   app.post('/events/create', wrap(async (req, res) => {
-    let src = req.headers.referer.split(req.headers.origin)[1]
+    let src = null
+    if (req.headers && req.headers.referer) {
+      src = req.headers.referer.split(req.headers.origin)
+      if (src)
+        src = src[1]
+    }
 
     if (!src) {
       // Sometimes the above results in undefined.
@@ -282,6 +287,9 @@ function startApp() {
       src = req.headers.sourceurl;
       log.debug('Missing header data', req.headers);
     }
+
+    if (!src)
+      src = 'unknown source'
 
     let form = req.body
     if (process.env.NODE_ENV === 'development')
