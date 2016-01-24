@@ -1,9 +1,9 @@
 // NOTE: this needs to be the first thing loaded or New Relic won't work
-import newrelic from 'newrelic'
+require('newrelic')
+import writeSchema from './data/writeSchema'
 import express from 'express'
 import graphQLHTTP from 'express-graphql'
 import {Schema} from './data/schema'
-import writeSchema from './data/writeSchema'
 import path from 'path'
 import fallback from 'express-history-api-fallback'
 import bodyParser from 'body-parser'
