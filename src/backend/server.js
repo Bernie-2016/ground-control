@@ -273,7 +273,7 @@ function startApp() {
     res.redirect('https://script.google.com/a/macros/berniesanders.com/s/AKfycbylHH3UCJM0ka4k_B8tVHVA02XIMcgOEzBjJFbIpnhBXYS2a30/exec')
   }))
 
-  app.post('/events/create', wrap(async (req, res) => {
+  app.post('/events/create', isAuthenticated, wrap(async (req, res) => {
     let src = null
     if (req.headers && req.headers.referer) {
       src = req.headers.referer.split(req.headers.origin)
