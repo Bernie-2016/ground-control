@@ -25,8 +25,7 @@ export default class Signup extends React.Component {
     location.search.substr(1).split("&").forEach((item) => {
       queryDict[item.split("=")[0]] = item.split("=")[1]
     })
-
-    window.location = queryDict.next || '/call';
+    this.props.history.push(queryDict.next || '/call')
   }
 
   formStates = {

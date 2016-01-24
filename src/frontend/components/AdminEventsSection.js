@@ -444,7 +444,7 @@ class AdminEventsSection extends React.Component {
             }}
           >refresh</IconButton>*/}
           <RaisedButton
-            label="More Filters"
+            label="Filter"
             labelPosition="after"
             onTouchTap={() => {
               this.setState({showFiltersDialog: true});
@@ -452,6 +452,16 @@ class AdminEventsSection extends React.Component {
           >
             <FontIcon className="material-icons" style={{position: 'relative', top: '6px', left: '6px'}}>filter_list</FontIcon>
           </RaisedButton>
+          <RaisedButton
+            label="Upload RSVPs"
+            labelPosition="after"
+            onTouchTap={() => {
+              this.props.history.push('/admin/events/upload_rsvps')
+            }}
+          >
+            <FontIcon className="material-icons" style={{position: 'relative', top: '6px', left: '6px'}}>file_upload</FontIcon>
+          </RaisedButton>
+
         </ToolbarGroup>
         <ToolbarGroup key={1} float="right">
           <RaisedButton

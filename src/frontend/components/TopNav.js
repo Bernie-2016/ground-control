@@ -70,7 +70,7 @@ export default class TopNav extends React.Component {
         }}
         value={tab.value}
         key={tab.value}
-        onActive={() => { window.location = tab.value }}
+        onActive={() => { this.props.history.push(tab.value) }}
       />)
     })
     tabs.push(<Tab
