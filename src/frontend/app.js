@@ -9,6 +9,7 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 import AdminDashboard from './components/AdminDashboard';
 import AdminEventEmailCreationForm from './components/AdminEventEmailCreationForm'
 import AdminEventsSection from './components/AdminEventsSection';
+import AdminEventUploadRsvps from './components/AdminEventUploadRsvps';
 import AdminCallAssignmentsSection from './components/AdminCallAssignmentsSection';
 import AdminCallAssignmentCreationForm from './components/AdminCallAssignmentCreationForm';
 import GCTextField from './components/forms/GCTextField';
@@ -119,6 +120,11 @@ ReactDOM.render(
           ...EventQueries
         }}
       />
+      <Route
+        path='events/upload-rsvps'
+        component={AdminEventUploadRsvps}
+      />
+
       <Route
         path='events'
         component={AdminEventsSection}

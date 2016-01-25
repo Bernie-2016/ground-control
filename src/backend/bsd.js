@@ -339,18 +339,12 @@ export default class BSD {
     return response
   }
 
-  async addRSVPToEvent(email, zip, phone, event_id) {
+  async addRSVPToEvent(rsvpDetails) {
     let params = {
-      'email' : email,
-      'zip' : zip,
-      'phone': phone,
+      ...rsvpDetails,
       'will_attend' : 1,
       'guests': 0
     }
-    if (/^\d+$/.test(event_id))
-      params['event_id'] = event_id
-    else
-      params['event_id_obfuscated'] = event_id
     let host = this.baseURL.protocol + '//' + this.baseURL.host
     let URL = host + '/page/graph/addrsvp' + '?' + qs.stringify(params)
 
@@ -363,7 +357,7 @@ export default class BSD {
     let response = await this.requestWrapper(options)
 
     if (response.body && response.body.error)
-      throw new Error(JSON.stringify(response.error))
+      throw new Error(JSON.stringify(response.body))
     return response
   }
 
@@ -496,7 +490,7 @@ export default class BSD {
 
   async requestWrapper(options) {
     // These are methods for which we don't want to make a call to BSD when we are in dev
-    let mockBSDMethodsInDev = ['/page/graph/addrsvp', '/event/update_event', '/event/delete_event']
+    let mockBSDMethodsInDev = ['/event/update_event', '/event/delete_event']
 
     if (process.env.NODE_ENV === 'development'
       && mockBSDMethodsInDev.reduce(

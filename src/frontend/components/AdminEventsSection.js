@@ -456,7 +456,7 @@ class AdminEventsSection extends React.Component {
             label="Upload RSVPs"
             labelPosition="after"
             onTouchTap={() => {
-              this.props.history.push('/admin/events/upload_rsvps')
+              this.props.history.push('/admin/events/upload-rsvps')
             }}
           >
             <FontIcon className="material-icons" style={{position: 'relative', top: '6px', left: '6px'}}>file_upload</FontIcon>

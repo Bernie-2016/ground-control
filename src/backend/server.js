@@ -273,6 +273,17 @@ function startApp() {
     res.redirect('https://script.google.com/a/macros/berniesanders.com/s/AKfycbylHH3UCJM0ka4k_B8tVHVA02XIMcgOEzBjJFbIpnhBXYS2a30/exec')
   }))
 
+  app.get('/events/add-rsvp', wrap(async(req, res) => {
+    let response = null
+    try {
+      response = await BSDClient.addRSVPToEvent(req.query)
+    } catch(ex) {
+      res.status(400).send(ex.toString())
+      return;
+    }
+    res.send(response.body)
+  }))
+
   app.post('/events/create', isAuthenticated, wrap(async (req, res) => {
     let src = null
     if (req.headers && req.headers.referer) {
