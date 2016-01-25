@@ -171,17 +171,27 @@ class AdminEventsSection extends React.Component {
     )
   }
 
-  HostInfoCell = ({rowIndex, data, col, info, ...props}) => (
-    <Cell {...props}
-    style={{
-      fontFamily: 'Roboto',
-      fontSize: '13px',
-      lineHeight: '18px'
-    }}
-    >
-      {(info == 'name' && data[rowIndex]['node'] && data[rowIndex]['node'][col]) ? data[rowIndex]['node'][col]['firstName'] + ' ' + data[rowIndex]['node'][col]['lastName'] : (data[rowIndex] && data[rowIndex]['node'] && data[rowIndex]['node'][col] ? data[rowIndex]['node'][col][info] : '')}
-    </Cell>
-  )
+  HostInfoCell = ({rowIndex, data, col, info, ...props}) => {
+    let cellData = data[rowIndex] && data[rowIndex]['node'] && data[rowIndex]['node'][col] ? data[rowIndex]['node'][col][info] : ''
+    if (info === 'email') {
+      let link = `mailto:${cellData}`
+      cellData = <a href={link}>{cellData}</a>
+    }
+    else if (info === 'name') {
+      cellData = data[rowIndex]['node'][col]['firstName'] + ' ' + data[rowIndex]['node'][col]['lastName']
+    }
+    return (
+      <Cell {...props}
+      style={{
+        fontFamily: 'Roboto',
+        fontSize: '13px',
+        lineHeight: '18px'
+      }}
+      >
+        {cellData}
+      </Cell>
+    )
+  }
 
   EventTypeCell = ({rowIndex, data, col, attr, ...props}) => (
     <Cell {...props}
