@@ -30,7 +30,8 @@ export default class AdminEventUploadRsvps extends React.Component {
       backgroundColor: '#ffdddd'
     },
     fileStatus: {
-      fontSize: '1em',
+      ...BernieText.secondaryTitle,
+      fontSize: '0.75em',
       textAlign: 'left',
       paddingLeft: 20
     }
@@ -55,7 +56,7 @@ export default class AdminEventUploadRsvps extends React.Component {
       processObj.processedRows += 1
 
       if (err) {
-        processObj.errors.push(err)
+        processObj.errors.push(JSON.stringify(row))
       }
       filesProcessed[fileName] = processObj
       this.setState(filesProcessed)
@@ -85,17 +86,45 @@ export default class AdminEventUploadRsvps extends React.Component {
 
   renderFileProgress() {
     let count = 0
+    let renderErrors = (fileObj) => {
+      console.log(fileObj.errors)
+      if (fileObj.errors.length === 0)
+        return <div></div>
+      return (
+        <div style={{
+          ...BernieText.default,
+          borderTop: '1px solid ' + BernieColors.red,
+          color: BernieColors.red,
+          fontSize: '0.5em',
+          paddingLeft: 10,
+          width: 470,
+          overflow: 'scroll'
+        }}>
+          {fileObj.errors.map((error) => {
+            return (
+              <div>
+                {error}
+              </div>
+            )
+          })}
+        </div>
+      )
+    }
     let fileNodes = Object.keys(this.state.filesProcessed).map((fileName) => {
       count = count + 1
       let fileObj = this.state.filesProcessed[fileName]
-      let color = fileObj.totalRows === fileObj.processedRows ? (fileObj.errors.length === 0 ? BernieColors.green : BernieColors.red) : BernieColors.gray
+      let color = (fileObj.errors.length === 0 ? (fileObj.totalRows === fileObj.processedRows ? BernieColors.green : BernieColors.gray) : BernieColors.red)
+
       return (
-        <div style={{
-          ...this.styles.fileStatus,
-          color: color,
-          backgroundColor: count % 2 ? BernieColors.lightGray : BernieColors.white
-        }}>
-          {fileName}: {fileObj.processedRows}/{fileObj.totalRows}
+        <div>
+          <div style={{
+            ...this.styles.fileStatus,
+            color: color,
+            backgroundColor: count % 2 ? BernieColors.lightGray : BernieColors.white
+          }}>
+            {fileName}: {fileObj.processedRows}/{fileObj.totalRows}
+            {renderErrors(fileObj)}
+          </div>
         </div>
       )
     })
