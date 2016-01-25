@@ -467,10 +467,12 @@ const GraphQLUser = new GraphQLObjectType({
               .from('bsd_person_bsd_groups as bsd_people')
               .where('bsd_people.cons_group_id', group.cons_group_id)
           } else if (group.query && group.query !== EVERYONE_GROUP) {
+            let shouldOrder = group.query.indexOf('order by') !== -1
             query = query
               .from('bsd_person_gc_bsd_groups as bsd_people')
               .where('gc_bsd_group_id', group.id)
-              .orderBy('bsd_people.id')
+            if (shouldOrder)
+              query = query.orderBy('bsd_people.id')
           } else {
             query = query.from('bsd_people')
           }
