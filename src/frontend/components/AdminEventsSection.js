@@ -1207,7 +1207,31 @@ ${signature}`
             cell={<this.NoHTMLCell data={events} col="description" />}
             width={450}
           />
+        </ColumnGroup>
+        <ColumnGroup
+          header={<this.HeaderCell content="Event Host" />}>
           <Column
+            flexGrow={1}
+            header={<this.HeaderCell content="Email" />}
+            cell={<this.HostInfoCell data={events} col="host" info="email" />}
+            width={220}
+          />
+          <Column
+            flexGrow={1}
+            header={<this.HeaderCell content="Name" />}
+            cell={<this.HostInfoCell data={events} col="host" info="name" />}
+            width={150}
+          />
+          <Column
+            flexGrow={1}
+            header={<this.SortControllerCell content="Phone" attribute="contactPhone" />}
+            cell={<this.TextCell data={events} col="contactPhone" />}
+            width={100}
+          />
+        </ColumnGroup>
+        <ColumnGroup
+          header={<this.HeaderCell content="Detailed Info" />}>
+         <Column
             header={<this.SortControllerCell content="Duration" attribute="duration" />}
             cell={<this.DurationCell data={events} col="duration" />}
             flexGrow={1}
@@ -1226,27 +1250,6 @@ ${signature}`
             cell={<this.TextCell data={events} col="attendeesCount" />}
             width={100}
             align='center'
-          />
-        </ColumnGroup>
-        <ColumnGroup
-          header={<this.HeaderCell content="Event Host" />}>
-          <Column
-            flexGrow={1}
-            header={<this.HeaderCell content="Name" />}
-            cell={<this.HostInfoCell data={events} col="host" info="name" />}
-            width={150}
-          />
-          <Column
-            flexGrow={1}
-            header={<this.SortControllerCell content="Phone" attribute="contactPhone" />}
-            cell={<this.TextCell data={events} col="contactPhone" />}
-            width={100}
-          />
-          <Column
-            flexGrow={1}
-            header={<this.HeaderCell content="Email" />}
-            cell={<this.HostInfoCell data={events} col="host" info="email" />}
-            width={220}
           />
         </ColumnGroup>
         <ColumnGroup
