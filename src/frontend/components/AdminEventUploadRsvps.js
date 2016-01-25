@@ -87,7 +87,6 @@ export default class AdminEventUploadRsvps extends React.Component {
   renderFileProgress() {
     let count = 0
     let renderErrors = (fileObj) => {
-      console.log(fileObj.errors)
       if (fileObj.errors.length === 0)
         return <div></div>
       return (
