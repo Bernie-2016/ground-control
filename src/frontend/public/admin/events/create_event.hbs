@@ -1537,22 +1537,22 @@
 										window.location.reload();
           		    },
           		    error: function(response){
-                    console.log(response)
           		      $('#submit_button').removeClass('in-progress');
 										$("#event-error-message").show();
                     $("#event-error-message-details").html('');
-                      if (response.responseJSON && response.responseJSON.errors) {
-                        var errors = response.responseJSON.errors
-                        $.each(errors, function(k, v) {
-                          switch (k) {
-                            case "is_searchable":
-                              k = "make event public";
-                            default:
-                              k = k.replace(/_/g, ' ');
-                          }
-                          $("#event-error-message-details").append("<li><span class='capitalized'" + k + "</span> : " + v[0] + "</li>");
-                        });
-                      }
+                    if (response.responseJSON && response.responseJSON.errors) {
+                      var errors = response.responseJSON.errors
+                      $.each(errors, function(key, value) {
+                        switch (key) {
+                          case "is_searchable":
+                            key = "make event public";
+                            break;
+                          default:
+                            key = key.replace(/_/g, ' ');
+                        }
+                        $("#event-error-message-details").append("<li><span class='capitalized'>" + key + "</span> : " + value[0] + "</li>");
+                      });
+                    }
                     window.scrollTo(0,0);
           		    }
           		});
