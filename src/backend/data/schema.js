@@ -473,6 +473,16 @@ const GraphQLUser = new GraphQLObjectType({
               .where('gc_bsd_group_id', group.id)
             if (shouldOrder)
               query = query.orderBy('bsd_people.id')
+            // Hack for performance reasons - this makes the query much faster for some reason
+            if (callAssignment.renderer === 'SingleEventRSVPSurvey') {
+              let geom = await knex('gc_bsd_events')
+                .select('bsd_events.geom')
+                .innerJoin('bsd_events', 'gc_bsd_events.event_id', 'bsd_events.event_id')
+                .where('turn_out_assignment', callAssignment.id)
+                .first()
+
+              query = query.whereRaw(`ST_DWithin(bsd_addresses.geom, '${geom.geom}', 50000)`)
+            }
           } else {
             query = query.from('bsd_people')
           }
