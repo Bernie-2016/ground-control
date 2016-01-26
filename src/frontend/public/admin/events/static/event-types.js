@@ -110,7 +110,6 @@ function setDefaults(eventTypeId){
 
 function updateFormValue(property, value) {
 	var form = document.getElementById('secondform');
-
 	switch (property) {
 		case "description":
 			CKEDITOR.instances.description.setData(value);
@@ -128,13 +127,18 @@ function updateFormValue(property, value) {
 	  		updateEventTime(newDateMoment);
 	  	});
 	    break;
-	  case typeof value === 'boolean':
-	  	if (form[property]){
-	  		form[property].checked = value;
-	  	}
+	  case "attendee_volunteer_show":
+	  	$('#attendee_volunteer_show').click();
 	  	break;
 	  default:
-	    form[property].value = value;
+	  	if (typeof value === 'boolean') {
+	  		if (form[property]){
+	  			form[property].checked = value;
+	  		}
+	  	}
+	  	else
+		    form[property].value = value;
+		  break
 	}
 }
 
