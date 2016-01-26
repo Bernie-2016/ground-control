@@ -36,6 +36,17 @@ var eventTypes = [
 		},
 		adminOnly: false
 	},
+	{
+		id: 41,
+		name: 'Barnstorm',
+		defaultValues: {
+			name: 'Bernstorm - Organizing Rally with National Bernie Staff',
+			description: '<p>Join other local volunteers and grassroots organizers on <DOW, Month DD> as a representative from the national organizing staff, <STAFF> comes to <State> for a series of special organizing events.</p><p>We will discuss how we can rapidly grow our movement in the next several months as we enter the primary season. We will also be discussing local volunteer activities to help the early primary states.</p><p>This will be a great opportunity to hear what\'s going on nationally and locally with the campaign, as well as a chance to meet other Bernie supporters from your community. Thank you for all that you\'ve contributed and all the hard work that you\'re about to do!</p>',
+			is_official: true,
+			attendee_volunteer_show: true
+		},
+		adminOnly: false
+	}
 	// { // Keep this event type in as an example for providing extra default values
 	// 	id: 44,
 	// 	name: 'Jan. 23rd Nationwide Bernie Address',
@@ -54,7 +65,7 @@ var eventTypes = [
 ];
 
 (function(){
-	var form = document.getElementById('secondform');	
+	var form = document.getElementById('secondform');
 
 	form.event_type_id.options[0] = new Option();
 	eventTypes.forEach(function(type){
@@ -74,7 +85,7 @@ var eventTypes = [
 function setDefaults(eventTypeId){
 	var form = document.getElementById('secondform');
 	$(form.start_tz).off("change");
-	
+
 	var eventType = null;
 	for (var i = 0; i < eventTypes.length; i++) {
 		if (eventTypes[i].id == eventTypeId) {
@@ -82,10 +93,10 @@ function setDefaults(eventTypeId){
 			break
 		}
 	}
-	if (!eventType) {return};	
+	if (!eventType) {return};
 
 	setHashValue("type", eventType.id);
-	var defaults = eventType.defaultValues;	
+	var defaults = eventType.defaultValues;
 
 	clearEvents();
 	updateFormValue('is_official', false);
@@ -107,7 +118,7 @@ function updateFormValue(property, value) {
 	  	break;
 	  case "date":
 	  	var dateMoment = moment(value.dateTime).tz(value.timeZone);
-	  	
+
 	  	setEventDate(dateMoment, true);
 	  	updateEventTime(dateMoment);
 
@@ -176,7 +187,7 @@ function clearEvents(){
 
 function updateEventTime(dateMoment) {
 	var form = document.getElementById('secondform');
-	
+
 	var hour = Number(dateMoment.format('hh'));
 	hour = (hour == 12) ? '00' : hour;
 	form['start_time[h]'].value = hour;
