@@ -285,6 +285,12 @@ function startApp() {
   }))
 
   app.post('/events/create', isAuthenticated, wrap(async (req, res) => {
+    if (!req.user) {
+      res.status(400).send({errors: {
+        'Session Timeout': ['Your session needs to be refreshed. Please visit https://organize.berniesanders.com and log in.']}
+      })
+      return
+    };
     let src = null
     if (req.headers && req.headers.referer) {
       src = req.headers.referer.split(req.headers.origin)
@@ -310,14 +316,10 @@ function startApp() {
 
     // Flag event as needing approval
     let batchEventMax = 20
-    if (req.user && src === '/admin/events/create') {
-      // const userIsAdmin = await isAdmin(req.user.id)
-      if ((form[ 'event_type_id' ] != 30 && form[ 'event_type_id' ] != 31 && form[ 'event_type_id' ] != 44) || form[ 'is_official' ] == 1) // to do: implement proper permissioning
-        form[ 'flag_approval' ] = '1'
-    } else {
-      batchEventMax = 10
-      form[ 'flag_approval' ] = '1'
-    }
+    const userIsAdmin = await isAdmin(req.user.id)
+    if (!userIsAdmin && form['event_type_id'] != 31) {
+      form['flag_approval'] = '1'
+    };
 
     form['event_dates'] = JSON.parse(form[ 'event_dates' ])
     let dateCount = form['event_dates'].length
