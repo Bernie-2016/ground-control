@@ -16,7 +16,7 @@ var eventTypes = [
 			name: 'Bernie Ballot Blast - PA Support Bernie and his Delegates and Collect Petition Signatures',
 			description: 'We only have 3 weeks to get all the needed signatures to get Bernie on the Ballot and get his Delegates nominated for the Democratic Convention.  Sign up for your local events scheduled between January 26th and February 10th.  We can\'t do this without you and you can make the difference in Pennsylvania, one of the most important swing states.  Come join the movement!',
 		},
-		adminOnly: true
+		adminOnly: false
 	},
 	{
 		id: 31,
@@ -36,21 +36,21 @@ var eventTypes = [
 		},
 		adminOnly: false
 	},
-	{
-		id: 44,
-		name: 'Jan. 23rd Nationwide Bernie Address',
-		defaultValues: {
-			name: 'Jan 23rd Bernie Livestream Party',
-			description: 'Bernie has a special message to share with his supporters one week away from the Iowa caucus. Join other volunteers in your area to watch Bernie address all of us live!',
-			date: {
-				dateTime: new Date('January 23 2016 18:00:00'),
-				timeZone: 'US/Eastern'
-			},
-			duration_num: 2,
-			duration_unit: 60
-		},
-		adminOnly: false
-	}
+	// { // Keep this event type in as an example for providing extra default values
+	// 	id: 44,
+	// 	name: 'Jan. 23rd Nationwide Bernie Address',
+	// 	defaultValues: {
+	// 		name: 'Jan 23rd Bernie Livestream Party',
+	// 		description: 'Bernie has a special message to share with his supporters one week away from the Iowa caucus. Join other volunteers in your area to watch Bernie address all of us live!',
+	// 		date: {
+	// 			dateTime: new Date('January 23 2016 18:00:00'),
+	// 			timeZone: 'US/Eastern'
+	// 		},
+	// 		duration_num: 2,
+	// 		duration_unit: 60
+	// 	},
+	// 	adminOnly: false
+	// }
 ];
 
 (function(){
@@ -62,9 +62,9 @@ var eventTypes = [
 			return
 		};
 		form.event_type_id.options[form.event_type_id.options.length] = new Option(type.name, type.id);
-	});	
+	});
 
-	form.event_type_id.selectedIndex = -1;	
+	form.event_type_id.selectedIndex = -1;
 
 	$(form.event_type_id).on("change", function(e){
 		setDefaults(e.target.value);
