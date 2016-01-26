@@ -35,6 +35,7 @@ import Form from 'react-formal';
 import {createHistory} from 'history';
 import GCNetworkLayer from './relay-extensions/GCNetworkLayer'
 import log from './log'
+import Loading from './components/Loading'
 
 window.jQuery = jQuery;
 window.log = log;
@@ -129,6 +130,7 @@ ReactDOM.render(
         path='events'
         component={AdminEventsSection}
         queries={ListContainerQueries}
+        renderLoading={() => <Loading />}
       />
     </Route>
     <Route
@@ -157,6 +159,7 @@ ReactDOM.render(
             ...CallAssignmentQueries,
             ...CurrentUserQueries
           }}
+          renderLoading={() => <Loading />}
         />
       </Route>
     </Route>
