@@ -311,9 +311,11 @@ function startApp() {
     // Flag event as needing approval
     let batchEventMax = 20
     if (req.user && src === '/admin/events/create') {
-      // const userIsAdmin = await isAdmin(req.user.id)
-      if ((form[ 'event_type_id' ] != 30 && form[ 'event_type_id' ] != 31 && form[ 'event_type_id' ] != 44) || form[ 'is_official' ] == 1) // to do: implement proper permissioning
-        form[ 'flag_approval' ] = '1'
+      const userIsAdmin = await isAdmin(req.user.id)
+      if (userIsAdmin || (form['event_type_id'] === 31 && form['is_official'] !== 1))
+        form['flag_approval'] = '0'
+      else
+        form['flag_approval'] = '1'
     } else {
       batchEventMax = 10
       form[ 'flag_approval' ] = '1'
