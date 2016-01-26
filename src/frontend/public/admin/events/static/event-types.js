@@ -128,7 +128,7 @@ function updateFormValue(property, value) {
 	  		updateEventTime(newDateMoment);
 	  	});
 	    break;
-	  case typeof value === 'boolean':
+	  case (typeof value) === 'boolean':
 	  	if (form[property]){
 	  		form[property].checked = value;
 	  	}
