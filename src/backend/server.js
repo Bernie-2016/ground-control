@@ -310,16 +310,17 @@ function startApp() {
 
     let form = req.body
     if (process.env.NODE_ENV === 'development')
-      form['event_type_id'] = 1
+      form['event_type_id'] = '1'
 
     log.info(`Event Create Form Submission to ${src} by ${req.user.email}`, JSON.stringify(form));
 
     // Flag event as needing approval
     let batchEventMax = 20
     const userIsAdmin = await isAdmin(req.user.id)
-    if (!userIsAdmin && form['event_type_id'] != 31) {
+    if (userIsAdmin || (form['event_type_id'] === '31' && form['is_official'] !== '1'))
+      form['flag_approval'] = '0'
+    else
       form['flag_approval'] = '1'
-    };
 
     form['event_dates'] = JSON.parse(form[ 'event_dates' ])
     let dateCount = form['event_dates'].length
