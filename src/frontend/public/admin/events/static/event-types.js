@@ -7,6 +7,7 @@ var eventTypes = [
 			description: 'Join Bernie Sanders and local leaders for a rally to discuss the major issues facing our country.',
 			is_official: false
 		},
+		disabled: ['contact_phone'],
 		adminOnly: true
 	},
 	{
@@ -45,6 +46,7 @@ var eventTypes = [
 			is_official: true,
 			attendee_volunteer_show: true
 		},
+		disabled: ['contact_phone'],
 		adminOnly: false
 	}
 	// { // Keep this event type in as an example for providing extra default values
@@ -82,9 +84,29 @@ var eventTypes = [
 	});
 })();
 
-function setDefaults(eventTypeId){
+var disabledInputs = [];
+function resetForm(){
 	var form = document.getElementById('secondform');
+	
 	$(form.start_tz).off("change");
+	clearEvents();
+	updateFormValue('is_official', false);
+
+	for (var i = 0; i < disabledInputs.length; i++){
+		var input = form[disabledInputs[i].name];
+		if (disabledInputs[i].required){
+			$(input).prop('required', true);
+		}
+		$(input).removeAttr('disabled');
+	}
+
+	disabledInputs = [];
+
+	return form
+}
+
+function setDefaults(eventTypeId){
+	var form = resetForm();
 
 	var eventType = null;
 	for (var i = 0; i < eventTypes.length; i++) {
@@ -98,14 +120,27 @@ function setDefaults(eventTypeId){
 	setHashValue("type", eventType.id);
 	var defaults = eventType.defaultValues;
 
-	clearEvents();
-	updateFormValue('is_official', false);
 	form.event_type_id.value = eventType.id;
+	
+	// add default values
 	for (var property in defaults) {
 	  if (defaults.hasOwnProperty(property)) {
 	    updateFormValue(property, defaults[property])
 	  }
 	}
+
+	// remove disabled inputs
+	if (eventType.disabled){
+		var disabled = eventType.disabled;
+		for (var i = 0; i < disabled.length; i++){
+			var input = form[disabled[i]];
+			disabledInputs.push({
+				name: disabled[i],
+				required: $(input).prop('required')
+			});
+			$(input).val('').removeProp('required').attr('disabled','disabled');
+		}
+	};
 }
 
 function updateFormValue(property, value) {
@@ -127,9 +162,6 @@ function updateFormValue(property, value) {
 	  		updateEventTime(newDateMoment);
 	  	});
 	    break;
-	  case "attendee_volunteer_show":
-	  	$('#attendee_volunteer_show').click();
-	  	break;
 	  default:
 	  	if (typeof value === 'boolean') {
 	  		if (form[property]){
@@ -138,6 +170,9 @@ function updateFormValue(property, value) {
 	  	}
 	  	else
 		    form[property].value = value;
+
+		  if (property === 'attendee_volunteer_show')
+		  	$('#attendee_volunteer_show').change()
 		  break
 	}
 }
