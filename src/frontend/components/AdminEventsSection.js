@@ -201,7 +201,7 @@ class AdminEventsSection extends React.Component {
       lineHeight: '18px'
     }}
     >
-      {data[rowIndex]['node'] ? data[rowIndex]['node'][col][attr] : ''}
+      {data[rowIndex]['node'] && data[rowIndex]['node'][col] ? data[rowIndex]['node'][col][attr] : ''}
     </Cell>
   )
 
