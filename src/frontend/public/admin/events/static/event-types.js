@@ -128,9 +128,9 @@ function updateFormValue(property, value) {
 	  		updateEventTime(newDateMoment);
 	  	});
 	    break;
-	  case "is_official":
-	  	if (form.is_official){
-	  		form.is_official.checked = value;
+	  case typeof value === 'boolean':
+	  	if (form[property]){
+	  		form[property].checked = value;
 	  	}
 	  	break;
 	  default:
