@@ -243,7 +243,7 @@
                         <label class="form_label" for="attendee_volunteer_show">Ask attendees to volunteer?</label>
                       </div>
                       <div class="field">
-                        <input onclick="if (this.checked){ $('#avm_block').show(); }else{ $('#avm_block').hide(); }" name="attendee_volunteer_show" type="checkbox" value="1" id="attendee_volunteer_show">
+                        <input name="attendee_volunteer_show" type="checkbox" value="1" id="attendee_volunteer_show">
                       </div>
                     </div>
                     <div class="form_hide_table hidden" id="avm_block">
@@ -1387,6 +1387,14 @@
           	$('#event_repeat_type').on('change', propagateEvents);
           	$('#repeat_duration_num').on('change', propagateEvents);
           	$('#repeat_duration_unit').on('change', propagateEvents);
+            $('#attendee_volunteer_show').on('change', function(){
+              if (this.checked){
+                $('#avm_block').show();
+              }
+              else {
+                $('#avm_block').hide();
+              }
+            });
 
           	function propagateEvents(e){
 

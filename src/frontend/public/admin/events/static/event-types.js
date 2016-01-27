@@ -96,6 +96,7 @@ function resetForm(){
 	$(form.start_tz).off("change");
 	clearEvents();
 	updateFormValue('is_official', false);
+	updateFormValue('attendee_volunteer_show', false);
 
 	for (var i = 0; i < disabledInputs.length; i++){
 		var input = form[disabledInputs[i].name];
