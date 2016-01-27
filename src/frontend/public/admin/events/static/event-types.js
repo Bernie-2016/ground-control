@@ -1,13 +1,19 @@
 var eventTypes = [
 	{
 		id: 14,
-		name: 'Rally',
+		name: 'Rally (Official Campaign Event)',
 		defaultValues: {
 			name: 'Rally for Bernie',
 			description: 'Join Bernie Sanders and local leaders for a rally to discuss the major issues facing our country.',
-			is_official: false
+			is_official: true
 		},
+		disabled: ['contact_phone'],
 		adminOnly: true
+	},
+	{
+		id: 24,
+		name: 'Volunteer Activity or Meeting',
+		adminOnly: false
 	},
 	{
 		id: 30,
@@ -36,6 +42,18 @@ var eventTypes = [
 		},
 		adminOnly: false
 	},
+	{
+		id: 41,
+		name: 'Barnstorm',
+		defaultValues: {
+			name: 'Bernstorm - Organizing Rally with National Bernie Staff',
+			description: '<p>Join other local volunteers and grassroots organizers on <DOW, Month DD> as a representative from the national organizing staff, <STAFF> comes to <State> for a series of special organizing events.</p><p>We will discuss how we can rapidly grow our movement in the next several months as we enter the primary season. We will also be discussing local volunteer activities to help the early primary states.</p><p>This will be a great opportunity to hear what\'s going on nationally and locally with the campaign, as well as a chance to meet other Bernie supporters from your community. Thank you for all that you\'ve contributed and all the hard work that you\'re about to do!</p>',
+			is_official: true,
+			attendee_volunteer_show: true
+		},
+		disabled: ['contact_phone'],
+		adminOnly: false
+	}
 	// { // Keep this event type in as an example for providing extra default values
 	// 	id: 44,
 	// 	name: 'Jan. 23rd Nationwide Bernie Address',
@@ -54,7 +72,7 @@ var eventTypes = [
 ];
 
 (function(){
-	var form = document.getElementById('secondform');	
+	var form = document.getElementById('secondform');
 
 	form.event_type_id.options[0] = new Option();
 	eventTypes.forEach(function(type){
@@ -71,10 +89,30 @@ var eventTypes = [
 	});
 })();
 
-function setDefaults(eventTypeId){
+var disabledInputs = [];
+function resetForm(){
 	var form = document.getElementById('secondform');
-	$(form.start_tz).off("change");
 	
+	$(form.start_tz).off("change");
+	clearEvents();
+	updateFormValue('is_official', false);
+
+	for (var i = 0; i < disabledInputs.length; i++){
+		var input = form[disabledInputs[i].name];
+		if (disabledInputs[i].required){
+			$(input).prop('required', true);
+		}
+		$(input).removeAttr('disabled');
+	}
+
+	disabledInputs = [];
+
+	return form
+}
+
+function setDefaults(eventTypeId){
+	var form = resetForm();
+
 	var eventType = null;
 	for (var i = 0; i < eventTypes.length; i++) {
 		if (eventTypes[i].id == eventTypeId) {
@@ -82,24 +120,36 @@ function setDefaults(eventTypeId){
 			break
 		}
 	}
-	if (!eventType) {return};	
+	if (!eventType) {return};
 
 	setHashValue("type", eventType.id);
-	var defaults = eventType.defaultValues;	
+	var defaults = eventType.defaultValues;
 
-	clearEvents();
-	updateFormValue('is_official', false);
 	form.event_type_id.value = eventType.id;
+	
+	// add default values
 	for (var property in defaults) {
 	  if (defaults.hasOwnProperty(property)) {
 	    updateFormValue(property, defaults[property])
 	  }
 	}
+
+	// remove disabled inputs
+	if (eventType.disabled){
+		var disabled = eventType.disabled;
+		for (var i = 0; i < disabled.length; i++){
+			var input = form[disabled[i]];
+			disabledInputs.push({
+				name: disabled[i],
+				required: $(input).prop('required')
+			});
+			$(input).val('').removeProp('required').attr('disabled','disabled');
+		}
+	};
 }
 
 function updateFormValue(property, value) {
 	var form = document.getElementById('secondform');
-
 	switch (property) {
 		case "description":
 			CKEDITOR.instances.description.setData(value);
@@ -107,7 +157,7 @@ function updateFormValue(property, value) {
 	  	break;
 	  case "date":
 	  	var dateMoment = moment(value.dateTime).tz(value.timeZone);
-	  	
+
 	  	setEventDate(dateMoment, true);
 	  	updateEventTime(dateMoment);
 
@@ -117,13 +167,18 @@ function updateFormValue(property, value) {
 	  		updateEventTime(newDateMoment);
 	  	});
 	    break;
-	  case "is_official":
-	  	if (form.is_official){
-	  		form.is_official.checked = value;
-	  	}
-	  	break;
 	  default:
-	    form[property].value = value;
+	  	if (typeof value === 'boolean') {
+	  		if (form[property]){
+	  			form[property].checked = value;
+	  		}
+	  	}
+	  	else
+		    form[property].value = value;
+
+		  if (property === 'attendee_volunteer_show')
+		  	$('#attendee_volunteer_show').change()
+		  break
 	}
 }
 
@@ -176,7 +231,7 @@ function clearEvents(){
 
 function updateEventTime(dateMoment) {
 	var form = document.getElementById('secondform');
-	
+
 	var hour = Number(dateMoment.format('hh'));
 	hour = (hour == 12) ? '00' : hour;
 	form['start_time[h]'].value = hour;
