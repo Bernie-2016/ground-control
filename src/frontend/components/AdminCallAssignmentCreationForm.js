@@ -45,7 +45,8 @@ export default class AdminCallAssignmentCreationForm extends React.Component {
           <div style={{marginTop: 10}}>
             <ol>
               <li>Create a signup form in BSD using the 'GROUND CONTROL - Survey' wrapper. Easiest is to clone <a href="https://bernie16.cp.bsd.net/modules/signup/admin/signup_form_fields.php?signup_form_id=480" target="_blank">this one</a>.</li>
-              <li>Create a constituent group in BSD (or prepare a SQL query) that defines your target group of callees</li>
+              <li>Create a constituent group in BSD (or prepare a SQL query) that defines your target group of callees. </li>
+              <li>Let Saikat know about your new constituent group so he can sync this group over to Ground Control.</li>
             </ol>
           </div>
           <div style={{marginTop: 10}}>
