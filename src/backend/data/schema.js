@@ -502,7 +502,6 @@ const GraphQLUser = new GraphQLObjectType({
             .first()
 
           query = query
-            .join('bsd_emails', 'bsd_people.cons_id', 'bsd_emails.cons_id')
             .join('bsd_phones', 'bsd_people.cons_id', 'bsd_phones.cons_id')
             .join('bsd_addresses', 'bsd_people.cons_id', 'bsd_addresses.cons_id')
             .join('zip_codes', 'zip_codes.zip', 'bsd_addresses.zip')
@@ -512,7 +511,6 @@ const GraphQLUser = new GraphQLObjectType({
             .whereNotIn('bsd_addresses.state_cd', ['IA', 'NH', 'NV', 'SC'])
             .whereIn('zip_codes.timezone_offset', validOffsets)
             .where('bsd_phones.is_primary', true)
-            .where('bsd_emails.is_primary', true)
             .limit(1)
             .first()
 

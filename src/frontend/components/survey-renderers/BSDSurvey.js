@@ -72,7 +72,7 @@ class BSDSurvey extends React.Component {
           message: 'setInputValue',
           details: {
             inputId: 'email',
-            value: this.props.interviewee.email
+            value: this.props.interviewee.email || ''
           }})
         if (this.props.onLoaded)
           this.props.onLoaded()

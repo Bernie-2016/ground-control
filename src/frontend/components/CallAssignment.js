@@ -205,13 +205,13 @@ ${userFirstName}`
     )
 
     let location = interviewee.address.city + ', ' + interviewee.address.state + ' ' + interviewee.address.zip
-
+    let email =  this.props.currentUser.intervieweeForCallAssignment.email ? <a target='_blank' href={this.generateEventsInfoEmailLink()}>{this.props.currentUser.intervieweeForCallAssignment.email}</a> : 'None'
     let content = (
       <div style={BernieText.default}>
         Location: {location}<br />
         Local Time: {localTime}<br />
         Last called: {lastCalled()}<br />
-        Email: <a target='_blank' href={this.generateEventsInfoEmailLink()}>{this.props.currentUser.intervieweeForCallAssignment.email}</a>
+        Email: {email}
       </div>
     )
 
