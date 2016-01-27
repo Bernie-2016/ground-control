@@ -99,6 +99,9 @@ class AdminEventEmailCreationForm extends React.Component {
 
   render() {
     let recipients = this.props.event.nearbyPeople.map((person) => person.id)
+    recipients.push(this.props.event.host.id)
+    recipients.push(this.props.currentUser.id)
+    
     let disableSubmit = (this.props.event.nearbyPeople.length === 0)
 
     return (
@@ -168,6 +171,11 @@ class AdminEventEmailCreationForm extends React.Component {
 
 export default Relay.createContainer(AdminEventEmailCreationForm, {
   fragments: {
+    currentUser: () => Relay.QL`
+      fragment on User {
+        id
+      }
+    `,
     listContainer: () => Relay.QL`
       fragment on ListContainer {
         ${CreateAdminEventEmail.getFragment('listContainer')},

@@ -118,7 +118,8 @@ ReactDOM.render(
         component={AdminEventEmailCreationForm}
         queries={{
           ...ListContainerQueries,
-          ...EventQueries
+          ...EventQueries,
+          ...CurrentUserQueries
         }}
       />
       <Route
