@@ -49,9 +49,10 @@ class GraphQLError extends Error {
 }
 
 function activeCallAssignments(query) {
-  return query
-    .where('end_dt', '>', moment().add(1, 'days').toDate())
+  return query.where(function() {
+    this.where('end_dt', '>', moment().add(1, 'days').toDate())
     .orWhere('end_dt', null)
+  })
 }
 
 function inactiveCallAssignments(query) {
@@ -377,10 +378,12 @@ const GraphQLUser = new GraphQLObjectType({
           nullQuery = inactiveCallAssignments(nullQuery)
           callerQuery = inactiveCallAssignments(callerQuery)
         }
-
-        let assignments = await knex.union([
+        let assignmentsQuery = knex.union([
           nullQuery, callerQuery
-        ])
+        ]);
+        log.info(`Running call assignment query: ${assignmentsQuery.toString()}`)
+
+        let assignments = await assignmentsQuery
 
         return connectionFromArray(assignments, {first})
       }
