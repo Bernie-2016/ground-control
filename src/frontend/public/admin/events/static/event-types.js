@@ -1,11 +1,11 @@
 var eventTypes = [
 	{
 		id: 14,
-		name: 'Rally',
+		name: 'Rally (Official Campaign Event)',
 		defaultValues: {
 			name: 'Rally for Bernie',
 			description: 'Join Bernie Sanders and local leaders for a rally to discuss the major issues facing our country.',
-			is_official: false
+			is_official: true
 		},
 		disabled: ['contact_phone'],
 		adminOnly: true
