@@ -11,6 +11,11 @@ var eventTypes = [
 		adminOnly: true
 	},
 	{
+		id: 24,
+		name: 'Volunteer Activity or Meeting',
+		adminOnly: false
+	},
+	{
 		id: 30,
 		name: 'Gather Ballot Access Signatures',
 		defaultValues: {
