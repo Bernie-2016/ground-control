@@ -317,10 +317,20 @@ function startApp() {
     // Flag event as needing approval
     let batchEventMax = 20
     const userIsAdmin = await isAdmin(req.user.id)
-    if (userIsAdmin || (form['event_type_id'] === '31' && form['is_official'] !== '1'))
-      form['flag_approval'] = '0'
-    else
-      form['flag_approval'] = '1'
+    if (userIsAdmin || (form['event_type_id'] === '31' && form['is_official'] !== '1')){
+      // Code to execute if bypassing approval queue
+    }
+    else {
+      form['flag_approval'] = '1';
+
+      // Disable rally event type submission by non-admins
+      if (form['event_type_id'] === '14'){
+        res.status(400).send({errors: {
+          'Permission Error': ['You need to be an administrator to create campaign rallies. Please select a different event type or email help@berniesanders.com to request admin access.']}
+        })
+        return
+      }
+    }
 
     form['event_dates'] = JSON.parse(form[ 'event_dates' ])
     let dateCount = form['event_dates'].length
@@ -329,7 +339,6 @@ function startApp() {
       res.status(400).send({errors: {
         'Number of Events' : [`You can only create up to ${batchEventMax} events at a time. ${form['event_dates'].length} events were received.`]
       }})
-
       return
     }
 
@@ -341,7 +350,6 @@ function startApp() {
       res.status(400).send({errors: {
         'Event Type': ['Does not exist in BSD']}
       })
-
       return
     }
 
