@@ -161,7 +161,7 @@ export default class MG {
     let content = await template.render(data)
     let message = {
       from: eventTypeData.senderAddress,
-      'h:Reply-To': 'help@berniesanders.com',
+      'h:Reply-To': 'info@berniesanders.com',
       to: event.email,
       subject: eventTypeData.subject,
       html: content.html
@@ -187,7 +187,7 @@ export default class MG {
 
   async sendEventDeletionNotification(data) {
     let message = {
-      from: 'Help Desk<help@berniesanders.com>',
+      from: senderAddress,
       to: data.recipient,
       subject: `Event Deletion Notice`,
       text: data.message

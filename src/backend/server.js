@@ -285,6 +285,12 @@ function startApp() {
   }))
 
   app.post('/events/create', isAuthenticated, wrap(async (req, res) => {
+    if (!req.user) {
+      res.status(400).send({errors: {
+        'Session Timeout': ['Your session needs to be refreshed. Please visit https://organize.berniesanders.com and log in.']}
+      })
+      return
+    };
     let src = null
     if (req.headers && req.headers.referer) {
       src = req.headers.referer.split(req.headers.origin)
@@ -304,19 +310,26 @@ function startApp() {
 
     let form = req.body
     if (process.env.NODE_ENV === 'development')
-      form['event_type_id'] = 1
+      form['event_type_id'] = '1'
 
     log.info(`Event Create Form Submission to ${src} by ${req.user.email}`, JSON.stringify(form));
 
     // Flag event as needing approval
     let batchEventMax = 20
-    if (req.user && src === '/admin/events/create') {
-      // const userIsAdmin = await isAdmin(req.user.id)
-      if ((form[ 'event_type_id' ] != 30 && form[ 'event_type_id' ] != 31 && form[ 'event_type_id' ] != 44) || form[ 'is_official' ] == 1) // to do: implement proper permissioning
-        form[ 'flag_approval' ] = '1'
-    } else {
-      batchEventMax = 10
-      form[ 'flag_approval' ] = '1'
+    const userIsAdmin = await isAdmin(req.user.id)
+    if (userIsAdmin || (form['event_type_id'] === '31' && form['is_official'] !== '1')){
+      // Code to execute if bypassing approval queue
+    }
+    else {
+      form['flag_approval'] = '1';
+
+      // Disable rally event type submission by non-admins
+      if (form['event_type_id'] === '14'){
+        res.status(400).send({errors: {
+          'Permission Error': ['You need to be an administrator to create campaign rallies. Please select a different event type or email help@berniesanders.com to request admin access.']}
+        })
+        return
+      }
     }
 
     form['event_dates'] = JSON.parse(form[ 'event_dates' ])
@@ -326,7 +339,6 @@ function startApp() {
       res.status(400).send({errors: {
         'Number of Events' : [`You can only create up to ${batchEventMax} events at a time. ${form['event_dates'].length} events were received.`]
       }})
-
       return
     }
 
@@ -338,7 +350,6 @@ function startApp() {
       res.status(400).send({errors: {
         'Event Type': ['Does not exist in BSD']}
       })
-
       return
     }
 

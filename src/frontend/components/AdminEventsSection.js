@@ -178,7 +178,7 @@ class AdminEventsSection extends React.Component {
       cellData = <a href={link}>{cellData}</a>
     }
     else if (info === 'name') {
-      cellData = data[rowIndex]['node'][col]['firstName'] + ' ' + data[rowIndex]['node'][col]['lastName']
+      cellData = data[rowIndex] && data[rowIndex]['node'] && data[rowIndex]['node'][col] ? data[rowIndex]['node'][col]['firstName'] + ' ' + data[rowIndex]['node'][col]['lastName'] : ''
     }
     return (
       <Cell {...props}
@@ -201,7 +201,7 @@ class AdminEventsSection extends React.Component {
       lineHeight: '18px'
     }}
     >
-      {data[rowIndex]['node'] ? data[rowIndex]['node'][col][attr] : ''}
+      {data[rowIndex]['node'] && data[rowIndex]['node'][col] ? data[rowIndex]['node'][col][attr] : ''}
     </Cell>
   )
 

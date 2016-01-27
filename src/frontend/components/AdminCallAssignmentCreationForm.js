@@ -9,18 +9,8 @@ import yup from 'yup'
 import MutationHandler from './MutationHandler'
 
 export default class AdminCallAssignmentCreationForm extends React.Component {
-  surveyRenderers = {
-    'BSDSurvey': 'BSD survey renderer',
-    'PhonebankRSVPSurvey': 'Phonebank RSVP survey renderer',
-    'SingleEventRSVPSurvey': 'Single event RSVP survey renderer',
-    'Jan23HostRecruitmentSurvey': 'Jan. 23 Livestream host recruitment'
-  }
-
   surveyProcessors = {
-    'bsd-form-submitter': 'Save form data in BSD',
-    'send-call-team-invite': 'Invite interviewees to the call team via E-mail',
-    'bsd-event-rsvper': 'Create event RSVPs',
-    'bsd-event-creator': 'Create event'
+    'bsd-event-rsvper': 'Create event RSVPs.'
   }
 
   styles = {
@@ -40,7 +30,6 @@ export default class AdminCallAssignmentCreationForm extends React.Component {
     intervieweeGroup: yup.string().required(),
     name: yup.string().required(),
     instructions: yup.string(),
-    renderer: yup.string().required(),
     processors: yup.array().of(yup.string()).required()
   })
 
@@ -51,13 +40,26 @@ export default class AdminCallAssignmentCreationForm extends React.Component {
         <div style={BernieText.title}>
           Create Assignment
         </div>
-        <div>
-          Create a new phonebanking assignment. Before you fill out this form, make sure you've set up the correct objects in BSD.
+        <div style={BernieText.default}>
+          Create a new phonebanking assignment. Before you fill out this form, you will need to do the following:
+          <div style={{marginTop: 10}}>
+            <ol>
+              <li>Create a signup form in BSD using the 'GROUND CONTROL - Survey' wrapper. Easiest is to clone <a href="https://bernie16.cp.bsd.net/modules/signup/admin/signup_form_fields.php?signup_form_id=480" target="_blank">this one</a>.</li>
+              <li>Create a constituent group in BSD (or prepare a SQL query) that defines your target group of callees. </li>
+              <li>Let Saikat know about your new constituent group so he can sync this group over to Ground Control.</li>
+            </ol>
+          </div>
+          <div style={{marginTop: 10}}>
+            If you select 'Create event RSVPs' under 'Post-submit survey processors', submissions of your survey in Ground Control will result in RSVPs being created. To use this, you must have a field in your survey that has a label that starts with [event_id] whose value is the ID of the event you want to create RSVPs for.
+          </div>
         </div>
         <Paper zDepth={1} style={this.styles.formContainer}>
           <GCForm
             schema={this.formSchema}
             onSubmit={(formValue) => {
+              formValue['renderer'] = 'BSDSurvey'
+              formValue['processors'] = []
+
               this.refs.mutationHandler.send({
                 listContainer: this.props.listContainer,
                 ...formValue
@@ -74,7 +76,7 @@ export default class AdminCallAssignmentCreationForm extends React.Component {
               multiLine={true}
               rows={5}
               label="Instructions"
-              hintText="(Optional) Enter HTML or plain text instructions for this call assignment."
+              hintText="(Optional) Enter instructions for this call assignment."
             /><br />
             <Form.Field
               name='surveyId'
@@ -85,17 +87,9 @@ export default class AdminCallAssignmentCreationForm extends React.Component {
               multiLine={true}
               rows={5}
               label="Interviewee group"
-              hintText="Enter a SQL query, BSD cons_group_id, or the word 'everyone'"
+              hintText="Enter a SQL query, BSD cons_group_id, or the word 'everyone' to target everyone (the last is not recommended)."
             /><br />
-            <Form.Field
-              name='renderer'
-              type='select'
-              choices={this.surveyRenderers}
-              label='How to render the survey?'
-              style={{
-                width: '100%'
-              }}
-            /><br />
+            <br />
             <Form.Field
               name='processors'
               choices={this.surveyProcessors}

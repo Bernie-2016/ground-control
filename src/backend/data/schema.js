@@ -49,9 +49,10 @@ class GraphQLError extends Error {
 }
 
 function activeCallAssignments(query) {
-  return query
-    .where('end_dt', '>', moment().add(1, 'days').toDate())
+  return query.where(function() {
+    this.where('end_dt', '>', moment().add(1, 'days').toDate())
     .orWhere('end_dt', null)
+  })
 }
 
 function inactiveCallAssignments(query) {
@@ -377,10 +378,12 @@ const GraphQLUser = new GraphQLObjectType({
           nullQuery = inactiveCallAssignments(nullQuery)
           callerQuery = inactiveCallAssignments(callerQuery)
         }
-
-        let assignments = await knex.union([
+        let assignmentsQuery = knex.union([
           nullQuery, callerQuery
-        ])
+        ]);
+        log.info(`Running call assignment query: ${assignmentsQuery.toString()}`)
+
+        let assignments = await assignmentsQuery
 
         return connectionFromArray(assignments, {first})
       }
@@ -467,10 +470,22 @@ const GraphQLUser = new GraphQLObjectType({
               .from('bsd_person_bsd_groups as bsd_people')
               .where('bsd_people.cons_group_id', group.cons_group_id)
           } else if (group.query && group.query !== EVERYONE_GROUP) {
+            let shouldOrder = group.query.indexOf('order by') !== -1
             query = query
               .from('bsd_person_gc_bsd_groups as bsd_people')
               .where('gc_bsd_group_id', group.id)
-              .orderBy('bsd_people.id')
+            if (shouldOrder)
+              query = query.orderBy('bsd_people.id')
+            // Hack for performance reasons - this makes the query much faster for some reason
+            if (callAssignment.renderer === 'SingleEventRSVPSurvey') {
+              let geom = await knex('gc_bsd_events')
+                .select('bsd_events.geom')
+                .innerJoin('bsd_events', 'gc_bsd_events.event_id', 'bsd_events.event_id')
+                .where('turn_out_assignment', callAssignment.id)
+                .first()
+
+              query = query.whereRaw(`ST_DWithin(bsd_addresses.geom, '${geom.geom}', 50000)`)
+            }
           } else {
             query = query.from('bsd_people')
           }
@@ -1307,6 +1322,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
     }
   },
   mutateAndGetPayload: async ({name, intervieweeGroup, surveyId, renderer, processors, instructions, startDate, endDate, callerGroupId}, {rootValue}) => {
+
     adminRequired(rootValue)
     let groupText = intervieweeGroup
     let group = null

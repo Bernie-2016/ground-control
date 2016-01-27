@@ -120,6 +120,10 @@
 		    text-decoration: underline;
 		}
 
+    input:disabled {
+      opacity: 0.7;
+    }
+
     </style>
     <script src="/admin/events/static/ckeditor/ckeditor.js"></script>
     <script src="/admin/events/static/less.js"></script>
@@ -236,10 +240,10 @@
                     </div>
                     <div class="inputgroup checkboxgroup">
                       <div class="label">
-                        <label class="form_label" for="qf_ce7b35">Ask attendees to volunteer?</label>
+                        <label class="form_label" for="attendee_volunteer_show">Ask attendees to volunteer?</label>
                       </div>
                       <div class="field">
-                        <input onclick="if (this.checked){ $('#avm_block').show(); }else{ $('#avm_block').hide(); }" name="attendee_volunteer_show" type="checkbox" value="1" id="qf_ce7b35">
+                        <input name="attendee_volunteer_show" type="checkbox" value="1" id="attendee_volunteer_show">
                       </div>
                     </div>
                     <div class="form_hide_table hidden" id="avm_block">
@@ -1287,14 +1291,10 @@
                 </div>
                 <div class="inputgroup">
                   <div class="label">
-                    <label class="form_label">Contact Phone:</label><span style="color: red;">*</span>
+                    <label class="form_label">Contact Phone:</label>
                   </div>
                   <div class="field">
                     <input size="30" name="contact_phone" type="tel" required>
-                  </div>
-                  <div class="phone-instruct">
-                    <span style="color: red;">*</span>
-                    <div class="explain"> A contact phone number is required.</div>
                   </div>
                 </div>
                 <div class="inputgroup">
@@ -1387,6 +1387,14 @@
           	$('#event_repeat_type').on('change', propagateEvents);
           	$('#repeat_duration_num').on('change', propagateEvents);
           	$('#repeat_duration_unit').on('change', propagateEvents);
+            $('#attendee_volunteer_show').on('change', function(){
+              if (this.checked){
+                $('#avm_block').show();
+              }
+              else {
+                $('#avm_block').hide();
+              }
+            });
 
           	function propagateEvents(e){
 
@@ -1537,22 +1545,22 @@
 										window.location.reload();
           		    },
           		    error: function(response){
-                    console.log(response)
           		      $('#submit_button').removeClass('in-progress');
 										$("#event-error-message").show();
                     $("#event-error-message-details").html('');
-                      if (response.responseJSON && response.responseJSON.errors) {
-                        var errors = response.responseJSON.errors
-                        $.each(errors, function(k, v) {
-                          switch (k) {
-                            case "is_searchable":
-                              k = "make event public";
-                            default:
-                              k = k.replace(/_/g, ' ');
-                          }
-                          $("#event-error-message-details").append("<li><span class='capitalized'" + k + "</span> : " + v[0] + "</li>");
-                        });
-                      }
+                    if (response.responseJSON && response.responseJSON.errors) {
+                      var errors = response.responseJSON.errors
+                      $.each(errors, function(key, value) {
+                        switch (key) {
+                          case "is_searchable":
+                            key = "make event public";
+                            break;
+                          default:
+                            key = key.replace(/_/g, ' ');
+                        }
+                        $("#event-error-message-details").append("<li><span class='capitalized'>" + key + "</span> : " + value[0] + "</li>");
+                      });
+                    }
                     window.scrollTo(0,0);
           		    }
           		});
