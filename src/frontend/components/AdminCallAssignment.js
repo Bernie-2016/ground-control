@@ -3,6 +3,7 @@ import Relay from 'react-relay';
 import {BernieText} from './styles/bernie-css';
 import {Paper, List, ListItem} from 'material-ui';
 import moment from 'moment';
+import {Link} from 'react-router'
 
 export class AdminCallAssignment extends React.Component {
   render() {
@@ -15,6 +16,9 @@ export class AdminCallAssignment extends React.Component {
           <div>
             Using survey: {this.props.callAssignment.survey.fullURL}<br/>
             Using query: {this.props.callAssignment.query}
+            <div>
+              <Link to={`/call/${this.props.callAssignment.id}`}> Assignment link</Link>
+            </div>
           </div>
         </div>
       </div>

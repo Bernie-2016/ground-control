@@ -1319,6 +1319,7 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
     }
   },
   mutateAndGetPayload: async ({name, intervieweeGroup, surveyId, renderer, processors, instructions, startDate, endDate, callerGroupId}, {rootValue}) => {
+
     adminRequired(rootValue)
     let groupText = intervieweeGroup
     let group = null
