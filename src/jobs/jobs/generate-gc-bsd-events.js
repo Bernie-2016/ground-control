@@ -10,6 +10,13 @@ export let job = async () => {
   let now = new Date()
   try {
     await knex.transaction(async (trx) => {
+      let eventsToUpdate = await knex.raw(`
+          update gc_bsd_events
+          set event_id=bsd_events.event_id,
+          event_id_obfuscated=null
+          from bsd_events
+          where bsd_events.event_id_obfuscated=gc_bsd_events.event_id_obfuscated
+        `).transacting(trx)
       let eventsToCreate = await knex('bsd_events')
         .select('bsd_events.event_id')
         .leftOuterJoin('gc_bsd_events', 'bsd_events.event_id', 'gc_bsd_events.event_id')
