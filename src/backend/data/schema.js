@@ -861,16 +861,18 @@ const GraphQLEvent = new GraphQLObjectType({
     nearbyPeople: {
       type: new GraphQLList(GraphQLPerson),
       resolve: async(event, _, {rootValue}) => {
-        return knex('bsd_addresses')
+        let query = knex('bsd_addresses')
           .select('bsd_people.*')
           .join('bsd_people', 'bsd_addresses.cons_id', 'bsd_people.cons_id')
           .join('bsd_emails', 'bsd_people.cons_id', 'bsd_emails.cons_id')
           .leftJoin('communications', 'bsd_people.cons_id', 'communications.person_id')
           .where('bsd_emails.is_primary', true)
           .whereNull('communications.id')
-          .whereRaw(`st_dwithin(bsd_addresses.geom, st_transform(st_setsrid(st_makepoint(${event.longitude}, ${event.latitude}), 4326), 900913), 50000)`)
-          .orderByRaw(`bsd_addresses.geom <-> st_transform(st_setsrid(st_makepoint(${event.longitude}, ${event.latitude}), 4326), 900913)`)
+          .whereRaw(`st_dwithin(bsd_addresses.geom, '${event.geom}', 50000)`)
+          .orderByRaw(`bsd_addresses.geom <-> '${event.geom}'`)
           .limit(500)
+        log.info(`Running query: ${query.toString()}`)
+        return query
       }
     }
   }),

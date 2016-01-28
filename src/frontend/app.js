@@ -121,6 +121,7 @@ ReactDOM.render(
           ...EventQueries,
           ...CurrentUserQueries
         }}
+        renderLoading={() => <Loading />}
       />
       <Route
         path='events/upload-rsvps'
