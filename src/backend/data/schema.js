@@ -885,7 +885,7 @@ const GraphQLEvent = new GraphQLObjectType({
           if (radius === 15000)
             backoff = 5000;
         }
-        return foundPeople
+        return foundPeople.slice(0, 500)
       }
     }
   }),
