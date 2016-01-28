@@ -1,7 +1,7 @@
 import React from 'react'
 import Relay from 'react-relay'
 import {BernieColors, BernieText} from './styles/bernie-css'
-import {Paper, Toggle} from 'material-ui'
+import {Paper, Slider, Toggle} from 'material-ui'
 import GCForm from './forms/GCForm'
 import Form from 'react-formal'
 import EventPreview from './EventPreview'
@@ -53,7 +53,8 @@ class AdminEventEmailCreationForm extends React.Component {
   })
 
   state = {
-    testMode: false
+    testMode: false,
+    recipientLimit: null
   }
 
   getRandomSubarray(arr, size) {
@@ -70,7 +71,7 @@ class AdminEventEmailCreationForm extends React.Component {
   }
 
   renderRecipientInfo() {
-    let recipientsCount = this.props.event.nearbyPeople.length
+    let recipientsCount = this.state.recipientLimit || (this.props.event.nearbyPeople.length + 1)
     let recipientsSample = this.getRandomSubarray(this.props.event.nearbyPeople, 10)
 
     if (recipientsCount === 0) {
@@ -109,6 +110,8 @@ class AdminEventEmailCreationForm extends React.Component {
       recipients.push(this.props.event.host.id)
     }
 
+    let recipientLimit = this.state.recipientLimit || recipients.length
+
     let disableSubmit = (this.props.event.nearbyPeople.length === 0)
 
     return (
@@ -130,7 +133,7 @@ class AdminEventEmailCreationForm extends React.Component {
               this.refs.mutationHandler.send({
                 listContainer: this.props.listContainer,
                 adminEmail: this.props.currentUser.email,
-                recipients: recipients,
+                recipients: recipients.slice(0, recipientLimit),
                 ...formValues
               })
             }}
@@ -163,13 +166,26 @@ class AdminEventEmailCreationForm extends React.Component {
               name='toolPassword'
               label="Password for this tool (ask an admin)"
             />
+            <br />
+            <br />
+            <h4 style={BernieText.default}>Number of recipients: {recipientLimit} (plus you)</h4>
+            <Slider
+              defaultValue={recipients.length}
+              disabled={this.state.testMode}
+              max={recipients.length}
+              min={1}
+              step={1}
+              onChange={(_, newSliderValue) => {
+                this.setState({recipientLimit: newSliderValue})
+              }}
+            />
+            <br />
+            <br />
             <Toggle
               label='Test mode (only delivers to you)'
               toggled={this.state.testMode}
               onToggle={() => {
-                this.setState({
-                  testMode: !this.state.testMode
-                })
+                this.setState({testMode: !this.state.testMode})
               }}
             />
             <br />
