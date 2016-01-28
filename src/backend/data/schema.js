@@ -861,18 +861,31 @@ const GraphQLEvent = new GraphQLObjectType({
     nearbyPeople: {
       type: new GraphQLList(GraphQLPerson),
       resolve: async(event, _, {rootValue}) => {
-        let query = knex('bsd_addresses')
-          .select('bsd_people.*')
-          .join('bsd_people', 'bsd_addresses.cons_id', 'bsd_people.cons_id')
-          .join('bsd_emails', 'bsd_people.cons_id', 'bsd_emails.cons_id')
-          .leftJoin('communications', 'bsd_people.cons_id', 'communications.person_id')
-          .where('bsd_emails.is_primary', true)
-          .whereNull('communications.id')
-          .whereRaw(`st_dwithin(bsd_addresses.geom, '${event.geom}', 50000)`)
-          .orderByRaw(`bsd_addresses.geom <-> '${event.geom}'`)
-          .limit(500)
-        log.info(`Running query: ${query.toString()}`)
-        return query
+        let maxRadius = 50000;
+        let radius = 1000;
+        let backoff = 1000;
+        let foundPeople = [];
+
+        while (foundPeople.length < 500 && radius <= maxRadius) {
+          let foundConsIds = foundPeople.map((person) => person.cons_id)
+          let query = knex('bsd_addresses')
+            .select('bsd_people.*')
+            .join('bsd_people', 'bsd_addresses.cons_id', 'bsd_people.cons_id')
+            .join('bsd_emails', 'bsd_people.cons_id', 'bsd_emails.cons_id')
+            .leftJoin('communications', 'bsd_people.cons_id', 'communications.person_id')
+            .where('bsd_emails.is_primary', true)
+            .whereNotIn('bsd_people.cons_id', foundConsIds)
+            .whereRaw(`st_dwithin(bsd_addresses.geom, '${event.geom}', ${radius})`)
+            .whereNull('communications.id')
+            .limit(500)
+          log.info(`Running query: ${query.toString()}`)
+          let people = await query
+          foundPeople = foundPeople.concat(people)
+          radius += backoff;
+          if (radius === 15000)
+            backoff = 5000;
+        }
+        return foundPeople
       }
     }
   }),
