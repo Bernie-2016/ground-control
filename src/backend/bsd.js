@@ -297,6 +297,17 @@ export default class BSD {
     return response
   }
 
+  async setConstituentData(cons_id, bundleName, data) {
+    let xmlData = ''
+    Object.keys(data).forEach((key) => {
+      if (data[key])
+        xmlData = xmlData + `<${key}>${data[key]}</${key}>`
+    })
+    let params = `<?xml version="1.0" encoding="utf-8"?><api><cons id="${cons_id}"><${bundleName}>${xmlData}</${bundleName}></cons></api>`
+    let response = await this.request('/cons/set_constituent_data', params, 'POST');
+    return response
+  }
+
   async createConstituent(email, firstName, lastName) {
     const params = `<?xml version="1.0" encoding="utf-8"?><api><cons><firstname>${firstName}</firstname><lastname>${lastName}</lastname><cons_email><email>${email}</email></cons_email></cons></api>`;
     let response = await this.request('/cons/set_constituent_data', params, 'POST');
