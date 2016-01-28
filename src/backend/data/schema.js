@@ -1244,6 +1244,7 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
   inputFields: {
     hostEmail: { type: new GraphQLNonNull(GraphQLString) },
     senderEmail: { type: new GraphQLNonNull(GraphQLString) },
+    adminEmail: { type: new GraphQLNonNull(GraphQLString) },
     hostMessage: { type: new GraphQLNonNull(GraphQLString) },
     senderMessage: { type: new GraphQLNonNull(GraphQLString) },
     recipients: { type: new GraphQLList(GraphQLString) },
@@ -1255,7 +1256,7 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
       resolve: () => SharedListContainer
     }
   },
-  mutateAndGetPayload: async ({hostEmail, senderEmail, hostMessage, senderMessage, recipients, toolPassword}, {rootValue}) => {
+  mutateAndGetPayload: async ({hostEmail, senderEmail, adminEmail, hostMessage, senderMessage, recipients, toolPassword}, {rootValue}) => {
     adminRequired(rootValue)
 
     // TODO: remove this goofy protection when the tool is ready
@@ -1267,22 +1268,27 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
       })
     }
 
+    await Mailgun.sendAdminEventInvite({
+      hostAddress: hostEmail,
+      senderAddress: senderEmail,
+      hostMessage: hostMessage,
+      senderMessage: senderMessage,
+      recipientAddress: adminEmail
+    })
+
     knex.transaction(async (trx) => {
       for (let i = 0; i < recipients.length; i++) {
         let recipientId = fromGlobalId(recipients[i]).id
         let recipient = await rootValue.loaders.bsdPeople.load(recipientId)
         let recipientEmail = await getPrimaryEmail(recipient)
 
-        await Mailgun.sendAdminEventInvite(
-          {
-            hostAddress: hostEmail,
-            senderAddress: senderEmail,
-            hostMessage: hostMessage,
-            senderMessage: senderMessage,
-            recipientAddress: recipientEmail
-          },
-          false      // debugging on or off?
-        )
+        await Mailgun.sendAdminEventInvite({
+          hostAddress: hostEmail,
+          senderAddress: senderEmail,
+          hostMessage: hostMessage,
+          senderMessage: senderMessage,
+          recipientAddress: recipientEmail
+        })
 
         await knex.insertAndFetch(
           'communications',

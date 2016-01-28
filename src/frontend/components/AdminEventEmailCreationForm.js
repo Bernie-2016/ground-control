@@ -1,7 +1,7 @@
 import React from 'react'
 import Relay from 'react-relay'
 import {BernieColors, BernieText} from './styles/bernie-css'
-import {Paper} from 'material-ui'
+import {Paper, Toggle} from 'material-ui'
 import GCForm from './forms/GCForm'
 import Form from 'react-formal'
 import EventPreview from './EventPreview'
@@ -52,6 +52,10 @@ class AdminEventEmailCreationForm extends React.Component {
     toolPassword: yup.string().required()
   })
 
+  state = {
+    testMode: false
+  }
+
   getRandomSubarray(arr, size) {
     let shuffled = arr.slice(0), i = arr.length, temp, index
 
@@ -98,10 +102,13 @@ class AdminEventEmailCreationForm extends React.Component {
   }
 
   render() {
-    let recipients = this.props.event.nearbyPeople.map((person) => person.id)
-    recipients.push(this.props.event.host.id)
-    recipients.push(this.props.currentUser.id)
-    
+    let recipients = []
+
+    if (!this.state.testMode) {
+      this.props.event.nearbyPeople.map((person) => recipients.push(person.id))
+      recipients.push(this.props.event.host.id)
+    }
+
     let disableSubmit = (this.props.event.nearbyPeople.length === 0)
 
     return (
@@ -122,6 +129,7 @@ class AdminEventEmailCreationForm extends React.Component {
             onSubmit={(formValues) => {
               this.refs.mutationHandler.send({
                 listContainer: this.props.listContainer,
+                adminEmail: this.props.currentUser.email,
                 recipients: recipients,
                 ...formValues
               })
@@ -155,6 +163,17 @@ class AdminEventEmailCreationForm extends React.Component {
               name='toolPassword'
               label="Password for this tool (ask an admin)"
             />
+            <Toggle
+              label='Test mode (only delivers to you)'
+              toggled={this.state.testMode}
+              onToggle={() => {
+                this.setState({
+                  testMode: !this.state.testMode
+                })
+              }}
+            />
+            <br />
+            <br />
             <Form.Button type='submit' label='Send!' fullWidth={true} disabled={disableSubmit} />
           </GCForm>
         </Paper>
@@ -174,6 +193,7 @@ export default Relay.createContainer(AdminEventEmailCreationForm, {
     currentUser: () => Relay.QL`
       fragment on User {
         id
+        email
       }
     `,
     listContainer: () => Relay.QL`
