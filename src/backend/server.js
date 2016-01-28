@@ -252,20 +252,20 @@ function startApp() {
     if (inDevEnv) {
       const temp = fs.readFileSync(templateDir + '/create_event.hbs', { encoding: 'utf-8' });
       const page = handlebars.compile(temp);
-      res.send(page({ is_public: false, events_root_url: publicEventsRootUrl }));
+      res.send(page({ is_public: false, events_root_url: publicEventsRootUrl, gcUser: req.user }));
       return
     }
-    res.send(createEventPage({ is_public: false, events_root_url: publicEventsRootUrl }));
+    res.send(createEventPage({ is_public: false, events_root_url: publicEventsRootUrl, gcUser: req.user }));
   }))
 
   app.get('/events/create', wrap(async (req, res) => {
     // if (inDevEnv) {
     //   const temp = fs.readFileSync(templateDir + '/create_event.hbs', { encoding: 'utf-8' });
     //   const page = handlebars.compile(temp);
-    //   res.send(page({ is_public: true, events_root_url: publicEventsRootUrl }));
+    //   res.send(page({ is_public: true, events_root_url: publicEventsRootUrl, gcUser: req.user }));
     //   return
     // }
-    // res.send(createEventPage({ is_public: true, events_root_url: publicEventsRootUrl }));
+    // res.send(createEventPage({ is_public: true, events_root_url: publicEventsRootUrl, gcUser: req.user }));
     res.redirect('https://go.berniesanders.com/page/event/create')
   }))
 

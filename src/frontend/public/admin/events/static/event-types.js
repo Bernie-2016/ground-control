@@ -49,7 +49,15 @@ var eventTypes = [
 			name: 'Bernstorm - Organizing Rally with National Bernie Staff',
 			description: '<p>Join other local volunteers and grassroots organizers on <DOW, Month DD> as a representative from the national organizing staff, <STAFF> comes to <State> for a series of special organizing events.</p><p>We will discuss how we can rapidly grow our movement in the next several months as we enter the primary season. We will also be discussing local volunteer activities to help the early primary states.</p><p>This will be a great opportunity to hear what\'s going on nationally and locally with the campaign, as well as a chance to meet other Bernie supporters from your community. Thank you for all that you\'ve contributed and all the hard work that you\'re about to do!</p>',
 			is_official: true,
-			attendee_volunteer_show: true
+			attendee_volunteer_show: true,
+			host_receive_rsvp_emails: false,
+			date: {
+				time: '18:00:00',
+			},
+			duration_num: 90,
+			duration_unit: 1,
+			cons_name: 'Bernie 2016',
+			cons_email: userEmail
 		},
 		disabled: ['contact_phone'],
 		adminOnly: false
@@ -157,16 +165,25 @@ function updateFormValue(property, value) {
 			document.getElementById('description').value = CKEDITOR.instances.description.getData();
 	  	break;
 	  case "date":
-	  	var dateMoment = moment(value.dateTime).tz(value.timeZone);
+	  	var dateMoment;
+	  	if (value.dateTime){
+	  		dateMoment = moment(value.dateTime).tz(value.timeZone);
+	  		setEventDate(dateMoment, true);
 
-	  	setEventDate(dateMoment, true);
+	  		$(form.start_tz).on("change", function(e){
+	  			var newDateMoment = dateMoment.tz(e.target.value);
+	  			setEventDate(newDateMoment, true);
+	  			updateEventTime(newDateMoment);
+	  		});
+	  	}
+	  	else if (value.time) {
+	  		dateMoment = new moment(value.time, 'HH:mm:ss');
+	  	}
+	  	else {
+	  		return
+	  	}
+
 	  	updateEventTime(dateMoment);
-
-	  	$(form.start_tz).on("change", function(e){
-	  		var newDateMoment = dateMoment.tz(e.target.value);
-	  		setEventDate(newDateMoment, true);
-	  		updateEventTime(newDateMoment);
-	  	});
 	    break;
 	  default:
 	  	if (typeof value === 'boolean') {
@@ -174,8 +191,10 @@ function updateFormValue(property, value) {
 	  			form[property].checked = value;
 	  		}
 	  	}
-	  	else
+	  	else {
 		    form[property].value = value;
+		    form[property].placeholder = value;
+	  	}
 
 		  if (property === 'attendee_volunteer_show')
 		  	$('#attendee_volunteer_show').change()
