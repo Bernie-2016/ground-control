@@ -545,12 +545,16 @@ ${signature}`
       {
         reason: 'Event is a Fundraiser',
         message: `Thank you for submitting your event to Bernie 2016 Events Central.
-
+​
 Please note we do not approve fundraisers without prior campaign contact.
-
-You can resubmit your event following guidelines at berniesanders.com/plan.
-
-Thank you again for your support and for helping to spread Bernie’s message!
+​
+You can resubmit your event following guidelines at BernieSanders.com/plan.
+​
+Also, we recommend you read our guide Organizing with Forming a PAC (https://docs.google.com/document/d/1IgbYG_DY3slh67OMua3t-KjuqMWvggp-ucCr-HcwAZo/edit) - this explains a few things related to fundraising and group costs, and refers you to the FEC for all other fundraising questions.
+​
+You can resubmit your event following guidelines at BernieSanders.com/plan.
+​
+Thank you again for your support and for helping to spread Bernie's message!
 
 ${signature}`
       },
