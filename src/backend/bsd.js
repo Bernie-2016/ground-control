@@ -368,7 +368,7 @@ export default class BSD {
     let response = await this.requestWrapper(options)
 
     if (response.body && response.body.error)
-      throw new Error(JSON.stringify(response.body))
+      log.error(JSON.stringify(response.body))
     return response
   }
 
@@ -482,9 +482,9 @@ export default class BSD {
     let response = await this.request('/event/update_event', {event_api_version: 2, values: JSON.stringify(inputs)}, 'POST');
 
     if (response.validation_errors)
-      throw new Error(JSON.stringify(response.validation_errors));
+      log.error(JSON.stringify(response.validation_errors));
     else if (typeof response.event_id_obfuscated === 'undefined')
-      throw new Error(response)
+      log.error(response)
     return response
   }
 
@@ -492,11 +492,10 @@ export default class BSD {
     let params = this.apiInputsFromEvent(event)
     let response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'POST');
     if (response.validation_errors)
-      throw new Error(JSON.stringify(response.validation_errors))
+      log.error(JSON.stringify(response.validation_errors))
     else if (typeof response.event_id_obfuscated === 'undefined')
-      throw new Error(response)
-    else
-      return response
+      log.error(response)
+    return response
   }
 
   async requestWrapper(options) {
