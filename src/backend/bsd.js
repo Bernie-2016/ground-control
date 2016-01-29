@@ -377,14 +377,13 @@ export default class BSD {
 
   async deleteEvents(eventIdArray) {
     let promises = eventIdArray.map((event_id) => {
-      let response = 'error';
       try {
-        response = this.request('/event/delete_event', {event_id}, 'POST');
+        return this.request('/event/delete_event', {event_id}, 'POST');
       }
       catch(ex) {
-        log.debug('delete event exception', response);
+        log.error('delete event exception');
+        return 'error'
       }
-      return response
     });
     let responses = await Promise.all(promises);
     return responses;
