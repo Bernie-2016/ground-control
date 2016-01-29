@@ -12,6 +12,9 @@ import htmlToText from 'html-to-text';
 
 const parseStringPromise = Promise.promisify(parseString);
 
+class BSDValidationError extends Error {}
+class BSDExistsError extends Error {}
+
 export default class BSD {
   constructor(host, id, secret) {
     this.baseURL = url.parse('http://' + host);
@@ -368,14 +371,19 @@ export default class BSD {
     let response = await this.requestWrapper(options)
 
     if (response.body && response.body.error)
-      log.error(JSON.stringify(response.body))
+      throw new BSDValidationError(JSON.stringify(response.body))
     return response
   }
 
   async deleteEvents(eventIdArray) {
     let promises = eventIdArray.map((event_id) => {
-      const response = this.request('/event/delete_event', {event_id}, 'POST');
-      log.debug('deletion', response);
+      let response;
+      try {
+        response = this.request('/event/delete_event', {event_id}, 'POST');
+      }
+      catch(ex) {
+        log.debug('delete event exception', response);
+      }
       return response
     });
     let responses = await Promise.all(promises);
@@ -484,9 +492,9 @@ export default class BSD {
     let response = await this.request('/event/update_event', {event_api_version: 2, values: JSON.stringify(inputs)}, 'POST');
 
     if (response.validation_errors)
-      log.error(JSON.stringify(response.validation_errors));
+      throw new BSDValidationError(JSON.stringify(response.validation_errors));
     else if (typeof response.event_id_obfuscated === 'undefined')
-      log.error(response)
+      throw new BSDExistsError(response)
     return response
   }
 

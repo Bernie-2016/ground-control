@@ -1040,26 +1040,30 @@ const GraphQLEditEvents = mutationWithClientMutationId({
 
       log.debug('Updated event: ', event)
 
-      let response = await BSDClient.updateEvent(event)
-
-      if (response.validation_errors) { // Todo: send modified user feedback
-        const errors = response.validation_errors
-        if (errors.event_id_obfuscated && errors.event_id_obfuscated.indexOf("exists_in_table") > -1) {
+      try { await BSDClient.updateEvent(event) }
+      catch(ex) {
+        if (ex instanceof BSDValidationError) {
+          // Todo: send modified user feedback
+          continue
+        }
+        else if (ex instanceof BSDExistsError) {
           await knex('bsd_events')
             .whereIn('event_id', event.event_id)
             .del()
+
+          continue
         }
-        continue
+        else throw ex
       }
-      else {
-        await knex('bsd_events')
-          .where('event_id', event.event_id)
-          .update({
-            ...event,
-            modified_dt: new Date()
-          })
-      }
+
+      await knex('bsd_events')
+        .where('event_id', event.event_id)
+        .update({
+          ...event,
+          modified_dt: new Date()
+        })
     }
+
     return events;
   }
 })
