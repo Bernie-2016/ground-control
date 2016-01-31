@@ -12,8 +12,21 @@ import htmlToText from 'html-to-text';
 
 const parseStringPromise = Promise.promisify(parseString);
 
-class BSDValidationError extends Error {}
-class BSDExistsError extends Error {}
+export class BSDValidationError extends Error {
+  constructor(message) {
+    super(message);
+    this.message = message;
+    this.name = 'BSDValidationError';
+  }
+}
+
+export class BSDExistsError extends Error {
+  constructor(message) {
+    super(message);
+    this.message = message;
+    this.name = 'BSDExistsError';
+  }
+}
 
 export default class BSD {
   constructor(host, id, secret) {
@@ -490,10 +503,12 @@ export default class BSD {
     delete inputs['event_id']
     let response = await this.request('/event/update_event', {event_api_version: 2, values: JSON.stringify(inputs)}, 'POST');
 
-    if (response.validation_errors)
-      throw new BSDValidationError(JSON.stringify(response.validation_errors));
-    else if (typeof response.event_id_obfuscated === 'undefined')
-      throw new BSDExistsError(response)
+    if (response.validation_errors){
+      let eventIdErrors = response.validation_errors.event_id_obfuscated;
+      if (eventIdErrors && eventIdErrors.indexOf('exists_in_table') > -1)
+        throw new BSDExistsError(JSON.stringify(response.validation_errors))
+      throw new BSDValidationError(JSON.stringify(response.validation_errors))
+    }
     return response
   }
 
@@ -504,6 +519,7 @@ export default class BSD {
       log.error(JSON.stringify(response.validation_errors))
     else if (typeof response.event_id_obfuscated === 'undefined')
       log.error(response)
+    log.info('response', response)
     return response
   }
 

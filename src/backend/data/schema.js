@@ -29,6 +29,7 @@ import Maestro from '../maestro'
 import url from 'url'
 import TZLookup from 'tz-lookup'
 import BSDClient from '../bsd-instance'
+import {BSDValidationError, BSDExistsError} from '../bsd'
 import knex from './knex'
 import humps from 'humps'
 import log from '../log'
@@ -1040,8 +1041,11 @@ const GraphQLEditEvents = mutationWithClientMutationId({
 
       log.debug('Updated event: ', event)
 
-      try { await BSDClient.updateEvent(event) }
+      try {
+        await BSDClient.updateEvent(event)
+      }
       catch(ex) {
+        log.error(ex)
         if (ex instanceof BSDValidationError) {
           // Todo: send modified user feedback
           continue
@@ -1050,10 +1054,12 @@ const GraphQLEditEvents = mutationWithClientMutationId({
           await knex('bsd_events')
             .whereIn('event_id', event.event_id)
             .del()
-
+          log.info(`Deleted event ${event.event_id_obfuscated}`)
           continue
         }
-        else throw ex
+        else {
+          throw ex
+        }
       }
 
       await knex('bsd_events')
