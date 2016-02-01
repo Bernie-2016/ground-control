@@ -109,7 +109,10 @@ export default class MutationHandler extends React.Component {
           <Snackbar
             open={this.state.open}
             message={this.state.message}
-            bodyStyle={{'backgroundColor' : (this.state.status === 'SUCCESS') ? BernieColors.blue : BernieColors.red}}
+            bodyStyle={{
+              maxWidth: '100%',
+              backgroundColor: (this.state.status === 'SUCCESS') ? BernieColors.blue : BernieColors.red
+            }}
             action={null}
             autoHideDuration={10000}
             onRequestClose={this.handleRequestClose}

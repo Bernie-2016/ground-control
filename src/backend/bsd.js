@@ -12,6 +12,22 @@ import htmlToText from 'html-to-text';
 
 const parseStringPromise = Promise.promisify(parseString);
 
+export class BSDValidationError extends Error {
+  constructor(message) {
+    super(message);
+    this.message = message;
+    this.name = 'BSDValidationError';
+  }
+}
+
+export class BSDExistsError extends Error {
+  constructor(message) {
+    super(message);
+    this.message = message;
+    this.name = 'BSDExistsError';
+  }
+}
+
 export default class BSD {
   constructor(host, id, secret) {
     this.baseURL = url.parse('http://' + host);
@@ -368,13 +384,18 @@ export default class BSD {
     let response = await this.requestWrapper(options)
 
     if (response.body && response.body.error)
-      throw new Error(JSON.stringify(response.body))
+      throw new BSDValidationError(JSON.stringify(response.body))
     return response
   }
 
   async deleteEvents(eventIdArray) {
     let promises = eventIdArray.map((event_id) => {
-      return this.request('/event/delete_event', {event_id}, 'POST');
+      return (
+        this.request('/event/delete_event', {event_id}, 'POST')
+          .catch((ex) => {
+            log.error(`BSD event ${event_id} could not be deleted.`);
+          })
+      )
     });
     let responses = await Promise.all(promises);
     return responses;
@@ -481,10 +502,12 @@ export default class BSD {
     delete inputs['event_id']
     let response = await this.request('/event/update_event', {event_api_version: 2, values: JSON.stringify(inputs)}, 'POST');
 
-    if (response.validation_errors)
-      throw new Error(JSON.stringify(response.validation_errors));
-    else if (typeof response.event_id_obfuscated === 'undefined')
-      throw new Error(response)
+    if (response.validation_errors){
+      let eventIdErrors = response.validation_errors.event_id_obfuscated;
+      if (eventIdErrors && eventIdErrors.indexOf('exists_in_table') > -1)
+        throw new BSDExistsError(JSON.stringify(response.validation_errors))
+      throw new BSDValidationError(JSON.stringify(response.validation_errors))
+    }
     return response
   }
 
@@ -492,11 +515,11 @@ export default class BSD {
     let params = this.apiInputsFromEvent(event)
     let response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'POST');
     if (response.validation_errors)
-      throw new Error(JSON.stringify(response.validation_errors))
+      log.error(JSON.stringify(response.validation_errors))
     else if (typeof response.event_id_obfuscated === 'undefined')
-      throw new Error(response)
-    else
-      return response
+      log.error(response)
+    log.info('response', response)
+    return response
   }
 
   async requestWrapper(options) {

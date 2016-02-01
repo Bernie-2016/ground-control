@@ -29,6 +29,7 @@ import Maestro from '../maestro'
 import url from 'url'
 import TZLookup from 'tz-lookup'
 import BSDClient from '../bsd-instance'
+import {BSDValidationError, BSDExistsError} from '../bsd'
 import knex from './knex'
 import humps from 'humps'
 import log from '../log'
@@ -1026,6 +1027,7 @@ const GraphQLEditEvents = mutationWithClientMutationId({
       return eventFromAPIFields(event)
     })
     let count = params.length;
+    let updateErrors = [];
 
     for (let index = 0; index < count; index++) {
       let newEventData = params[index]
@@ -1038,9 +1040,29 @@ const GraphQLEditEvents = mutationWithClientMutationId({
         ...newEventData
       }
 
-      log.debug('Updated event: ', event)
+      log.debug('Updated event:', event)
 
-      await BSDClient.updateEvent(event)
+      try {
+        await BSDClient.updateEvent(event)
+      }
+      catch(ex) {
+        log.error(ex)
+        if (ex instanceof BSDValidationError) {
+          updateErrors.push(`${event.event_id_obfuscated}: ${ex.message}`)
+          continue
+        }
+        else if (ex instanceof BSDExistsError) {
+          await knex('bsd_events')
+            .whereIn('event_id', event.event_id)
+            .del()
+          log.info(`Deleted event ${event.event_id_obfuscated}`)
+          continue
+        }
+        else {
+          throw ex
+        }
+      }
+
       await knex('bsd_events')
         .where('event_id', event.event_id)
         .update({
@@ -1048,6 +1070,14 @@ const GraphQLEditEvents = mutationWithClientMutationId({
           modified_dt: new Date()
         })
     }
+
+    if (updateErrors.length > 0){
+      throw new GraphQLError({
+        status: 400,
+        message: updateErrors.join(', ')
+      })
+    }
+
     return events;
   }
 })
@@ -1069,25 +1099,31 @@ const GraphQLDeleteEvents = mutationWithClientMutationId({
     let localIds = ids.map((id) => fromGlobalId(id).id)
     await BSDClient.deleteEvents(localIds)
 
-    if (hostMessage.length > 0){
-      const hostIds = await knex('bsd_events').select('creator_cons_id').whereIn('event_id', localIds);
-      const attendeeIds = await knex('bsd_event_attendees').select('attendee_cons_id', 'event_id').whereIn('event_id', localIds);
-      const events = await knex('bsd_events').select('event_id_obfuscated', 'event_id', 'name', 'start_dt').whereIn('event_id', localIds);
-      log.info(attendeeIds, events);
+    try {
+      if (hostMessage.length > 0){
+        const hostIds = await knex('bsd_events').select('creator_cons_id').whereIn('event_id', localIds);
+        const attendeeIds = await knex('bsd_event_attendees').select('attendee_cons_id', 'event_id').whereIn('event_id', localIds);
+        const events = await knex('bsd_events').select('event_id_obfuscated', 'event_id', 'name', 'start_dt').whereIn('event_id', localIds);
+        log.info(attendeeIds, events);
 
-      for (let i = 0; i < hostIds.length; i++) {
-        let host = await rootValue.loaders.bsdPeople.load(hostIds[i].creator_cons_id);
-        let recipient = await getPrimaryEmail(host);
-        if (recipient)
-          await Mailgun.sendEventDeletionNotification({recipient, message: hostMessage, events})
-      }
+        for (let i = 0; i < hostIds.length; i++) {
+          let host = await rootValue.loaders.bsdPeople.load(hostIds[i].creator_cons_id);
+          let recipient = await getPrimaryEmail(host);
+          if (recipient)
+            await Mailgun.sendEventDeletionNotification({recipient, message: hostMessage, events})
+        }
 
-      for (let i = 0; i < attendeeIds.length; i++) {
-        let attendee = await rootValue.loaders.bsdPeople.load(attendeeIds[i].attendee_cons_id);
-        let recipient = await getPrimaryEmail(attendee);
-        if (recipient)
-          await Mailgun.sendEventDeletionNotification({recipient, message: hostMessage, events})
+        for (let i = 0; i < attendeeIds.length; i++) {
+          let attendee = await rootValue.loaders.bsdPeople.load(attendeeIds[i].attendee_cons_id);
+          let recipient = await getPrimaryEmail(attendee);
+          if (recipient)
+            await Mailgun.sendEventDeletionNotification({recipient, message: hostMessage, events})
+        }
       }
+    }
+    catch(ex){
+      log.error('Could not send deletion email')
+      log.error(ex)
     }
 
     await knex('bsd_events')
