@@ -1027,6 +1027,7 @@ const GraphQLEditEvents = mutationWithClientMutationId({
       return eventFromAPIFields(event)
     })
     let count = params.length;
+    let updateErrors = [];
 
     for (let index = 0; index < count; index++) {
       let newEventData = params[index]
@@ -1039,7 +1040,7 @@ const GraphQLEditEvents = mutationWithClientMutationId({
         ...newEventData
       }
 
-      log.debug('Updated event: ', event)
+      log.debug('Updated event:', event)
 
       try {
         await BSDClient.updateEvent(event)
@@ -1047,7 +1048,7 @@ const GraphQLEditEvents = mutationWithClientMutationId({
       catch(ex) {
         log.error(ex)
         if (ex instanceof BSDValidationError) {
-          // Todo: send modified user feedback
+          updateErrors.push(`${event.event_id_obfuscated}: ${ex.message}`)
           continue
         }
         else if (ex instanceof BSDExistsError) {
@@ -1068,6 +1069,13 @@ const GraphQLEditEvents = mutationWithClientMutationId({
           ...event,
           modified_dt: new Date()
         })
+    }
+
+    if (updateErrors.length > 0){
+      throw new GraphQLError({
+        status: 400,
+        message: updateErrors.join(', ')
+      })
     }
 
     return events;
