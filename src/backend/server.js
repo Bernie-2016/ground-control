@@ -135,6 +135,26 @@ function startApp() {
     done(null, user)
   }))
 
+  function eventDataLoader() {
+    return new DataLoader(async (keys) => {
+      let eventIds = keys.map((key) => {
+        return key.toString().match(/^\d+$/) ? key : null
+      }).filter((key) => key !== null)
+      let obfuscatedIds = keys.filter((key) => {
+        return eventIds.indexOf(key) === -1
+      })
+
+      let rows = await knex('bsd_events')
+        .whereIn('event_id', eventIds)
+        .orWhereIn('event_id_obfuscated', obfuscatedIds)
+      return keys.map((key) => {
+        return rows.find((row) =>
+          row['event_id'].toString() === key.toString() || row['event_id_obfuscated'] === key.toString()
+        )
+      })
+    })
+  }
+
   function dataLoaderCreator(tablename, idField) {
     return new DataLoader(async (keys) => {
       // This way it works with strings passed in as well
@@ -179,7 +199,7 @@ function startApp() {
       gcBsdSurveys: dataLoaderCreator('gc_bsd_surveys', 'id'),
       bsdSurveys: dataLoaderCreator('bsd_surveys', 'signup_form_id'),
       bsdEventTypes: dataLoaderCreator('bsd_event_types', 'event_type_id'),
-      bsdEvents: dataLoaderCreator('bsd_events', 'event_id'),
+      bsdEvents: eventDataLoader(),
       bsdAddresses: dataLoaderCreator('bsd_addresses', 'cons_addr_id'),
       gcBsdGroups: dataLoaderCreator('gc_bsd_groups', 'id')
     }

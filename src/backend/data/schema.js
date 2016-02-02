@@ -1514,8 +1514,12 @@ let RootQuery = new GraphQLObjectType({
         id: { type: new GraphQLNonNull(GraphQLString) }
       },
       resolve: async (root, {id}, {rootValue}) => {
-        authRequired(rootValue)
-        let localId = fromGlobalId(id).id
+        let localId = fromGlobalId(id)
+        console.log(localId)
+        if (localId.type !== 'Event')
+          localId = id
+        else
+          localId = localId.id
         return rootValue.loaders.bsdEvents.load(localId)
       }
     },
