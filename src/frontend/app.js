@@ -8,6 +8,7 @@ import ReactRouterRelay from 'react-router-relay';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import AdminDashboard from './components/AdminDashboard';
 import AdminEventEmailCreationForm from './components/AdminEventEmailCreationForm'
+import RequestEmailForm from './components/RequestEmailForm';
 import AdminEventsSection from './components/AdminEventsSection';
 import AdminEventUploadRsvps from './components/AdminEventUploadRsvps';
 import AdminCallAssignmentsSection from './components/AdminCallAssignmentsSection';
@@ -140,10 +141,15 @@ ReactDOM.render(
       component={Signup}
     />
     <Route
+      path='/events/:id/request-email'
+      component={RequestEmailForm}
+      queries={EventQueries}
+    />
+    <Route
       path='/'
       component={Dashboard}
       queries={CurrentUserQueries}
-      >
+    >
       <IndexRedirect to='/call' />
       <Route
         path='call'

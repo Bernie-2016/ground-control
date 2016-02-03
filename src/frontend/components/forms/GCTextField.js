@@ -4,11 +4,12 @@ import {BernieText} from '../styles/bernie-css';
 import GCFormField from './GCFormField';
 
 export default class GCTextField extends GCFormField {
+
   render() {
     return <TextField
       floatingLabelText={this.floatingLabelText()}
       errorStyle={BernieText.inputError}
-      hintText={this.props.label}
+      hintText={this.props.hintText || this.props.label}
       floatingLabelStyle={{
         zIndex: 0
       }}
