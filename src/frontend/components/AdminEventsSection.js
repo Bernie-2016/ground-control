@@ -282,23 +282,6 @@ class AdminEventsSection extends React.Component {
         >
           <FontIcon className="material-icons" hoverColor={BernieColors.blue}>search</FontIcon>
         </IconButton>
-        <IconButton
-          title="view public event"
-          onTouchTap={function(){
-            this._handlePublicEventOpen(rowIndex);
-          }.bind(this)}
-        >
-          <FontIcon className="material-icons" hoverColor={BernieColors.blue}>open_in_new</FontIcon>
-        </IconButton>
-
-        <IconButton
-          title="edit"
-          onTouchTap={function(){
-            this._handleEventPreviewOpen(rowIndex, 1);
-          }.bind(this)}
-        >
-          <FontIcon className="material-icons" hoverColor={BernieColors.blue}>edit</FontIcon>
-        </IconButton>
 
         <IconButton
           title="duplicate"
@@ -328,6 +311,15 @@ class AdminEventsSection extends React.Component {
           }}
         >
           <FontIcon className="material-icons" color={iconColor} hoverColor={BernieColors.blue}>event_available</FontIcon>
+        </IconButton>
+
+        <IconButton
+          title="edit"
+          onTouchTap={() => {
+            this._handleEventPreviewOpen(rowIndex, 1);
+          }}
+        >
+          <FontIcon className="material-icons" color={iconColor} hoverColor={BernieColors.blue}>edit</FontIcon>
         </IconButton>
 
         <IconButton
@@ -1159,7 +1151,7 @@ ${signature}`
             header={<this.HeaderCell content="Manage" />}
             cell={<this.ActionCell data={events} col="actions" />}
             fixed={true}
-            width={180}
+            width={220}
             align='center'
           />
         </ColumnGroup>
