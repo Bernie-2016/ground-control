@@ -61,6 +61,15 @@ var eventTypes = [
 		},
 		disabled: ['contact_phone'],
 		adminOnly: false
+	},
+	{
+		id: 47,
+		name: 'Vol 2 Vol Turnout Shift',
+		defaultValues: {
+			name: 'Vol2Vol Turnout Shift',
+			description: '<div class="description"><p>Five minutes before your calling time, navigate to <a href="http://hubdialer.com/agent">hubdialer.com/agent</a>.</p><p>You can find the login codes and various tips in the FAQ: <a href="http://bernie.to/vol2volFAQ">http://bernie.to/vol2volFAQ</a></p><p>If it&#39;s your first time calling, read through the instructions and familiarize yourself with the script.</p><p>We encourage you to hop onto Slack and ask questions, raise concerns, and revel in your successes with us in real time! Here&#39;s a short video to get you set up: <a href="https://www.youtube.com/watch?v=2_BaZ4_9M6M"><u>https://www.youtube.com/watch?v=2_BaZ4_9M6M</u></a></p><p>It&#39;s a honor to have you on the team!</p></div>',
+		},
+		adminOnly: false
 	}
 	// { // Keep this event type in as an example for providing extra default values
 	// 	id: 44,
