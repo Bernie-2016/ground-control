@@ -515,9 +515,9 @@ export default class BSD {
     let params = this.apiInputsFromEvent(event)
     let response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'POST');
     if (response.validation_errors)
-      log.error(JSON.stringify(response.validation_errors))
+      throw new BSDValidationError(JSON.stringify(response.validation_errors))
     else if (typeof response.event_id_obfuscated === 'undefined')
-      log.error(response)
+      throw new Error(response)
     log.info('response', response)
     return response
   }
