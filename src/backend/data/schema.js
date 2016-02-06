@@ -1006,10 +1006,14 @@ const GraphQLEditEvents = mutationWithClientMutationId({
     events: { type: new GraphQLNonNull(new GraphQLList(GraphQLEventInput)) }
   },
   outputFields: {
-    listContainer: {
-      type: GraphQLListContainer,
-      resolve: () => SharedListContainer
-    }
+      message: {
+        type: GraphQLString,
+        resolve: ({message}) => message
+      },
+      listContainer: {
+        type: GraphQLListContainer,
+        resolve: ({events}) => SharedListContainer
+      }
   },
   mutateAndGetPayload: async ({events}, {rootValue}) => {
     adminRequired(rootValue)
@@ -1068,7 +1072,9 @@ const GraphQLEditEvents = mutationWithClientMutationId({
       })
     }
 
-    return events;
+    let message = 'eureka!'
+
+    return {events, message}
   }
 })
 
@@ -1522,7 +1528,7 @@ let RootQuery = new GraphQLObjectType({
         authRequired(rootValue)
         return rootValue.user
       }
-    },
+    }, 
     callAssignment: {
       type: GraphQLCallAssignment,
       args: {

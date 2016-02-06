@@ -70,6 +70,7 @@ export default class MutationHandler extends React.Component {
     }
 
     onSuccess(transaction) {
+      console.log(transaction);
       this.clearState()
 
       if (this.props.successMessage)

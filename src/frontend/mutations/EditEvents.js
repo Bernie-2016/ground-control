@@ -18,6 +18,7 @@ export default class EditEvents extends Relay.Mutation {
   getFatQuery() {
     return Relay.QL`
       fragment on EditEventsPayload {
+        message,
         listContainer {
           id,
           events
@@ -30,6 +31,7 @@ export default class EditEvents extends Relay.Mutation {
     return [{
       type: 'FIELDS_CHANGE',
       fieldIDs: {
+        message: 'editEventMutationMessage',
         listContainer: this.props.listContainer.id
       }
     }];
