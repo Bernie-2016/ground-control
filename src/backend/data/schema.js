@@ -1022,6 +1022,7 @@ const GraphQLEditEvents = mutationWithClientMutationId({
     })
     let count = params.length;
     let updateErrors = [];
+    let message = `${events.length} Event${(events.length > 1) ? 's' : ''} Updated`;
 
     for (let index = 0; index < count; index++) {
       let newEventData = params[index]
@@ -1071,13 +1072,8 @@ const GraphQLEditEvents = mutationWithClientMutationId({
     }
 
     if (updateErrors.length > 0){
-      throw new GraphQLError({
-        status: 400,
-        message: updateErrors.join(', ')
-      })
+      message = updateErrors.join(', ')
     }
-
-    let message = 'eureka!'
 
     return {events, message}
   }

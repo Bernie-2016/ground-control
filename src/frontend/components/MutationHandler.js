@@ -70,13 +70,13 @@ export default class MutationHandler extends React.Component {
     }
 
     onSuccess(transaction) {
-      console.log(transaction);
+      console.log(transaction, this.props);
       this.clearState()
 
       if (this.props.successMessage)
         this.setState({
           status: 'SUCCESS',
-          message: this.props.successMessage,
+          message: transaction[this.props.mutationName].message ? transaction[this.props.mutationName].message : this.props.successMessage,
           open: true
         })
 
