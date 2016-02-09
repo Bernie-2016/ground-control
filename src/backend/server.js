@@ -332,6 +332,11 @@ function startApp() {
       }
     }
 
+    // Require phone number for RSVPs to phonebanks
+    if (form['event_type_id'] === '31'){
+      form['attendee_require_phone'] = 1;
+    }
+
     form['event_dates'] = JSON.parse(form[ 'event_dates' ])
     let dateCount = form['event_dates'].length
 
