@@ -286,7 +286,8 @@ const GraphQLListContainer = new GraphQLObjectType({
       type: GraphQLEventConnection,
       args: {
         ...connectionArgs,
-        filterOptions: {type: GraphQLEventInput },
+        eventFilterOptions: {type: GraphQLEventInput },
+        hostFilterOptions: {type: GraphQLPersonInput },
         sortField: {type: GraphQLString},
         sortDirection: {type: new GraphQLEnumType({
           name: 'GraphQLSortDirection',
@@ -296,11 +297,12 @@ const GraphQLListContainer = new GraphQLObjectType({
           }
         })}
       },
-      resolve: async (event, {first, filterOptions, sortField, sortDirection}, {rootValue}) => {
-        let filters = eventFromAPIFields(filterOptions);
+      resolve: async (event, {first, eventFilterOptions, sortField, sortDirection}, {rootValue}) => {
+        let filters = eventFromAPIFields(eventFilterOptions);
         let convertedSortField = eventFieldFromAPIField(sortField)
 
         let events = await knex('bsd_events')
+          .join('bsd_people', 'bsd_events.creator_cons_id', 'bsd_people.cons_id')
           .where('start_dt', '>=', new Date())
           .where(filters)
           .limit(first)
@@ -673,6 +675,25 @@ const GraphQLPerson = new GraphQLObjectType({
   interfaces: [nodeInterface]
 })
 
+const GraphQLPersonInput = new GraphQLInputObjectType({
+  name: 'PersonInput',
+  fields: {
+    id: { type: GraphQLString },
+    prefix: { type: GraphQLString },
+    firstName: { type: GraphQLString },
+    middleName: { type: GraphQLString },
+    lastName: { type: GraphQLString },
+    suffix: { type: GraphQLString },
+    gender: { type: GraphQLString },
+    birthDate: { type: GraphQLDate },
+    title: { type: GraphQLString },
+    employer: { type: GraphQLString },
+    occupation: { type: GraphQLString },
+    phone: { type: GraphQLString },
+    email: { type: GraphQLString }
+  }
+})
+
 const GraphQLCall = new GraphQLObjectType({
   name: 'Call',
   description: 'A call between a user and a person',
@@ -731,6 +752,10 @@ const GraphQLEvent = new GraphQLObjectType({
     host: {
       type: GraphQLPerson,
       resolve: async (event, _, {rootValue}) => rootValue.loaders.bsdPeople.load(event.creator_cons_id)
+    },
+    creatorName: {
+      type: GraphQLString,
+      resolve: (event) => event.creator_name
     },
     eventType: {
       type: GraphQLEventType,
@@ -971,6 +996,7 @@ const GraphQLEventInput = new GraphQLInputObjectType({
     isOfficial: { type: GraphQLBoolean },
     eventTypeId: { type: GraphQLString },
     hostId: { type: GraphQLString },
+    creatorName: { type: GraphQLString },
     flagApproval: { type: GraphQLBoolean },
     name: { type: GraphQLString },
     description: { type: GraphQLString },

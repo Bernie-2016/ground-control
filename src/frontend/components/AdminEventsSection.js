@@ -1100,6 +1100,7 @@ ${signature}`
 
   render() {
     let events = this.props.listContainer.events.edges;
+    console.log(events);
 
     return (
     <div>
@@ -1310,7 +1311,8 @@ export default Relay.createContainer(AdminEventsSection, {
     numEvents: 100,
     sortField: 'startDate',
     sortDirection: 'ASC',
-    filters: {flagApproval: true}
+    filters: {flagApproval: true},
+    hostFilters: {}
   },
   fragments: {
     listContainer: () => Relay.QL`
@@ -1324,7 +1326,8 @@ export default Relay.createContainer(AdminEventsSection, {
         }
         events(
           first: $numEvents
-          filterOptions: $filters
+          eventFilterOptions: $filters
+          hostFilterOptions: $hostFilters
           sortField: $sortField
           sortDirection: $sortDirection
         ) {
@@ -1343,6 +1346,7 @@ export default Relay.createContainer(AdminEventsSection, {
                 id
                 name
               }
+              creatorName
               eventIdObfuscated
               flagApproval
               isOfficial
