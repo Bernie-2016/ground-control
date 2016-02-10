@@ -753,10 +753,6 @@ const GraphQLEvent = new GraphQLObjectType({
       type: GraphQLPerson,
       resolve: async (event, _, {rootValue}) => rootValue.loaders.bsdPeople.load(event.creator_cons_id)
     },
-    creatorName: {
-      type: GraphQLString,
-      resolve: (event) => event.creator_name
-    },
     eventType: {
       type: GraphQLEventType,
       resolve: (event, _, {rootValue}) => rootValue.loaders.bsdEventTypes.load(event.event_type_id)
@@ -996,7 +992,6 @@ const GraphQLEventInput = new GraphQLInputObjectType({
     isOfficial: { type: GraphQLBoolean },
     eventTypeId: { type: GraphQLString },
     hostId: { type: GraphQLString },
-    creatorName: { type: GraphQLString },
     flagApproval: { type: GraphQLBoolean },
     name: { type: GraphQLString },
     description: { type: GraphQLString },

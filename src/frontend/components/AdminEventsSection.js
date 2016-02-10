@@ -1346,7 +1346,6 @@ export default Relay.createContainer(AdminEventsSection, {
                 id
                 name
               }
-              creatorName
               eventIdObfuscated
               flagApproval
               isOfficial
