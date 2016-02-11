@@ -38,7 +38,7 @@ var eventTypes = [
 		name: 'Canvass',
 		defaultValues: {
 			name: 'Door knocking for Bernie',
-			description: 'You\'re invited to join your neighbors and supporters to knock on the doors of undecided voters. We\'ll provide you with a script, a list of voters that you\'ll be talking to, and a map of where to go. We\'ll also train you to use your time effectively out in the field. You\'ll be able to talk to real people about how this country belongs to all of us, not just the billionaire class. Our victory starts with us knocking on doors together.',
+			description: 'You\'re invited to join your neighbors and supporters to knock on the doors of supporters and undecided voters. We\'ll provide you with a script, a list of voters that you\'ll be talking to, and a map of where to go. We\'ll also train you to use your time effectively out in the field. You\'ll be able to talk to real people about how this country belongs to all of us, not just the billionaire class. Our victory starts with us knocking on doors together.',
 		},
 		adminOnly: false
 	},
@@ -124,7 +124,7 @@ var eventTypes = [
 var disabledInputs = [];
 function resetForm(){
 	var form = document.getElementById('secondform');
-	
+
 	$(form.start_tz).off("change");
 	clearEvents();
 	updateFormValue('is_official', false);
@@ -159,7 +159,7 @@ function setDefaults(eventTypeId){
 	var defaults = eventType.defaultValues;
 
 	form.event_type_id.value = eventType.id;
-	
+
 	// add default values
 	for (var property in defaults) {
 	  if (defaults.hasOwnProperty(property)) {
