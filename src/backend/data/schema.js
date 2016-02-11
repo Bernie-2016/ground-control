@@ -302,7 +302,7 @@ const GraphQLListContainer = new GraphQLObjectType({
         let convertedSortField = eventFieldFromAPIField(sortField)
 
         let events = await knex('bsd_events')
-          .join('bsd_people', 'bsd_events.creator_cons_id', 'bsd_people.cons_id')
+          .leftJoin('bsd_people', 'bsd_events.creator_cons_id', 'bsd_people.cons_id')
           .where('start_dt', '>=', new Date())
           .where(filters)
           .limit(first)
