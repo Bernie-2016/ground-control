@@ -1370,6 +1370,12 @@ export default Relay.createContainer(AdminEventsSection, {
               rsvpUseReminderEmail
               rsvpEmailReminderHours
               attendeesCount
+              attendees {
+                firstName
+                lastName
+                phone
+                email
+              }
             }
           }
         }
