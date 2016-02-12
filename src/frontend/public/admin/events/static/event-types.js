@@ -38,7 +38,7 @@ var eventTypes = [
 		name: 'Canvass',
 		defaultValues: {
 			name: 'Door knocking for Bernie',
-			description: 'You\'re invited to join your neighbors and supporters to knock on the doors of undecided voters. We\'ll provide you with a script, a list of voters that you\'ll be talking to, and a map of where to go. We\'ll also train you to use your time effectively out in the field. You\'ll be able to talk to real people about how this country belongs to all of us, not just the billionaire class. Our victory starts with us knocking on doors together.',
+			description: 'You\'re invited to join your neighbors and supporters to knock on the doors of supporters and undecided voters. We\'ll provide you with a script, a list of voters that you\'ll be talking to, and a map of where to go. We\'ll also train you to use your time effectively out in the field. You\'ll be able to talk to real people about how this country belongs to all of us, not just the billionaire class. Our victory starts with us knocking on doors together.',
 		},
 		adminOnly: false
 	},
@@ -67,8 +67,23 @@ var eventTypes = [
 		name: 'Vol 2 Vol Turnout Shift',
 		defaultValues: {
 			name: 'Vol2Vol Turnout Shift',
-			description: '<div class="description"><p>Five minutes before your calling time, navigate to <a href="http://hubdialer.com/agent">hubdialer.com/agent</a>.</p><p>You can find the login codes and various tips in the FAQ: <a href="http://bernie.to/vol2volFAQ">http://bernie.to/vol2volFAQ</a></p><p>If it&#39;s your first time calling, read through the instructions and familiarize yourself with the script.</p><p>We encourage you to hop onto Slack and ask questions, raise concerns, and revel in your successes with us in real time! Here&#39;s a short video to get you set up: <a href="https://www.youtube.com/watch?v=2_BaZ4_9M6M"><u>https://www.youtube.com/watch?v=2_BaZ4_9M6M</u></a></p><p>It&#39;s a honor to have you on the team!</p></div>',
+			description: '<div class="description"><p>Five minutes before your calling time, navigate to <a href="http://hubdialer.com/agent">hubdialer.com/agent</a>.</p><p>You can find the login codes and various tips in the FAQ: <a href="http://bernie.to/vol2volFAQ">http://bernie.to/vol2volFAQ</a></p><p>If it&#39;s your first time calling, read through the instructions and familiarize yourself with the script.</p><p>We encourage you to hop onto Slack and ask questions, raise concerns, and revel in your successes with us in real time! Here&#39;s a short video to get you set up: <a href="https://www.youtube.com/watch?v=2_BaZ4_9M6M"><u>https://www.youtube.com/watch?v=2_BaZ4_9M6M</u></a></p><p>Please keep in mind we\'re relying on you to fulfill your commitment. If you\'re not able to call for the full two hours, come online when you can and call for the time that you\'re able.</p><p>It&#39;s an honor to have you on the team!</p></div>',
+			is_searchable: 0,
+			is_official: true,
+			rsvp_email_reminder_hours: 4,
+			date: {
+				time: '17:00:00',
+			},
+			duration_num: 2,
+			duration_unit: 60,
+			venue_name: 'HubDialer (online event)',
+			venue_zip: '05401',
+			venue_city: 'Burlington',
+			venue_state_cd: 'VT',
+			start_tz: 'US/Eastern',
+			cons_name: 'Robert Reeves'
 		},
+		disabled: ['contact_phone'],
 		adminOnly: false
 	}
 	// { // Keep this event type in as an example for providing extra default values
@@ -109,7 +124,7 @@ var eventTypes = [
 var disabledInputs = [];
 function resetForm(){
 	var form = document.getElementById('secondform');
-	
+
 	$(form.start_tz).off("change");
 	clearEvents();
 	updateFormValue('is_official', false);
@@ -144,7 +159,7 @@ function setDefaults(eventTypeId){
 	var defaults = eventType.defaultValues;
 
 	form.event_type_id.value = eventType.id;
-	
+
 	// add default values
 	for (var property in defaults) {
 	  if (defaults.hasOwnProperty(property)) {

@@ -317,7 +317,7 @@ function startApp() {
     // Flag event as needing approval
     let batchEventMax = 20
     const userIsAdmin = await isAdmin(req.user.id)
-    if (userIsAdmin || (form['event_type_id'] === '31' && form['is_official'] !== '1')){
+    if (userIsAdmin || ((form['event_type_id'] === '31' || form['event_type_id'] === '32') && form['is_official'] !== '1')){
       // Code to execute if bypassing approval queue
     }
     else {
@@ -330,6 +330,11 @@ function startApp() {
         })
         return
       }
+    }
+
+    // Require phone number for RSVPs to phonebanks
+    if (form['event_type_id'] === '31'){
+      form['attendee_require_phone'] = 1;
     }
 
     form['event_dates'] = JSON.parse(form[ 'event_dates' ])

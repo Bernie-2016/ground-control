@@ -1147,11 +1147,13 @@ ${signature}`
       <MutationHandler
         ref='eventDeletionHandler'
         successMessage={`${this.state.indexesMarkedForDeletion.length} event${plurry(this.state.indexesMarkedForDeletion.length)} deleted`}
+        mutationName='deleteEvents'
         mutationClass={DeleteEvents}
       />
       <MutationHandler
         ref='eventEditHandler'
         mutationClass={EditEvents}
+        mutationName='editEvents'
         successMessage='Event(s) updated successfully'
         onSuccess={() => {console.log('woohoo!')}}
       />

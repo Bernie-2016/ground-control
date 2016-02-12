@@ -25,7 +25,7 @@ The seed script will create an admin user with e-mail address `admin@localhost.c
 
 On Linux, follow the same directions as OS X above, but substitue `./setup-linux` for the equivalent OSx script.
 
-You will also need to have [Docker](docs.docker.com/engine/installation) and [docker-compose](docs.docker.com/compose/install) installed to provide your database.
+You will also need to have [Docker](https://docs.docker.com/engine/installation) and [docker-compose](https://docs.docker.com/compose/install) installed to provide your database.
 
 ### Windows
 
