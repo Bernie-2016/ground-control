@@ -1362,7 +1362,7 @@ ${signature}`
 
 const getDefaultQuery = () => {
   const hashParams = queryString.parse(location.hash)
-  const defaultParams = {
+  let defaultParams = {
     numEvents: 100,
     sortField: 'startDate',
     sortDirection: 'ASC',
@@ -1370,10 +1370,11 @@ const getDefaultQuery = () => {
   }
   if (hashParams.query){
     try {
-      return JSON.parse(hashParams.query)
+      let hashQueryParams = JSON.parse(hashParams.query)
+      return Object.assign({}, defaultParams, hashQueryParams)
     }
     catch(ex) {
-      console.error('Invalid query parameters')
+      console.error('Invalid query parameters', ex)
     }
   }
   
