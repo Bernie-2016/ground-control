@@ -8,6 +8,7 @@ import {Table, Column, ColumnGroup, Cell} from 'fixed-data-table'
 import {BernieText, BernieColors} from './styles/bernie-css'
 import moment from 'moment'
 import json2csv from 'json2csv'
+import queryString from 'query-string'
 import {states} from './data/states'
 import {USTimeZones} from './data/USTimeZones'
 
@@ -96,7 +97,7 @@ class AdminEventsSection extends React.Component {
         sortDir = 'DESC'
       }
 
-      this.props.relay.setVariables({
+      this._handleQueryChange({
         sortField: attribute,
         sortDirection: sortDir
       })
@@ -376,7 +377,7 @@ class AdminEventsSection extends React.Component {
     const resultLengthMenuItems = resultLengthOptions.map((value) => <MenuItem value={value} key={value} primaryText={`${value} Events`} />)
 
     this._handleEventRequestLengthChange = (event, selectedIndex, value) => {
-      this.props.relay.setVariables({
+      this._handleQueryChange({
         numEvents: value
       })
 
@@ -959,9 +960,9 @@ ${signature}`
         newVars['flagApproval'] = oldVars['flagApproval']
       }
 
-      this.props.relay.setVariables({filters: newVars})
+      this._handleQueryChange({filters: newVars})
     } else {
-      this.props.relay.setVariables(Object.assign(oldVars, newVars))
+      this._handleQueryChange(Object.assign(oldVars, newVars))
     }
 
     this.setState({selectedRows: []})
@@ -1136,6 +1137,18 @@ ${signature}`
 
     this.setState({
       selectedRows: currentSelectedRows
+    })
+  }
+
+  _handleQueryChange = (queryParams) => {
+    this.props.relay.setVariables(queryParams, (readyState) => {
+      if (readyState.ready) {
+        setTimeout(() => {
+          let hash = queryString.parse(location.hash);
+          hash.query = JSON.stringify(this.props.relay.variables);
+          location.hash = queryString.stringify(hash);
+        }, 500);
+      }
     })
   }
 
@@ -1347,13 +1360,28 @@ ${signature}`
   }
 }
 
-export default Relay.createContainer(AdminEventsSection, {
-  initialVariables: {
+const getDefaultQuery = () => {
+  const hashParams = queryString.parse(location.hash)
+  const defaultParams = {
     numEvents: 100,
     sortField: 'startDate',
     sortDirection: 'ASC',
     filters: {flagApproval: true}
-  },
+  }
+  if (hashParams.query){
+    try {
+      return JSON.parse(hashParams.query)
+    }
+    catch(ex) {
+      console.error('Invalid query parameters')
+    }
+  }
+  
+  return defaultParams
+}
+
+export default Relay.createContainer(AdminEventsSection, {
+  initialVariables: getDefaultQuery(),
   fragments: {
     listContainer: () => Relay.QL`
       fragment on ListContainer {
