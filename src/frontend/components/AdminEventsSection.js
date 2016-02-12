@@ -7,6 +7,7 @@ import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle, SelectField, Drop
 import {Table, Column, ColumnGroup, Cell} from 'fixed-data-table'
 import {BernieText, BernieColors} from './styles/bernie-css'
 import moment from 'moment'
+import json2csv from 'json2csv'
 import {states} from './data/states'
 import {USTimeZones} from './data/USTimeZones'
 
@@ -330,6 +331,16 @@ class AdminEventsSection extends React.Component {
           }}
           >
             <FontIcon className="material-icons" color={iconColor} hoverColor={BernieColors.blue}>email</FontIcon>
+        </IconButton>
+
+        <IconButton
+          title="download RSVPs"
+          disabled={(data[rowIndex].node.attendeesCount <= 0)}
+          onTouchTap={() => {
+            this._handleRSVPDownload([rowIndex])
+          }}
+          >
+            <FontIcon className="material-icons" color={iconColor} hoverColor={BernieColors.blue}>file_download</FontIcon>
         </IconButton>
 
         {/*
@@ -1028,6 +1039,36 @@ ${signature}`
     this.props.history.push(`/admin/events/${eventId}/emails/create`)
   }
 
+  _handleRSVPDownload = (eventIndex) => {
+    const event = this.props.listContainer.events.edges[eventIndex].node
+
+    json2csv({ data: event.attendees, fields: ['firstName', 'lastName', 'phone', 'email'] }, (err, csv) => {
+      if (err) console.log(err);
+
+      let byteNumbers = new Uint8Array(csv.length);
+
+      for (let i = 0; i < csv.length; i++)
+      {
+        byteNumbers[i] = csv.charCodeAt(i);
+      }
+      let blob = new Blob([byteNumbers], {type: "text/csv"});
+     
+          // Construct the uri
+      let uri = URL.createObjectURL(blob);  
+
+      // Construct the <a> element
+      let link = document.createElement("a");
+      link.download = `Event RSVPs (${event.eventIdObfuscated}).csv`;
+      link.href = uri;  
+
+      document.body.appendChild(link);
+      link.click(); 
+
+      // Cleanup the DOM
+      document.body.removeChild(link);
+    })
+  }
+
   _handleEventEdit = (event, newData) => {
     this._handlePreviewRequestClose()
 
@@ -1112,6 +1153,7 @@ ${signature}`
         ref='eventEditHandler'
         mutationClass={EditEvents}
         successMessage='Event(s) updated successfully'
+        onSuccess={() => {console.log('woohoo!')}}
       />
       {this.renderDeleteModal()}
       {this.renderCreateModal()}
@@ -1151,7 +1193,7 @@ ${signature}`
             header={<this.HeaderCell content="Manage" />}
             cell={<this.ActionCell data={events} col="actions" />}
             fixed={true}
-            width={220}
+            width={260}
             align='center'
           />
         </ColumnGroup>
