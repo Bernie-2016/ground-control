@@ -178,7 +178,7 @@ export default class MG {
       from: data.senderAddress,
       'h:Reply-To': data.hostAddress,
       to: data.recipientAddress,
-      subject: 'Fwd: HELP! I need more people to come to my phonebank',
+      subject: 'Fwd: ' + data.subject,
       text: content.text
     }
 
