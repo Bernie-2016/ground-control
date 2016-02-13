@@ -8,6 +8,11 @@ import EventPreview from './EventPreview'
 import MutationHandler from './MutationHandler'
 import CreateAdminEventEmail from '../mutations/CreateAdminEventEmail'
 import yup from 'yup'
+import moment from 'moment';
+
+const momentWithOffset = (startDate, utcOffset) => {
+  return moment(startDate).utcOffset(utcOffset)
+};
 
 class AdminEventEmailCreationForm extends React.Component {
   styles = {
@@ -70,6 +75,36 @@ class AdminEventEmailCreationForm extends React.Component {
     return shuffled.slice(0, size)
   }
 
+  getSenderMessage(event) {
+      const eventDate = momentWithOffset(event.startDate, event.localUTCOffset).format('LLLL');
+      const messageTemplates = [
+`${event.host.firstName} in ${event.venueCity} is hosting an event on ${eventDate} and needs more people to sign up. Hope you can make it -- here's a link to the event: ${event.link}`,
+
+`Hey, are you free on ${eventDate}? ${event.host.firstName} in ${event.venueCity} is hosting an event on for Bernie and needs more people to sign up. Here's a link to the event: ${event.link}`,
+
+`There's a great Bernie volunteer event coming up near you on ${eventDate}. ${event.host.firstName} asked me to pass along the message below -- they need more people to sign up. 
+Here's a link where you can RSVP and get more info: ${event.link}`,
+
+`${event.host.firstName} in ${event.venueCity} made a special request that I forward on the message below to Bernie supporters nearby. Can you come to a volunteer event on ${eventDate}? 
+Here's a link to sign up and get more info: ${event.link}`,
+
+`I don't usually do this, but ${event.host.firstName} has asked me to send out a special request to recruit more RSVPs for a Bernie volunteer event in ${event.venueCity} on ${eventDate}. Can you join in? 
+Here's a link where you can get more info and sign up: ${event.link}`,
+
+`When people in the Bernie movement put out a call for help, we try to answer it. ${event.host.firstName} has asked for some help getting people to a volunteer event on ${eventDate}. Can you join in? 
+RSVP and get more info here: ${event.link}`,
+
+`A local volunteer in ${event.venueCity} has asked for help to fill up her event. Let's blow ${event.host.firstName} away and fill this event! I included the message from ${event.host.firstName} below, and you can get details and sign up here: ${event.link}`,
+
+`When someone working in this political revolution calls for some help, we try to answer. ${event.host.firstName} needs more people to help fill up an upcoming event on ${eventDate}. Can you join in? RSVP and get more info here: ${event.link}`,
+
+`Do you have plans on ${eventDate}? There's a volunteer event for Bernie in ${event.venueCity} that needs more people to fill it, and the event host asked me to pass along the message below. You can get more details and sign up here: ${event.link}`,
+
+`OK folks, a local volunteer for Bernie needs our help, so let's show up! ${event.host.firstName} in ${event.venueCity} has asked me to forward on the message below to supporters nearby. The short version is that there's an event coming up on ${eventDate} that needs more people to join in. You can RSVP and get more info here: ${event.link}`
+];
+    return this.getRandomSubarray(messageTemplates, 1)[0];
+  }
+
   renderRecipientInfo() {
     let recipientsCount = this.state.recipientLimit || (this.props.event.nearbyPeople.length + 1)
     let recipientsSample = this.getRandomSubarray(this.props.event.nearbyPeople, 10)
@@ -127,7 +162,8 @@ class AdminEventEmailCreationForm extends React.Component {
           <GCForm
             schema={this.formSchema}
             defaultValue={{
-              hostEmail: this.props.event.host.email
+              hostEmail: this.props.event.host.email,
+              senderMessage: this.getSenderMessage(this.props.event)
             }}
             onSubmit={(formValues) => {
               this.refs.mutationHandler.send({
@@ -243,6 +279,7 @@ export default Relay.createContainer(AdminEventEmailCreationForm, {
         id
         isSearchable
         latitude
+        link
         localTimezone
         localUTCOffset
         longitude
