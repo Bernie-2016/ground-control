@@ -62,7 +62,7 @@ var eventTypes = [
 			cons_email: userEmail,
 			rsvp_email_reminder_hours: '24',
 		},
-		disabled: ['contact_phone', 'attendee_volunteer_show'],
+		disabled: ['contact_phone', 'public_phone', 'attendee_volunteer_show'],
 		adminOnly: false
 	},
 	{
@@ -82,7 +82,7 @@ var eventTypes = [
 			cons_name: 'Bernie 2016',
 			cons_email: userEmail
 		},
-		disabled: ['contact_phone'],
+		disabled: ['contact_phone', 'public_phone'],
 		adminOnly: true
 	},
 	{
@@ -106,7 +106,7 @@ var eventTypes = [
 			start_tz: 'US/Eastern',
 			cons_name: 'Robert Reeves'
 		},
-		disabled: ['contact_phone'],
+		disabled: ['contact_phone', 'public_phone'],
 		adminOnly: true
 	}
 	// { // Keep this event type in as an example for providing extra default values
@@ -199,9 +199,7 @@ function setDefaults(eventTypeId){
 				name: disabled[i],
 				required: $(input).prop('required')
 			});
-			$(input).val('').removeProp('required').hide();
-			var label = $(`label[for='${$(input).attr('id')}']`);
-			label.hide()
+			$(input).val('').removeProp('required').attr('disabled','disabled');
 		}
 	};
 }
