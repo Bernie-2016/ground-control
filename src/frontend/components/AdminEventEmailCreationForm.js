@@ -47,7 +47,7 @@ class AdminEventEmailCreationForm extends React.Component {
   formSchema = yup.object({
     hostEmail: yup.string().email().required(),
     senderEmail: yup.string().email().required(),
-    subject: yup.string().required(),
+    subject: yup.string().required().matches(/^Fwd: /),
     hostMessage: yup.string().required(),
     senderMessage: yup.string().required(),
     toolPassword: yup.string().required()
@@ -84,7 +84,7 @@ class AdminEventEmailCreationForm extends React.Component {
 	  "Help me fill my event?",
 	  "Can you help turn people out for this Bernie event?"
       ]
-      return this.getRandomSubarray(subjects, 1)[0];
+      return 'Fwd: ' + this.getRandomSubarray(subjects, 1)[0];
   }
 
   renderRecipientInfo() {

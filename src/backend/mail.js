@@ -178,7 +178,7 @@ export default class MG {
       from: data.senderAddress,
       'h:Reply-To': data.hostAddress,
       to: data.recipientAddress,
-      subject: 'Fwd: ' + data.subject,
+      subject: data.subject.match(/^Fwd: /) ? data.subject : 'Fwd: ' + data.subject,
       text: content.text
     }
 
