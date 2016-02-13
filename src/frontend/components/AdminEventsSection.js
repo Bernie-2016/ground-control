@@ -1381,7 +1381,9 @@ const getDefaultQuery = () => {
   }
   if (hashParams.query){
     try {
-      return Object.assign({}, defaultParams, hashParams.query)
+      let newQueryParams = Object.assign({}, defaultParams, hashParams.query)
+      newQueryParams.filters = Object.assign({}, defaultParams.filters, hashParams.query.filters)
+      return newQueryParams
     }
     catch(ex) {
       console.error('Invalid query parameters', ex)
