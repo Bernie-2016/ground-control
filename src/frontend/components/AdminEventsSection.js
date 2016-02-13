@@ -8,7 +8,7 @@ import {Table, Column, ColumnGroup, Cell} from 'fixed-data-table'
 import {BernieText, BernieColors} from './styles/bernie-css'
 import moment from 'moment'
 import json2csv from 'json2csv'
-import queryString from 'query-string'
+import qs from 'qs'
 import {states} from './data/states'
 import {USTimeZones} from './data/USTimeZones'
 
@@ -24,6 +24,31 @@ require('./styles/adminEventsSection.css')
 const publicEventsRootUrl = 'https://secure.berniesanders.com/page/event/detail/'
 
 const plurry = (n) => (Math.abs(n) == 1) ? '' : 's';
+
+const convertType = (value) => {
+  if (typeof value === 'object'){
+    let updatedValue = {}
+    Object.keys(value).forEach((key) => {
+      const currentValue = convertType(value[key])
+      if (currentValue != undefined)
+        value[key] = currentValue
+    })
+    return value
+  }
+  else if (value === 'none')
+    return null
+  else if (value === 'true')
+    return true
+  else if (value === 'false')
+    return false
+  else if (value != '' && !isNaN(value))
+    return Number(value)
+  else if (value)
+    return String(value)
+  else {
+    return undefined
+  }
+}
 
 const keyboardActionStyles = {
   text: {fontSize: '0.9em', top: '-7px', color: BernieColors.gray, cursor: 'default'},
@@ -735,25 +760,9 @@ ${signature}`
           let filtersArray = jQuery(this.refs.eventSearchForm).serializeArray();
           let filtersObject = {};
           filtersArray.forEach((filter) => {
-
-            filtersObject[filter.name] = filter.value;
-
-            if (filtersObject[filter.name] === 'none'){
-              filtersObject[filter.name] = null
-            }
-            else if (filtersObject[filter.name] === 'true'){
-              filtersObject[filter.name] = true
-            }
-            else if (filtersObject[filter.name] === 'false'){
-              filtersObject[filter.name] = false
-            }
-            else if (filtersObject[filter.name]){
-              filtersObject[filter.name] = String(filter.value)
-            }
-            else {
-              delete filtersObject[filter.name]
-            }
-
+            const currentValue = convertType(filter.value)
+            if (currentValue != undefined)
+              filtersObject[filter.name] = currentValue
           });
 
           this._handleRequestFiltersChange(filtersObject, true);
@@ -962,7 +971,7 @@ ${signature}`
 
       this._handleQueryChange({filters: newVars})
     } else {
-      this._handleQueryChange(Object.assign(oldVars, newVars))
+      this._handleQueryChange({filters: Object.assign(oldVars, newVars)})
     }
 
     this.setState({selectedRows: []})
@@ -1141,12 +1150,15 @@ ${signature}`
   }
 
   _handleQueryChange = (queryParams) => {
-    console.log(queryParams)
     this.props.relay.setVariables(queryParams, (readyState) => {
-      if (readyState.done) {
-          let hash = queryString.parse(location.hash);
-          hash.query = JSON.stringify(this.props.relay.variables);
-          location.hash = queryString.stringify(hash);
+      if (readyState.ready) {
+        setTimeout(() => {
+          const relayProps = this.props.relay.variables;
+          let hash = qs.parse(location.hash.substr(1));
+          hash.query = relayProps;
+
+          location.hash = qs.stringify(hash, { encode: false, skipNulls: true });
+        }, 500);
       }
     })
   }
@@ -1360,7 +1372,7 @@ ${signature}`
 }
 
 const getDefaultQuery = () => {
-  const hashParams = queryString.parse(location.hash)
+  const hashParams = convertType(qs.parse(location.hash.substr(1), { strictNullHandling: true }))
   let defaultParams = {
     numEvents: 100,
     sortField: 'startDate',
@@ -1369,8 +1381,7 @@ const getDefaultQuery = () => {
   }
   if (hashParams.query){
     try {
-      let hashQueryParams = JSON.parse(hashParams.query)
-      return Object.assign({}, defaultParams, hashQueryParams)
+      return Object.assign({}, defaultParams, hashParams.query)
     }
     catch(ex) {
       console.error('Invalid query parameters', ex)
