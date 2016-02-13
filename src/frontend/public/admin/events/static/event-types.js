@@ -70,7 +70,7 @@ var eventTypes = [
 		name: 'Official Barnstorm',
 		defaultValues: {
 			name: 'Bernstorm - Organizing Rally with National Bernie Staff',
-			description: '<p>Join other local volunteers and grassroots organizers on <DOW, Month DD> as a representative from the national organizing staff, <STAFF> comes to <State> for a series of special organizing events.</p><p>We will discuss how we can rapidly grow our movement in the next several months as we enter the primary season. We will also be discussing local volunteer activities to help the early primary states.</p><p>This will be a great opportunity to hear what\'s going on nationally and locally with the campaign, as well as a chance to meet other Bernie supporters from your community. Thank you for all that you\'ve contributed and all the hard work that you\'re about to do!</p>',
+			description: '<p>Join other local volunteers and grassroots organizers on [DOW, Month DD] as a representative from the national organizing staff, [STAFF] comes to [STATE] for a series of special organizing events.</p><p>We will discuss how we can rapidly grow our movement in the next several months as we enter the primary season. We will also be discussing local volunteer activities to help the early primary states.</p><p>This will be a great opportunity to hear what\'s going on nationally and locally with the campaign, as well as a chance to meet other Bernie supporters from your community. Thank you for all that you\'ve contributed and all the hard work that you\'re about to do!</p>',
 			is_official: true,
 			attendee_volunteer_show: true,
 			host_receive_rsvp_emails: false,
