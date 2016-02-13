@@ -318,7 +318,7 @@ function startApp() {
       src = 'unknown source'
 
     let form = req.body
-    let user = req.user.email ? req.user.email : 'Anonymous'
+    let user = req.user ? req.user.email : 'Anonymous'
     log.info(`Event Create Form Submission to ${src} by ${user}`, JSON.stringify(form));
 
     // Flag event as needing approval
