@@ -133,20 +133,27 @@
     <script src="/admin/events/static/clndr.js"></script>
   </head>
   <body class="event-central step2">
-    {{#if is_public}}
     <header id="bsd-header" class="clear">
       <div class="container">
         <a href="https://berniesanders.com/">
           <h1>Bernie Sanders for President</h1>
         </a>
+        {{#if is_public}}
         <div class="contribute">
           <a href="https://secure.actblue.com/contribute/page/lets-go-bernie?refcode=action-page" class="contribute">
           Contribute
           </a>
         </div>
+        {{else}}
+        <div style="float: right">
+          <h2 style="color:#EC3E3E">
+            Admin
+          </h2>
+        </div>
+        {{/if}}
       </div>
     </header>
-    {{/if}}
+
     <div class="content" style="visibility: visible;">
       <div id="SKIN" class="module_event2 bsd-page bsd-event bsd-event-createdetails">
         <div class="basic container">
@@ -168,13 +175,13 @@
 
           <form method="post" name="secondform" id="secondform">
             <div>
-              <div class="section-wrap">
+              <div class="section-wrap {{#unless is_public}}admin{{/unless}}">
                 <div class="sectionheader section-what">
                   <h3>What:<span class="bsd-image-replacement"></span></h3>
                 </div>
                 <div class="inputgroup">
                   <div class="label">
-                    <label class="form_label">Event Type:</label>
+                    <label class="form_label" for="event_type_id">Event Type:</label>
                   </div>
                   <div class="field">
                     <div class="select-wrapper" style="float:none;">
@@ -213,27 +220,10 @@
                       });
                     </script>
                     <span class="explain">(Say a little more about your event and why people should attend)</span>
-                    {{#if is_public }}
                     <div class="checkboxgroup">
                       <label class="form_label" for="is_searchable">Make this event public?</label>
                       <input name="is_searchable" type="checkbox" value="1" id="is_searchable" checked="checked">
                     </div>
-                    {{ else }}
-                    <div class="inputgroup">
-                      <div class="label">
-                        <label class="form_label">Make this event public?</label>
-                      </div>
-                      <div class="field">
-                        <div class="select-wrapper" style="float:none;">
-                          <select size="1" name="is_searchable">
-                            <option value="1">Make Public</option>
-                            <option value="0">Make Private</option>
-                            <!-- <option value="-2">Use Event Type Default</option> -->
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-                    {{/if}}
                     <div class="checkboxgroup">
                       <label class="form_label" for="qf_aa7bcc">Receive email when users sign up?</label>
                       <input name="host_receive_rsvp_emails" type="checkbox" value="1" id="qf_aa7bcc" checked="checked">
@@ -271,7 +261,7 @@
                   </div>
                   <div class="hideabletable" id="rsvp_email_reminder_hours_section">
                     <div class="label">
-                      <label class="form_label">Enter # of hours before event to send reminder:</label>
+                      <label class="form_label" for="rsvp_email_reminder_hours">Enter # of hours before event to send reminder:</label>
                     </div>
                     <div class="field">
                       <input size="8" id="rsvp_email_reminder_hours" name="rsvp_email_reminder_hours" type="number" value="8" min="0" step="0.5">
@@ -279,7 +269,7 @@
                   </div>
                 </div>
               </div>
-              <div class="section-wrap">
+              <div class="section-wrap {{#unless is_public}}admin{{/unless}}">
                 <div class="sectionheader section-where">
                   <h3>Where:<span class="bsd-image-replacement"></span></h3>
                 </div>
@@ -660,7 +650,7 @@
                 </div>
                 <span class="explain">(Optional; only necessary if guests will need additional directions after arriving at address.)</span>
               </div>
-              <div class="section-wrap">
+              <div class="section-wrap {{#unless is_public}}admin{{/unless}}">
                 <div class="sectionheader section-when">
                   <h3>When:<span class="bsd-image-replacement"></span></h3>
                 </div>
@@ -1285,16 +1275,16 @@
                   </div>
                 </div>
               </div>
-              <div class="section-wrap">
+              <div class="section-wrap {{#unless is_public}}admin{{/unless}}">
                 <div class="sectionheader section-where">
                   <h3>Who:<span class="bsd-image-replacement"></span></h3>
                 </div>
                 <div class="inputgroup">
                   <div class="label">
-                    <label class="form_label">Contact Phone:</label>
+                    <label class="form_label" for="contact_phone">Contact Phone:</label>
                   </div>
                   <div class="field">
-                    <input size="30" name="contact_phone" type="tel" required>
+                    <input size="30" name="contact_phone" id="contact_phone" type="tel" required>
                   </div>
                 </div>
                 <div class="inputgroup">

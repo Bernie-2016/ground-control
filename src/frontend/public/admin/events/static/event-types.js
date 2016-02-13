@@ -1,6 +1,6 @@
 var eventTypes = [
-	{
-		id: 14,
+	/*{
+		id: 'rally',
 		name: 'Rally (Official Campaign Event)',
 		defaultValues: {
 			name: 'Rally for Bernie',
@@ -10,13 +10,14 @@ var eventTypes = [
 		disabled: ['contact_phone'],
 		adminOnly: true
 	},
+	*/
 	{
-		id: 24,
+		id: 'volunteer-meeting',
 		name: 'Volunteer Activity or Meeting',
 		adminOnly: false
 	},
 	{
-		id: 30,
+		id: 'ballot-access',
 		name: 'Gather Ballot Access Signatures',
 		defaultValues: {
 			name: 'Bernie Ballot Blast - PA Support Bernie and his Delegates and Collect Petition Signatures',
@@ -25,7 +26,7 @@ var eventTypes = [
 		adminOnly: false
 	},
 	{
-		id: 31,
+		id: 'phonebank',
 		name: 'Phonebank',
 		defaultValues: {
 			name: 'Phone banking for Bernie',
@@ -34,7 +35,7 @@ var eventTypes = [
 		adminOnly: false
 	},
 	{
-		id: 32,
+		id: 'canvass',
 		name: 'Canvass',
 		defaultValues: {
 			name: 'Door knocking for Bernie',
@@ -43,8 +44,30 @@ var eventTypes = [
 		adminOnly: false
 	},
 	{
-		id: 41,
+		id: 'barnstorm',
 		name: 'Barnstorm',
+		defaultValues: {
+			name: 'Barnstorm Organizing Rally for Bernie',
+			description: '<p>Join other local volunteers and grassroots organizers for a “barnstorm" organizing rally and learn how to get to work for Bernie. A Bernie volunteer will present an update from the national campaign, talk about our plan to win and plug you into a voter contact program locally.</p><p>This will be a great opportunity to hear what\'s going on nationally and locally with the campaign, as well as a chance to meet other Bernie supporters from your community. Thank you for all that you\'ve contributed and all the hard work that you\'re about to do!</p>',
+
+			is_official: false,
+			attendee_volunteer_show: false,
+			host_receive_rsvp_emails: false,
+			date: {
+				time: '18:30:00',
+			},
+			duration_num: 90,
+			duration_unit: 1,
+			cons_name: '',
+			cons_email: userEmail,
+			rsvp_email_reminder_hours: '24',
+		},
+		disabled: ['contact_phone', 'attendee_volunteer_show'],
+		adminOnly: false
+	},
+	{
+		id: 'official-barnstorm',
+		name: 'Official Barnstorm',
 		defaultValues: {
 			name: 'Bernstorm - Organizing Rally with National Bernie Staff',
 			description: '<p>Join other local volunteers and grassroots organizers on <DOW, Month DD> as a representative from the national organizing staff, <STAFF> comes to <State> for a series of special organizing events.</p><p>We will discuss how we can rapidly grow our movement in the next several months as we enter the primary season. We will also be discussing local volunteer activities to help the early primary states.</p><p>This will be a great opportunity to hear what\'s going on nationally and locally with the campaign, as well as a chance to meet other Bernie supporters from your community. Thank you for all that you\'ve contributed and all the hard work that you\'re about to do!</p>',
@@ -60,10 +83,10 @@ var eventTypes = [
 			cons_email: userEmail
 		},
 		disabled: ['contact_phone'],
-		adminOnly: false
+		adminOnly: true
 	},
 	{
-		id: 47,
+		id: 'vol2vol',
 		name: 'Vol 2 Vol Turnout Shift',
 		defaultValues: {
 			name: 'Vol2Vol Turnout Shift',
@@ -84,7 +107,7 @@ var eventTypes = [
 			cons_name: 'Robert Reeves'
 		},
 		disabled: ['contact_phone'],
-		adminOnly: false
+		adminOnly: true
 	}
 	// { // Keep this event type in as an example for providing extra default values
 	// 	id: 44,
@@ -176,7 +199,9 @@ function setDefaults(eventTypeId){
 				name: disabled[i],
 				required: $(input).prop('required')
 			});
-			$(input).val('').removeProp('required').attr('disabled','disabled');
+			$(input).val('').removeProp('required').hide();
+			var label = $(`label[for='${$(input).attr('id')}']`);
+			label.hide()
 		}
 	};
 }

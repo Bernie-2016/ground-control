@@ -248,25 +248,29 @@ function startApp() {
     })
   )
 
-  app.get('/admin/events/create', isAuthenticated, wrap(async (req, res) => {
+  app.get('/events/create', wrap(async (req, res) => {
+    let userIsAuthed = false
+    let userIsAdmin = false
+    let userEmail = null
+    if (req.user && req.user.id) {
+      userIsAdmin = await isAdmin(req.user.id)
+      userIsAuthed = true
+      userEmail = await knex('users')
+        .select('email')
+        .where('id', req.user.id)
+        .first()
+    }
     if (inDevEnv) {
       const temp = fs.readFileSync(templateDir + '/create_event.hbs', { encoding: 'utf-8' });
       const page = handlebars.compile(temp);
-      res.send(page({ is_public: false, events_root_url: publicEventsRootUrl, gcUser: req.user }));
+      res.send(page({ is_public: !userIsAdmin, is_logged_in: userIsAuthed, events_root_url: publicEventsRootUrl, gcUser: req.user }));
       return
     }
-    res.send(createEventPage({ is_public: false, events_root_url: publicEventsRootUrl, gcUser: req.user }));
+    res.send(createEventPage({ is_public: !userIsAdmin, is_logged_in: userIsAuthed, events_root_url: publicEventsRootUrl, gcUser: req.user }));
   }))
 
-  app.get('/events/create', wrap(async (req, res) => {
-    // if (inDevEnv) {
-    //   const temp = fs.readFileSync(templateDir + '/create_event.hbs', { encoding: 'utf-8' });
-    //   const page = handlebars.compile(temp);
-    //   res.send(page({ is_public: true, events_root_url: publicEventsRootUrl, gcUser: req.user }));
-    //   return
-    // }
-    // res.send(createEventPage({ is_public: true, events_root_url: publicEventsRootUrl, gcUser: req.user }));
-    res.redirect('https://go.berniesanders.com/page/event/create')
+  app.get('/admin/events/create', isAuthenticated, wrap(async (req, res) => {
+    res.redirect('/events/create')
   }))
 
   app.get('/events/data/upload', wrap(async (req, res) => {
@@ -284,13 +288,18 @@ function startApp() {
     res.send(response.body)
   }))
 
-  app.post('/events/create', isAuthenticated, wrap(async (req, res) => {
-    if (!req.user) {
-      res.status(400).send({errors: {
-        'Session Timeout': ['Your session needs to be refreshed. Please visit https://organize.berniesanders.com and log in.']}
-      })
-      return
-    };
+  app.post('/events/create', wrap(async (req, res) => {
+    const eventIdMap = {
+      'volunteer-meeting' : 24,
+      'ballot-access' : 30,
+      'phonebank' : 31,
+      'canvass' : 32,
+      'barnstorm' : 41,
+      'official-barnstorm' : 41,
+      'vol2vol' : 47,
+      'rally' : 14
+    }
+
     let src = null
     if (req.headers && req.headers.referer) {
       src = req.headers.referer.split(req.headers.origin)
@@ -309,31 +318,23 @@ function startApp() {
       src = 'unknown source'
 
     let form = req.body
-    if (process.env.NODE_ENV === 'development')
-      form['event_type_id'] = '1'
-
-    log.info(`Event Create Form Submission to ${src} by ${req.user.email}`, JSON.stringify(form));
+    let user = req.user.email ? req.user.email : 'Anonymous'
+    log.info(`Event Create Form Submission to ${src} by ${user}`, JSON.stringify(form));
 
     // Flag event as needing approval
     let batchEventMax = 20
-    const userIsAdmin = await isAdmin(req.user.id)
-    if (userIsAdmin || ((form['event_type_id'] === '31' || form['event_type_id'] === '32') && form['is_official'] !== '1')){
+    let userIsAdmin = false
+    if (req.user)
+      userIsAdmin = await isAdmin(req.user.id)
+
+    if (userIsAdmin || (form['event_type_id'] === 'phonebank' && form['is_official'] !== '1')){
       // Code to execute if bypassing approval queue
     }
-    else {
+    else
       form['flag_approval'] = '1';
 
-      // Disable rally event type submission by non-admins
-      if (form['event_type_id'] === '14'){
-        res.status(400).send({errors: {
-          'Permission Error': ['You need to be an administrator to create campaign rallies. Please select a different event type or email help@berniesanders.com to request admin access.']}
-        })
-        return
-      }
-    }
-
     // Require phone number for RSVPs to phonebanks
-    if (form['event_type_id'] === '31'){
+    if (form['event_type_id'] === 'phonebank') {
       form['attendee_require_phone'] = 1;
     }
 
@@ -346,6 +347,9 @@ function startApp() {
       }})
       return
     }
+    form['event_type_id'] = eventIdMap[form['event_type_id']]
+    if (process.env.NODE_ENV === 'development')
+      form['event_type_id'] = '1'
 
     let eventType = await knex('bsd_event_types')
       .where('event_type_id', form['event_type_id'])
@@ -390,7 +394,7 @@ function startApp() {
 
         createdEventIds.push(result.event_id_obfuscated)
       } catch(ex) {
-        log.error(`Event Creation Error: ${ex.message} [${req.user.email}]`)
+        log.error(`Event Creation Error: ${ex.message} [${user}]`)
 
         let error = null
 
@@ -414,7 +418,7 @@ function startApp() {
       constituent
     )
 
-    log.info(`Event Creation Success: ${createdEventIds.join(' ')} [${req.user.email}]`)
+    log.info(`Event Creation Success: ${createdEventIds.join(' ')} [${user}]`)
 
     res.send({ids: createdEventIds})
   }))

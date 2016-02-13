@@ -1053,17 +1053,17 @@ ${signature}`
         byteNumbers[i] = csv.charCodeAt(i);
       }
       let blob = new Blob([byteNumbers], {type: "text/csv"});
-     
+
           // Construct the uri
-      let uri = URL.createObjectURL(blob);  
+      let uri = URL.createObjectURL(blob);
 
       // Construct the <a> element
       let link = document.createElement("a");
       link.download = `Event RSVPs (${event.eventIdObfuscated}).csv`;
-      link.href = uri;  
+      link.href = uri;
 
       document.body.appendChild(link);
-      link.click(); 
+      link.click();
 
       // Cleanup the DOM
       document.body.removeChild(link);
@@ -1141,13 +1141,12 @@ ${signature}`
   }
 
   _handleQueryChange = (queryParams) => {
+    console.log(queryParams)
     this.props.relay.setVariables(queryParams, (readyState) => {
-      if (readyState.ready) {
-        setTimeout(() => {
+      if (readyState.done) {
           let hash = queryString.parse(location.hash);
           hash.query = JSON.stringify(this.props.relay.variables);
           location.hash = queryString.stringify(hash);
-        }, 500);
       }
     })
   }
@@ -1377,7 +1376,7 @@ const getDefaultQuery = () => {
       console.error('Invalid query parameters', ex)
     }
   }
-  
+
   return defaultParams
 }
 
