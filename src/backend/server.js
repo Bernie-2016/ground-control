@@ -353,7 +353,7 @@ function startApp() {
       }})
       return
     }
-    form['event_type_id'] = String(eventIdMap[form['event_type_id']])
+    form['event_type_id'] = isNaN(form['event_type_id']) ? String(eventIdMap[form['event_type_id']]) : String(form['event_type_id'])
     if (process.env.NODE_ENV === 'development')
       form['event_type_id'] = '1'
 
