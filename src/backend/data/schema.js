@@ -1038,6 +1038,13 @@ const GraphQLEditEvents = mutationWithClientMutationId({
         ...newEventData
       }
 
+      // Delete empty event data
+      Object.keys(event).forEach((key) => {
+        if (event[key] === '') {
+          delete event[key]
+        }
+      })
+
       // Require phone number for RSVPs to phonebanks
       if (event['event_type_id'] === '31'){
         event['attendee_require_phone'] = 1;
