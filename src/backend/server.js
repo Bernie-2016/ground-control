@@ -263,7 +263,12 @@ function startApp() {
     if (inDevEnv) {
       const temp = fs.readFileSync(templateDir + '/create_event.hbs', { encoding: 'utf-8' });
       const page = handlebars.compile(temp);
-      res.send(page({ is_public: !userIsAdmin, is_logged_in: userIsAuthed, events_root_url: publicEventsRootUrl, gcUser: req.user }));
+      res.send(page({
+        is_public: !userIsAdmin,
+        is_logged_in: userIsAuthed,
+        events_root_url: publicEventsRootUrl,
+        gcUser: req.user
+      }));
       return
     }
     res.send(createEventPage({ is_public: !userIsAdmin, is_logged_in: userIsAuthed, events_root_url: publicEventsRootUrl, gcUser: req.user }));
@@ -295,6 +300,7 @@ function startApp() {
       'phonebank' : 31,
       'canvass' : 32,
       'barnstorm' : 41,
+      'carpool-to-nevada' : 39,
       'official-barnstorm' : 41,
       'vol2vol' : 47,
       'rally' : 14
