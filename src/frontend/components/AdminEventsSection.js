@@ -1179,7 +1179,6 @@ ${signature}`
         mutationClass={EditEvents}
         mutationName='editEvents'
         successMessage='Event(s) updated successfully'
-        onSuccess={() => {console.log('woohoo!')}}
       />
       {this.renderDeleteModal()}
       {this.renderCreateModal()}
