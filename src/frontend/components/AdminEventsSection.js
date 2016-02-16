@@ -50,6 +50,44 @@ const convertType = (value) => {
   }
 }
 
+JSON.flatten = (data, options) => {
+  let result = {}
+  let addProp = (prop, val) => {
+    if (options.ignoreProps && options.ignoreProps.length > 0){
+      const props = prop.split('.')
+      for (const item of props) {
+        if (options.ignoreProps.indexOf(item) > -1)
+          return
+      }
+    }
+    result[prop] = val
+  }
+  let recurse = (cur, prop) => {    
+    if (Object(cur) !== cur) {
+      addProp(prop, cur)
+    }
+    else if (Array.isArray(cur)) {
+      let l=cur.length;
+      for(let i=0; i<l; i++)
+        recurse(cur[i], `${prop}[${i}]`)
+    
+    if (l == 0)
+      addProp(prop, [])
+    }
+    else {
+      let isEmpty = true
+      for (let p in cur) {
+        isEmpty = false
+        recurse(cur[p], prop ? `${prop}.${p}` : p)
+      }
+      if (isEmpty && prop)
+        addProp(prop, {})
+    }
+  }
+  recurse(data, '')
+  return result
+}
+
 const keyboardActionStyles = {
   text: {fontSize: '0.9em', top: '-7px', color: BernieColors.gray, cursor: 'default'},
   icon: {cursor: 'default'}
@@ -1051,14 +1089,21 @@ ${signature}`
 
   _handleRSVPDownload = (eventIndex) => {
     const event = this.props.listContainer.events.edges[eventIndex].node
+    const data = event.attendees.map(
+      (attendee) => JSON.flatten(attendee, {ignoreProps: ['__dataID__']})
+    )
 
-    json2csv({ data: event.attendees, fields: ['firstName', 'lastName', 'phone', 'email'] }, (err, csv) => {
+    let options = {
+      data,
+      fields: Object.keys(data[0])
+    }
+
+    json2csv(options, (err, csv) => {
       if (err) console.log(err);
 
       let byteNumbers = new Uint8Array(csv.length);
 
-      for (let i = 0; i < csv.length; i++)
-      {
+      for (let i = 0; i < csv.length; i++){
         byteNumbers[i] = csv.charCodeAt(i);
       }
       let blob = new Blob([byteNumbers], {type: "text/csv"});
@@ -1459,6 +1504,11 @@ export default Relay.createContainer(AdminEventsSection, {
                 lastName
                 phone
                 email
+                address {
+                  city
+                  state
+                  zip
+                }
               }
             }
           }
