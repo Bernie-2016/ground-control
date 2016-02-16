@@ -216,6 +216,8 @@ let {nodeInterface, nodeField} = nodeDefinitions(
       return addType(knex('bsd_addresses').where('cons_addr_id', id))
     if (type === 'ListContainer')
       return SharedListContainer
+    if (type == 'BoostAttendanceRequest')
+      return addType(knex('boost_attendance_request').where('id', id))
     return null
   },
   (obj) => {
@@ -237,6 +239,8 @@ let {nodeInterface, nodeField} = nodeDefinitions(
       return GraphQLAddress
     if (obj._type == 'users')
       return GraphQLUser
+    if (obj._type == 'boost_attendance_request')
+      return GraphQLBoostAttendanceRequest
     return null
   }
 )
@@ -1354,6 +1358,36 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
   }
 })
 
+const GraphQLCreateBoostAttendanceRequest = mutationWithClientMutationId({
+  name: 'CreateBoostAttendanceRequest',
+  inputFields: {
+    hostMessage: { type: new GraphQLNonNull(GraphQLString) },
+  },
+  outputFields: {
+    listContainer: {
+      type: GraphQLListContainer,
+      resolve: () => SharedListContainer
+    }
+  },
+  mutateAndGetPayload: async ({hostMessage}, {rootValue}) => {
+    adminRequired(rootValue)
+
+    // then a miracle happens ...
+
+    return []
+  }
+})
+
+const GraphQLBoostAttendanceRequest = new GraphQLObjectType({
+  name: 'BoostAttendanceRequest',
+  description: 'A request from event hosts to send a FastForward invite',
+  fields: () => ({
+    id: globalIdField('BoostAttendanceRequest'),
+    event: { type: GraphQLEvent },
+    hostMessage: { type: GraphQLString }
+  })
+})
+
 const GraphQLCreateCallAssignment = mutationWithClientMutationId({
   name: 'CreateCallAssignment',
   inputFields: {
@@ -1508,7 +1542,8 @@ let RootMutation = new GraphQLObjectType({
     submitCallSurvey: GraphQLSubmitCallSurvey,
     createCallAssignment: GraphQLCreateCallAssignment,
     deleteEvents: GraphQLDeleteEvents,
-    createAdminEventEmail: GraphQLCreateAdminEventEmail
+    createAdminEventEmail: GraphQLCreateAdminEventEmail,
+    createBoostAttendanceRequest: GraphQLCreateBoostAttendanceRequest
   })
 })
 
@@ -1547,9 +1582,24 @@ let RootQuery = new GraphQLObjectType({
         id: { type: new GraphQLNonNull(GraphQLString) }
       },
       resolve: async (root, {id}, {rootValue}) => {
+        let localId = fromGlobalId(id)
+        console.log(localId)
+        if (localId.type !== 'Event')
+          localId = id
+        else
+          localId = localId.id
+        return rootValue.loaders.bsdEvents.load(localId)
+      }
+    },
+    boostAttendanceRequest: {
+      type: GraphQLBoostAttendanceRequest,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLString) }
+      },
+      resolve: async (root, {id}, {rootValue}) => {
         authRequired(rootValue)
         let localId = fromGlobalId(id).id
-        return rootValue.loaders.bsdEvents.load(localId)
+        return knex('boost_attendance_request').where('id', localId)
       }
     },
     node: nodeField

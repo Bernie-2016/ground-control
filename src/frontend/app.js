@@ -12,6 +12,7 @@ import AdminEventsSection from './components/AdminEventsSection';
 import AdminEventUploadRsvps from './components/AdminEventUploadRsvps';
 import AdminCallAssignmentsSection from './components/AdminCallAssignmentsSection';
 import AdminCallAssignmentCreationForm from './components/AdminCallAssignmentCreationForm';
+import BoostEventAttendanceForm from './components/BoostEventAttendanceForm';
 import GCTextField from './components/forms/GCTextField';
 import GCPhoneField from './components/forms/GCPhoneField';
 import GCDateField from './components/forms/GCDateField';
@@ -48,8 +49,8 @@ window.onerror = (msg, file, line, col, error) => {
 
   log.error(error)
   setTimeout(() => {
-    alert('Whoops! Something went wrong. We\'re looking into it, but in the meantime please refresh your browser.')
-    document.location.reload(true)
+    // alert('Whoops! Something went wrong. We\'re looking into it, but in the meantime please refresh your browser.')
+    // document.location.reload(true)
   }, 2000)
 };
 
@@ -84,7 +85,11 @@ const CurrentUserQueries = {
 
 const EventQueries = {
   event: () => Relay.QL`query { event(id: $id) }`
-}
+};
+
+const BoostAttendanceRequest = {
+  boostAttendanceRequest: () => Relay.QL`query{ boostAttendanceRequest(id: $id) }`
+};
 
 let history = createHistory();
 
@@ -165,6 +170,16 @@ ReactDOM.render(
         />
       </Route>
     </Route>
+    <Route
+      path='/boost-event-attendance/:id'
+      component={BoostEventAttendanceForm}
+        queries={{
+          ...ListContainerQueries,
+          ...EventQueries,
+          ...CurrentUserQueries
+        }}
+        renderLoading={() => <Loading />}
+    />
     <Route path='/unauthorized' component={Unauthorized} />
     <Route path="*" component={NotFound} />
   </Router>,

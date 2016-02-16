@@ -324,7 +324,7 @@ class AdminEventsSection extends React.Component {
 
         <IconButton
           title="email"
-          disabled={(data[rowIndex].node.flagApproval === true || data[rowIndex].node.isSearchable === 0)}
+          // disabled={(data[rowIndex].node.flagApproval === true || data[rowIndex].node.isSearchable === 0)}
           onTouchTap={() => {
             this._handleEventEmail([rowIndex])
           }}
