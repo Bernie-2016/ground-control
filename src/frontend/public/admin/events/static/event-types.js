@@ -282,7 +282,7 @@ function setEventDate(dateMoment, auto_generated) {
 }
 
 function addEventDate(dateMoment, auto_generated) {
-	if (moment() >= dateMoment){
+	if (moment().subtract(1, 'days') >= dateMoment) {
 		console.error('Event date is in the past!');
 		return false;
 	};
