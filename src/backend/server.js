@@ -340,7 +340,7 @@ function startApp() {
       form['flag_approval'] = '1';
 
     // Require phone number for RSVPs to phonebanks
-    if (form['event_type_id'] === 'phonebank') {
+    if (form['event_type_id'] === 'phonebank' || form['event_type_id'] === 'carpool-to-nevada') {
       form['attendee_require_phone'] = 1;
     }
 
