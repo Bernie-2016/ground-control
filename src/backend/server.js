@@ -279,7 +279,7 @@ function startApp() {
   }))
 
   app.get('/events/data/upload', wrap(async (req, res) => {
-    res.redirect('https://script.google.com/a/macros/berniesanders.com/s/AKfycbylHH3UCJM0ka4k_B8tVHVA02XIMcgOEzBjJFbIpnhBXYS2a30/exec')
+    res.redirect('https://script.google.com/macros/s/AKfycbwVZHnRZ5CJkzFID91QYcsLNFLkPgstd7XjS9o1QSEAh3tC2vY/exec')
   }))
 
   app.get('/events/add-rsvp', wrap(async(req, res) => {
