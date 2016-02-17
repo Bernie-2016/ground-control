@@ -657,6 +657,16 @@ Thank you again for your support and for helping to spread Bernie’s message!
 ${signature}`
       },
       {
+        reason: 'Canvass event in non-canvass state',
+        message: `Thank you for submitting your canvass event.  At the moment, we're not running volunteer-led canvasses in that area, however we do have other very important tasks where we'd like your help.
+
+In particular, we're asking volunteers to host phone banks to call voters in states with upcoming caucuses/primaries. You can create your phone bank event right here: https://organize.berniesanders.com/events/create#type=phonebank
+
+Again, thank you so much for your willingness to help spread Bernie's message.
+
+${signature}`
+      },
+      {
         reason: 'General Deletion Message',
         message: `Your event does not meet parameters at berniesanders.com/plan.
 
