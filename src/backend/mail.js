@@ -135,12 +135,7 @@ export default class MG {
         template: 'phone-bank-instructions',
         senderAddress: 'Liam Clive<liamclive@berniesanders.com>',
         sender: 'Liam Clive',
-        subject: 'IMPORTANT: Next steps for hosting your phone bank'
-      },
-      'carpool to an early primary state' : {
-        template: 'carpool-instructions',
-        senderAddress: 'Team Bernie<info@berniesanders.com>',
-        subject: 'IMPORTANT: Next steps for your carpool'
+        subject: 'Next steps for hosting your phone bank'
       },
       'default' : {
         template: 'generic-event-instructions',

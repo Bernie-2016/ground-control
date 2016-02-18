@@ -13,7 +13,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <!-- this has to do with fonts -->
     <script src="/admin/events/static/vga4irg.js"></script>
-    <script>try{Typekit.load()}catch(e){}</script>
+    <script>try{Typekit.load();}catch(e){}</script>
     <link rel="stylesheet/less" type="text/css" href="/admin/events/static/clndr.less" />
     <link rel="stylesheet" id="bsd-css" href="/admin/events/static/signup.css" type="text/css" media="all">
     <style>
@@ -133,27 +133,20 @@
     <script src="/admin/events/static/clndr.js"></script>
   </head>
   <body class="event-central step2">
+    {{#if is_public}}
     <header id="bsd-header" class="clear">
       <div class="container">
         <a href="https://berniesanders.com/">
           <h1>Bernie Sanders for President</h1>
         </a>
-        {{#if is_public}}
         <div class="contribute">
           <a href="https://secure.actblue.com/contribute/page/lets-go-bernie?refcode=action-page" class="contribute">
           Contribute
           </a>
         </div>
-        {{else}}
-        <div style="float: right">
-          <h2 style="color:#EC3E3E">
-            Admin
-          </h2>
-        </div>
-        {{/if}}
       </div>
     </header>
-
+    {{/if}}
     <div class="content" style="visibility: visible;">
       <div id="SKIN" class="module_event2 bsd-page bsd-event bsd-event-createdetails">
         <div class="basic container">
@@ -181,7 +174,7 @@
                 </div>
                 <div class="inputgroup">
                   <div class="label">
-                    <label class="form_label" for="event_type_id">Event Type:</label>
+                    <label class="form_label">Event Type:</label>
                   </div>
                   <div class="field">
                     <div class="select-wrapper" style="float:none;">
@@ -220,13 +213,30 @@
                       });
                     </script>
                     <span class="explain">(Say a little more about your event and why people should attend)</span>
+                    {{#if is_public }}
                     <div class="checkboxgroup">
                       <label class="form_label" for="is_searchable">Make this event public?</label>
                       <input name="is_searchable" type="checkbox" value="1" id="is_searchable" checked="checked">
                     </div>
+                    {{ else }}
+                    <div class="inputgroup">
+                      <div class="label">
+                        <label class="form_label">Make this event public?</label>
+                      </div>
+                      <div class="field">
+                        <div class="select-wrapper" style="float:none;">
+                          <select size="1" name="is_searchable">
+                            <option value="1">Make Public</option>
+                            <option value="0">Make Private</option>
+                            <!-- <option value="-2">Use Event Type Default</option> -->
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    {{/if}}
                     <div class="checkboxgroup">
-                      <label class="form_label" for="host_receive_rsvp_emails">Receive email when others sign up?</label>
-                      <input name="host_receive_rsvp_emails" type="checkbox" value="1" id="host_receive_rsvp_emails" checked="checked">
+                      <label class="form_label" for="qf_aa7bcc">Receive email when users sign up?</label>
+                      <input name="host_receive_rsvp_emails" type="checkbox" value="1" id="qf_aa7bcc" checked="checked">
                     </div>
                     <div class="inputgroup checkboxgroup">
                       <div class="label">
@@ -261,7 +271,7 @@
                   </div>
                   <div class="hideabletable" id="rsvp_email_reminder_hours_section">
                     <div class="label">
-                      <label class="form_label" for="rsvp_email_reminder_hours">Enter # of hours before event to send reminder:</label>
+                      <label class="form_label">Enter # of hours before event to send reminder:</label>
                     </div>
                     <div class="field">
                       <input size="8" id="rsvp_email_reminder_hours" name="rsvp_email_reminder_hours" type="number" value="8" min="0" step="0.5">
@@ -661,7 +671,6 @@
                   <div class="field">
                     <div class="select-wrapper">
                       <select name="start_tz" required>
-                        <option></option>
                         <option value="US/Eastern">US/Eastern, EST</option>
                         <option value="US/Michigan">US/Michigan, EST</option>
                         <option value="US/East-Indiana">US/East-Indiana, EST</option>
@@ -673,6 +682,7 @@
                         <option value="US/Alaska">US/Alaska, AKST</option>
                         <option value="US/Aleutian">US/Aleutian, HAST</option>
                         <option value="US/Hawaii">US/Hawaii, HST</option>
+                        <option selected="selected"></option>
                         <option value="Africa/Abidjan">Africa/Abidjan, GMT</option>
                         <option value="Africa/Accra">Africa/Accra, GMT</option>
                         <option value="Africa/Addis_Ababa">Africa/Addis_Ababa, EAT</option>
@@ -1188,9 +1198,65 @@
                       <select name="start_time[i]" required>
                         <option selected="selected"></option>
                         <option value="00">00</option>
+                        <option value="01">01</option>
+                        <option value="02">02</option>
+                        <option value="03">03</option>
+                        <option value="04">04</option>
+                        <option value="05">05</option>
+                        <option value="06">06</option>
+                        <option value="07">07</option>
+                        <option value="08">08</option>
+                        <option value="09">09</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
                         <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18">18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                        <option value="21">21</option>
+                        <option value="22">22</option>
+                        <option value="23">23</option>
+                        <option value="24">24</option>
+                        <option value="25">25</option>
+                        <option value="26">26</option>
+                        <option value="27">27</option>
+                        <option value="28">28</option>
+                        <option value="29">29</option>
                         <option value="30">30</option>
+                        <option value="31">31</option>
+                        <option value="32">32</option>
+                        <option value="33">33</option>
+                        <option value="34">34</option>
+                        <option value="35">35</option>
+                        <option value="36">36</option>
+                        <option value="37">37</option>
+                        <option value="38">38</option>
+                        <option value="39">39</option>
+                        <option value="40">40</option>
+                        <option value="41">41</option>
+                        <option value="42">42</option>
+                        <option value="43">43</option>
+                        <option value="44">44</option>
                         <option value="45">45</option>
+                        <option value="46">46</option>
+                        <option value="47">47</option>
+                        <option value="48">48</option>
+                        <option value="49">49</option>
+                        <option value="50">50</option>
+                        <option value="51">51</option>
+                        <option value="52">52</option>
+                        <option value="53">53</option>
+                        <option value="54">54</option>
+                        <option value="55">55</option>
+                        <option value="56">56</option>
+                        <option value="57">57</option>
+                        <option value="58">58</option>
+                        <option value="59">59</option>
                       </select>
                     </div>
                     &nbsp;
@@ -1225,10 +1291,10 @@
                 </div>
                 <div class="inputgroup">
                   <div class="label">
-                    <label class="form_label" for="contact_phone">Contact Phone:</label>
+                    <label class="form_label">Contact Phone:</label>
                   </div>
                   <div class="field">
-                    <input size="30" name="contact_phone" id="contact_phone" type="tel" required>
+                    <input size="30" name="contact_phone" type="tel" required>
                   </div>
                 </div>
                 <div class="inputgroup">
