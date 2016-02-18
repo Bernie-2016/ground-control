@@ -1,6 +1,6 @@
 var eventTypes = [
-	{
-		id: 14,
+	/*{
+		id: 'rally',
 		name: 'Rally (Official Campaign Event)',
 		defaultValues: {
 			name: 'Rally for Bernie',
@@ -10,13 +10,41 @@ var eventTypes = [
 		disabled: ['contact_phone'],
 		adminOnly: true
 	},
+	*/
 	{
-		id: 24,
+		id: 'volunteer-meeting',
 		name: 'Volunteer Activity or Meeting',
 		adminOnly: false
 	},
 	{
-		id: 30,
+		id: 'carpool-to-nevada',
+		name: 'Carpool to Nevada',
+		adminOnly: false,
+		labels: {
+			'host_receive_rsvp_emails': 'Receive an email when people join my carpool',
+			'attendee_volunteer_show': 'Ask riders to help out',
+		},
+		defaultValues: {
+			public_phone: 1,
+			venue_name: 'My car',
+			capacity: 4,
+			name: 'Carpool to Help Nevada Win!',
+			is_searchable: true,
+			rsvp_use_reminder_email: true,
+			rsvp_email_reminder_hours: 24,
+			start_tz: 'US/Pacific',
+			date: {
+				time: '6:00 AM',
+			},
+			duration_num: 40,
+			attendee_volunteer_message: 'If you can chip in for gas and snacks, please sign up as a volunteer. Thanks!',
+			host_receive_rsvp_emails: true,
+			attendee_volunteer_show: true,
+			description: '<a href="https://docs.google.com/document/d/1pEVXkHyf5wpr7k0IwwN4I6prXRZyvwrqOovQBW6utfU/edit">Click here to view Nevada Carpool FAQs</a><p>Join me and other Bernie supporters for a road trip to Nevada!</p><p>I’ll be leaving on [WRITE YOUR DEPARTURE DATE/TIME HERE] and returning on [WRITE YOUR RETURN DATE/TIME HERE]. The campaign isn’t providing housing, so we’ll figure out a hotel or something!</p><p>We’re going to travel to the help out in the crucial final days before Nevadans caucus on Saturday, Feb 20. Once we get to Nevada, Bernie staff on the ground will train us and plug us into the campaign so that we can be as effective as possible out in the field.</p><p>The main way we can help is by knocking on doors and talking to fellow Bernie supporters to caucus this Saturday. The staff in Nevada will provide us with a script, a list of voters to talk to, and a map of where to go. Together, we’ll  have thousands of strategic conversations about how this country belongs to all of us, not just the billionaire class.</p><p>A victory in Nevada will require us talking to as many voters as possible, so sign up and let’s go on a road trip!</p>'
+		}
+	},
+	{
+		id: 'ballot-access',
 		name: 'Gather Ballot Access Signatures',
 		defaultValues: {
 			name: 'Bernie Ballot Blast - PA Support Bernie and his Delegates and Collect Petition Signatures',
@@ -25,7 +53,7 @@ var eventTypes = [
 		adminOnly: false
 	},
 	{
-		id: 31,
+		id: 'phonebank',
 		name: 'Phonebank',
 		defaultValues: {
 			name: 'Phone banking for Bernie',
@@ -34,20 +62,42 @@ var eventTypes = [
 		adminOnly: false
 	},
 	{
-		id: 32,
+		id: 'canvass',
 		name: 'Canvass',
 		defaultValues: {
 			name: 'Door knocking for Bernie',
-			description: 'You\'re invited to join your neighbors and supporters to knock on the doors of undecided voters. We\'ll provide you with a script, a list of voters that you\'ll be talking to, and a map of where to go. We\'ll also train you to use your time effectively out in the field. You\'ll be able to talk to real people about how this country belongs to all of us, not just the billionaire class. Our victory starts with us knocking on doors together.',
+			description: 'You\'re invited to join your neighbors and supporters to knock on the doors of supporters and undecided voters. We\'ll provide you with a script, a list of voters that you\'ll be talking to, and a map of where to go. We\'ll also train you to use your time effectively out in the field. You\'ll be able to talk to real people about how this country belongs to all of us, not just the billionaire class. Our victory starts with us knocking on doors together.',
 		},
 		adminOnly: false
 	},
 	{
-		id: 41,
+		id: 'barnstorm',
 		name: 'Barnstorm',
 		defaultValues: {
+			name: 'Barnstorm Organizing Rally for Bernie',
+			description: '<p>Join other local volunteers and grassroots organizers for a “barnstorm" organizing rally and learn how to get to work for Bernie. A Bernie volunteer will present an update from the national campaign, talk about our plan to win and plug you into a voter contact program locally.</p><p>This will be a great opportunity to hear what\'s going on nationally and locally with the campaign, as well as a chance to meet other Bernie supporters from your community. Thank you for all that you\'ve contributed and all the hard work that you\'re about to do!</p>',
+
+			is_official: false,
+			attendee_volunteer_show: false,
+			host_receive_rsvp_emails: false,
+			date: {
+				time: '18:30:00',
+			},
+			duration_num: 90,
+			duration_unit: 1,
+			cons_name: '',
+			cons_email: userEmail,
+			rsvp_email_reminder_hours: '24',
+		},
+		disabled: ['attendee_volunteer_show'],
+		adminOnly: false
+	},
+	{
+		id: 'official-barnstorm',
+		name: 'Official Barnstorm',
+		defaultValues: {
 			name: 'Bernstorm - Organizing Rally with National Bernie Staff',
-			description: '<p>Join other local volunteers and grassroots organizers on <DOW, Month DD> as a representative from the national organizing staff, <STAFF> comes to <State> for a series of special organizing events.</p><p>We will discuss how we can rapidly grow our movement in the next several months as we enter the primary season. We will also be discussing local volunteer activities to help the early primary states.</p><p>This will be a great opportunity to hear what\'s going on nationally and locally with the campaign, as well as a chance to meet other Bernie supporters from your community. Thank you for all that you\'ve contributed and all the hard work that you\'re about to do!</p>',
+			description: '<p>Join other local volunteers and grassroots organizers on [DOW, Month DD] as a representative from the national organizing staff, [STAFF] comes to [STATE] for a series of special organizing events.</p><p>We will discuss how we can rapidly grow our movement in the next several months as we enter the primary season. We will also be discussing local volunteer activities to help the early primary states.</p><p>This will be a great opportunity to hear what\'s going on nationally and locally with the campaign, as well as a chance to meet other Bernie supporters from your community. Thank you for all that you\'ve contributed and all the hard work that you\'re about to do!</p>',
 			is_official: true,
 			attendee_volunteer_show: true,
 			host_receive_rsvp_emails: false,
@@ -59,11 +109,11 @@ var eventTypes = [
 			cons_name: 'Bernie 2016',
 			cons_email: userEmail
 		},
-		disabled: ['contact_phone'],
-		adminOnly: false
+		disabled: ['contact_phone', 'public_phone'],
+		adminOnly: true
 	},
 	{
-		id: 47,
+		id: 'vol2vol',
 		name: 'Vol 2 Vol Turnout Shift',
 		defaultValues: {
 			name: 'Vol2Vol Turnout Shift',
@@ -83,8 +133,8 @@ var eventTypes = [
 			start_tz: 'US/Eastern',
 			cons_name: 'Robert Reeves'
 		},
-		disabled: ['contact_phone'],
-		adminOnly: false
+		disabled: ['contact_phone', 'public_phone'],
+		adminOnly: true
 	}
 	// { // Keep this event type in as an example for providing extra default values
 	// 	id: 44,
@@ -124,7 +174,7 @@ var eventTypes = [
 var disabledInputs = [];
 function resetForm(){
 	var form = document.getElementById('secondform');
-	
+
 	$(form.start_tz).off("change");
 	clearEvents();
 	updateFormValue('is_official', false);
@@ -159,7 +209,7 @@ function setDefaults(eventTypeId){
 	var defaults = eventType.defaultValues;
 
 	form.event_type_id.value = eventType.id;
-	
+
 	// add default values
 	for (var property in defaults) {
 	  if (defaults.hasOwnProperty(property)) {
@@ -232,7 +282,7 @@ function setEventDate(dateMoment, auto_generated) {
 }
 
 function addEventDate(dateMoment, auto_generated) {
-	if (moment() >= dateMoment){
+	if (moment().subtract(1, 'days') >= dateMoment) {
 		console.error('Event date is in the past!');
 		return false;
 	};
