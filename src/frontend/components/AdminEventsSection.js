@@ -105,6 +105,8 @@ const KeyboardActionsInfo = () => (
   </div>
 )
 
+let events = []
+
 class AdminEventsSection extends React.Component {
   constructor(props) {
     super(props)
@@ -572,7 +574,6 @@ class AdminEventsSection extends React.Component {
   }
 
   _deleteEvent = () => {
-    let events = this.props.listContainer.events.edges
     let eventsToDelete = this.state.indexesMarkedForDeletion.map(index => {
       return events[index].node.id
     })
@@ -907,7 +908,6 @@ ${signature}`
   }
 
   renderEventPreviewModal() {
-    let events = this.props.listContainer.events.edges
 
     let customActions = [
       // <KeyboardActionsInfo key="0" />,
@@ -1038,7 +1038,6 @@ ${signature}`
 
   _iterateActiveEvent = (n) => {
     // Do not iterate if there are no more events available before/after current event
-    let events = this.props.listContainer.events.edges
 
     if (this.state.activeEventIndex === null ||
         this.state.activeEventIndex + n < 0 ||
@@ -1069,7 +1068,6 @@ ${signature}`
   }
 
   _handleEventConfirmation = (eventIndexes) => {
-    let events = this.props.listContainer.events.edges
     let eventsToConfirm = []
 
     events.forEach((event, index) => {
@@ -1091,14 +1089,13 @@ ${signature}`
   }
 
   _handleEventEmail = (eventIndex) => {
-    let events = this.props.listContainer.events.edges
     let eventId = events[eventIndex].node.id
 
     this.props.history.push(`/admin/events/${eventId}/emails/create`)
   }
 
   _handleRSVPDownload = (eventIndex) => {
-    const event = this.props.listContainer.events.edges[eventIndex].node
+    const event = events[eventIndex].node
     const data = event.attendees.map(
       (attendee) => JSON.flatten(attendee, {ignoreProps: ['__dataID__']})
     )
@@ -1191,7 +1188,6 @@ ${signature}`
 
   _masterCheckBoxChecked = (checkEvent, checked) => {
     let currentSelectedRows = []
-    let events = this.props.listContainer.events.edges
 
     if (checked) {
       for (let i=0; i<events.length; i++) {
@@ -1205,13 +1201,14 @@ ${signature}`
   }
 
   _handleQueryChange = (queryParams) => {
+    console.log('loading')
     this.props.relay.setVariables(queryParams, (readyState) => {
       if (readyState.ready) {
         setTimeout(() => {
           const relayProps = this.props.relay.variables;
           let hash = qs.parse(location.hash.substr(1));
           hash.query = relayProps;
-
+          console.log('finished')
           location.hash = qs.stringify(hash, { encode: false, skipNulls: true });
         }, 500);
       }
@@ -1219,8 +1216,7 @@ ${signature}`
   }
 
   render() {
-    let events = this.props.listContainer.events.edges;
-    console.log(events);
+    events = this.props.listContainer.events ? this.props.listContainer.events.edges : []
 
     return (
     <div>
@@ -1530,3 +1526,6 @@ export default Relay.createContainer(AdminEventsSection, {
     `
   }
 })
+
+
+
