@@ -7,8 +7,6 @@ import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle, SelectField, Drop
 import {Table, Column, ColumnGroup, Cell} from 'fixed-data-table'
 import {BernieText, BernieColors} from './styles/bernie-css'
 import moment from 'moment'
-import json2csv from 'json2csv'
-import qs from 'qs'
 import {states} from './data/states'
 import {USTimeZones} from './data/USTimeZones'
 
@@ -24,69 +22,6 @@ require('./styles/adminEventsSection.css')
 const publicEventsRootUrl = 'https://secure.berniesanders.com/page/event/detail/'
 
 const plurry = (n) => (Math.abs(n) == 1) ? '' : 's';
-
-const convertType = (value) => {
-  if (typeof value === 'object'){
-    let updatedValue = {}
-    Object.keys(value).forEach((key) => {
-      const currentValue = convertType(value[key])
-      if (currentValue != undefined)
-        value[key] = currentValue
-    })
-    return value
-  }
-  else if (value === 'none')
-    return null
-  else if (value === 'true')
-    return true
-  else if (value === 'false')
-    return false
-  else if (value != '' && !isNaN(value))
-    return Number(value)
-  else if (value)
-    return String(value)
-  else {
-    return undefined
-  }
-}
-
-JSON.flatten = (data, options) => {
-  let result = {}
-  let addProp = (prop, val) => {
-    if (options.ignoreProps && options.ignoreProps.length > 0){
-      const props = prop.split('.')
-      for (const item of props) {
-        if (options.ignoreProps.indexOf(item) > -1)
-          return
-      }
-    }
-    result[prop] = val
-  }
-  let recurse = (cur, prop) => {    
-    if (Object(cur) !== cur) {
-      addProp(prop, cur)
-    }
-    else if (Array.isArray(cur)) {
-      let l=cur.length;
-      for(let i=0; i<l; i++)
-        recurse(cur[i], `${prop}[${i}]`)
-    
-    if (l == 0)
-      addProp(prop, [])
-    }
-    else {
-      let isEmpty = true
-      for (let p in cur) {
-        isEmpty = false
-        recurse(cur[p], prop ? `${prop}.${p}` : p)
-      }
-      if (isEmpty && prop)
-        addProp(prop, {})
-    }
-  }
-  recurse(data, '')
-  return result
-}
 
 const keyboardActionStyles = {
   text: {fontSize: '0.9em', top: '-7px', color: BernieColors.gray, cursor: 'default'},
@@ -160,7 +95,7 @@ class AdminEventsSection extends React.Component {
         sortDir = 'DESC'
       }
 
-      this._handleQueryChange({
+      this.props.relay.setVariables({
         sortField: attribute,
         sortDirection: sortDir
       })
@@ -397,16 +332,6 @@ class AdminEventsSection extends React.Component {
             <FontIcon className="material-icons" color={iconColor} hoverColor={BernieColors.blue}>email</FontIcon>
         </IconButton>
 
-        <IconButton
-          title="download RSVPs"
-          disabled={(data[rowIndex].node.attendeesCount <= 0)}
-          onTouchTap={() => {
-            this._handleRSVPDownload([rowIndex])
-          }}
-          >
-            <FontIcon className="material-icons" color={iconColor} hoverColor={BernieColors.blue}>file_download</FontIcon>
-        </IconButton>
-
         {/*
           IconMenu does not not work inside of fixed-data-table cells because of overflow:hidden on parent divs;
           The plan is to use https://github.com/tajo/react-portal to overcome this limitation
@@ -440,7 +365,7 @@ class AdminEventsSection extends React.Component {
     const resultLengthMenuItems = resultLengthOptions.map((value) => <MenuItem value={value} key={value} primaryText={`${value} Events`} />)
 
     this._handleEventRequestLengthChange = (event, selectedIndex, value) => {
-      this._handleQueryChange({
+      this.props.relay.setVariables({
         numEvents: value
       })
 
@@ -657,16 +582,6 @@ Thank you again for your support and for helping to spread Bernie’s message!
 ${signature}`
       },
       {
-        reason: 'Canvass event in non-canvass state',
-        message: `Thank you for submitting your canvass event.  At the moment, we're not running volunteer-led canvasses in that area, however we do have other very important tasks where we'd like your help.
-
-In particular, we're asking volunteers to host phone banks to call voters in states with upcoming caucuses/primaries. You can create your phone bank event right here: https://organize.berniesanders.com/events/create#type=phonebank
-
-Again, thank you so much for your willingness to help spread Bernie's message.
-
-${signature}`
-      },
-      {
         reason: 'General Deletion Message',
         message: `Your event does not meet parameters at berniesanders.com/plan.
 
@@ -808,9 +723,25 @@ ${signature}`
           let filtersArray = jQuery(this.refs.eventSearchForm).serializeArray();
           let filtersObject = {};
           filtersArray.forEach((filter) => {
-            const currentValue = convertType(filter.value)
-            if (currentValue != undefined)
-              filtersObject[filter.name] = currentValue
+
+            filtersObject[filter.name] = filter.value;
+
+            if (filtersObject[filter.name] === 'none'){
+              filtersObject[filter.name] = null
+            }
+            else if (filtersObject[filter.name] === 'true'){
+              filtersObject[filter.name] = true
+            }
+            else if (filtersObject[filter.name] === 'false'){
+              filtersObject[filter.name] = false
+            }
+            else if (filtersObject[filter.name]){
+              filtersObject[filter.name] = String(filter.value)
+            }
+            else {
+              delete filtersObject[filter.name]
+            }
+
           });
 
           this._handleRequestFiltersChange(filtersObject, true);
@@ -1017,9 +948,9 @@ ${signature}`
         newVars['flagApproval'] = oldVars['flagApproval']
       }
 
-      this._handleQueryChange({filters: newVars})
+      this.props.relay.setVariables({filters: newVars})
     } else {
-      this._handleQueryChange({filters: Object.assign(oldVars, newVars)})
+      this.props.relay.setVariables(Object.assign(oldVars, newVars))
     }
 
     this.setState({selectedRows: []})
@@ -1097,43 +1028,6 @@ ${signature}`
     this.props.history.push(`/admin/events/${eventId}/emails/create`)
   }
 
-  _handleRSVPDownload = (eventIndex) => {
-    const event = this.props.listContainer.events.edges[eventIndex].node
-    const data = event.attendees.map(
-      (attendee) => JSON.flatten(attendee, {ignoreProps: ['__dataID__']})
-    )
-
-    let options = {
-      data,
-      fields: Object.keys(data[0])
-    }
-
-    json2csv(options, (err, csv) => {
-      if (err) console.log(err);
-
-      let byteNumbers = new Uint8Array(csv.length);
-
-      for (let i = 0; i < csv.length; i++){
-        byteNumbers[i] = csv.charCodeAt(i);
-      }
-      let blob = new Blob([byteNumbers], {type: "text/csv"});
-
-          // Construct the uri
-      let uri = URL.createObjectURL(blob);
-
-      // Construct the <a> element
-      let link = document.createElement("a");
-      link.download = `Event RSVPs (${event.eventIdObfuscated}).csv`;
-      link.href = uri;
-
-      document.body.appendChild(link);
-      link.click();
-
-      // Cleanup the DOM
-      document.body.removeChild(link);
-    })
-  }
-
   _handleEventEdit = (event, newData) => {
     this._handlePreviewRequestClose()
 
@@ -1204,20 +1098,6 @@ ${signature}`
     })
   }
 
-  _handleQueryChange = (queryParams) => {
-    this.props.relay.setVariables(queryParams, (readyState) => {
-      if (readyState.ready) {
-        setTimeout(() => {
-          const relayProps = this.props.relay.variables;
-          let hash = qs.parse(location.hash.substr(1));
-          hash.query = relayProps;
-
-          location.hash = qs.stringify(hash, { encode: false, skipNulls: true });
-        }, 500);
-      }
-    })
-  }
-
   render() {
     let events = this.props.listContainer.events.edges;
     console.log(events);
@@ -1274,7 +1154,7 @@ ${signature}`
             header={<this.HeaderCell content="Manage" />}
             cell={<this.ActionCell data={events} col="actions" />}
             fixed={true}
-            width={260}
+            width={220}
             align='center'
           />
         </ColumnGroup>
@@ -1426,36 +1306,14 @@ ${signature}`
   }
 }
 
-const getDefaultQuery = () => {
-  const hashParams = convertType(qs.parse(location.hash.substr(1), { strictNullHandling: true }))
-  let defaultParams = {
+export default Relay.createContainer(AdminEventsSection, {
+  initialVariables: {
     numEvents: 100,
     sortField: 'startDate',
     sortDirection: 'ASC',
-<<<<<<< HEAD
     filters: {flagApproval: true},
     hostFilters: {}
   },
-=======
-    filters: {flagApproval: true}
-  }
-  if (hashParams.query){
-    try {
-      let newQueryParams = Object.assign({}, defaultParams, hashParams.query)
-      newQueryParams.filters = Object.assign({}, defaultParams.filters, hashParams.query.filters)
-      return newQueryParams
-    }
-    catch(ex) {
-      console.error('Invalid query parameters', ex)
-    }
-  }
-
-  return defaultParams
-}
-
-export default Relay.createContainer(AdminEventsSection, {
-  initialVariables: getDefaultQuery(),
->>>>>>> master
   fragments: {
     listContainer: () => Relay.QL`
       fragment on ListContainer {
@@ -1517,17 +1375,6 @@ export default Relay.createContainer(AdminEventsSection, {
               rsvpUseReminderEmail
               rsvpEmailReminderHours
               attendeesCount
-              attendees {
-                firstName
-                lastName
-                phone
-                email
-                address {
-                  city
-                  state
-                  zip
-                }
-              }
             }
           }
         }

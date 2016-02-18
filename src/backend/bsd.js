@@ -475,7 +475,7 @@ export default class BSD {
         eventDate[key] = event[key]
       else if (key === 'duration')
         eventDate[key] = event[key]
-      else if (key === 'contact_phone' && event[key])
+      else if (key === 'contact_phone')
         inputs[key] = event[key].replace(/\D/g,'')
       else if (key === 'attendee_visibility') {
         inputs[key] = 'NONE'
