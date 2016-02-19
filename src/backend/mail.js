@@ -172,13 +172,16 @@ export default class MG {
 
   async sendAdminEventInvite(data) {
     let template = new EmailTemplate(templateDir + '/admin-event-invitation')
+    if (data.subject.match(/^Fwd: /)) {
+      data.subject = data.subject.replace(/^Fwd: /, '')
+    }
     let content = await template.render(data)
 
     let message = {
       from: data.senderAddress,
       'h:Reply-To': data.hostAddress,
       to: data.recipientAddress,
-      subject: data.subject.match(/^Fwd: /) ? data.subject : 'Fwd: ' + data.subject,
+      subject: 'Fwd: ' + data.subject,
       text: content.text
     }
 
