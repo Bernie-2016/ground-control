@@ -129,6 +129,8 @@ class AdminEventEmailCreationForm extends React.Component {
             defaultValue={{
               hostEmail: this.props.event.host.email
             }}
+            value={this.state}
+            onChange={model => this.setState(model)}
             onSubmit={(formValues) => {
               this.refs.mutationHandler.send({
                 listContainer: this.props.listContainer,
