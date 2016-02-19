@@ -874,7 +874,15 @@ ${signature}`
       {name: 'venueZip', label: 'Zip Code'},
       {name: 'latitude', label: 'Latitude', type: 'number'},
       {name: 'longitude', label: 'Longitude', type: 'number'},
-    ];
+    ]
+
+    const hostFilterInputs = [
+      {name: 'eventIdObfuscated', label: 'Event ID'},
+      {name: 'name', label: 'Event Name'},
+      {name: 'eventTypeId', label: 'Event Type', type: 'select', options: this.props.listContainer.eventTypes, optionValue: 'id'},
+      {name: 'isOfficial', label: 'Official Campaign Event', type: 'select', options: booleanOptions},
+      {name: 'isSearchable', label: 'Public Event', type: 'select', options: booleanOptions},
+    ]
 
     return (
       <Dialog

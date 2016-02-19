@@ -139,6 +139,15 @@ function eventFromAPIFields(fields) {
   return event
 }
 
+function preConcatObjectKeys(obj, string) {
+  let newObj = {}
+  Object.keys(obj).forEach((fieldName) => {
+    newObj[`${string}.${fieldName}`] = obj[fieldName]
+  })
+
+  return newObj
+}
+
 async function getPrimaryEmail(person, transaction) {
   let query = knex('bsd_emails')
     .where({
@@ -297,16 +306,23 @@ const GraphQLListContainer = new GraphQLObjectType({
           }
         })}
       },
-      resolve: async (event, {first, eventFilterOptions, sortField, sortDirection}, {rootValue}) => {
-        let filters = eventFromAPIFields(eventFilterOptions);
+      resolve: async (event, {first, eventFilterOptions, hostFilterOptions, sortField, sortDirection}, {rootValue}) => {
+        let eventFilters = eventFromAPIFields(eventFilterOptions)
+        let hostFilters = humps.decamelizeKeys(hostFilterOptions)
         let convertedSortField = eventFieldFromAPIField(sortField)
 
-        let events = await knex('bsd_events')
+        let eventsQuery = knex('bsd_events')
           .leftJoin('bsd_people', 'bsd_events.creator_cons_id', 'bsd_people.cons_id')
           .where('start_dt', '>=', new Date())
-          .where(filters)
+          .where(eventFilters)
           .limit(first)
           .orderBy(convertedSortField, sortDirection)
+
+        log.info(preConcatObjectKeys(hostFilters, 'bsd_people'))
+        if (Object.keys(hostFilters).length)
+          eventsQuery.where(preConcatObjectKeys(hostFilters, 'bsd_people'))
+
+        const events = await eventsQuery
         return connectionFromArray(events, {first})
       }
     },
