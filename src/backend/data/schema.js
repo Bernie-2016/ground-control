@@ -882,6 +882,12 @@ const GraphQLEvent = new GraphQLObjectType({
         }
         return foundPeople.slice(0, 500)
       }
+    },
+    boostAttendanceRequest: {
+      type: GraphQLBoostAttendanceRequest,
+      resolve: async (event) => {
+        return await knex('boost_attendance_request').where('event_id', event.event_id)
+      }
     }
   }),
   interfaces: [nodeInterface]
@@ -1361,7 +1367,8 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
 const GraphQLCreateBoostAttendanceRequest = mutationWithClientMutationId({
   name: 'CreateBoostAttendanceRequest',
   inputFields: {
-    hostMessage: { type: new GraphQLNonNull(GraphQLString) },
+    event_id: globalIdField('Event', (obj) => obj.event_id),
+    host_message: { type: new GraphQLNonNull(GraphQLString) },
   },
   outputFields: {
     listContainer: {
@@ -1369,12 +1376,16 @@ const GraphQLCreateBoostAttendanceRequest = mutationWithClientMutationId({
       resolve: () => SharedListContainer
     }
   },
-  mutateAndGetPayload: async ({hostMessage}, {rootValue}) => {
-    adminRequired(rootValue)
+  mutateAndGetPayload: async ({host_mssage, event_id}, {rootValue}) => {
 
-    // then a miracle happens ...
+    console.log(host_message)
+    console.log(event_id)
+    
+    return await knex.insert('boost_attendance_request', {
+        host_message: host_message,
+        event_id: event_id
+      })
 
-    return []
   }
 })
 

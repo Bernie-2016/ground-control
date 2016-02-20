@@ -37,7 +37,7 @@ class BoostEventAttendanceForm extends React.Component {
   }
 
   formSchema = yup.object({
-    hostMessage: yup.string().required(),
+    host_message: yup.string().required(),
   })
 
   state = {
@@ -47,7 +47,11 @@ class BoostEventAttendanceForm extends React.Component {
 
   render() {
 
-    let defaultHostMessage = this.props.event.boostAttendanceRequest.hostMessage ||
+    console.log('from render method');
+    console.log(this.props);
+    console.log(this.props.event);
+
+    let default_host_message = this.props.event.boostAttendanceRequest.host_message ||
                             "Hello, neighbors!\n\nI'm hosting a " +
                             this.props.event.eventType.name +
                             " and I need a few more Bernie supporters " +
@@ -59,7 +63,8 @@ class BoostEventAttendanceForm extends React.Component {
       <div style={this.styles.pageContainer}>
         <MutationHandler ref='mutationHandler'
                          successMessage='Event email sent!'
-                         mutationClass={CreateBoostAttendanceRequest} />
+                         mutationClass={CreateBoostAttendanceRequest}
+                         mutationName='createBoostAttendanceRequest' />
         <div style={BernieText.title}>
           Boost Attendance at your Event
         </div>
@@ -73,11 +78,12 @@ class BoostEventAttendanceForm extends React.Component {
           <GCForm
             schema={this.formSchema}
             defaultValue={{
-              hostMessage: this.props.hostMessage || defaultHostMessage
+              host_message: this.props.host_message || default_host_message
             }}
             onSubmit={(formValues) => {
               this.refs.mutationHandler.send({
                 listContainer: this.props.listContainer,
+                event_id: this.props.event.id,
                 ...formValues
               })
             }}
@@ -85,7 +91,7 @@ class BoostEventAttendanceForm extends React.Component {
             <p style={BernieText.inputLabel}>Author a message below about your event and why people should come out.
               We'll forward it on to potential attendees in your area.</p>
             <Form.Field
-              name='hostMessage'
+              name='host_message'
               multiLine={true}
               rows={12}
               label="Message From Host"
@@ -123,7 +129,7 @@ export default Relay.createContainer(BoostEventAttendanceForm, {
         contactPhone
         createDate
         description
-        duration
+        duration        
         eventIdObfuscated
         eventType {
           id

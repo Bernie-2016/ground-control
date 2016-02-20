@@ -35,8 +35,11 @@ export default class CreateBoostAttendanceRequest extends Relay.Mutation {
   }
 
   getVariables() {
+    console.log('this.props')
+    console.log(this.props)
     return {
-      hostMessage: this.props.hostMessage
+      host_message: this.props.host_message,
+      event_id: this.props.event_id
     }
   }
 }
