@@ -93,6 +93,20 @@ var eventTypes = [
 		adminOnly: false
 	},
 	{
+		id: 'get-out-the-vote',
+		name: 'Get Out the Vote',
+		useShifts: true,
+		adminOnly: true,
+		defaultValues: {
+			name: 'Get Out the Vote For Bernie!',
+			description: 'Join other volunteers in the area to help get out the vote for Bernie. You’ll get training, materials, and anything else you might need to put Bernie over the top in the upcoming election. This is the final push, so let’s give it all we’ve got!',
+			is_searchable: true,
+			host_receive_rsvp_emails: false,
+			attendee_volunteer_show: false,
+			capacity: 0
+		}
+	},
+	{
 		id: 'barnstorm',
 		name: 'Barnstorm',
 		defaultValues: {
