@@ -89,8 +89,8 @@ BSD is Blue State Digital and VAN is Voter Activation Network.  BSD is basically
 
 VAN and BSD have their own APIs, and currently Ground Control makes use of the BSD API heavily for its syncing purposes.
 
-    * [BSD API](https://www.bluestatedigital.com/page/api/doc)
-    * [VAN API](http://developers.ngpvan.com/van-api)
+* [Blue State Digital (BSD) API Reference](https://www.bluestatedigital.com/page/api/doc)
+* [Voter Activation Network (VAN) API Reference](http://developers.ngpvan.com/van-api)
 
 ## What stack is this project using?
 
