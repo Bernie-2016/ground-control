@@ -115,6 +115,7 @@ var eventTypes = [
 			is_searchable: true,
 			host_receive_rsvp_emails: false,
 			attendee_volunteer_show: false,
+			duration_allday: true,
 			capacity: 0
 		}
 	},
@@ -318,8 +319,8 @@ function updateFormValue(property, value) {
 		    form[property].placeholder = value;
 	  	}
 
-		  if (property === 'attendee_volunteer_show')
-		  	$('#attendee_volunteer_show').change()
+		  if (property === 'attendee_volunteer_show' || property === 'duration_allday')
+		  	$('[name="' + property + '"]').change()
 		  break
 	}
 }

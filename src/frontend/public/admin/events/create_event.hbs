@@ -1215,7 +1215,7 @@
                         <option value="1440">days</option>
                       </select>
                     </div>
-                    &nbsp; or &nbsp;<input onclick="document.secondform.duration_num.value=&#39;&#39;; document.secondform.duration.value=-1;" name="duration_allday" value="-1" type="radio" id="qf_c37f82"><label for="qf_c37f82">all day event</label>
+                    &nbsp; or &nbsp;<input name="duration_allday" value="-1" type="radio" id="qf_c37f82"><label for="qf_c37f82">all day event</label>
                   </div>
                 </div>
               </div>
@@ -1328,6 +1328,12 @@
               }
               else {
                 $('#avm_block').hide();
+              }
+            });
+            $('[name="duration_allday"]').on('change', function(){
+              if (this.checked){
+                $('[name="duration_num"').val('');  
+                $('[name="duration_unit"').prop('selectedIndex', -1);  
               }
             });
 
