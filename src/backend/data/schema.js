@@ -1069,7 +1069,9 @@ const GraphQLEditEvents = mutationWithClientMutationId({
           continue
         }
         else {
-          throw ex
+          log.error(`Unknown exception when updating event ${JSON.stringify(event)}`)
+          updateErrors.push(`${event.event_id_obfuscated}: ${ex.message}`)
+          log.error(ex)
         }
       }
 
