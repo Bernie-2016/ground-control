@@ -102,7 +102,7 @@ export default class TopNav extends React.Component {
               style={this.styles.logo}
           />}
           iconElementRight={
-            <div>
+            <div style={{top: '-4px', position: 'relative'}}>
               {this.props.extraTop}
               <Tabs valueLink={{
                 value: selectedTab ? selectedTab : 'none',

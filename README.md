@@ -21,7 +21,9 @@ If you ever want to re-seed the database, run
 
 The seed script will create an admin user with e-mail address `admin@localhost.com` and password `admin`.  Login with those credentials when you first go to `localhost:3000` and then check out `localhost:3000/admin`.
 
-### Linux
+If you ever add a new Node.js package, be sure to run `npm shrinkwrap` after you do or things will break for everyone else.
+
+### Linux (PROBABLY DEPRECATED)
 
 On Linux, follow the same directions as OS X above, but substitue `./setup-linux` for the equivalent OSx script.
 
@@ -37,20 +39,20 @@ Here is a list of Environment Variables and how they are used:
 
 You can find their defaults in `.env`
 
-* `BSD_HOST`: 
-* `BSD_API_ID`: 
-* `BSD_API_SECRET`: 
-* `MAILGUN_DOMAIN`: 
-* `MAILGUN_KEY`: 
-* `MAILGUN_DOMAIN`: 
-* `PORT`: 
-* `SESSION_SECRET`: 
-* `NODE_ENV`: 
-* `DATABASE_URL`: 
-* `config.use_env_variable`: 
-* `process.env.WEBPACK_PORT`: 
-* `APP_HOST`: 
-* `WEBPACK_PROXY_PORT`: 
+* `BSD_HOST`:
+* `BSD_API_ID`:
+* `BSD_API_SECRET`:
+* `MAILGUN_DOMAIN`:
+* `MAILGUN_KEY`:
+* `MAILGUN_DOMAIN`:
+* `PORT`:
+* `SESSION_SECRET`:
+* `NODE_ENV`:
+* `DATABASE_URL`:
+* `config.use_env_variable`:
+* `process.env.WEBPACK_PORT`:
+* `APP_HOST`:
+* `WEBPACK_PROXY_PORT`:
 
 ## What does this do and how do I get started?
 
@@ -87,14 +89,12 @@ BSD is Blue State Digital and VAN is Voter Activation Network.  BSD is basically
 
 VAN and BSD have their own APIs, and currently Ground Control makes use of the BSD API heavily for its syncing purposes.
 
-    * [BSD API](https://www.bluestatedigital.com/page/api/doc)
-    * [VAN API](http://developers.ngpvan.com/van-api)
+* [Blue State Digital (BSD) API Reference](https://www.bluestatedigital.com/page/api/doc)
+* [Voter Activation Network (VAN) API Reference](http://developers.ngpvan.com/van-api)
 
 ## What stack is this project using?
 
-We are using RethinkDB for our database.  Take a look at the [RethinkDB query language](https://www.rethinkdb.com/docs/guide/javascript/) -- it's a very powerful model for querying data by chaining together actions, and that is the main reason we are using it for this project.
-
-On top of that, we are creating a [GraphQL](http://graphql.org/) API.  GraphQL is designed to make it easy to build APIs for objects that have many relationships.  On the frontend, we are using [React](https://facebook.github.io/react/) for the view layer, and React talks to GraphQL via [Relay](https://facebook.github.io/relay/).
+We are using PostgreSQL for our database. On top of that, we are creating a [GraphQL](http://graphql.org/) API.  GraphQL is designed to make it easy to build APIs for objects that have many relationships.  On the frontend, we are using [React](https://facebook.github.io/react/) for the view layer, and React talks to GraphQL via [Relay](https://facebook.github.io/relay/).
 
 If you are feeling stuck/aren't familiar with any of this and want some help, please don't bang your head against a wall!  Talk to me (saikat@berniesanders.com, @saikat in the BernieBuilders Slack).
 

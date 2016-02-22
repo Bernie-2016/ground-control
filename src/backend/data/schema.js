@@ -703,15 +703,6 @@ const GraphQLEventType = new GraphQLObjectType({
   })
 })
 
-const GraphQLEventAttendee = new GraphQLObjectType({
-  name: 'EventAttendee',
-  description: 'An event attendee',
-  fields: () => ({
-    id: globalIdField('EventAttendee', (obj) => obj.event_attendee_id),
-  }),
-  interfaces: [nodeInterface]
-})
-
 let {
   connectionType: GraphQLEventTypeConnection,
 } = connectionDefinitions({
@@ -853,15 +844,27 @@ const GraphQLEvent = new GraphQLObjectType({
         return count[0].count
       }
     },
+    attendees: {
+      type: new GraphQLList(GraphQLPerson),
+      resolve: async (event, _, {rootValue}) => {
+        const attendeeIds = await knex('bsd_event_attendees').select('attendee_cons_id', 'event_id').where('event_id', event.event_id);
+        let attendees = [];
+        for (let i = 0; i < attendeeIds.length; i++) {
+          let attendee = await rootValue.loaders.bsdPeople.load(attendeeIds[i].attendee_cons_id);
+          attendees.push(attendee);
+        }
+        return attendees
+      }
+    },
     nearbyPeople: {
       type: new GraphQLList(GraphQLPerson),
-      resolve: async(event, _, {rootValue}) => {
+      resolve: async (event, _, {rootValue}) => {
         let maxRadius = 50000;
         let radius = 1000;
         let backoff = 1000;
         let foundPeople = [];
 
-        while (foundPeople.length < 500 && radius <= maxRadius) {
+        while (foundPeople.length < 250 && radius <= maxRadius) {
           let foundConsIds = foundPeople.map((person) => person.cons_id)
           let query = knex('bsd_addresses')
             .select('bsd_people.*')
@@ -872,7 +875,7 @@ const GraphQLEvent = new GraphQLObjectType({
             .whereNotIn('bsd_people.cons_id', foundConsIds)
             .whereRaw(`st_dwithin(bsd_addresses.geom, '${event.geom}', ${radius})`)
             .whereNull('communications.id')
-            .limit(500)
+            .limit(250)
           log.info(`Running query: ${query.toString()}`)
           let people = await query
           foundPeople = foundPeople.concat(people)
@@ -880,7 +883,7 @@ const GraphQLEvent = new GraphQLObjectType({
           if (radius === 15000)
             backoff = 5000;
         }
-        return foundPeople.slice(0, 500)
+        return foundPeople.slice(0, 250)
       }
     },
     boostAttendanceRequest: {
@@ -1048,9 +1051,16 @@ const GraphQLEditEvents = mutationWithClientMutationId({
         ...newEventData
       }
 
+      // Delete empty event data
+      Object.keys(event).forEach((key) => {
+        if (event[key] === '') {
+          delete event[key]
+        }
+      })
+
       // Require phone number for RSVPs to phonebanks
-      if (event['event_type_id'] === '31'){
-        event['attendee_require_phone'] = 1;
+      if (event['event_type_id'] == '31' || event['event_type_id'] == '39'){
+        event['attendee_require_phone'] = 1
       }
 
       log.debug('Updated event:', event)
