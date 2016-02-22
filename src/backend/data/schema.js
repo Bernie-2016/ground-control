@@ -886,7 +886,9 @@ const GraphQLEvent = new GraphQLObjectType({
     boostAttendanceRequest: {
       type: GraphQLBoostAttendanceRequest,
       resolve: async (event) => {
-        return await knex('boost_attendance_request').where('event_id', event.event_id)
+        let req = await knex.table('boost_attendance_request')
+                          .where('event_id', event['event_id'])
+        return req[0]
       }
     }
   }),
@@ -1367,8 +1369,8 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
 const GraphQLCreateBoostAttendanceRequest = mutationWithClientMutationId({
   name: 'CreateBoostAttendanceRequest',
   inputFields: {
-    event_id: globalIdField('Event', (obj) => obj.event_id),
-    host_message: { type: new GraphQLNonNull(GraphQLString) },
+    eventId: globalIdField('Event', (obj) => obj.event_id),
+    hostMessage: { type: new GraphQLNonNull(GraphQLString) },
   },
   outputFields: {
     listContainer: {
@@ -1376,14 +1378,37 @@ const GraphQLCreateBoostAttendanceRequest = mutationWithClientMutationId({
       resolve: () => SharedListContainer
     }
   },
-  mutateAndGetPayload: async ({host_mssage, event_id}, {rootValue}) => {
+  mutateAndGetPayload: async ({hostMessage, eventId}, {rootValue}) => {
 
-    console.log(host_message)
-    console.log(event_id)
+    let intEventId = fromGlobalId(eventId).id
+
+    console.log('existing');
+
+    let existingRecord = await knex.table('boost_attendance_request')
+                            .where('event_id', intEventId)
+
+    console.log(existingRecord);
+    console.log('existing 2');
+
+    if(existingRecord.length){
+      console.log('yoooo');
+      await knex.table('boost_attendance_request')
+                            .where('event_id', intEventId)
+                            .update({
+                              'host_message': hostMessage
+                            });
+
+      console.log('found it');
+
+      let updatedRecord = await knex.table('boost_attendance_request')
+                            .where('event_id', intEventId)
+      console.log(updatedRecord)
+      return updatedRecord
+    }
     
-    return await knex.insert('boost_attendance_request', {
-        host_message: host_message,
-        event_id: event_id
+    return await knex.insertAndFetch('boost_attendance_request', {
+        host_message: hostMessage,
+        event_id: intEventId
       })
 
   }

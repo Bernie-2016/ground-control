@@ -7,7 +7,8 @@ var sharedConfig = {
   migrations: {
     tableName: 'knex_migrations',
     directory: './migrations'
-  }
+  },
+  'debug': true
 }
 
 var development = {

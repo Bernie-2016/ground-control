@@ -4,6 +4,8 @@ exports.up = async function(knex, Promise) {
         table.increments('id').primary();
         table.bigint('event_id').notNullable().index().references('event_id').inTable('bsd_events');
         table.text('host_message').notNullable();
+        table.timestamp('modified_dt').notNullable();
+        table.timestamp('create_dt').notNullable();
     })
   
 };
