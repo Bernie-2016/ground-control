@@ -501,19 +501,16 @@ const GraphQLUser = new GraphQLObjectType({
 
           let previousCallsSubquery = knex('bsd_calls')
             .select('interviewee_id')
+            // Don't call people we have successfully canvassed
             .where(function() {
               this.where('completed', true)
-                .where('attempted_at', '>', new Date(new Date() - 14 * 24 * 60 * 60 * 1000))
-            })
-            .orWhere(function() {
-              this.whereIn('reason_not_completed', ['NOT_INTERESTED'])
-                .where('attempted_at', '>', new Date(new Date() - 21 * 24 * 60 * 60 * 1000))
-            })
-            .orWhere(function() {
-              this.whereIn('reason_not_completed', ['NO_PICKUP', 'CALL_BACK'])
-                .where('attempted_at', '>', new Date(new Date() - 7 * 24 * 60 * 60 * 1000))
+                .where('call_assignment_id', localId)
             })
             .orWhereIn('reason_not_completed', ['WRONG_NUMBER', 'DISCONNECTED_NUMBER', 'OTHER_LANGUAGE'])
+            .orWhere(function() {
+              this.whereIn('reason_not_completed', ['NO_PICKUP', 'CALL_BACK'])
+                .where('attempted_at', '>', new Date(new Date() - 24 * 60 * 60 * 1000))
+            })
             .orWhere(function() {
               this.where('call_assignment_id', localId)
                 .where('reason_not_completed', 'NOT_INTERESTED')
@@ -530,8 +527,6 @@ const GraphQLUser = new GraphQLObjectType({
             query = query
               .from('bsd_person_gc_bsd_groups as bsd_people')
               .where('gc_bsd_group_id', group.id)
-//            if (shouldOrder)
-//              query = query.orderBy('bsd_people.id')
           } else {
             query = query.from('bsd_people')
           }
@@ -551,7 +546,6 @@ const GraphQLUser = new GraphQLObjectType({
             .join('bsd_phones', 'bsd_people.cons_id', 'bsd_phones.cons_id')
             .join('bsd_addresses', 'bsd_people.cons_id', 'bsd_addresses.cons_id')
             .join('zip_codes', 'zip_codes.zip', 'bsd_addresses.zip')
-            // Doing these subqueries instead of a left outer join because a left outer join seems to make the whole thing run really slow if I add any sort of sorting at the end of this query.
             .whereNotIn('bsd_people.cons_id', previousCallsSubquery)
             .whereNotIn('bsd_people.cons_id', assignedCallsSubquery)
             .whereNotIn('bsd_addresses.state_cd', ['IA', 'NH', 'NV', 'SC'])
