@@ -888,7 +888,8 @@ const GraphQLEvent = new GraphQLObjectType({
       resolve: async (event) => {
         let req = await knex.table('boost_attendance_request')
                           .where('event_id', event['event_id'])
-        return req[0]
+        log.info(req)
+        return humps.camelizeKeys(req[0])
       }
     }
   }),
@@ -1419,7 +1420,6 @@ const GraphQLBoostAttendanceRequest = new GraphQLObjectType({
   description: 'A request from event hosts to send a FastForward invite',
   fields: () => ({
     id: globalIdField('BoostAttendanceRequest'),
-    event: { type: GraphQLEvent },
     hostMessage: { type: GraphQLString }
   })
 })
