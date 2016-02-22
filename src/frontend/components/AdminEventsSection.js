@@ -431,13 +431,21 @@ class AdminEventsSection extends React.Component {
   renderToolbar() {
     const approvalFilterOptions = [
       {value: 1, 'text': 'Pending Approval'},
-      {value: 0, 'text': 'Approved Events'}
+      {value: 0, 'text': 'Approved Events'},
+      {value: 2, 'text': 'Approved Events With Boost Requests'}
     ]
 
     const approvalFilterMenuItems = approvalFilterOptions.map((item) => <MenuItem value={item.value} key={item.value} primaryText={item.text} />)
 
     const resultLengthOptions = [ 10, 25, 50, 100]
     const resultLengthMenuItems = resultLengthOptions.map((value) => <MenuItem value={value} key={value} primaryText={`${value} Events`} />)
+
+    this._handleApprovalFilterChange = (value) => {
+      this._handleQueryChange({
+        flagApproval: value == 1,
+        hasHostMessages: value == 2
+      })
+    }
 
     this._handleEventRequestLengthChange = (event, selectedIndex, value) => {
       this._handleQueryChange({
@@ -463,9 +471,9 @@ class AdminEventsSection extends React.Component {
       <Toolbar>
         <ToolbarGroup key={0} float="left">
           <DropDownMenu
-            value={this.props.relay.variables.filters.flagApproval ? 1 : 0}
+            value={this.props.relay.variables.filters.flagApproval ? 1 : this.props.relay.variables.hasHostMessages ? 2 : 0}
             onChange={(event, index, value) => {
-              this._handleRequestFiltersChange({flagApproval: (value == 1)});
+              this._handleApprovalFilterChange(value);
             }}
           >
             {approvalFilterMenuItems}
@@ -872,7 +880,7 @@ ${signature}`
       {name: 'venueState', label: 'State', type: 'select', options: states, optionValue: 'abbreviation'},
       {name: 'venueZip', label: 'Zip Code'},
       {name: 'latitude', label: 'Latitude', type: 'number'},
-      {name: 'longitude', label: 'Longitude', type: 'number'},
+      {name: 'longitude', label: 'Longitude', type: 'number'}
     ];
 
     return (
@@ -1012,11 +1020,12 @@ ${signature}`
   _handleRequestFiltersChange = (newVars, doNotPreserveOldFilters) => {
     let oldVars = this.props.relay.variables.filters;
 
+    console.log(newVars);
+
     if (doNotPreserveOldFilters) {
       if (!newVars.hasOwnProperty('flagApproval')) {
         newVars['flagApproval'] = oldVars['flagApproval']
       }
-
       this._handleQueryChange({filters: newVars})
     } else {
       this._handleQueryChange({filters: Object.assign(oldVars, newVars)})
@@ -1431,7 +1440,8 @@ const getDefaultQuery = () => {
     numEvents: 100,
     sortField: 'startDate',
     sortDirection: 'ASC',
-    filters: {flagApproval: true}
+    filters: {flagApproval: true},
+    hasHostMessages: false
   }
   if (hashParams.query){
     try {
@@ -1462,6 +1472,7 @@ export default Relay.createContainer(AdminEventsSection, {
         events(
           first: $numEvents
           filterOptions: $filters
+          hasHostMessages: $hasHostMessages
           sortField: $sortField
           sortDirection: $sortDirection
         ) {

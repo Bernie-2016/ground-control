@@ -291,6 +291,7 @@ const GraphQLListContainer = new GraphQLObjectType({
       args: {
         ...connectionArgs,
         filterOptions: {type: GraphQLEventInput },
+        hasHostMessages: {type: GraphQLBoolean},
         sortField: {type: GraphQLString},
         sortDirection: {type: new GraphQLEnumType({
           name: 'GraphQLSortDirection',
@@ -300,16 +301,21 @@ const GraphQLListContainer = new GraphQLObjectType({
           }
         })}
       },
-      resolve: async (event, {first, filterOptions, sortField, sortDirection}, {rootValue}) => {
+      resolve: async (event, {first, filterOptions, sortField, sortDirection, hasHostMessages}, {rootValue}) => {
         let filters = eventFromAPIFields(filterOptions);
         let convertedSortField = eventFieldFromAPIField(sortField)
 
-        let events = await knex('bsd_events')
+        let events = knex('bsd_events')
           .where('start_dt', '>=', new Date())
           .where(filters)
           .limit(first)
           .orderBy(convertedSortField, sortDirection)
-        return connectionFromArray(events, {first})
+
+        if(hasHostMessages){
+          events.join('boost_attendance_request', 'bsd_events.event_id', '=', 'boost_attendance_request.event_id')
+        }
+
+        return connectionFromArray(await events, {first})
       }
     },
     callAssignments: {
@@ -891,7 +897,6 @@ const GraphQLEvent = new GraphQLObjectType({
       resolve: async (event) => {
         let req = await knex.table('boost_attendance_request')
                           .where('event_id', event['event_id'])
-        log.info(req)
         return humps.camelizeKeys(req[0])
       }
     }

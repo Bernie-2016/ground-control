@@ -171,7 +171,7 @@ ReactDOM.render(
       </Route>
     </Route>
     <Route
-      path='/boost-event-attendance/:id'
+      path='/event/:id/request_email'
       component={BoostEventAttendanceForm}
         queries={{
           ...ListContainerQueries,

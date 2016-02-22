@@ -5,9 +5,12 @@ import {Paper, Slider, Toggle} from 'material-ui'
 import GCForm from './forms/GCForm'
 import Form from 'react-formal'
 import EventPreview from './EventPreview'
+import moment from 'moment';
 import MutationHandler from './MutationHandler'
 import CreateAdminEventEmail from '../mutations/CreateAdminEventEmail'
 import yup from 'yup'
+
+const publicEventsRootUrl = 'https://secure.berniesanders.com/page/event/detail/'
 
 class AdminEventEmailCreationForm extends React.Component {
   styles = {
@@ -114,6 +117,17 @@ class AdminEventEmailCreationForm extends React.Component {
 
     let disableSubmit = (this.props.event.nearbyPeople.length === 0)
 
+    let defaultSenderMessage = "Hi everyone,\n\n" +
+        "A local volunteer in " + this.props.event.venueCity + " has asked me " +
+        "to help her fill up a " + this.props.event.eventType.name + " she is hosting.\n\n" +
+        "It's on " + moment(this.props.event.startDate).format("dddd, MMMM Do [at] h:mma") +
+        ". You can get more info and RSVP at this link:\n\n" +
+        publicEventsRootUrl + this.props.event.eventIdObfuscated + "\n\n" + 
+        "Let's blow her away and get folks it help her out -- please sign up if you can!\n\n" +
+        "Thanks,\n" +
+        this.props.currentUser.email.split('@')[0].replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();}) + "\n" +
+        "Bernie 2016"
+
     return (
       <div style={this.styles.pageContainer}>
         <MutationHandler ref='mutationHandler'
@@ -127,7 +141,10 @@ class AdminEventEmailCreationForm extends React.Component {
           <GCForm
             schema={this.formSchema}
             defaultValue={{
-              hostEmail: this.props.event.host.email
+              senderEmail: this.props.currentUser.email,
+              senderMessage: defaultSenderMessage,
+              hostEmail: this.props.event.host.email,
+              hostMessage: this.props.event.boostAttendanceRequest ? this.props.event.boostAttendanceRequest.hostMessage : ''
             }}
             onSubmit={(formValues) => {
               this.refs.mutationHandler.send({
@@ -139,14 +156,21 @@ class AdminEventEmailCreationForm extends React.Component {
             }}
           >
             <Form.Field
+              name='senderEmail'
+              label="Sender Email Address"
+            />
+            <Form.Field
+              name='senderMessage'
+              multiLine={true}
+              rows={5}
+              label="Message From Sender"
+            />
+            <br />
+            <Form.Field
               name='hostEmail'
               label="Host Email Address"
             />
             <br />
-            <Form.Field
-              name='senderEmail'
-              label="Sender Email Address"
-            />
             <Form.Field
               name='hostMessage'
               multiLine={true}
@@ -154,12 +178,6 @@ class AdminEventEmailCreationForm extends React.Component {
               label="Message From Host"
             />
             <br />
-            <Form.Field
-              name='senderMessage'
-              multiLine={true}
-              rows={5}
-              label="Message From Sender"
-            />
             <br />
             <br />
             <Form.Field
@@ -222,6 +240,9 @@ export default Relay.createContainer(AdminEventEmailCreationForm, {
         attendeesCount
         attendeeVolunteerMessage
         attendeeVolunteerShow
+        boostAttendanceRequest{
+          hostMessage
+        }
         capacity
         contactPhone
         createDate
