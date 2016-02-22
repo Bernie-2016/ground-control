@@ -436,7 +436,7 @@ class AdminEventsSection extends React.Component {
 
     const approvalFilterMenuItems = approvalFilterOptions.map((item) => <MenuItem value={item.value} key={item.value} primaryText={item.text} />)
 
-    const resultLengthOptions = [ 10, 25, 50, 100]
+    const resultLengthOptions = [ 10, 25, 50, 100, 500]
     const resultLengthMenuItems = resultLengthOptions.map((value) => <MenuItem value={value} key={value} primaryText={`${value} Events`} />)
 
     this._handleEventRequestLengthChange = (event, selectedIndex, value) => {
@@ -1428,7 +1428,7 @@ ${signature}`
 const getDefaultQuery = () => {
   const hashParams = convertType(qs.parse(location.hash.substr(1), { strictNullHandling: true }))
   let defaultParams = {
-    numEvents: 100,
+    numEvents: 500,
     sortField: 'startDate',
     sortDirection: 'ASC',
     filters: {flagApproval: true}
