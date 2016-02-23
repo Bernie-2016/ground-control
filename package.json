@@ -55,7 +55,7 @@
     "json2csv": "^3.0.2",
     "knex": "^0.9.0",
     "mailgun-js": "0.7.6",
-    "material-ui": "^0.14.2",
+    "material-ui": "^0.14.4",
     "minilog": "^3.0.0",
     "moment": "^2.10.6",
     "moment-timezone": "^0.4.1",
