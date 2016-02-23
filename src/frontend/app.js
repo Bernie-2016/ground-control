@@ -55,7 +55,9 @@ window.onerror = (msg, file, line, col, error) => {
 };
 
 injectTapEventPlugin();
-Relay.injectNetworkLayer(new GCNetworkLayer('/graphql'));
+Relay.injectNetworkLayer(new GCNetworkLayer('/graphql'), {
+    fetchTimeout: 30000,   // Timeout after 30s.
+  });
 
 Form.addInputTypes({
   string: GCTextField,

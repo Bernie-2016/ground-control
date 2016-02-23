@@ -144,6 +144,9 @@ class EventEdit extends React.Component {
       isSearchable: yup.string()
         .default(String(event.isSearchable)),
 
+      isOfficial: yup.boolean()
+        .default(event.isOfficial),
+
       flagApproval: yup.boolean()
         .default(false)
 
@@ -324,6 +327,14 @@ class EventEdit extends React.Component {
           label='Make Event Public?'
           fullWidth={true}
           choices={this.eventSearchableOptions()}
+        />
+
+        <Form.Field
+          name="isOfficial"
+          label="Mark as an official campaign event"
+          onChange={(val) => {
+            this.props.onFieldChanged('isOfficial', val)
+          }}
         />
 
         <Form.Field
