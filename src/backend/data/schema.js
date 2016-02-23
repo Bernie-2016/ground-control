@@ -313,6 +313,7 @@ const GraphQLListContainer = new GraphQLObjectType({
 
         if(hasHostMessages){
           events.join('boost_attendance_request', 'bsd_events.event_id', '=', 'boost_attendance_request.event_id')
+              .whereNull('email_sent_dt')
         }
 
         return connectionFromArray(await events, {first})
@@ -1325,7 +1326,8 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
     hostMessage: { type: new GraphQLNonNull(GraphQLString) },
     senderMessage: { type: new GraphQLNonNull(GraphQLString) },
     recipients: { type: new GraphQLList(GraphQLString) },
-    toolPassword: { type: new GraphQLNonNull(GraphQLString) }
+    toolPassword: { type: new GraphQLNonNull(GraphQLString) },
+    eventId: { type: new GraphQLNonNull(GraphQLString) }
   },
   outputFields: {
     listContainer: {
@@ -1333,7 +1335,8 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
       resolve: () => SharedListContainer
     }
   },
-  mutateAndGetPayload: async ({hostEmail, senderEmail, adminEmail, hostMessage, senderMessage, recipients, toolPassword}, {rootValue}) => {
+  mutateAndGetPayload: async ({hostEmail, senderEmail, adminEmail, hostMessage, senderMessage, recipients, toolPassword, eventId}, {rootValue}) => {
+
     adminRequired(rootValue)
 
     // TODO: remove this goofy protection when the tool is ready
@@ -1378,6 +1381,16 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
       }
     })
 
+    // somewhat hackish; catches Test Mode.
+    // don't mark it as sent until it goes out to volunteers.
+    if(recipients.length > 1){
+      await knex.table('boost_attendance_request')
+              .where('event_id', fromGlobalId(eventId).id)
+              .update({
+                'email_sent_dt': new Date()
+              })
+    }
+
     return []
   }
 })
@@ -1398,27 +1411,19 @@ const GraphQLCreateBoostAttendanceRequest = mutationWithClientMutationId({
 
     let intEventId = fromGlobalId(eventId).id
 
-    console.log('existing');
-
     let existingRecord = await knex.table('boost_attendance_request')
                             .where('event_id', intEventId)
 
-    console.log(existingRecord);
-    console.log('existing 2');
-
     if(existingRecord.length){
-      console.log('yoooo');
       await knex.table('boost_attendance_request')
                             .where('event_id', intEventId)
                             .update({
                               'host_message': hostMessage
                             });
 
-      console.log('found it');
-
       let updatedRecord = await knex.table('boost_attendance_request')
                             .where('event_id', intEventId)
-      console.log(updatedRecord)
+      
       return updatedRecord
     }
     

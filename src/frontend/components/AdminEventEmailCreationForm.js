@@ -132,7 +132,8 @@ class AdminEventEmailCreationForm extends React.Component {
       <div style={this.styles.pageContainer}>
         <MutationHandler ref='mutationHandler'
                          successMessage='Event email sent!'
-                         mutationClass={CreateAdminEventEmail} />
+                         mutationClass={CreateAdminEventEmail}
+                         mutationName='createAdminEventEmail' />
         <div style={BernieText.title}>
           Send Event Email
         </div>
@@ -151,6 +152,7 @@ class AdminEventEmailCreationForm extends React.Component {
                 listContainer: this.props.listContainer,
                 adminEmail: this.props.currentUser.email,
                 recipients: recipients.slice(0, recipientLimit),
+                eventId: this.props.event.id,
                 ...formValues
               })
             }}
