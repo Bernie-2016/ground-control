@@ -49,8 +49,8 @@ window.onerror = (msg, file, line, col, error) => {
 
   log.error(error)
   setTimeout(() => {
-    // alert('Whoops! Something went wrong. We\'re looking into it, but in the meantime please refresh your browser.')
-    // document.location.reload(true)
+    alert('Whoops! Something went wrong. We\'re looking into it, but in the meantime please refresh your browser.')
+    document.location.reload(true)
   }, 2000)
 };
 
