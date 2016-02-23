@@ -281,6 +281,10 @@ const GraphQLDate = new GraphQLScalarType({
   }
 })
 
+const addWhere = ({ query, property, value, operator='=', method='where' }) => {
+  return query[method](property, operator, value)
+}
+
 const GraphQLListContainer = new GraphQLObjectType({
   name: 'ListContainer',
   fields: () => ({
@@ -308,22 +312,34 @@ const GraphQLListContainer = new GraphQLObjectType({
       },
       resolve: async (event, {first, eventFilterOptions, hostFilterOptions, sortField, sortDirection}, {rootValue}) => {
         let eventFilters = eventFromAPIFields(eventFilterOptions)
-        let hostFilters = humps.decamelizeKeys(hostFilterOptions)
         let convertedSortField = eventFieldFromAPIField(sortField)
 
-        let eventsQuery = knex('bsd_events')
-          .leftJoin('bsd_people', 'bsd_events.creator_cons_id', 'bsd_people.cons_id')
+        let events = knex('bsd_events')
           .where('start_dt', '>=', new Date())
           .where(eventFilters)
           .limit(first)
           .orderBy(convertedSortField, sortDirection)
 
-        log.info(preConcatObjectKeys(hostFilters, 'bsd_people'))
-        if (Object.keys(hostFilters).length)
-          eventsQuery.where(preConcatObjectKeys(hostFilters, 'bsd_people'))
+        if (Object.keys(hostFilterOptions).length){
+          events = events.leftJoin('bsd_people', 'bsd_events.creator_cons_id', 'bsd_people.cons_id')
+          let hostFilters = humps.decamelizeKeys(hostFilterOptions)
+          
+          Object.keys(hostFilters).forEach((key) => {
+            if (key === 'email'){
+              events = events.join('bsd_emails', 'bsd_events.creator_cons_id', 'bsd_emails.cons_id')
+              events = addWhere({query: events, property: `bsd_emails.${key}`, value: hostFilters[key]})
+            }
+            else if (key === 'phone'){
+              events = events.join('bsd_phones', 'bsd_events.creator_cons_id', 'bsd_phones.cons_id')
+              events = addWhere({query: events, property: `bsd_phones.${key}`, value: hostFilters[key]})
+            }
+            else {
+              events = addWhere({query: events, property: `bsd_people.${key}`, value: hostFilters[key]})
+            }
+          })
+        }
 
-        const events = await eventsQuery
-        return connectionFromArray(events, {first})
+        return connectionFromArray(await events, {first})
       }
     },
     callAssignments: {
@@ -696,9 +712,9 @@ const GraphQLPersonInput = new GraphQLInputObjectType({
   fields: {
     id: { type: GraphQLString },
     prefix: { type: GraphQLString },
-    firstName: { type: GraphQLString },
-    middleName: { type: GraphQLString },
-    lastName: { type: GraphQLString },
+    firstname: { type: GraphQLString },
+    middlename: { type: GraphQLString },
+    lastname: { type: GraphQLString },
     suffix: { type: GraphQLString },
     gender: { type: GraphQLString },
     birthDate: { type: GraphQLDate },

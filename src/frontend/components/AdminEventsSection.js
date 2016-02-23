@@ -467,7 +467,7 @@ class AdminEventsSection extends React.Component {
           <DropDownMenu
             value={this.props.relay.variables.filters.flagApproval ? 1 : 0}
             onChange={(event, index, value) => {
-              this._handleRequestFiltersChange({flagApproval: (value == 1)});
+              this._handleRequestFiltersChange({newVars: {flagApproval: (value == 1)}});
             }}
           >
             {approvalFilterMenuItems}
@@ -787,6 +787,7 @@ ${signature}`
   }
 
   renderFiltersModal() {
+
     const standardActions = [
       <FlatButton
         label="Cancel"
@@ -799,7 +800,8 @@ ${signature}`
         label="Clear"
         secondary={true}
         onTouchTap={() => {
-          this._handleRequestFiltersChange({}, true);
+          this._handleRequestFiltersChange({newVars: {}, doNotPreserveOldFilters: true});
+          this._handleRequestFiltersChange({filterKey: 'hostFilters', newVars: {}, doNotPreserveOldFilters: true});
         }}
       />,
       <FlatButton
@@ -807,27 +809,48 @@ ${signature}`
         primary={true}
         onTouchTap={() => {
           let filtersArray = jQuery(this.refs.eventSearchForm).serializeArray();
-          let filtersObject = {};
+          let eventFiltersObject = {};
+          let hostFiltersObject = {};
+
           filtersArray.forEach((filter) => {
+            console.log(filter)
             const currentValue = convertType(filter.value)
-            if (currentValue != undefined)
-              filtersObject[filter.name] = currentValue
+            if (currentValue != undefined){
+              if (containsInput(filterInputs, filter.name))
+                eventFiltersObject[filter.name] = currentValue
+              if (containsInput(hostFilterInputs, filter.name))
+                hostFiltersObject[filter.name] = currentValue
+            }
           });
 
-          this._handleRequestFiltersChange(filtersObject, true);
+          console.log(eventFiltersObject, hostFiltersObject);
+
+          this._handleRequestFiltersChange({newVars: eventFiltersObject, doNotPreserveOldFilters: true});
+          this._handleRequestFiltersChange({filterKey: 'hostFilters', newVars: hostFiltersObject, doNotPreserveOldFilters: true});
           this.setState({showFiltersDialog: false});
         }}
       />,
     ];
 
+    const containsInput = (inputArray, inputProp, key='name') => {
+      let found = false
+      for(let i = 0; i < inputArray.length; i++) {
+        if (inputArray[i][key] === inputProp) {
+          found = true
+          break
+        }
+      }
+      return found
+    }
+
     const labelStyle = { display: 'inline', marginRight: '0.5em', fontSize: '0.8em' }
 
-    const FilterInput = ({name, label, type='text'}) => (
+    const FilterInput = ({filterProperty, name, label, type='text'}) => (
       <div>
         <label htmlFor={name} style={labelStyle}>{label}: </label>
         <input
           name={name}
-          defaultValue={this.props.relay.variables.filters[name]}
+          defaultValue={filterProperty[name]}
           type={type}
         />
       </div>
@@ -843,20 +866,6 @@ ${signature}`
         value: false
       }
     ];
-    const FilterSelect = ({name, label, options, optionName='name', optionValue='value'}) => (
-      <div>
-        <label htmlFor={name} style={labelStyle}>{label}: </label>
-        <select
-          name={name}
-          defaultValue={this.props.relay.variables.filters[name]}
-        >
-          <option value='none'>--</option>
-          {options.map((item, index) => {
-            return <option key={index} value={item[optionValue]}>{item[optionName]}</option>
-          })}
-        </select>
-      </div>
-    );
 
     const filterInputs = [
       {name: 'eventIdObfuscated', label: 'Event ID'},
@@ -874,19 +883,47 @@ ${signature}`
       {name: 'venueZip', label: 'Zip Code'},
       {name: 'latitude', label: 'Latitude', type: 'number'},
       {name: 'longitude', label: 'Longitude', type: 'number'},
-    ]
+    ];
 
     const hostFilterInputs = [
-      {name: 'eventIdObfuscated', label: 'Event ID'},
-      {name: 'name', label: 'Event Name'},
-      {name: 'eventTypeId', label: 'Event Type', type: 'select', options: this.props.listContainer.eventTypes, optionValue: 'id'},
-      {name: 'isOfficial', label: 'Official Campaign Event', type: 'select', options: booleanOptions},
-      {name: 'isSearchable', label: 'Public Event', type: 'select', options: booleanOptions},
-    ]
+      {name: 'firstname', label: 'First Name'},
+      {name: 'middlename', label: 'Middle Name'},
+      {name: 'lastname', label: 'Last Name'},
+      {name: 'email', label: 'Email Address'},
+      {name: 'phone', label: 'Phone Number'}
+    ];
+
+    const FilterSelect = ({filterProperty, name, label, options, optionName='name', optionValue='value'}) => (
+      <div>
+        <label htmlFor={name} style={labelStyle}>{label}: </label>
+        <select
+          name={name}
+          defaultValue={filterProperty[name]}
+        >
+          <option value='none'>--</option>
+          {options.map((item, index) => {
+            return <option key={index} value={item[optionValue]}>{item[optionName]}</option>
+          })}
+        </select>
+      </div>
+    );
+
+    const FilterGroup = ({filterProperty, name, inputs, containerStyle}) => (
+        <div style={containerStyle}>
+          <h3 style={{marginBottom: '0.5em'}}>{name}</h3>
+          {inputs.map((input, index) => {
+            if (input.type == 'select'){
+              return <FilterSelect name={input.name} label={input.label} options={input.options} optionValue={input.optionValue} optionName={input.optionName} key={index} filterProperty={filterProperty} />
+            }
+            else {
+              return <FilterInput name={input.name} label={input.label} type={input.type} key={index} filterProperty={filterProperty} />
+            }
+          })}
+        </div>
+      )
 
     return (
       <Dialog
-        title='Event Filters'
         actions={standardActions}
         open={this.state.showFiltersDialog}
         onRequestClose={() => {
@@ -902,14 +939,8 @@ ${signature}`
           e.preventDefault();
         }}
       >
-        {filterInputs.map((input, index) => {
-          if (input.type == 'select'){
-            return <FilterSelect name={input.name} label={input.label} options={input.options} optionValue={input.optionValue} optionName={input.optionName} key={index} />
-          }
-          else {
-            return <FilterInput name={input.name} label={input.label} type={input.type} key={index} />
-          }
-        })}
+        <FilterGroup name='Event Filters' inputs={filterInputs} filterProperty={this.props.relay.variables.filters} containerStyle={{float: 'left', width: '50%'}} />
+        <FilterGroup name='Host Filters' inputs={hostFilterInputs} filterProperty={this.props.relay.variables.hostFilters} containerStyle={{marginLeft: '50%'}} />
       </form>
       </Dialog>
     )
@@ -1017,18 +1048,18 @@ ${signature}`
   }
 
 
-  _handleRequestFiltersChange = (newVars, doNotPreserveOldFilters) => {
-    let oldVars = this.props.relay.variables.filters;
+  _handleRequestFiltersChange = ({newVars, filterKey='filters', doNotPreserveOldFilters=false}) => {
+    let oldVars = this.props.relay.variables[filterKey]
 
     if (doNotPreserveOldFilters) {
-      if (!newVars.hasOwnProperty('flagApproval')) {
+      if (filterKey === 'filters' && !newVars.hasOwnProperty('flagApproval')) {
         newVars['flagApproval'] = oldVars['flagApproval']
       }
 
-      this._handleQueryChange({filters: newVars})
-    } else {
-      this._handleQueryChange({filters: Object.assign(oldVars, newVars)})
+      this._handleQueryChange({[filterKey]: newVars})
     }
+    else
+      this._handleQueryChange({[filterKey]: Object.assign(oldVars, newVars)})
 
     this.setState({selectedRows: []})
   }
@@ -1433,11 +1464,11 @@ ${signature}`
 const getDefaultQuery = () => {
   const hashParams = convertType(qs.parse(location.hash.substr(1), { strictNullHandling: true }))
   let defaultParams = {
-    numEvents: 500,
+    numEvents: 10,
     sortField: 'startDate',
     sortDirection: 'ASC',
     filters: {flagApproval: true},
-    hostFilters: {}
+    hostFilters: {firstname: 'Merle'}
   }
   if (hashParams.query){
     try {
