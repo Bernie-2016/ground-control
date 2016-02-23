@@ -30,6 +30,7 @@ import url from 'url'
 import TZLookup from 'tz-lookup'
 import BSDClient from '../bsd-instance'
 import {BSDValidationError, BSDExistsError} from '../bsd'
+import phoneFormatter from 'phone-formatter'
 import knex from './knex'
 import humps from 'humps'
 import log from '../log'
@@ -336,7 +337,7 @@ const GraphQLListContainer = new GraphQLObjectType({
             }
             else if (key === 'phone'){
               events = events.join('bsd_phones', 'bsd_events.creator_cons_id', 'bsd_phones.cons_id')
-              events = addWhere({query: events, property: `bsd_phones.${key}`, value: hostFilters[key]})
+              events = addWhere({query: events, property: `bsd_phones.${key}`, value: phoneFormatter.format(hostFilters[key], 'NNNNNNNNNN')})
             }
             else {
               events = addWhere({query: events, property: `bsd_people.${key}`, value: hostFilters[key]})
@@ -892,9 +893,7 @@ const GraphQLEvent = new GraphQLObjectType({
     },
     link: {
       type: GraphQLString,
-      resolve: (event) => {
-        return url.resolve('https://' + process.env.BSD_HOST, '/page/event/detail/' + event.event_id_obfuscated)
-      }
+      resolve: (event) => url.resolve(`https://${process.env.BSD_HOST}`, `/page/event/detail/${event.event_id_obfuscated}`)
     },
     attendeesCount: {
       type: GraphQLInt,

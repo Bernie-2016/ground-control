@@ -29,33 +29,6 @@ var eventTypes = [
 		adminOnly: false
 	},
 	{
-		id: 'carpool-to-nevada',
-		name: 'Carpool to Nevada',
-		adminOnly: false,
-		labels: {
-			'host_receive_rsvp_emails': 'Receive an email when people join my carpool',
-			'attendee_volunteer_show': 'Ask riders to help out',
-		},
-		defaultValues: {
-			public_phone: 1,
-			venue_name: 'My car',
-			capacity: 4,
-			name: 'Carpool to Help Nevada Win!',
-			is_searchable: true,
-			rsvp_use_reminder_email: true,
-			rsvp_email_reminder_hours: 24,
-			start_tz: 'US/Pacific',
-			date: {
-				time: '6:00 AM',
-			},
-			duration_num: 40,
-			attendee_volunteer_message: 'If you can chip in for gas and snacks, please sign up as a volunteer. Thanks!',
-			host_receive_rsvp_emails: true,
-			attendee_volunteer_show: true,
-			description: '<a href="https://docs.google.com/document/d/1pEVXkHyf5wpr7k0IwwN4I6prXRZyvwrqOovQBW6utfU/edit">Click here to view Nevada Carpool FAQs</a><p>Join me and other Bernie supporters for a road trip to Nevada!</p><p>I’ll be leaving on [WRITE YOUR DEPARTURE DATE/TIME HERE] and returning on [WRITE YOUR RETURN DATE/TIME HERE]. The campaign isn’t providing housing, so we’ll figure out a hotel or something!</p><p>We’re going to travel to the help out in the crucial final days before Nevadans caucus on Saturday, Feb 20. Once we get to Nevada, Bernie staff on the ground will train us and plug us into the campaign so that we can be as effective as possible out in the field.</p><p>The main way we can help is by knocking on doors and talking to fellow Bernie supporters to caucus this Saturday. The staff in Nevada will provide us with a script, a list of voters to talk to, and a map of where to go. Together, we’ll  have thousands of strategic conversations about how this country belongs to all of us, not just the billionaire class.</p><p>A victory in Nevada will require us talking to as many voters as possible, so sign up and let’s go on a road trip!</p>'
-		}
-	},
-	{
 		id: 'carpool',
 		name: 'Carpool to an early voting state',
 		adminOnly: false,
@@ -108,7 +81,8 @@ var eventTypes = [
 		id: 'get-out-the-vote',
 		name: 'Get Out the Vote',
 		useShifts: true,
-		adminOnly: true,
+		adminOnly: false,
+		disabled: ['contact_phone', 'public_phone'],
 		defaultValues: {
 			name: 'Get Out the Vote For Bernie!',
 			description: 'Join other volunteers in the area to help get out the vote for Bernie. You’ll get training, materials, and anything else you might need to put Bernie over the top in the upcoming election. This is the final push, so let’s give it all we’ve got!',

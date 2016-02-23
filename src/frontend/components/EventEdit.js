@@ -84,13 +84,13 @@ class EventEdit extends React.Component {
       duration: yup.object({
         h: yup.number()
           .default(Math.floor(event.duration / 60))
-          .min(0)
+          .min(-1)
           .nullable()
           .required(),
 
         m: yup.number()
           .default(event.duration % 60)
-          .min(0).max(59)
+          .min(-1).max(59)
           .nullable()
           .required(),
       }),
@@ -123,8 +123,7 @@ class EventEdit extends React.Component {
         .min(0)
         .required(),
       contactPhone: yup.string()
-        .default(event.contactPhone)
-        .required(),
+        .default(event.contactPhone),
 
       publicPhone: yup.boolean()
         .default(event.publicPhone),
