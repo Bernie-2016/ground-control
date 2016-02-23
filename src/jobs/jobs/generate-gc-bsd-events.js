@@ -20,7 +20,8 @@ export let job = async () => {
           event_id: event.event_id,
           followup_emailed: false,
           create_dt: now,
-          modified_dt: now
+          modified_dt: now,
+          pending_review: true
         }
       })
 
