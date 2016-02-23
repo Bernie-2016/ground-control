@@ -82,6 +82,7 @@ var eventTypes = [
 		name: 'Get Out the Vote',
 		useShifts: true,
 		adminOnly: false,
+		disabled: ['contact_phone', 'public_phone'],
 		defaultValues: {
 			name: 'Get Out the Vote For Bernie!',
 			description: 'Join other volunteers in the area to help get out the vote for Bernie. You’ll get training, materials, and anything else you might need to put Bernie over the top in the upcoming election. This is the final push, so let’s give it all we’ve got!',
