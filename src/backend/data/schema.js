@@ -883,9 +883,7 @@ const GraphQLEvent = new GraphQLObjectType({
     },
     link: {
       type: GraphQLString,
-      resolve: (event) => {
-        return url.resolve('https://' + process.env.BSD_HOST, '/page/event/detail/' + event.event_id_obfuscated)
-      }
+      resolve: (event) => url.resolve(`https://${process.env.BSD_HOST}`, `/page/event/detail/${event.event_id_obfuscated}`)
     },
     attendeesCount: {
       type: GraphQLInt,
