@@ -1468,7 +1468,7 @@ const getDefaultQuery = () => {
     sortField: 'startDate',
     sortDirection: 'ASC',
     filters: {flagApproval: true},
-    hostFilters: {firstname: 'Merle'}
+    hostFilters: {}
   }
   if (hashParams.query){
     try {
