@@ -444,8 +444,7 @@ class AdminEventsSection extends React.Component {
 
     this._handleApprovalFilterChange = (value) => {
       this._handleQueryChange({
-        flagApproval: value == 1,
-        hasHostMessages: value == 2
+        hasHostMessages: (value == 2)
       })
     }
 
@@ -475,7 +474,7 @@ class AdminEventsSection extends React.Component {
           <DropDownMenu
             value={this.props.relay.variables.filters.flagApproval ? 1 : this.props.relay.variables.hasHostMessages ? 2 : 0}
             onChange={(event, index, value) => {
-              this._handleRequestFiltersChange({newVars: {flagApproval: (value == 1)}});
+              this._handleApprovalFilterChange(value);
             }}
           >
             {approvalFilterMenuItems}
