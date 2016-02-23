@@ -897,7 +897,7 @@ const GraphQLEvent = new GraphQLObjectType({
         let backoff = 1000;
         let foundPeople = [];
 
-        while (foundPeople.length < 500 && radius <= maxRadius) {
+        while (foundPeople.length < 250 && radius <= maxRadius) {
           let foundConsIds = foundPeople.map((person) => person.cons_id)
           let query = knex('bsd_addresses')
             .select('bsd_people.*')
@@ -908,7 +908,7 @@ const GraphQLEvent = new GraphQLObjectType({
             .whereNotIn('bsd_people.cons_id', foundConsIds)
             .whereRaw(`st_dwithin(bsd_addresses.geom, '${event.geom}', ${radius})`)
             .whereNull('communications.id')
-            .limit(500)
+            .limit(250)
           log.info(`Running query: ${query.toString()}`)
           let people = await query
           foundPeople = foundPeople.concat(people)
@@ -916,7 +916,7 @@ const GraphQLEvent = new GraphQLObjectType({
           if (radius === 15000)
             backoff = 5000;
         }
-        return foundPeople.slice(0, 500)
+        return foundPeople.slice(0, 250)
       }
     }
   }),
@@ -1106,7 +1106,9 @@ const GraphQLEditEvents = mutationWithClientMutationId({
           continue
         }
         else {
-          throw ex
+          log.error(`Unknown exception when updating event ${JSON.stringify(event)}`)
+          updateErrors.push(`${event.event_id_obfuscated}: ${ex.message}`)
+          log.error(ex)
         }
       }
 

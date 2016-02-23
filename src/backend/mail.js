@@ -42,6 +42,7 @@ Handlebars.registerPartial('footer', footerHTML)
 const messageRichTextTemplate = Handlebars.compile(fs.readFileSync(templateDir + '/message.hbs', {encoding: 'utf-8'}));
 const senderAddress = 'Team Bernie<info@berniesanders.com>'
 const inDevEnv = (process.env.NODE_ENV === 'development')
+const publicEventsRootUrl = process.env.PUBLIC_EVENTS_ROOT_URL
 
 export default class MG {
   constructor(apiKey, domain) {
@@ -160,7 +161,8 @@ export default class MG {
     let data = {
       volunteerName: name,
       callAssignmentId: toGlobalId('CallAssignment', event.turn_out_assignment),
-      sender: eventTypeData.sender
+      sender: eventTypeData.sender,
+      eventURL: `${publicEventsRootUrl}${event.event_id_obfuscated}`
     }
     let template = new EmailTemplate(`${templateDir}/${eventTypeData.template}`)
     let content = await template.render(data)

@@ -1,3 +1,15 @@
+function dynamicSort(property) {
+	var sortOrder = 1;
+	if(property[0] === "-") {
+		sortOrder = -1;
+		property = property.substr(1);
+	}
+	return function (a,b) {
+		var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+		return result * sortOrder;
+	}
+}
+
 var eventTypes = [
 	/*{
 		id: 'rally',
@@ -44,6 +56,28 @@ var eventTypes = [
 		}
 	},
 	{
+		id: 'carpool',
+		name: 'Carpool to an early voting state',
+		adminOnly: false,
+		labels: {
+			'host_receive_rsvp_emails': 'Receive an email when people join my carpool',
+			'attendee_volunteer_show': 'Ask riders to help out',
+		},
+		defaultValues: {
+			public_phone: 1,
+			venue_name: 'My car',
+			name: 'Carpool to Help Bernie Win!',
+			is_searchable: true,
+			rsvp_use_reminder_email: true,
+			rsvp_email_reminder_hours: 24,
+			duration_num: 40,
+			attendee_volunteer_message: 'If you can chip in for gas and snacks, please sign up as a volunteer. Thanks!',
+			host_receive_rsvp_emails: true,
+			attendee_volunteer_show: true,
+			description: '<a href="http://bernie.to/distance-faq">Click here to view Carpool FAQs</a><p>Join me and other Bernie supporters for a road trip!</p><p>I’ll be leaving on [WRITE YOUR DEPARTURE DATE/TIME HERE] and returning on [WRITE YOUR RETURN DATE/TIME HERE]. The campaign isn’t providing housing, so we’ll figure out a hotel or something.</p><p>We’re going to hit the road for Bernie to the help out in the crucial final days before the election. Bernie staff on the ground will train us and plug us into the campaign so that we can be as effective as possible.</p><p>Victory will require all of us pitching in, so sign up and let’s go the distance for Bernie!</p>'
+		}
+	},
+	{
 		id: 'ballot-access',
 		name: 'Gather Ballot Access Signatures',
 		defaultValues: {
@@ -69,6 +103,21 @@ var eventTypes = [
 			description: 'You\'re invited to join your neighbors and supporters to knock on the doors of supporters and undecided voters. We\'ll provide you with a script, a list of voters that you\'ll be talking to, and a map of where to go. We\'ll also train you to use your time effectively out in the field. You\'ll be able to talk to real people about how this country belongs to all of us, not just the billionaire class. Our victory starts with us knocking on doors together.',
 		},
 		adminOnly: false
+	},
+	{
+		id: 'get-out-the-vote',
+		name: 'Get Out the Vote',
+		useShifts: true,
+		adminOnly: true,
+		defaultValues: {
+			name: 'Get Out the Vote For Bernie!',
+			description: 'Join other volunteers in the area to help get out the vote for Bernie. You’ll get training, materials, and anything else you might need to put Bernie over the top in the upcoming election. This is the final push, so let’s give it all we’ve got!',
+			is_searchable: true,
+			host_receive_rsvp_emails: false,
+			attendee_volunteer_show: false,
+			duration_allday: true,
+			capacity: 0
+		}
 	},
 	{
 		id: 'barnstorm',
@@ -151,7 +200,7 @@ var eventTypes = [
 	// 	},
 	// 	adminOnly: false
 	// }
-];
+].sort(dynamicSort("name"));
 
 (function(){
 	var form = document.getElementById('secondform');
@@ -270,8 +319,8 @@ function updateFormValue(property, value) {
 		    form[property].placeholder = value;
 	  	}
 
-		  if (property === 'attendee_volunteer_show')
-		  	$('#attendee_volunteer_show').change()
+		  if (property === 'attendee_volunteer_show' || property === 'duration_allday')
+		  	$('[name="' + property + '"]').change()
 		  break
 	}
 }

@@ -301,7 +301,9 @@ function startApp() {
       'canvass' : 32,
       'barnstorm' : 41,
       'carpool-to-nevada' : 39,
+      'carpool' : 39,
       'official-barnstorm' : 41,
+      'get-out-the-vote' : 45,
       'vol2vol' : 47,
       'rally' : 14
     }
