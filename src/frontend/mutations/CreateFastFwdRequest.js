@@ -1,6 +1,6 @@
 import Relay from 'react-relay'
 
-export default class CreateBoostAttendanceRequest extends Relay.Mutation {
+export default class CreateFastFwdRequest extends Relay.Mutation {
   static fragments = {
     listContainer: () => Relay.QL`
       fragment on ListContainer {
@@ -11,13 +11,13 @@ export default class CreateBoostAttendanceRequest extends Relay.Mutation {
 
   getMutation() {
     return Relay.QL`
-      mutation{ createBoostAttendanceRequest }
+      mutation{ createFastFwdRequest }
     `
   }
 
   getFatQuery() {
     return Relay.QL`
-      fragment on CreateBoostAttendanceRequestPayload {
+      fragment on CreateFastFwdRequestPayload {
         listContainer {
           id
         }

@@ -145,7 +145,7 @@ class AdminEventEmailCreationForm extends React.Component {
               senderEmail: this.props.currentUser.email,
               senderMessage: defaultSenderMessage,
               hostEmail: this.props.event.host.email,
-              hostMessage: this.props.event.boostAttendanceRequest ? this.props.event.boostAttendanceRequest.hostMessage : ''
+              hostMessage: this.props.event.fastFwdRequest ? this.props.event.fastFwdRequest.hostMessage : ''
             }}
             onSubmit={(formValues) => {
               this.refs.mutationHandler.send({
@@ -242,7 +242,7 @@ export default Relay.createContainer(AdminEventEmailCreationForm, {
         attendeesCount
         attendeeVolunteerMessage
         attendeeVolunteerShow
-        boostAttendanceRequest{
+        fastFwdRequest{
           hostMessage
         }
         capacity

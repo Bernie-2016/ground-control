@@ -12,7 +12,7 @@ import AdminEventsSection from './components/AdminEventsSection';
 import AdminEventUploadRsvps from './components/AdminEventUploadRsvps';
 import AdminCallAssignmentsSection from './components/AdminCallAssignmentsSection';
 import AdminCallAssignmentCreationForm from './components/AdminCallAssignmentCreationForm';
-import BoostEventAttendanceForm from './components/BoostEventAttendanceForm';
+import FastFwdForm from './components/FastFwdForm';
 import GCTextField from './components/forms/GCTextField';
 import GCPhoneField from './components/forms/GCPhoneField';
 import GCDateField from './components/forms/GCDateField';
@@ -87,8 +87,8 @@ const EventQueries = {
   event: () => Relay.QL`query { event(id: $id) }`
 };
 
-const BoostAttendanceRequest = {
-  boostAttendanceRequest: () => Relay.QL`query{ boostAttendanceRequest(id: $id) }`
+const FastFwdRequest = {
+  fastFwdRequest: () => Relay.QL`query{ fastFwdRequest(id: $id) }`
 };
 
 let history = createHistory();
@@ -172,7 +172,7 @@ ReactDOM.render(
     </Route>
     <Route
       path='/event/:id/request_email'
-      component={BoostEventAttendanceForm}
+      component={FastFwdForm}
         queries={{
           ...ListContainerQueries,
           ...EventQueries,

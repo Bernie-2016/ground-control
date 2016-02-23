@@ -432,7 +432,7 @@ class AdminEventsSection extends React.Component {
     const approvalFilterOptions = [
       {value: 1, 'text': 'Pending Approval'},
       {value: 0, 'text': 'Approved Events'},
-      {value: 2, 'text': 'Approved Events With Boost Requests'}
+      {value: 2, 'text': 'FastFwd Requests'}
     ]
 
     const approvalFilterMenuItems = approvalFilterOptions.map((item) => <MenuItem value={item.value} key={item.value} primaryText={item.text} />)

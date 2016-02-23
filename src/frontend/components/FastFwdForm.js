@@ -6,10 +6,10 @@ import GCForm from './forms/GCForm'
 import Form from 'react-formal'
 import EventPreview from './EventPreview'
 import MutationHandler from './MutationHandler'
-import CreateBoostAttendanceRequest from '../mutations/CreateBoostAttendanceRequest'
+import CreateFastFwdRequest from '../mutations/CreateFastFwdRequest'
 import yup from 'yup'
 
-class BoostEventAttendanceForm extends React.Component {
+class FastFwdForm extends React.Component {
   styles = {
     detailsContainer: {
       float: 'left',
@@ -49,7 +49,7 @@ class BoostEventAttendanceForm extends React.Component {
 
     console.log(this.props.event);
 
-    let defaultHostMessage = this.props.event.boostAttendanceRequest.hostMessage ||
+    let defaultHostMessage = this.props.event.fastFwdRequest ? this.props.event.fastFwdRequest.hostMessage :
                             "Hello, neighbors!\n\nI'm hosting a " +
                             this.props.event.eventType.name +
                             " and I need a few more Bernie supporters " +
@@ -61,10 +61,10 @@ class BoostEventAttendanceForm extends React.Component {
       <div style={this.styles.pageContainer}>
         <MutationHandler ref='mutationHandler'
                          successMessage='Your message has been saved.'
-                         mutationClass={CreateBoostAttendanceRequest}
-                         mutationName='createBoostAttendanceRequest' />
+                         mutationClass={CreateFastFwdRequest}
+                         mutationName='createFastFwdRequest' />
         <div style={BernieText.title}>
-          Boost Attendance at your Event
+          Fast Fwd: Send a message to bring volunteers to your event
         </div>
 
         <Paper zDepth={1} style={this.styles.detailsContainer}>
@@ -104,7 +104,7 @@ class BoostEventAttendanceForm extends React.Component {
   }
 }
 
-export default Relay.createContainer(BoostEventAttendanceForm, {
+export default Relay.createContainer(FastFwdForm, {
   fragments: {
     currentUser: () => Relay.QL`
       fragment on User {
@@ -114,7 +114,7 @@ export default Relay.createContainer(BoostEventAttendanceForm, {
     `,
     listContainer: () => Relay.QL`
       fragment on ListContainer {
-        ${CreateBoostAttendanceRequest.getFragment('listContainer')},
+        ${CreateFastFwdRequest.getFragment('listContainer')},
       }
     `,
     event: () => Relay.QL`
@@ -122,7 +122,7 @@ export default Relay.createContainer(BoostEventAttendanceForm, {
         attendeesCount
         attendeeVolunteerMessage
         attendeeVolunteerShow
-        boostAttendanceRequest{
+        fastFwdRequest{
           hostMessage
         }
         capacity

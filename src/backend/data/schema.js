@@ -216,8 +216,8 @@ let {nodeInterface, nodeField} = nodeDefinitions(
       return addType(knex('bsd_addresses').where('cons_addr_id', id))
     if (type === 'ListContainer')
       return SharedListContainer
-    if (type == 'BoostAttendanceRequest')
-      return addType(knex('boost_attendance_request').where('id', id))
+    if (type == 'FastFwdRequest')
+      return addType(knex('fast_fwd_request').where('id', id))
     return null
   },
   (obj) => {
@@ -239,8 +239,8 @@ let {nodeInterface, nodeField} = nodeDefinitions(
       return GraphQLAddress
     if (obj._type == 'users')
       return GraphQLUser
-    if (obj._type == 'boost_attendance_request')
-      return GraphQLBoostAttendanceRequest
+    if (obj._type == 'fast_fwd_request')
+      return GraphQLFastFwdRequest
     return null
   }
 )
@@ -312,7 +312,7 @@ const GraphQLListContainer = new GraphQLObjectType({
           .orderBy(convertedSortField, sortDirection)
 
         if(hasHostMessages){
-          events.join('boost_attendance_request', 'bsd_events.event_id', '=', 'boost_attendance_request.event_id')
+          events.join('fast_fwd_request', 'bsd_events.event_id', '=', 'fast_fwd_request.event_id')
               .whereNull('email_sent_dt')
         }
 
@@ -893,10 +893,10 @@ const GraphQLEvent = new GraphQLObjectType({
         return foundPeople.slice(0, 250)
       }
     },
-    boostAttendanceRequest: {
-      type: GraphQLBoostAttendanceRequest,
+    fastFwdRequest: {
+      type: GraphQLFastFwdRequest,
       resolve: async (event) => {
-        let req = await knex.table('boost_attendance_request')
+        let req = await knex.table('fast_fwd_request')
                           .where('event_id', event['event_id'])
         return humps.camelizeKeys(req[0])
       }
@@ -1384,7 +1384,7 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
     // somewhat hackish; catches Test Mode.
     // don't mark it as sent until it goes out to volunteers.
     if(recipients.length > 1){
-      await knex.table('boost_attendance_request')
+      await knex.table('fast_fwd_request')
               .where('event_id', fromGlobalId(eventId).id)
               .update({
                 'email_sent_dt': new Date()
@@ -1395,8 +1395,8 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
   }
 })
 
-const GraphQLCreateBoostAttendanceRequest = mutationWithClientMutationId({
-  name: 'CreateBoostAttendanceRequest',
+const GraphQLCreateFastFwdRequest = mutationWithClientMutationId({
+  name: 'CreateFastFwdRequest',
   inputFields: {
     eventId: globalIdField('Event', (obj) => obj.event_id),
     hostMessage: { type: new GraphQLNonNull(GraphQLString) },
@@ -1411,23 +1411,23 @@ const GraphQLCreateBoostAttendanceRequest = mutationWithClientMutationId({
 
     let intEventId = fromGlobalId(eventId).id
 
-    let existingRecord = await knex.table('boost_attendance_request')
+    let existingRecord = await knex.table('fast_fwd_request')
                             .where('event_id', intEventId)
 
     if(existingRecord.length){
-      await knex.table('boost_attendance_request')
+      await knex.table('fast_fwd_request')
                             .where('event_id', intEventId)
                             .update({
                               'host_message': hostMessage
                             });
 
-      let updatedRecord = await knex.table('boost_attendance_request')
+      let updatedRecord = await knex.table('fast_fwd_request')
                             .where('event_id', intEventId)
       
       return updatedRecord
     }
     
-    return await knex.insertAndFetch('boost_attendance_request', {
+    return await knex.insertAndFetch('fast_fwd_request', {
         host_message: hostMessage,
         event_id: intEventId
       })
@@ -1435,11 +1435,11 @@ const GraphQLCreateBoostAttendanceRequest = mutationWithClientMutationId({
   }
 })
 
-const GraphQLBoostAttendanceRequest = new GraphQLObjectType({
-  name: 'BoostAttendanceRequest',
+const GraphQLFastFwdRequest = new GraphQLObjectType({
+  name: 'FastFwdRequest',
   description: 'A request from event hosts to send a FastForward invite',
   fields: () => ({
-    id: globalIdField('BoostAttendanceRequest'),
+    id: globalIdField('FastFwdRequest'),
     hostMessage: { type: GraphQLString }
   })
 })
@@ -1599,7 +1599,7 @@ let RootMutation = new GraphQLObjectType({
     createCallAssignment: GraphQLCreateCallAssignment,
     deleteEvents: GraphQLDeleteEvents,
     createAdminEventEmail: GraphQLCreateAdminEventEmail,
-    createBoostAttendanceRequest: GraphQLCreateBoostAttendanceRequest
+    createFastFwdRequest: GraphQLCreateFastFwdRequest
   })
 })
 
@@ -1647,15 +1647,15 @@ let RootQuery = new GraphQLObjectType({
         return rootValue.loaders.bsdEvents.load(localId)
       }
     },
-    boostAttendanceRequest: {
-      type: GraphQLBoostAttendanceRequest,
+    fastFwdRequest: {
+      type: GraphQLFastFwdRequest,
       args: {
         id: { type: new GraphQLNonNull(GraphQLString) }
       },
       resolve: async (root, {id}, {rootValue}) => {
         authRequired(rootValue)
         let localId = fromGlobalId(id).id
-        return knex('boost_attendance_request').where('id', localId)
+        return knex('fast_fwd_request').where('id', localId)
       }
     },
     node: nodeField
