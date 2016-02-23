@@ -139,6 +139,15 @@ function eventFromAPIFields(fields) {
   return event
 }
 
+function preConcatObjectKeys(obj, string) {
+  let newObj = {}
+  Object.keys(obj).forEach((fieldName) => {
+    newObj[`${string}.${fieldName}`] = obj[fieldName]
+  })
+
+  return newObj
+}
+
 async function getPrimaryEmail(person, transaction) {
   let query = knex('bsd_emails')
     .where({
@@ -276,6 +285,10 @@ const GraphQLDate = new GraphQLScalarType({
   }
 })
 
+const addWhere = ({ query, property, value, operator='=', method='where' }) => {
+  return query[method](property, operator, value)
+}
+
 const GraphQLListContainer = new GraphQLObjectType({
   name: 'ListContainer',
   fields: () => ({
@@ -290,8 +303,9 @@ const GraphQLListContainer = new GraphQLObjectType({
       type: GraphQLEventConnection,
       args: {
         ...connectionArgs,
-        filterOptions: {type: GraphQLEventInput },
+        eventFilterOptions: {type: GraphQLEventInput },
         hasHostMessages: {type: GraphQLBoolean},
+        hostFilterOptions: {type: GraphQLPersonInput },
         sortField: {type: GraphQLString},
         sortDirection: {type: new GraphQLEnumType({
           name: 'GraphQLSortDirection',
@@ -301,15 +315,34 @@ const GraphQLListContainer = new GraphQLObjectType({
           }
         })}
       },
-      resolve: async (event, {first, filterOptions, sortField, sortDirection, hasHostMessages}, {rootValue}) => {
-        let filters = eventFromAPIFields(filterOptions);
+      resolve: async (event, {first, eventFilterOptions, hostFilterOptions, sortField, sortDirection, hasHostMessages}, {rootValue}) => {
+        let eventFilters = eventFromAPIFields(eventFilterOptions)
         let convertedSortField = eventFieldFromAPIField(sortField)
 
         let events = knex('bsd_events')
           .where('start_dt', '>=', new Date())
-          .where(filters)
+          .where(eventFilters)
           .limit(first)
           .orderBy(convertedSortField, sortDirection)
+
+        if (Object.keys(hostFilterOptions).length){
+          events = events.leftJoin('bsd_people', 'bsd_events.creator_cons_id', 'bsd_people.cons_id')
+          let hostFilters = humps.decamelizeKeys(hostFilterOptions)
+          
+          Object.keys(hostFilters).forEach((key) => {
+            if (key === 'email'){
+              events = events.join('bsd_emails', 'bsd_events.creator_cons_id', 'bsd_emails.cons_id')
+              events = addWhere({query: events, property: `bsd_emails.${key}`, value: hostFilters[key]})
+            }
+            else if (key === 'phone'){
+              events = events.join('bsd_phones', 'bsd_events.creator_cons_id', 'bsd_phones.cons_id')
+              events = addWhere({query: events, property: `bsd_phones.${key}`, value: hostFilters[key]})
+            }
+            else {
+              events = addWhere({query: events, property: `bsd_people.${key}`, value: hostFilters[key]})
+            }
+          })
+        }
 
         if(hasHostMessages){
           events.join('fast_fwd_request', 'bsd_events.event_id', '=', 'fast_fwd_request.event_id')
@@ -682,6 +715,25 @@ const GraphQLPerson = new GraphQLObjectType({
     }
   }),
   interfaces: [nodeInterface]
+})
+
+const GraphQLPersonInput = new GraphQLInputObjectType({
+  name: 'PersonInput',
+  fields: {
+    id: { type: GraphQLString },
+    prefix: { type: GraphQLString },
+    firstname: { type: GraphQLString },
+    middlename: { type: GraphQLString },
+    lastname: { type: GraphQLString },
+    suffix: { type: GraphQLString },
+    gender: { type: GraphQLString },
+    birthDate: { type: GraphQLDate },
+    title: { type: GraphQLString },
+    employer: { type: GraphQLString },
+    occupation: { type: GraphQLString },
+    phone: { type: GraphQLString },
+    email: { type: GraphQLString }
+  }
 })
 
 const GraphQLCall = new GraphQLObjectType({
