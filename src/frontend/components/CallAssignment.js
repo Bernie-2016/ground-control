@@ -76,7 +76,7 @@ class CallAssignment extends React.Component {
   {
     'NO_PICKUP' : 'Did not pick up',
     'CALL_BACK' : 'Busy/call back later',
-    'NOT_INTERESTED' : 'Not interested in talking',
+    'NOT_INTERESTED' : 'Not interested/Do not call',
     'OTHER_LANGUAGE' : 'Spoke different language',
     'WRONG_NUMBER' : 'Wrong number',
     'DISCONNECTED_NUMBER' : 'Disconnected number'
