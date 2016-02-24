@@ -47,6 +47,7 @@ class AdminEventEmailCreationForm extends React.Component {
   formSchema = yup.object({
     hostEmail: yup.string().email().required(),
     senderEmail: yup.string().email().required(),
+    subject: yup.string().required().matches(/^Fwd: /),
     hostMessage: yup.string().required(),
     senderMessage: yup.string().required(),
     toolPassword: yup.string().required()
@@ -68,6 +69,22 @@ class AdminEventEmailCreationForm extends React.Component {
     }
 
     return shuffled.slice(0, size)
+  }
+
+  getSubject(event) {
+      const subjects = [
+	  "HELP! I need more people to come to my event",
+	  "can you help recruit people for my Bernie event?",
+	  "Pass along my event info to local volunteers?",
+	  "I have extra room -- can you help recruit people?",
+	  "I need help with my Bernie event",
+	  "I want to help Bernie...but I need more people to show up!",
+	  "SOS: I need more people at my event!",
+	  "I have the space, now I just need people to show up!",
+	  "Help me fill my event?",
+	  "Can you help turn people out for this Bernie event?"
+      ]
+      return 'Fwd: ' + this.getRandomSubarray(subjects, 1)[0];
   }
 
   renderRecipientInfo() {
@@ -127,7 +144,8 @@ class AdminEventEmailCreationForm extends React.Component {
           <GCForm
             schema={this.formSchema}
             defaultValue={{
-              hostEmail: this.props.event.host.email
+              hostEmail: this.props.event.host.email,
+              subject: this.getSubject(this.props.event)
             }}
             onSubmit={(formValues) => {
               this.refs.mutationHandler.send({
@@ -146,6 +164,12 @@ class AdminEventEmailCreationForm extends React.Component {
             <Form.Field
               name='senderEmail'
               label="Sender Email Address"
+            />
+            <br />
+            <Form.Field
+              name='subject'
+              label="Subject Line"
+	      style={{width: "100%"}}
             />
             <Form.Field
               name='hostMessage'

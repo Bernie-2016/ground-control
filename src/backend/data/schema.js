@@ -1358,6 +1358,7 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
     hostEmail: { type: new GraphQLNonNull(GraphQLString) },
     senderEmail: { type: new GraphQLNonNull(GraphQLString) },
     adminEmail: { type: new GraphQLNonNull(GraphQLString) },
+    subject: { type: new GraphQLNonNull(GraphQLString) },
     hostMessage: { type: new GraphQLNonNull(GraphQLString) },
     senderMessage: { type: new GraphQLNonNull(GraphQLString) },
     recipients: { type: new GraphQLList(GraphQLString) },
@@ -1369,7 +1370,7 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
       resolve: () => SharedListContainer
     }
   },
-  mutateAndGetPayload: async ({hostEmail, senderEmail, adminEmail, hostMessage, senderMessage, recipients, toolPassword}, {rootValue}) => {
+  mutateAndGetPayload: async ({hostEmail, senderEmail, adminEmail, subject, hostMessage, senderMessage, recipients, toolPassword}, {rootValue}) => {
     adminRequired(rootValue)
 
     // TODO: remove this goofy protection when the tool is ready
@@ -1386,7 +1387,8 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
       senderAddress: senderEmail,
       hostMessage: hostMessage,
       senderMessage: senderMessage,
-      recipientAddress: adminEmail
+      recipientAddress: adminEmail,
+      subject: subject
     })
 
     knex.transaction(async (trx) => {
