@@ -50,6 +50,15 @@ class GraphQLError extends Error {
   }
 }
 
+function eventIdFromRelayId(id) {
+  let localId = fromGlobalId(id)
+  if (localId.type !== 'Event')
+    localId = id
+  else
+    localId = localId.id
+  return localId
+}
+
 function activeCallAssignments(query) {
   return query.where(function() {
     this.where('end_dt', '>', moment().add(1, 'days').toDate())
@@ -462,6 +471,74 @@ const GraphQLUser = new GraphQLObjectType({
           query = query.where('completed', completed)
 
         return knex.count(query, 'id')
+      }
+    },
+    intervieweeForEventTurnout: {
+      type: GraphQLPerson,
+      args: {
+        eventIds: { type: GraphQLString },
+      },
+      resolve: async (user, {eventIds}, {rootValue}) => {
+        let localIds = eventIds.map((relayId) => eventIdFromRelayId(relayId))
+
+        // Clear out any existing people this caller has checked out
+        await knex('bsd_assigned_calls')
+          .where('caller_id', user.id)
+          .delete()
+
+        let allOffsets = [-10, -9, -8, -7, -6, -5, -4]
+        let validOffsets = []
+        // So that I can program late at night
+        if (process.env.NODE_ENV === 'development')
+          validOffsets = allOffsets
+
+        allOffsets.forEach((offset) => {
+          let time = moment().utcOffset(offset)
+
+          if (time.hours() >= 9 && time.hours() < 21)
+            validOffsets.push(offset)
+        })
+
+        if (validOffsets.length === 0)
+          return null
+
+        let userConsId = await knex('bsd_emails')
+          .select('bsd_emails.cons_id')
+          .where('bsd_emails.email', user.email)
+          .first()
+
+        let validEvents = await knex('bsd_events')
+          .select('bsd_events.event_id')
+          .join('zip_codes', 'bsd_events.venue_zip', 'zip_codes.zip')
+          .leftOuterJoin('bsd_event_attendees', 'bsd_event_attendees.event_id', 'bsd_events.event_id')
+          .whereNot('bsd_events.is_searchable', 0)
+          .where('bsd_events.flag_approval', false)
+          .where('bsd_events.start_dt', '>', new Date())
+          .whereIn('bsd_events.event_id_obfuscated', localIds)
+          .groupBy('bsd_events.event_id')
+          .havingRaw('count(bsd_events.event_id) < bsd_events.capacity or events.capacity = 0')
+
+        let assignedCallsSubquery = knex('bsd_assigned_calls')
+            .select('interviewee_id')
+
+        let previousCallsSubquery = knex('bsd_calls')
+          .select('interviewee_id')
+          .where(function() {
+            this.where('completed', true)
+
+          })
+          .orWhereIn('reason_not_completed', ['WRONG_NUMBER', 'DISCONNECTED_NUMBER', 'OTHER_LANGUAGE', 'NOT_INTERESTED'])
+          .orWhere('attempted_at', '>', new Date(new Date() - 5 * 24 * 60 * 60 * 1000))
+
+        let query = knex('bsd_phones')
+          .join('bsd_addresses', 'bsd_phones.cons_id', 'bsd_addresses.cons_id')
+          .join('zip_codes', 'zip_codes.zip', 'bsd_addresses.zip')
+          .whereNotIn('bsd_phones.cons_id', previousCallsSubquery)
+          .whereNotIn('bsd_phones.cons_id', assignedCallsSubquery)
+          .whereNotIn('bsd_addresses.state_cd', ['IA', 'NH', 'NV', 'SC'])
+          .whereIn('zip_codes.timezone_offset', validOffsets)
+          .where('bsd_phones.is_primary', true)
+          .where('bsd_addresses.is_primary', true)
       }
     },
     intervieweeForCallAssignment: {
