@@ -100,6 +100,11 @@ ReactDOM.render(
       queries={ListContainerQueries}
     >
       <Route
+        path='people'
+        component={AdminPeopleSection}
+        queries={ListContainerQueries}
+      />
+      <Route
         path='call-assignments'
         component={AdminCallAssignmentsSection}
         queries={ListContainerQueries}
