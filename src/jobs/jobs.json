@@ -20,9 +20,9 @@
       "cron": "00 */7 * * * *",
       "job": "./jobs/email-event-instructions.js"
     },
-    {
-      "cron": "00 00 09 * * *",
-      "job": "./jobs/email-fast-fwd-instructions.js"
-    }
+    // {
+    //   "cron": "00 00 09 * * *",
+    //   "job": "./jobs/email-fast-fwd-instructions.js"
+    // }
   ]
 }
