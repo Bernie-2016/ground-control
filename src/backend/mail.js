@@ -202,4 +202,20 @@ export default class MG {
 
     return await this.send(message)
   }
+
+  async sendFastFwdInstructions(data) {
+    let template = new EmailTemplate(templateDir + '/send-fast-fwd-instructions')
+    let content = await template.render(data)
+
+    let message = {
+      from: data.senderAddress,
+      'h:Reply-To': data.hostAddress,
+      to: data.recipientAddress,
+      subject: 'Need help getting volunteers to your event?',
+      text: content.text
+    }
+
+    return await this.send(message)
+  }
+
 }

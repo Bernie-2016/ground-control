@@ -8,9 +8,16 @@ exports.up = async function(knex, Promise) {
         table.timestamp('modified_dt').notNullable();
         table.timestamp('create_dt').notNullable();
     })
+
+    await knex.schema.table('gc_bsd_events', function(table){
+        table.boolean('fast_fwd_instructions_sent').notNullable.default(false)
+    })
   
 };
 
 exports.down = async function(knex, Promise) {
-    await knex.schema.raw('DROP TABLE fast_fwd_request')  
+    await knex.schema.dropTable('fast_fwd_request')
+    await knex.schema.table('gc_bsd_events', function(table){
+        table.dropColumn('fast_fwd_instructions_sent')
+    })
 };
