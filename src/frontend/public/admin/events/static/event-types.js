@@ -26,12 +26,14 @@ var eventTypes = [
 	{
 		id: 'volunteer-meeting',
 		name: 'Volunteer Activity or Meeting',
-		adminOnly: false
+		adminOnly: false,
+		disabled: ['use_shifts']
 	},
 	{
 		id: 'carpool',
 		name: 'Carpool to an early voting state',
 		adminOnly: false,
+		disabled: ['use_shifts'],
 		labels: {
 			'host_receive_rsvp_emails': 'Receive an email when people join my carpool',
 			'attendee_volunteer_show': 'Ask riders to help out',
@@ -57,7 +59,8 @@ var eventTypes = [
 			name: 'Bernie Ballot Blast - PA Support Bernie and his Delegates and Collect Petition Signatures',
 			description: 'We only have 3 weeks to get all the needed signatures to get Bernie on the Ballot and get his Delegates nominated for the Democratic Convention.  Sign up for your local events scheduled between January 26th and February 10th.  We can\'t do this without you and you can make the difference in Pennsylvania, one of the most important swing states.  Come join the movement!',
 		},
-		adminOnly: false
+		adminOnly: false,
+		disabled: ['use_shifts']
 	},
 	{
 		id: 'phonebank',
@@ -112,7 +115,7 @@ var eventTypes = [
 			cons_email: userEmail,
 			rsvp_email_reminder_hours: '24',
 		},
-		disabled: ['attendee_volunteer_show'],
+		disabled: ['attendee_volunteer_show', 'use_shifts'],
 		adminOnly: false
 	},
 	{
@@ -132,7 +135,7 @@ var eventTypes = [
 			cons_name: 'Bernie 2016',
 			cons_email: userEmail
 		},
-		disabled: ['contact_phone', 'public_phone'],
+		disabled: ['contact_phone', 'public_phone', 'use_shifts'],
 		adminOnly: true
 	},
 	{
@@ -192,6 +195,69 @@ var eventTypes = [
 	$(form.event_type_id).on("change", function(e){
 		setDefaults(e.target.value);
 	});
+
+	$(form.use_shifts).on("change", function(e){
+		if (this.checked){
+			$("#date-input-group")
+				.hide()
+				.find("input, select")
+				.attr("disabled", true);
+			$("#shift-wrapper")
+				.show()
+				.find("input, select")
+				.removeAttr("disabled");
+		}
+		else{
+			$("#shift-wrapper")
+				.hide()
+				.find("input, select")
+				.attr("disabled", true);
+			$("#date-input-group")
+				.show()
+				.find("input, select")
+				.removeAttr("disabled");;
+		}
+	});
+
+	$("#add-shift").on("click", function(e){
+		$(".shift-input-group")
+			.last()
+			.clone()
+			.appendTo("#shift-inputs");
+		if ($(".shift-input-group").length > 1)
+			$("#remove-shift").show();
+	});
+
+	$("#remove-shift").on("click", function(e){
+		$(".shift-input-group")
+			.last()
+			.remove()
+		if ($(".shift-input-group").length <= 1)
+			$(this).hide();
+	});
+
+	function generateShiftInputs(){
+
+		var start = $(".time-inputs")
+			.first()
+			.clone();
+		var end = $(".time-inputs")
+			.first()
+			.clone()
+			.append("<br/>");
+		end.find(".time-type").each(function() {
+			$(this).html("End");
+		});
+		end.find("select").each(function() {
+			$(this).attr("name", 'end_time[' + $(this).attr('name').split("[")[1]);
+		});
+
+		start.appendTo(".shift-input-group");
+		end.appendTo(".shift-input-group");
+	}
+
+	generateShiftInputs();
+
 })();
 
 var disabledInputs = [];
