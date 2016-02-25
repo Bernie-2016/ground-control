@@ -3,6 +3,7 @@ import jQuery from 'jquery';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Relay from 'react-relay';
+import EventCreate from './components/EventCreate.js'
 import {Redirect, IndexRoute, IndexRedirect, Route, Router} from 'react-router';
 import ReactRouterRelay from 'react-router-relay';
 import injectTapEventPlugin from 'react-tap-event-plugin';
@@ -147,6 +148,12 @@ ReactDOM.render(
       queries={CurrentUserQueries}
       >
       <IndexRedirect to='/call' />
+      <Route
+        path='events/create/v2'
+        component={EventCreate}
+        queries={CurrentUserQueries}
+        renderLoading={() => <Loading />}
+      />
       <Route
         path='call'
         component={CallAssignmentsDashboard}

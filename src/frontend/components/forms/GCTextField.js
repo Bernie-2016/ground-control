@@ -8,7 +8,6 @@ export default class GCTextField extends GCFormField {
     return <TextField
       floatingLabelText={this.floatingLabelText()}
       errorStyle={BernieText.inputError}
-      hintText={this.props.label}
       floatingLabelStyle={{
         zIndex: 0
       }}
