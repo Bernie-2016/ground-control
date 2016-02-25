@@ -73,11 +73,19 @@ class AdminEventEmailCreationForm extends React.Component {
     return shuffled.slice(0, size)
   }
 
-  renderRecipientInfo() {
-    let recipientsCount = this.state.recipientLimit || (this.props.event.nearbyPeople.length + 1)
-    let recipientsSample = this.getRandomSubarray(this.props.event.nearbyPeople, 10)
+  renderRecipientInfo(recipientsCount) {
+    let recipientsSample = this.getRandomSubarray(this.props.event.nearbyPeople,
+						  Math.min(10, recipientsCount))
 
-    if (recipientsCount === 0) {
+    if (this.state.testMode) {
+      return (
+        <Paper zDepth={1} style={this.styles.recipientInfoContainer}>
+          <p style={{color: 'red', fontWeight: 'strong'}}>
+            In test mode, this email will only be sent to you.
+          </p>
+        </Paper>
+        )
+    } else if (recipientsCount === 0) {
       return (
         <Paper zDepth={1} style={this.styles.recipientInfoContainer}>
           <p style={{color: 'red', fontWeight: 'strong'}}>
@@ -113,7 +121,7 @@ class AdminEventEmailCreationForm extends React.Component {
       recipients.push(this.props.event.host.id)
     }
 
-    let recipientLimit = this.state.recipientLimit || recipients.length
+    let recipientLimit = this.state.recipientLimit || Math.min(250, recipients.length)
 
     let disableSubmit = (this.props.event.nearbyPeople.length === 0)
 
@@ -190,10 +198,10 @@ class AdminEventEmailCreationForm extends React.Component {
             <br />
             <h4 style={BernieText.default}>Number of recipients: {recipientLimit} (plus you)</h4>
             <Slider
-              defaultValue={recipients.length}
+              defaultValue={recipientLimit}
               disabled={this.state.testMode}
               max={recipients.length}
-              min={1}
+              min={this.state.testMode ? 0 : 1}
               step={1}
               onChange={(_, newSliderValue) => {
                 this.setState({recipientLimit: newSliderValue})
@@ -214,7 +222,7 @@ class AdminEventEmailCreationForm extends React.Component {
           </GCForm>
         </Paper>
 
-        {this.renderRecipientInfo()}
+        {this.renderRecipientInfo(recipientLimit)}
 
         <Paper zDepth={1} style={this.styles.detailsContainer}>
           <EventPreview event={this.props.event} />
