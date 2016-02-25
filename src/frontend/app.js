@@ -69,7 +69,7 @@ Form.addInputTypes({
   array: GCCheckboxesField,
   password: GCPasswordField,
   date: GCDateField,
-//  time: GCTimeField, <-- broken
+  time: GCTimeField,
   datetime: GCDateTimeField,
   phone: GCPhoneField
 });
