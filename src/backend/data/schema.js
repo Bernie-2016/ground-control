@@ -319,10 +319,8 @@ const GraphQLListContainer = new GraphQLObjectType({
           .where(eventFilters)
           .limit(first)
 
-        log.info(status)
         if (status === 'pendingReview'){
           events = events
-            .where('flag_approval', false)
             .join('gc_bsd_events', 'bsd_events.event_id', 'gc_bsd_events.event_id')
             .where('gc_bsd_events.pending_review', true)
         }
