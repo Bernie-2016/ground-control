@@ -317,7 +317,7 @@ const GraphQLListContainer = new GraphQLObjectType({
       },
       resolve: async (event, {first, eventFilterOptions, hostFilterOptions, status, sortField, sortDirection}, {rootValue}) => {
         let eventFilters = eventFromAPIFields(eventFilterOptions)
-        let convertedSortField = eventFieldFromAPIField(sortField)
+        let convertedSortField = `bsd_events.${eventFieldFromAPIField(sortField)}`
 
         let events = knex('bsd_events')
           .where('start_dt', '>=', new Date())
