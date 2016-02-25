@@ -1053,7 +1053,7 @@ ${signature}`
   _handleEventConfirmation = (eventIndexes, flagApproval=false) => {
     if (this.props.relay.variables.status === 'PENDING_REVIEW'){
       this._reviewEvents(eventIndexes)
-      // return
+      return
     }
 
     let eventsToConfirm = []
