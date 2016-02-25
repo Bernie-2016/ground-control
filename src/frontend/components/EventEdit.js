@@ -328,9 +328,6 @@ class EventEdit extends React.Component {
         <Form.Field
           name="isOfficial"
           label="Mark as an official campaign event"
-          onChange={(val) => {
-            this.props.onFieldChanged('isOfficial', val)
-          }}
         />
 
       <Form.Button  style={ { display: "none" } } ref="submit" type='submit' label='Submit Changes' fullWidth={true} />
