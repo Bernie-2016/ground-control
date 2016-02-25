@@ -302,7 +302,8 @@ const GraphQLListContainer = new GraphQLObjectType({
           values: {
             PENDING_APPROVAL: { value: 'pendingApproval' },
             PENDING_REVIEW: { value: 'pendingReview' },
-            APPROVED: { value: 'approved' }
+            APPROVED: { value: 'approved' },
+            FAST_FWD_REQUEST: { value: 'fastFwdRequest' }
           }
         })},
         sortField: { type: GraphQLString },
@@ -314,7 +315,7 @@ const GraphQLListContainer = new GraphQLObjectType({
           }
         })}
       },
-      resolve: async (event, {first, eventFilterOptions, hostFilterOptions, status, sortField, sortDirection, hasHostMessages}, {rootValue}) => {
+      resolve: async (event, {first, eventFilterOptions, hostFilterOptions, status, sortField, sortDirection}, {rootValue}) => {
         let eventFilters = eventFromAPIFields(eventFilterOptions)
         let convertedSortField = eventFieldFromAPIField(sortField)
 
@@ -332,6 +333,10 @@ const GraphQLListContainer = new GraphQLObjectType({
           events = events.where('flag_approval', true)
         else if (status === 'approved')
           events = events.where('flag_approval', false)
+        else if (status == 'fastFwdRequest')
+          events = events.join('fast_fwd_request', 'bsd_events.event_id', '=', 'fast_fwd_request.event_id')
+              .where('flag_approval', false)
+              .whereNull('email_sent_dt')
 
         events = events.where(eventFilters)
           .orderBy(convertedSortField, sortDirection)
@@ -353,11 +358,6 @@ const GraphQLListContainer = new GraphQLObjectType({
               events = addWhere({query: events, property: `bsd_people.${key}`, value: hostFilters[key]})
             }
           })
-        }
-
-        if(hasHostMessages){
-          events.join('fast_fwd_request', 'bsd_events.event_id', '=', 'fast_fwd_request.event_id')
-              .whereNull('email_sent_dt')
         }
 
         return connectionFromArray(await events, {first})

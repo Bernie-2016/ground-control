@@ -229,7 +229,7 @@ export default class MG {
       hostFirstName: name,
       sender: eventTypeData.sender,
       fastFwdURL: 'https://organize.berniesanders.com/event/' +
-                      toGlobalId('Event', event.event_id),
+                      toGlobalId('Event', event.event_id)
                       + '/request_email'
     }
     let template = new EmailTemplate(templateDir + '/send-fast-fwd-instructions')

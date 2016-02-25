@@ -419,19 +419,14 @@ class AdminEventsSection extends React.Component {
     const approvalFilterOptions = [
       {value: 'PENDING_APPROVAL', 'text': 'Pending Approval'},
       {value: 'PENDING_REVIEW', 'text': 'Pending Review'},
-      {value: 'APPROVED', 'text': 'Public Events'}
+      {value: 'APPROVED', 'text': 'Public Events'},
+      {value: 'FAST_FWD_REQUEST', 'text': 'FastFwd Requests'}
     ]
 
     const approvalFilterMenuItems = approvalFilterOptions.map((item) => <MenuItem value={item.value} key={item.value} primaryText={item.text} />)
 
     const resultLengthOptions = [ 10, 25, 50, 100, 500]
     const resultLengthMenuItems = resultLengthOptions.map((value) => <MenuItem value={value} key={value} primaryText={`${value} Events`} />)
-
-    this._handleApprovalFilterChange = (value) => {
-      this._handleQueryChange({
-        hasHostMessages: (value == 2)
-      })
-    }
 
     this._handleEventRequestLengthChange = (event, selectedIndex, value) => {
       this._handleQueryChange({
@@ -1440,7 +1435,6 @@ const getDefaultQuery = () => {
     status: 'PENDING_REVIEW',
     filters: {},
     hostFilters: {}
-    hasHostMessages: false
   }
   if (hashParams.query){
     try {
@@ -1473,7 +1467,6 @@ export default Relay.createContainer(AdminEventsSection, {
           eventFilterOptions: $filters
           hostFilterOptions: $hostFilters
           status: $status
-          hasHostMessages: $hasHostMessages
           sortField: $sortField
           sortDirection: $sortDirection
         ) {
