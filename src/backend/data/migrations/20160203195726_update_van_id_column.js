@@ -1,5 +1,6 @@
 
 exports.up = async function(knex, Promise) {
+  return;
   await knex.schema.raw('DROP TABLE livevox_contacts')
   await knex.schema.createTable('livevox_contacts', function(table) {
     table.increments('id').primary();

@@ -17,6 +17,7 @@ import MenuItem from 'material-ui/lib/menus/menu-item'
 import MutationHandler from './MutationHandler'
 import DeleteEvents from '../mutations/DeleteEvents'
 import EditEvents from '../mutations/EditEvents'
+import ReviewEvents from '../mutations/ReviewEvents'
 
 require('fixed-data-table/dist/fixed-data-table.min.css')
 require('./styles/adminEventsSection.css')
@@ -62,7 +63,7 @@ JSON.flatten = (data, options) => {
     }
     result[prop] = val
   }
-  let recurse = (cur, prop) => {    
+  let recurse = (cur, prop) => {
     if (Object(cur) !== cur) {
       addProp(prop, cur)
     }
@@ -70,7 +71,7 @@ JSON.flatten = (data, options) => {
       let l=cur.length;
       for(let i=0; i<l; i++)
         recurse(cur[i], `${prop}[${i}]`)
-    
+
     if (l == 0)
       addProp(prop, [])
     }
@@ -123,9 +124,9 @@ class AdminEventsSection extends React.Component {
       activeEventIndex: null,
       previewTabIndex: 0,
       userMessage: '',
-      approveOnUpdate: true,
       deletionConfirmationMessage: null,
       deletionReasonIndex: null,
+      actionButtons: new Set(['delete', 'demote', 'approve', 'edit', 'email', 'downloadRSVPs']),
       undoAction: function(){console.log('undo')}
     }
 
@@ -337,93 +338,77 @@ class AdminEventsSection extends React.Component {
       iconColor = BernieColors.darkRed
     }
 
+    const actions = {
+      delete: {
+        execute: () => {
+            this._handleEventDeletion([rowIndex])
+          },
+        icon: 'delete',
+        hoverColor: BernieColors.red
+      },
+      approve: {
+        title: (this.props.relay.variables.status === 'PENDING_REVIEW') ? 'mark reviewed' : 'mark approved',
+        execute: () => {
+            this._handleEventConfirmation([rowIndex])
+          },
+        icon: 'event_available',
+        disabled: this.props.relay.variables.status === 'APPROVED'
+      },
+      demote: {
+        title: 'move to approval queue',
+        execute: () => {
+            this._handleEventConfirmation([rowIndex], true)
+          },
+        icon: 'event_busy',
+        hoverColor: BernieColors.red,
+        disabled: this.props.relay.variables.status === 'PENDING_APPROVAL'
+      },
+      edit: {
+        title: 'edit',
+        execute: () => {
+            this._handleEventPreviewOpen(rowIndex, 1);
+          },
+        icon: 'edit',
+      },
+      email: {
+        title: 'email',
+        execute: () => {
+            this._handleEventEmail([rowIndex])
+          },
+        icon: 'email',
+        disabled: (data[rowIndex].node.flagApproval === true || data[rowIndex].node.isSearchable === 0)
+      },
+      downloadRSVPs: {
+        title: 'download RSVPs',
+        execute: () => {
+            this._handleRSVPDownload([rowIndex])
+          },
+        icon: 'file_download',
+        disabled: (data[rowIndex].node.attendeesCount <= 0)
+      }
+    }
+
+    const getActionButtons = (actionTypes) => {
+      return actionTypes.map((key) => {
+        const type = actions[key]
+        return (
+          <IconButton
+            title={type.title}
+            onTouchTap={type.execute}
+            disabled={(type.disabled !== undefined) ? type.disabled : false}
+            key={key}
+          >
+            <FontIcon className="material-icons" color={iconColor} hoverColor={type.hoverColor || BernieColors.blue}>{type.icon}</FontIcon>
+          </IconButton>
+        )
+      })
+    }
+
     return (
       <Cell {...props} style={cellStyle}>
       <div style={{position: 'relative', left: '-5px'}}>
-        {/*
-          <IconButton
-          title="preview"
-          onTouchTap={function(){
-            this._handleEventPreviewOpen(rowIndex, 0);
-          }.bind(this)}
-        >
-          <FontIcon className="material-icons" hoverColor={BernieColors.blue}>search</FontIcon>
-        </IconButton>
 
-        <IconButton
-          title="duplicate"
-          onTouchTap={function(){
-            this._handleEventPreviewOpen(rowIndex, 1);
-          }.bind(this)}
-        >
-          <FontIcon className="material-icons" hoverColor={BernieColors.blue}>content_copy</FontIcon>
-        </IconButton>
-
-        */}
-
-        <IconButton
-          title="delete"
-          onTouchTap={() => {
-            this._handleEventDeletion([rowIndex])
-          }}
-        >
-          <FontIcon className="material-icons" color={iconColor} hoverColor={BernieColors.red}>delete</FontIcon>
-        </IconButton>
-
-        <IconButton
-          title="approve"
-          disabled={this.props.relay.variables.filters.flagApproval === false}
-          onTouchTap={() => {
-            this._handleEventConfirmation([rowIndex])
-          }}
-        >
-          <FontIcon className="material-icons" color={iconColor} hoverColor={BernieColors.blue}>event_available</FontIcon>
-        </IconButton>
-
-        <IconButton
-          title="edit"
-          onTouchTap={() => {
-            this._handleEventPreviewOpen(rowIndex, 1);
-          }}
-        >
-          <FontIcon className="material-icons" color={iconColor} hoverColor={BernieColors.blue}>edit</FontIcon>
-        </IconButton>
-
-        <IconButton
-          title="email"
-          disabled={(data[rowIndex].node.flagApproval === true || data[rowIndex].node.isSearchable === 0)}
-          onTouchTap={() => {
-            this._handleEventEmail([rowIndex])
-          }}
-          >
-            <FontIcon className="material-icons" color={iconColor} hoverColor={BernieColors.blue}>email</FontIcon>
-        </IconButton>
-
-        <IconButton
-          title="download RSVPs"
-          disabled={(data[rowIndex].node.attendeesCount <= 0)}
-          onTouchTap={() => {
-            this._handleRSVPDownload([rowIndex])
-          }}
-          >
-            <FontIcon className="material-icons" color={iconColor} hoverColor={BernieColors.blue}>file_download</FontIcon>
-        </IconButton>
-
-        {/*
-          IconMenu does not not work inside of fixed-data-table cells because of overflow:hidden on parent divs;
-          The plan is to use https://github.com/tajo/react-portal to overcome this limitation
-        */}
-        {/*
-        <IconMenu
-          iconButtonElement={<FontIcon className="material-icons" hoverColor={BernieColors.blue}>more_vert</FontIcon>}
-          desktop={true}
-          openDirection="bottom-right"
-        >
-          <MenuItem index={0} primaryText="Refresh" leftIcon={<FontIcon className="material-icons">delete</FontIcon>} />
-          <MenuItem index={1} primaryText="Send feedback" leftIcon={<FontIcon className="material-icons">delete</FontIcon>} />
-          <MenuItem index={2} primaryText="Settings" leftIcon={<FontIcon className="material-icons">delete</FontIcon>} />
-        </IconMenu>
-        */}
+        {getActionButtons([...this.state.actionButtons])}
 
       </div>
       </Cell>
@@ -432,9 +417,9 @@ class AdminEventsSection extends React.Component {
 
   renderToolbar() {
     const approvalFilterOptions = [
-      {value: 1, 'text': 'Pending Approval'},
-      {value: 0, 'text': 'Approved Events'},
-      {value: 2, 'text': 'FastFwd Requests'}
+      {value: 'PENDING_APPROVAL', 'text': 'Pending Approval'},
+      {value: 'PENDING_REVIEW', 'text': 'Pending Review'},
+      {value: 'APPROVED', 'text': 'Public Events'}
     ]
 
     const approvalFilterMenuItems = approvalFilterOptions.map((item) => <MenuItem value={item.value} key={item.value} primaryText={item.text} />)
@@ -472,10 +457,11 @@ class AdminEventsSection extends React.Component {
       <Toolbar>
         <ToolbarGroup key={0} float="left">
           <DropDownMenu
-            value={this.props.relay.variables.filters.flagApproval ? 1 : this.props.relay.variables.hasHostMessages ? 2 : 0}
+            value={this.props.relay.variables.status}
             onChange={(event, index, value) => {
-              this._handleApprovalFilterChange(value);
-            }}
+                this._handleQueryChange({status: value});
+              }
+            }
           >
             {approvalFilterMenuItems}
           </DropDownMenu>
@@ -487,48 +473,7 @@ class AdminEventsSection extends React.Component {
           >
             {resultLengthMenuItems}
           </DropDownMenu>
-          {/*IconMenus are just broken right now
-          <IconMenu
-            iconButtonElement={<FontIcon className="material-icons" hoverColor={BernieColors.blue}>filter_list</FontIcon>}
-            desktop={true}
-            // multiple={true}
-            closeOnItemTouchTap={false}
-            openDirection="bottom-right"
-            style={{ position: 'relative', top: '15px' }}
-            menuStyle={{ maxHeight: '300px' }}
-          >
-            {states.map((item, index) => {
-              return <MenuItem index={index} key={index} primaryText={item.abbreviation} />
-            })}
-          </IconMenu>*/}
-          {/*<div
-            style={{ position: 'relative', top: '20px', display: 'inline' }}
-          >
-            <label htmlFor="stateSelect" style={{ display: 'inline', marginRight: '0.5em', fontSize: '0.8em' }}>Filter by State</label>
-            <select
-              id='stateSelect'
-              onChange={(event) => {
-                let updatedValue = event.target.value;
-                if (updatedValue == 'none'){updatedValue = null}
-                this._handleRequestFiltersChange({'venueState': updatedValue});
-              }}
-            >
-              <option value='none'>--</option>
-              {states.map((item, index) => {
-                return <option key={index} value={item.abbreviation}>{item.name}</option>
-              })}
-            </select>
-          </div>*/}
-          {/*<IconButton
-            iconClassName="material-icons"
-            tooltipPosition="bottom-center"
-            title="Refresh Events"
-            style={{float: 'left', top: '5px'}}
-            tooltipStyles={{zIndex: 10}}
-            onTouchTap={() => {
-              this._handleRequestRefresh();
-            }}
-          >refresh</IconButton>*/}
+
           <RaisedButton
             label="Filter"
             labelPosition="after"
@@ -567,10 +512,10 @@ class AdminEventsSection extends React.Component {
             }}
           />
           <RaisedButton
-            label="Approve Selected"
+            label={(this.props.relay.variables.status === 'PENDING_REVIEW') ? 'Mark Reviewed' : 'Mark Approved'}
             style={{marginLeft: 0}}
             secondary={true}
-            disabled={(this.state.selectedRows.length == 0 || this.props.relay.variables.filters.flagApproval === false)}
+            disabled={(this.state.selectedRows.length == 0 || this.props.relay.variables.status === 'APPROVED')}
             onTouchTap={() => {
           this._handleEventConfirmation(this.state.selectedRows);
         }}
@@ -578,6 +523,22 @@ class AdminEventsSection extends React.Component {
         </ToolbarGroup>
       </Toolbar>
     )
+  }
+
+  _reviewEvents = (indexes, pendingReview=false) => {
+    let eventIDs = indexes.map(index => {
+      return events[index].node.id
+    })
+
+    this.refs.eventReviewedHandler.send({
+      listContainer: this.props.listContainer,
+      eventIDs,
+      pendingReview
+    })
+
+    this.props.relay.forceFetch()
+    this.setState({showEventPreview: false})
+    this._deselectRows({indexesToRemove: indexes})
   }
 
   _deleteEvent = () => {
@@ -971,7 +932,7 @@ ${signature}`
         }}
       />,
       <FlatButton
-        label={(this.state.previewTabIndex == 0) ? 'Approve' : (this.state.approveOnUpdate ? 'Update and Approve' : 'Update')}
+        label='Update'
         key="3"
         disabled={this.props.relay.variables.filters.flagApproval === false && this.state.previewTabIndex === 0}
         secondary={true}
@@ -1035,14 +996,6 @@ ${signature}`
               }}
               event={activeEvent}
               listContainer={this.props.listContainer}
-              onFieldChanged={(fieldName, val) => {
-                if (fieldName === 'flagApproval') {
-                  if (val === true)
-                    this.setState({approveOnUpdate: false})
-                  else
-                    this.setState({approveOnUpdate: true})
-                }
-              }}
             />
           </Tab>
         </Tabs>
@@ -1078,7 +1031,6 @@ ${signature}`
       showEventPreview: true,
       activeEventIndex: eventIndex,
       previewTabIndex: tabIndex,
-      approveOnUpdate: true
     })
   }
 
@@ -1113,7 +1065,12 @@ ${signature}`
     })
   }
 
-  _handleEventConfirmation = (eventIndexes) => {
+  _handleEventConfirmation = (eventIndexes, flagApproval=false) => {
+    if (this.props.relay.variables.status === 'PENDING_REVIEW' && !flagApproval){
+      this._reviewEvents(eventIndexes)
+      return
+    }
+
     let eventsToConfirm = []
 
     events.forEach((event, index) => {
@@ -1121,7 +1078,7 @@ ${signature}`
         let node = event.node
         eventsToConfirm.push({
           id: node.id,
-          flagApproval: false
+          flagApproval
         })
       }
     })
@@ -1278,6 +1235,12 @@ ${signature}`
         mutationName='editEvents'
         successMessage='Event(s) updated successfully'
       />
+      <MutationHandler
+        ref='eventReviewedHandler'
+        mutationClass={ReviewEvents}
+        mutationName='reviewEvents'
+        successMessage='Event(s) marked reviewed'
+      />
       {this.renderDeleteModal()}
       {this.renderCreateModal()}
       {this.renderEventPreviewModal()}
@@ -1316,7 +1279,7 @@ ${signature}`
             header={<this.HeaderCell content="Manage" />}
             cell={<this.ActionCell data={events} col="actions" />}
             fixed={true}
-            width={260}
+            width={this.state.actionButtons.size * 48 + 16}
             align='center'
           />
         </ColumnGroup>
@@ -1474,8 +1437,9 @@ const getDefaultQuery = () => {
     numEvents: 100,
     sortField: 'startDate',
     sortDirection: 'ASC',
-    filters: {flagApproval: true},
-    hostFilters: {},
+    status: 'PENDING_REVIEW',
+    filters: {},
+    hostFilters: {}
     hasHostMessages: false
   }
   if (hashParams.query){
@@ -1508,6 +1472,7 @@ export default Relay.createContainer(AdminEventsSection, {
           first: $numEvents
           eventFilterOptions: $filters
           hostFilterOptions: $hostFilters
+          status: $status
           hasHostMessages: $hasHostMessages
           sortField: $sortField
           sortDirection: $sortDirection
@@ -1574,6 +1539,3 @@ export default Relay.createContainer(AdminEventsSection, {
     `
   }
 })
-
-
-

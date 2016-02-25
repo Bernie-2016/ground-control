@@ -140,15 +140,6 @@ function eventFromAPIFields(fields) {
   return event
 }
 
-function preConcatObjectKeys(obj, string) {
-  let newObj = {}
-  Object.keys(obj).forEach((fieldName) => {
-    newObj[`${string}.${fieldName}`] = obj[fieldName]
-  })
-
-  return newObj
-}
-
 async function getPrimaryEmail(person, transaction) {
   let query = knex('bsd_emails')
     .where({
@@ -304,11 +295,18 @@ const GraphQLListContainer = new GraphQLObjectType({
       type: GraphQLEventConnection,
       args: {
         ...connectionArgs,
-        eventFilterOptions: {type: GraphQLEventInput },
-        hasHostMessages: {type: GraphQLBoolean},
-        hostFilterOptions: {type: GraphQLPersonInput },
-        sortField: {type: GraphQLString},
-        sortDirection: {type: new GraphQLEnumType({
+        eventFilterOptions: { type: GraphQLEventInput },
+        hostFilterOptions: { type: GraphQLPersonInput },
+        status: { type: new GraphQLEnumType({
+          name: 'GraphQLEventStatus',
+          values: {
+            PENDING_APPROVAL: { value: 'pendingApproval' },
+            PENDING_REVIEW: { value: 'pendingReview' },
+            APPROVED: { value: 'approved' }
+          }
+        })},
+        sortField: { type: GraphQLString },
+        sortDirection: { type: new GraphQLEnumType({
           name: 'GraphQLSortDirection',
           values: {
             ASC: { value: 'asc' },
@@ -316,7 +314,7 @@ const GraphQLListContainer = new GraphQLObjectType({
           }
         })}
       },
-      resolve: async (event, {first, eventFilterOptions, hostFilterOptions, sortField, sortDirection, hasHostMessages}, {rootValue}) => {
+      resolve: async (event, {first, eventFilterOptions, hostFilterOptions, status, sortField, sortDirection, hasHostMessages}, {rootValue}) => {
         let eventFilters = eventFromAPIFields(eventFilterOptions)
         let convertedSortField = eventFieldFromAPIField(sortField)
 
@@ -324,12 +322,24 @@ const GraphQLListContainer = new GraphQLObjectType({
           .where('start_dt', '>=', new Date())
           .where(eventFilters)
           .limit(first)
+
+        if (status === 'pendingReview'){
+          events = events
+            .join('gc_bsd_events', 'bsd_events.event_id', 'gc_bsd_events.event_id')
+            .where('gc_bsd_events.pending_review', true)
+        }
+        else if (status === 'pendingApproval')
+          events = events.where('flag_approval', true)
+        else if (status === 'approved')
+          events = events.where('flag_approval', false)
+
+        events = events.where(eventFilters)
           .orderBy(convertedSortField, sortDirection)
 
         if (Object.keys(hostFilterOptions).length){
           events = events.leftJoin('bsd_people', 'bsd_events.creator_cons_id', 'bsd_people.cons_id')
           let hostFilters = humps.decamelizeKeys(hostFilterOptions)
-          
+
           Object.keys(hostFilters).forEach((key) => {
             if (key === 'email'){
               events = events.join('bsd_emails', 'bsd_events.creator_cons_id', 'bsd_emails.cons_id')
@@ -1095,6 +1105,7 @@ const GraphQLEditEvents = mutationWithClientMutationId({
     })
     let count = params.length;
     let updateErrors = [];
+    let reviewedEvents = [];
     let message = `${events.length} Event${(events.length > 1) ? 's' : ''} Updated`;
 
     for (let index = 0; index < count; index++) {
@@ -1151,11 +1162,16 @@ const GraphQLEditEvents = mutationWithClientMutationId({
           ...event,
           modified_dt: new Date()
         })
+
+      reviewedEvents.push(Number(event.event_id))
     }
 
     if (updateErrors.length > 0){
       message = updateErrors.join(', ')
     }
+
+    if (reviewedEvents.length > 0)
+      await markEventsReviewed(reviewedEvents)
 
     return {events, message}
   }
@@ -1209,6 +1225,31 @@ const GraphQLDeleteEvents = mutationWithClientMutationId({
       .whereIn('event_id', localIds)
       .del()
     return localIds
+  }
+})
+
+const markEventsReviewed = async (ids, pendingReview=false) => {
+  await knex('gc_bsd_events')
+    .whereIn('event_id', ids)
+    .update('pending_review', pendingReview)
+  return ids
+}
+const GraphQLReviewEvents = mutationWithClientMutationId({
+  name: 'ReviewEvents',
+  inputFields: {
+    ids: { type: new GraphQLNonNull(new GraphQLList(GraphQLString)) },
+    pendingReview: { type: GraphQLBoolean }
+  },
+  outputFields: {
+    listContainer: {
+      type: GraphQLListContainer,
+      resolve: () => SharedListContainer
+    }
+  },
+  mutateAndGetPayload: async ({ids, pendingReview}, {rootValue}) => {
+    adminRequired(rootValue)
+    const localIds = ids.map((id) => fromGlobalId(id).id)
+    return await markEventsReviewed(localIds, pendingReview)
   }
 })
 
@@ -1648,6 +1689,7 @@ let RootMutation = new GraphQLObjectType({
   name: 'RootMutation',
   fields: () => ({
     editEvents: GraphQLEditEvents,
+    reviewEvents: GraphQLReviewEvents,
     submitCallSurvey: GraphQLSubmitCallSurvey,
     createCallAssignment: GraphQLCreateCallAssignment,
     deleteEvents: GraphQLDeleteEvents,
@@ -1673,7 +1715,7 @@ let RootQuery = new GraphQLObjectType({
         authRequired(rootValue)
         return rootValue.user
       }
-    }, 
+    },
     callAssignment: {
       type: GraphQLCallAssignment,
       args: {
