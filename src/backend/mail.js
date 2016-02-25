@@ -203,19 +203,47 @@ export default class MG {
     return await this.send(message)
   }
 
-  async sendFastFwdInstructions(data) {
+  async sendFastFwdInstructions(eventId) {
+
+    let event = await knex('gc_bsd_events')
+      .innerJoin('bsd_events', 'bsd_events.event_id', 'gc_bsd_events.event_id')
+      .innerJoin('bsd_people', 'bsd_events.creator_cons_id', 'bsd_people.cons_id')
+      .innerJoin('bsd_emails', 'bsd_events.creator_cons_id', 'bsd_emails.cons_id')
+      .where('gc_bsd_events.event_id', eventId)
+
+    event = event[0]
+    if (event.length > 1) {
+      event.forEach((e) => {
+        if (e.is_primary)
+          event = e;
+      })
+    }
+    if (!event) {
+      log.warn(`Not sending e-mail for event ${eventId} -- did not find a corresponding event/creator email address`)
+      return
+    }
+
+    let name = event.firstname ? event.firstname : "Bernie Volunteer"
+
+    let data = {
+      hostFirstName: name,
+      sender: eventTypeData.sender,
+      fastFwdURL: 'https://organize.berniesanders.com/event/' +
+                      toGlobalId('Event', event.event_id),
+                      + '/request_email'
+    }
     let template = new EmailTemplate(templateDir + '/send-fast-fwd-instructions')
     let content = await template.render(data)
-
     let message = {
-      from: data.senderAddress,
-      'h:Reply-To': data.hostAddress,
-      to: data.recipientAddress,
-      subject: 'Need help getting volunteers to your event?',
-      text: content.text
+      from: 'Team Bernie<info@berniesanders.com>',
+      'h:Reply-To': 'info@berniesanders.com',
+      to: event.email,
+      subject: 'Find volunteers in your area for your upcoming event!',
+      html: content.html
     }
 
     return await this.send(message)
+
   }
 
 }
