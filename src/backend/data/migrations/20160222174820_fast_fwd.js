@@ -10,7 +10,7 @@ exports.up = async function(knex, Promise) {
     })
 
     await knex.schema.table('gc_bsd_events', function(table){
-        table.boolean('fast_fwd_instructions_sent').notNullable.default(false)
+        table.boolean('fast_fwd_instructions_sent').notNullable.defaultTo(false)
     })
   
 };
