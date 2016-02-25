@@ -419,7 +419,8 @@ class AdminEventsSection extends React.Component {
     const approvalFilterOptions = [
       {value: 'PENDING_APPROVAL', 'text': 'Pending Approval'},
       {value: 'PENDING_REVIEW', 'text': 'Pending Review'},
-      {value: 'APPROVED', 'text': 'Public Events'}
+      {value: 'APPROVED', 'text': 'Public Events'},
+      {value: 'FAST_FWD_REQUEST', 'text': 'FastFwd Requests'}
     ]
 
     const approvalFilterMenuItems = approvalFilterOptions.map((item) => <MenuItem value={item.value} key={item.value} primaryText={item.text} />)
@@ -844,7 +845,7 @@ ${signature}`
       {name: 'venueState', label: 'State', type: 'select', options: states, optionValue: 'abbreviation'},
       {name: 'venueZip', label: 'Zip Code'},
       {name: 'latitude', label: 'Latitude', type: 'number'},
-      {name: 'longitude', label: 'Longitude', type: 'number'},
+      {name: 'longitude', label: 'Longitude', type: 'number'}
     ];
 
     const hostFilterInputs = [

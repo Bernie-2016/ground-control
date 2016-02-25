@@ -13,6 +13,7 @@ import AdminEventsSection from './components/AdminEventsSection';
 import AdminEventUploadRsvps from './components/AdminEventUploadRsvps';
 import AdminCallAssignmentsSection from './components/AdminCallAssignmentsSection';
 import AdminCallAssignmentCreationForm from './components/AdminCallAssignmentCreationForm';
+import FastFwdForm from './components/FastFwdForm';
 import GCTextField from './components/forms/GCTextField';
 import GCPhoneField from './components/forms/GCPhoneField';
 import GCDateField from './components/forms/GCDateField';
@@ -87,7 +88,11 @@ const CurrentUserQueries = {
 
 const EventQueries = {
   event: () => Relay.QL`query { event(id: $id) }`
-}
+};
+
+const FastFwdRequest = {
+  fastFwdRequest: () => Relay.QL`query{ fastFwdRequest(id: $id) }`
+};
 
 let history = createHistory();
 
@@ -174,6 +179,15 @@ ReactDOM.render(
         />
       </Route>
     </Route>
+    <Route
+      path='/event/:id/request_email'
+      component={FastFwdForm}
+        queries={{
+          ...EventQueries,
+          ...CurrentUserQueries
+        }}
+        renderLoading={() => <Loading />}
+    />
     <Route path='/unauthorized' component={Unauthorized} />
     <Route path="*" component={NotFound} />
   </Router>,

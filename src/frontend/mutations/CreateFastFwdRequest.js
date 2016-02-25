@@ -1,6 +1,6 @@
 import Relay from 'react-relay'
 
-export default class CreateAdminEventEmail extends Relay.Mutation {
+export default class CreateFastFwdRequest extends Relay.Mutation {
   static fragments = {
     listContainer: () => Relay.QL`
       fragment on ListContainer {
@@ -11,13 +11,13 @@ export default class CreateAdminEventEmail extends Relay.Mutation {
 
   getMutation() {
     return Relay.QL`
-      mutation{ createAdminEventEmail }
+      mutation{ createFastFwdRequest }
     `
   }
 
   getFatQuery() {
     return Relay.QL`
-      fragment on CreateAdminEventEmailPayload {
+      fragment on CreateFastFwdRequestPayload {
         listContainer {
           id
         }
@@ -36,13 +36,7 @@ export default class CreateAdminEventEmail extends Relay.Mutation {
 
   getVariables() {
     return {
-      hostEmail: this.props.hostEmail,
-      senderEmail: this.props.senderEmail,
-      adminEmail: this.props.adminEmail,
       hostMessage: this.props.hostMessage,
-      senderMessage: this.props.senderMessage,
-      recipients: this.props.recipients,
-      toolPassword: this.props.toolPassword,
       eventId: this.props.eventId
     }
   }

@@ -31,7 +31,7 @@ export let job = async () => {
     })
     log.info(`Sending email to ${eventsToEmail.length} events`)
     let promises = eventsToEmail.map(async (event) => {
-      return Mailgun.sendEventInstructions(event.event_id)
+      return Mailgun.sendEventInstructions(event)
     })
     await Promise.all(promises)
     log.info('Done sending e-mails!')

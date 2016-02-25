@@ -217,6 +217,8 @@ let {nodeInterface, nodeField} = nodeDefinitions(
       return addType(knex('bsd_addresses').where('cons_addr_id', id))
     if (type === 'ListContainer')
       return SharedListContainer
+    if (type == 'FastFwdRequest')
+      return addType(knex('fast_fwd_request').where('id', id))
     return null
   },
   (obj) => {
@@ -238,6 +240,8 @@ let {nodeInterface, nodeField} = nodeDefinitions(
       return GraphQLAddress
     if (obj._type == 'users')
       return GraphQLUser
+    if (obj._type == 'fast_fwd_request')
+      return GraphQLFastFwdRequest
     return null
   }
 )
@@ -298,7 +302,8 @@ const GraphQLListContainer = new GraphQLObjectType({
           values: {
             PENDING_APPROVAL: { value: 'pendingApproval' },
             PENDING_REVIEW: { value: 'pendingReview' },
-            APPROVED: { value: 'approved' }
+            APPROVED: { value: 'approved' },
+            FAST_FWD_REQUEST: { value: 'fastFwdRequest' }
           }
         })},
         sortField: { type: GraphQLString },
@@ -328,6 +333,10 @@ const GraphQLListContainer = new GraphQLObjectType({
           events = events.where('flag_approval', true)
         else if (status === 'approved')
           events = events.where('flag_approval', false)
+        else if (status == 'fastFwdRequest')
+          events = events.join('fast_fwd_request', 'bsd_events.event_id', '=', 'fast_fwd_request.event_id')
+              .where('flag_approval', false)
+              .whereNull('email_sent_dt')
 
         events = events.where(eventFilters)
           .orderBy(convertedSortField, sortDirection)
@@ -944,6 +953,14 @@ const GraphQLEvent = new GraphQLObjectType({
         }
         return foundPeople.slice(0, 250)
       }
+    },
+    fastFwdRequest: {
+      type: GraphQLFastFwdRequest,
+      resolve: async (event) => {
+        let req = await knex.table('fast_fwd_request')
+                          .where('event_id', event['event_id'])
+        return humps.camelizeKeys(req[0])
+      }
     }
   }),
   interfaces: [nodeInterface]
@@ -1403,7 +1420,8 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
     hostMessage: { type: new GraphQLNonNull(GraphQLString) },
     senderMessage: { type: new GraphQLNonNull(GraphQLString) },
     recipients: { type: new GraphQLList(GraphQLString) },
-    toolPassword: { type: new GraphQLNonNull(GraphQLString) }
+    toolPassword: { type: new GraphQLNonNull(GraphQLString) },
+    eventId: { type: new GraphQLNonNull(GraphQLString) }
   },
   outputFields: {
     listContainer: {
@@ -1411,7 +1429,8 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
       resolve: () => SharedListContainer
     }
   },
-  mutateAndGetPayload: async ({hostEmail, senderEmail, adminEmail, hostMessage, senderMessage, recipients, toolPassword}, {rootValue}) => {
+  mutateAndGetPayload: async ({hostEmail, senderEmail, adminEmail, hostMessage, senderMessage, recipients, toolPassword, eventId}, {rootValue}) => {
+
     adminRequired(rootValue)
 
     // TODO: remove this goofy protection when the tool is ready
@@ -1456,8 +1475,67 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
       }
     })
 
+    // somewhat hackish; catches Test Mode.
+    // don't mark it as sent until it goes out to volunteers.
+    if(recipients.length > 1){
+      await knex.table('fast_fwd_request')
+              .where('event_id', fromGlobalId(eventId).id)
+              .update({
+                'email_sent_dt': new Date()
+              })
+    }
+
     return []
   }
+})
+
+const GraphQLCreateFastFwdRequest = mutationWithClientMutationId({
+  name: 'CreateFastFwdRequest',
+  inputFields: {
+    eventId: globalIdField('Event', (obj) => obj.event_id),
+    hostMessage: { type: new GraphQLNonNull(GraphQLString) },
+  },
+  outputFields: {
+    listContainer: {
+      type: GraphQLListContainer,
+      resolve: () => SharedListContainer
+    }
+  },
+  mutateAndGetPayload: async ({hostMessage, eventId}, {rootValue}) => {
+
+    let intEventId = fromGlobalId(eventId).id
+
+    let existingRecord = await knex.table('fast_fwd_request')
+                            .where('event_id', intEventId)
+
+    if(existingRecord.length){
+      await knex.table('fast_fwd_request')
+                            .where('event_id', intEventId)
+                            .update({
+                              'host_message': hostMessage
+                            });
+
+      let updatedRecord = await knex.table('fast_fwd_request')
+                            .where('event_id', intEventId)
+      
+      return updatedRecord
+    }
+    
+    return await knex.insertAndFetch('fast_fwd_request', {
+        host_message: hostMessage,
+        event_id: intEventId
+      })
+
+  }
+})
+
+const GraphQLFastFwdRequest = new GraphQLObjectType({
+  name: 'FastFwdRequest',
+  description: 'A request from event hosts to send a FastForward invite',
+  fields: () => ({
+    id: globalIdField('FastFwdRequest'),
+    hostMessage: { type: GraphQLString }
+  })
 })
 
 const GraphQLCreateCallAssignment = mutationWithClientMutationId({
@@ -1615,7 +1693,8 @@ let RootMutation = new GraphQLObjectType({
     submitCallSurvey: GraphQLSubmitCallSurvey,
     createCallAssignment: GraphQLCreateCallAssignment,
     deleteEvents: GraphQLDeleteEvents,
-    createAdminEventEmail: GraphQLCreateAdminEventEmail
+    createAdminEventEmail: GraphQLCreateAdminEventEmail,
+    createFastFwdRequest: GraphQLCreateFastFwdRequest
   })
 })
 
@@ -1654,9 +1733,23 @@ let RootQuery = new GraphQLObjectType({
         id: { type: new GraphQLNonNull(GraphQLString) }
       },
       resolve: async (root, {id}, {rootValue}) => {
+        let localId = fromGlobalId(id)
+        if (localId.type !== 'Event')
+          localId = id
+        else
+          localId = localId.id
+        return rootValue.loaders.bsdEvents.load(localId)
+      }
+    },
+    fastFwdRequest: {
+      type: GraphQLFastFwdRequest,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLString) }
+      },
+      resolve: async (root, {id}, {rootValue}) => {
         authRequired(rootValue)
         let localId = fromGlobalId(id).id
-        return rootValue.loaders.bsdEvents.load(localId)
+        return knex('fast_fwd_request').where('id', localId)
       }
     },
     node: nodeField

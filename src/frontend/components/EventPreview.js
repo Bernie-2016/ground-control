@@ -96,6 +96,9 @@ export default class EventPreview extends React.Component {
           <h1 style={BernieText.title}>{event.name}</h1>
           {isOfficial}
 
+          <InfoHeader content='Event Host' />
+          <p>{event.host.firstName} {event.host.lastName}</p>
+
           <InfoHeader content='Event Type' />
           <p>{event.eventType.name}</p>
 
