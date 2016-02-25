@@ -337,7 +337,7 @@ const GraphQLListContainer = new GraphQLObjectType({
         if (Object.keys(hostFilterOptions).length){
           events = events.leftJoin('bsd_people', 'bsd_events.creator_cons_id', 'bsd_people.cons_id')
           let hostFilters = humps.decamelizeKeys(hostFilterOptions)
-          
+
           Object.keys(hostFilters).forEach((key) => {
             if (key === 'email'){
               events = events.join('bsd_emails', 'bsd_events.creator_cons_id', 'bsd_emails.cons_id')
@@ -1148,9 +1148,7 @@ const GraphQLEditEvents = mutationWithClientMutationId({
           modified_dt: new Date()
         })
 
-      if (!event['flag_approval']){
-        reviewedEvents.push(Number(event.event_id))
-      }
+      reviewedEvents.push(Number(event.event_id))
     }
 
     if (updateErrors.length > 0){
@@ -1640,7 +1638,7 @@ let RootQuery = new GraphQLObjectType({
         authRequired(rootValue)
         return rootValue.user
       }
-    }, 
+    },
     callAssignment: {
       type: GraphQLCallAssignment,
       args: {
