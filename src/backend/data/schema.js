@@ -624,7 +624,7 @@ const GraphQLAddress = new GraphQLObjectType({
     latitude: { type: GraphQLFloat },
     longitude: { type: GraphQLFloat },
     localUTCOffset: {
-      type: GraphQLString,
+      type: GraphQLInt,
       resolve: async (address) => {
         let tz = TZLookup(address.latitude, address.longitude)
         return moment().tz(tz).format('Z')
@@ -847,10 +847,10 @@ const GraphQLEvent = new GraphQLObjectType({
       }
     },
     localUTCOffset: {
-      type: GraphQLString,
+      type: GraphQLInt,
       resolve: (event) => {
         let tz = moment().tz(event.start_tz);
-        return tz ? tz.format('Z') : '+0000'
+        return tz ? tz.utcOffset() : 0
       }
     },
     startDate: {
