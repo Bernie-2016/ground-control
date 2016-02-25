@@ -63,7 +63,7 @@ JSON.flatten = (data, options) => {
     }
     result[prop] = val
   }
-  let recurse = (cur, prop) => {    
+  let recurse = (cur, prop) => {
     if (Object(cur) !== cur) {
       addProp(prop, cur)
     }
@@ -71,7 +71,7 @@ JSON.flatten = (data, options) => {
       let l=cur.length;
       for(let i=0; i<l; i++)
         recurse(cur[i], `${prop}[${i}]`)
-    
+
     if (l == 0)
       addProp(prop, [])
     }
@@ -124,7 +124,6 @@ class AdminEventsSection extends React.Component {
       activeEventIndex: null,
       previewTabIndex: 0,
       userMessage: '',
-      approveOnUpdate: true,
       deletionConfirmationMessage: null,
       deletionReasonIndex: null,
       actionButtons: new Set(['delete', 'approve', 'edit', 'email', 'downloadRSVPs']),
@@ -348,7 +347,7 @@ class AdminEventsSection extends React.Component {
         hoverColor: BernieColors.red
       },
       approve: {
-        title: 'approve',
+        title: (this.props.relay.variables.status === 'PENDING_REVIEW') ? 'mark reviewed' : 'mark approved',
         execute: () => {
             this._handleEventConfirmation([rowIndex])
           },
@@ -498,7 +497,7 @@ class AdminEventsSection extends React.Component {
             }}
           />
           <RaisedButton
-            label="Approve Selected"
+            label={(this.props.relay.variables.status === 'PENDING_REVIEW') ? 'Mark Reviewed' : 'Mark Approved'}
             style={{marginLeft: 0}}
             secondary={true}
             disabled={(this.state.selectedRows.length == 0 || this.props.relay.variables.status === 'APPROVED')}
@@ -522,6 +521,7 @@ class AdminEventsSection extends React.Component {
       pendingReview
     })
 
+    this.props.relay.forceFetch()
     this.setState({showEventPreview: false})
     this._deselectRows({indexesToRemove: indexes})
   }
@@ -917,7 +917,7 @@ ${signature}`
         }}
       />,
       <FlatButton
-        label={(this.state.previewTabIndex == 0) ? 'Approve' : (this.state.approveOnUpdate ? 'Update and Approve' : 'Update')}
+        label='Update'
         key="3"
         disabled={this.props.relay.variables.filters.flagApproval === false && this.state.previewTabIndex === 0}
         secondary={true}
@@ -981,14 +981,6 @@ ${signature}`
               }}
               event={activeEvent}
               listContainer={this.props.listContainer}
-              onFieldChanged={(fieldName, val) => {
-                if (fieldName === 'flagApproval') {
-                  if (val === true)
-                    this.setState({approveOnUpdate: false})
-                  else
-                    this.setState({approveOnUpdate: true})
-                }
-              }}
             />
           </Tab>
         </Tabs>
@@ -1024,7 +1016,6 @@ ${signature}`
       showEventPreview: true,
       activeEventIndex: eventIndex,
       previewTabIndex: tabIndex,
-      approveOnUpdate: true
     })
   }
 
@@ -1059,7 +1050,12 @@ ${signature}`
     })
   }
 
-  _handleEventConfirmation = (eventIndexes) => {
+  _handleEventConfirmation = (eventIndexes, flagApproval=false) => {
+    if (this.props.relay.variables.status === 'PENDING_REVIEW'){
+      this._reviewEvents(eventIndexes)
+      // return
+    }
+
     let eventsToConfirm = []
 
     events.forEach((event, index) => {
@@ -1067,7 +1063,7 @@ ${signature}`
         let node = event.node
         eventsToConfirm.push({
           id: node.id,
-          flagApproval: false
+          flagApproval
         })
       }
     })
@@ -1526,6 +1522,3 @@ export default Relay.createContainer(AdminEventsSection, {
     `
   }
 })
-
-
-
