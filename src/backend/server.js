@@ -90,6 +90,12 @@ function startApp() {
     return user.is_admin
   }
 
+  let isStaff = async (userId) => {
+    const user = await knex('users').where('id', userId).first()
+    const domain = user.email.split('@')[1]
+    return (domain === 'berniesanders.com' || user.is_admin)
+  }
+
   passport.use('signup', new LocalStrategy(
     {
       usernameField: 'email',
@@ -253,7 +259,7 @@ function startApp() {
     let userIsAdmin = false
     let userEmail = null
     if (req.user && req.user.id) {
-      userIsAdmin = await isAdmin(req.user.id)
+      userIsAdmin = await isStaff(req.user.id)
       userIsAuthed = true
       userEmail = await knex('users')
         .select('email')
@@ -294,18 +300,48 @@ function startApp() {
   }))
 
   app.post('/events/create', wrap(async (req, res) => {
+
+    let form = req.body
+    let user = req.user ? req.user.email : 'Anonymous'
+    log.info(`Event Create Form Submission to ${src} by ${user}`, JSON.stringify(form));
+
     const eventIdMap = {
-      'volunteer-meeting' : 24,
-      'ballot-access' : 30,
-      'phonebank' : 31,
-      'canvass' : 32,
-      'barnstorm' : 41,
-      'carpool-to-nevada' : 39,
-      'carpool' : 39,
-      'official-barnstorm' : 41,
-      'get-out-the-vote' : 45,
-      'vol2vol' : 47,
-      'rally' : 14
+      'volunteer-meeting': { id: 24, staffOnly: false },
+      'ballot-access': { id: 30, staffOnly: false },
+      'phonebank': { id: 31, staffOnly: false },
+      'canvass': { id: 32, staffOnly: false },
+      'barnstorm': { id: 41, staffOnly: false },
+      'carpool-to-nevada': { id: 39, staffOnly: false },
+      'carpool': { id: 39, staffOnly: false },
+      'official-barnstorm': { id: 41, staffOnly: true },
+      'get-out-the-vote': { id: 45, staffOnly: false },
+      'vol2vol': { id: 47, staffOnly: true },
+      'rally': { id: 14, staffOnly: true },
+    }
+
+    // Flag event as needing approval
+    let batchEventMax = 20
+    let userIsStaff = false
+    let flagForApproval = eventIdMap[form['event_type_id']].staffOnly
+
+    if (req.user){
+      userIsStaff = await isStaff(req.user.id)
+      if (userIsStaff){
+        flagForApproval = false
+        batchEventMax = 40
+      }
+    }
+    if (flagForApproval || eventIdMap[form['event_type_id']] === undefined){
+      // form['flag_approval'] = '1'
+      res.status(400).send({errors: {
+        'Permission Error' : [`You don't have permission to use that event type.`]
+      }})
+      return
+    }
+
+    // Require phone number for RSVPs to phonebanks
+    if (form['event_type_id'] === 'phonebank' || form['event_type_id'] === 'carpool-to-nevada') {
+      form['attendee_require_phone'] = 1;
     }
 
     let src = null
@@ -325,27 +361,6 @@ function startApp() {
     if (!src)
       src = 'unknown source'
 
-    let form = req.body
-    let user = req.user ? req.user.email : 'Anonymous'
-    log.info(`Event Create Form Submission to ${src} by ${user}`, JSON.stringify(form));
-
-    // Flag event as needing approval
-    let batchEventMax = 20
-    let userIsAdmin = false
-    if (req.user)
-      userIsAdmin = await isAdmin(req.user.id)
-
-    if (userIsAdmin || (form['event_type_id'] === 'phonebank' && form['is_official'] !== '1')){
-      // Code to execute if bypassing approval queue
-    }
-    else
-      form['flag_approval'] = '1';
-
-    // Require phone number for RSVPs to phonebanks
-    if (form['event_type_id'] === 'phonebank' || form['event_type_id'] === 'carpool-to-nevada') {
-      form['attendee_require_phone'] = 1;
-    }
-
     form['event_dates'] = JSON.parse(form[ 'event_dates' ])
     let dateCount = form['event_dates'].length
 
@@ -355,7 +370,7 @@ function startApp() {
       }})
       return
     }
-    form['event_type_id'] = isNaN(form['event_type_id']) ? String(eventIdMap[form['event_type_id']]) : String(form['event_type_id'])
+    form['event_type_id'] = isNaN(form['event_type_id']) ? String(eventIdMap[form['event_type_id']].id) : String(form['event_type_id'])
     if (process.env.NODE_ENV === 'development')
       form['event_type_id'] = '1'
 
