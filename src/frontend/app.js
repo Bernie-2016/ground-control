@@ -20,7 +20,7 @@ import GCTextField from './components/forms/GCTextField';
 import GCPhoneField from './components/forms/GCPhoneField';
 import GCDateField from './components/forms/GCDateField';
 import GCDateTimeField from './components/forms/GCDateTimeField';
-//import GCTimeField from './components/forms/GCTimeField';
+import GCTimeField from './components/forms/GCTimeField';
 import GCPasswordField from './components/forms/GCPasswordField';
 import GCRadioButtonsField from './components/forms/GCRadioButtonsField';
 import GCSelectField from './components/forms/GCSelectField';
