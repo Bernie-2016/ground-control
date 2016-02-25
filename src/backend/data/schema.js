@@ -1734,7 +1734,6 @@ let RootQuery = new GraphQLObjectType({
       },
       resolve: async (root, {id}, {rootValue}) => {
         let localId = fromGlobalId(id)
-        console.log(localId)
         if (localId.type !== 'Event')
           localId = id
         else

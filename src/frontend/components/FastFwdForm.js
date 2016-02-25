@@ -47,8 +47,6 @@ class FastFwdForm extends React.Component {
 
   render() {
 
-    console.log(this.props.event);
-
     let defaultHostMessage = this.props.event.fastFwdRequest ? this.props.event.fastFwdRequest.hostMessage :
                             "Hello, neighbors!\n\nI'm hosting a " +
                             this.props.event.eventType.name +
