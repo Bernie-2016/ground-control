@@ -513,6 +513,7 @@ export default class BSD {
 
   async createEvent(event) {
     let params = this.apiInputsFromEvent(event)
+    log.debug(params)
     let response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'POST');
     if (response.validation_errors)
       throw new BSDValidationError(JSON.stringify(response.validation_errors))

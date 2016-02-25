@@ -366,27 +366,25 @@ function startApp() {
       return
     }
 
-    // Require phone number for RSVPs to phonebanks
-    if (form['event_type_id'] === 'phonebank' || form['event_type_id'] === 'carpool-to-nevada') {
-      form['attendee_require_phone'] = 1;
-    }
-
-    let src = null
+    let src = 'unknown source'
     if (req.headers && req.headers.referer) {
       src = req.headers.referer.split(req.headers.origin)
       if (src)
         src = src[1]
     }
-
     if (!src) {
       // Sometimes the above results in undefined.
       // The sourceurl header is set from the client, so we don't necessarily want to trust it.
       src = req.headers.sourceurl;
       log.debug('Missing header data', req.headers);
     }
-
     if (!src)
       src = 'unknown source'
+
+    // Require phone number for RSVPs to phonebanks
+    if (form['event_type_id'] === 'phonebank' || form['event_type_id'] === 'carpool-to-nevada') {
+      form['attendee_require_phone'] = 1;
+    }
 
     form['event_dates'] = JSON.parse(form[ 'event_dates' ])
     let dateCount = form['event_dates'].length
@@ -397,6 +395,7 @@ function startApp() {
       }})
       return
     }
+
     form['event_type_id'] = isNaN(form['event_type_id']) ? String(eventIdMap[form['event_type_id']].id) : String(form['event_type_id'])
     if (process.env.NODE_ENV === 'development')
       form['event_type_id'] = '1'
@@ -422,18 +421,40 @@ function startApp() {
 
     form['creator_cons_id'] = constituent.id
 
+    // Use time/duration or shifts
     let startHour = null
-    if (form['start_time']['a'] == 'pm') {
-      startHour = Number(form['start_time']['h']) + 12
-    } else {
-      startHour = form['start_time']['h']
+    if (form['use_shifts']){
+      // try {
+        startHour = (form['start_time']['a'][0] == 'pm') ? Number(form['start_time']['h'][0]) + 12 : form['start_time']['h'][0];
+        form['days'] = [];
+        form['days'].push({})
+        form['days'][0]['shifts'] = form['start_time']['h'].map((item, index) => {
+          return ({
+              start_time: `${(form['start_time']['a'][index] == 'pm') ? Number(form['start_time']['h'][index]) + 12 : form['start_time']['h'][index]}:${form['start_time']['i'][index]}:00`,
+              end_time: `${(form['end_time']['a'][index] == 'pm') ? Number(form['end_time']['h'][index]) + 12 : form['end_time']['h'][index]}:${form['end_time']['i'][index]}:00`,
+              capacity: form['capacity']
+            })
+        })
+
+      // }
+      // catch(ex) {
+      //   res.status(400).send({'errors': ex})
+      // }
     }
+    else
+      startHour = (form['start_time']['a'] == 'pm') ? Number(form['start_time']['h']) + 12 : form['start_time']['h']
 
     let createdEventIds = []
 
     for (let index = 0; index < dateCount; index++) {
       let result = null
-
+      if (form.hasOwnProperty('days')){
+        if (form['use_shifts'])
+          form.days[0].start_datetime_system = `${form['event_dates'][index]['date']} ${startHour}:${form['start_time']['i'][0]}:00`
+        else
+          form.days[0].start_datetime_system = `${form['event_dates'][index]['date']} ${startHour}:${form['start_time']['i']}:00`
+      }
+      log.info(form)
       try {
         result = await BSDClient.createEvent({
           ...form,
