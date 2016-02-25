@@ -144,10 +144,7 @@ class EventEdit extends React.Component {
         .default(String(event.isSearchable)),
 
       isOfficial: yup.boolean()
-        .default(event.isOfficial),
-
-      flagApproval: yup.boolean()
-        .default(false)
+        .default(event.isOfficial)
 
     });
 
@@ -333,14 +330,6 @@ class EventEdit extends React.Component {
           label="Mark as an official campaign event"
           onChange={(val) => {
             this.props.onFieldChanged('isOfficial', val)
-          }}
-        />
-
-        <Form.Field
-          name="flagApproval"
-          label="Mark this event as incomplete/needs further review"
-          onChange={(val) => {
-            this.props.onFieldChanged('flagApproval', val)
           }}
         />
 
