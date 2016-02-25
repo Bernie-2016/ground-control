@@ -78,7 +78,6 @@ class FastFwdForm extends React.Component {
             }}
             onSubmit={(formValues) => {
               this.refs.mutationHandler.send({
-                listContainer: this.props.listContainer,
                 eventId: this.props.event.id,
                 ...formValues
               })
@@ -108,11 +107,6 @@ export default Relay.createContainer(FastFwdForm, {
       fragment on User {
         id
         email
-      }
-    `,
-    listContainer: () => Relay.QL`
-      fragment on ListContainer {
-        ${CreateFastFwdRequest.getFragment('listContainer')},
       }
     `,
     event: () => Relay.QL`

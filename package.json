@@ -17,7 +17,8 @@
     "lint": "eslint src",
     "knex": "knex --knexfile ./src/backend/data/knexfile.js",
     "migrate": "knex migrate:latest --knexfile ./src/backend/data/knexfile.js",
-    "seed": "knex seed:run --knexfile ./src/backend/data/knexfile.js"
+    "seed": "knex seed:run --knexfile ./src/backend/data/knexfile.js",
+    "job": "./run-job"
   },
   "dependencies": {
     "async": "^1.5.0",

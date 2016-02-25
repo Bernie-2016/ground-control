@@ -8,6 +8,7 @@ import htmlToText from 'html-to-text'
 import knex from './data/knex'
 import {toGlobalId} from 'graphql-relay'
 import log from './log'
+import moment from 'moment'
 
 const templateDir = path.resolve(__dirname, './email-templates')
 const headerHTML = fs.readFileSync(templateDir + '/header.hbs', {encoding: 'utf-8'})
@@ -227,19 +228,22 @@ export default class MG {
 
     let data = {
       hostFirstName: name,
-      sender: eventTypeData.sender,
       fastFwdURL: 'https://organize.berniesanders.com/event/' +
                       toGlobalId('Event', event.event_id)
-                      + '/request_email'
+                      + '/request_email',
+      eventDate: moment(event.event_start_dt).format('dddd, MMMM Do [at] h:mma'),
+      eventDay: moment(event.event_start_dt).format('dddd'),
     }
+
     let template = new EmailTemplate(templateDir + '/send-fast-fwd-instructions')
     let content = await template.render(data)
+
     let message = {
       from: 'Team Bernie<info@berniesanders.com>',
       'h:Reply-To': 'info@berniesanders.com',
       to: event.email,
       subject: 'Find volunteers in your area for your upcoming event!',
-      html: content.html
+      text: content.text
     }
 
     return await this.send(message)
