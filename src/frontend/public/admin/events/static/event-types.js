@@ -254,6 +254,11 @@ var eventTypes = [
 
 		start.appendTo(".shift-input-group");
 		end.appendTo(".shift-input-group");
+
+		$("#shift-wrapper")
+			.hide()
+			.find("input, select")
+			.attr("disabled", true);
 	}
 
 	generateShiftInputs();
@@ -359,7 +364,7 @@ function updateFormValue(property, value) {
 		    form[property].placeholder = value;
 	  	}
 
-		  if (property === 'attendee_volunteer_show' || property === 'duration_allday')
+		  if (property === 'attendee_volunteer_show' || property === 'duration_allday' || property === 'use_shifts')
 		  	$('[name="' + property + '"]').change()
 		  break
 	}
