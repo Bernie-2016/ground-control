@@ -21,6 +21,7 @@ export default class GCDateField extends GCFormField {
         newDate = moment(newDate)
           .add(moment().utcOffset() - this.props.utcOffset, 'minutes')
           .toDate()
+        console.log(newDate)
         this.props.onChange(newDate)
       }}
     />

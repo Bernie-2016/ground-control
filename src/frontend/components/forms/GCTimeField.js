@@ -11,12 +11,14 @@ export default class GCTimeField extends GCFormField {
       .add(this.props.utcOffset - moment().utcOffset(), 'minutes')
       .toDate()
     return <TimePicker
+
       floatingLabelText={this.floatingLabelText()}
-      defaultTime={fakeDate}
+      value={fakeDate}
       onChange={(_, time) => {
         let newDate = moment(time)
           .add(moment().utcOffset() - this.props.utcOffset, 'minutes')
           .toDate()
+        console.log(newDate)
         this.props.onChange(newDate)
       }}
     />
