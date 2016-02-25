@@ -915,13 +915,15 @@ const GraphQLEvent = new GraphQLObjectType({
     attendees: {
       type: new GraphQLList(GraphQLPerson),
       resolve: async (event, _, {rootValue}) => {
-        const attendeeIds = await knex('bsd_event_attendees').select('attendee_cons_id', 'event_id').where('event_id', event.event_id);
+        /*const attendeeIds = await knex('bsd_event_attendees').select('attendee_cons_id', 'event_id').where('event_id', event.event_id);
         let attendees = [];
         for (let i = 0; i < attendeeIds.length; i++) {
           let attendee = await rootValue.loaders.bsdPeople.load(attendeeIds[i].attendee_cons_id);
           attendees.push(attendee);
         }
         return attendees
+        */
+        return []
       }
     },
     nearbyPeople: {
@@ -1517,10 +1519,10 @@ const GraphQLCreateFastFwdRequest = mutationWithClientMutationId({
 
       let updatedRecord = await knex.table('fast_fwd_request')
                             .where('event_id', intEventId)
-      
+
       return updatedRecord
     }
-    
+
     return await knex.insertAndFetch('fast_fwd_request', {
         host_message: hostMessage,
         event_id: intEventId
