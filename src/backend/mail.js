@@ -181,8 +181,6 @@ export default class MG {
     let template = new EmailTemplate(templateDir + '/admin-event-invitation')
     let content = await template.render(data)
 
-    content.text = content.text.replace(/&#x27;/gi, "'").replace(/&quot;/gi, '"');
-
     let message = {
       from: data.senderAddress,
       'h:Reply-To': data.hostAddress,
