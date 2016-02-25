@@ -87,13 +87,19 @@ function startApp() {
 
   let isAdmin = async (userId) => {
     const user = await knex('users').where('id', userId).first()
-    return user.is_admin
+    if (req.user)
+      return user.is_admin
+    return false
   }
 
   let isStaff = async (userId) => {
     const user = await knex('users').where('id', userId).first()
-    const domain = user.email.split('@')[1]
-    return (domain === 'berniesanders.com' || user.is_admin)
+    if (user && user.email){
+      let domain = user.email.split('@')
+      if (domain.length > 0)
+        return (domain[1] === 'berniesanders.com' || user.is_admin)
+    }
+    return false
   }
 
   passport.use('signup', new LocalStrategy(
