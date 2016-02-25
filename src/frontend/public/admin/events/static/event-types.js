@@ -215,7 +215,7 @@ var eventTypes = [
 			$("#date-input-group")
 				.show()
 				.find("input, select")
-				.removeAttr("disabled");;
+				.removeAttr("disabled");
 		}
 	});
 
@@ -224,7 +224,7 @@ var eventTypes = [
 			.last()
 			.clone()
 			.appendTo("#shift-inputs");
-		if ($(".shift-input-group").length > 1)
+		if ($(".shift-input-group").length > 2)
 			$("#remove-shift").show();
 	});
 
@@ -232,7 +232,7 @@ var eventTypes = [
 		$(".shift-input-group")
 			.last()
 			.remove()
-		if ($(".shift-input-group").length <= 1)
+		if ($(".shift-input-group").length <= 2)
 			$(this).hide();
 	});
 
@@ -254,6 +254,8 @@ var eventTypes = [
 
 		start.appendTo(".shift-input-group");
 		end.appendTo(".shift-input-group");
+
+		$("#add-shift").click();
 
 		$("#shift-wrapper")
 			.hide()
@@ -320,7 +322,11 @@ function setDefaults(eventTypeId){
 				name: disabled[i],
 				required: $(input).prop('required')
 			});
-			$(input).val('').removeProp('required').attr('disabled','disabled');
+			if (input.checked)
+				$(input).attr('checked', false).change()
+			else
+				$(input).val('').change()
+			$(input).removeProp('required').attr('disabled','disabled');
 		}
 	};
 }
