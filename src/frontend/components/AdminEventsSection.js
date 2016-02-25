@@ -126,7 +126,7 @@ class AdminEventsSection extends React.Component {
       userMessage: '',
       deletionConfirmationMessage: null,
       deletionReasonIndex: null,
-      actionButtons: new Set(['delete', 'approve', 'edit', 'email', 'downloadRSVPs']),
+      actionButtons: new Set(['delete', 'demote', 'approve', 'edit', 'email', 'downloadRSVPs']),
       undoAction: function(){console.log('undo')}
     }
 
@@ -353,6 +353,15 @@ class AdminEventsSection extends React.Component {
           },
         icon: 'event_available',
         disabled: this.props.relay.variables.status === 'APPROVED'
+      },
+      demote: {
+        title: 'move to approval queue',
+        execute: () => {
+            this._handleEventConfirmation([rowIndex], true)
+          },
+        icon: 'event_busy',
+        hoverColor: BernieColors.red,
+        disabled: this.props.relay.variables.status === 'PENDING_APPROVAL'
       },
       edit: {
         title: 'edit',
@@ -1051,7 +1060,7 @@ ${signature}`
   }
 
   _handleEventConfirmation = (eventIndexes, flagApproval=false) => {
-    if (this.props.relay.variables.status === 'PENDING_REVIEW'){
+    if (this.props.relay.variables.status === 'PENDING_REVIEW' && !flagApproval){
       this._reviewEvents(eventIndexes)
       return
     }
