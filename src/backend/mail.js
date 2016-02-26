@@ -100,10 +100,32 @@ export default class MG {
     let eventConfirmation = new EmailTemplate(templateDir + '/event-create-confirmation')
     let content = await eventConfirmation.render(data)
 
-    let message = {
+    const message = {
       from: senderAddress,
       to: form.cons_email,
       subject: 'Event Creation Confirmation',
+      html: content.html
+    }
+
+    // Send organizer notification
+    if (data.event.event_type_id == 1)
+      await this.sendCanvassCreationNotification(data)
+    return await this.send(message)
+  }
+
+  async sendCanvassCreationNotification({event, eventIds, user}) {
+    let notificationEmail = new EmailTemplate(templateDir + '/canvass-field-organizer-notification')
+    let content = await notificationEmail.render({event, eventIds, user})
+
+    const organizer = {
+      name: '',
+      email: ''
+    }
+
+    const message = {
+      from: senderAddress,
+      to: organizer.email,
+      subject: 'ACTION NEEDED: New canvass event created',
       html: content.html
     }
 
