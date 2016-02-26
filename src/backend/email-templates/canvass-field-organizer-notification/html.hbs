@@ -1,0 +1,42 @@
+<p>Hi {{organizer.name}},</p>
+
+A volunteer just signed up to lead a canvass in {{event.venue_city}}, {{event.venue_state_cd}}. Please reach out as soon as possible to train the canvass host and provide them with turf and materials.
+
+Host Name: {{host.name}}
+Email Address: {{host.email}}
+Phone Number: {{host.phone}}
+
+You'll find more information about the event below.
+
+<hr>
+
+<h1>{{event.name}}</h1>
+
+{{#each eventIds}}
+  <a href="https://go.berniesanders.com/page/event/detail/{{this}}">go.berniesanders.com/page/event/detail/{{this}}</a><br/>
+{{/each}}
+
+<h4>Event Description</h4>
+<p>{{event.event_type_name}}</p>
+{{{event.description}}}
+
+<h4>Event Venue</h4>
+{{event.venue_name}}, capacity {{event.capacity}}
+<br>
+{{event.venue_addr1}} {{event.venue_city}} {{event.venue_state_cd}} {{event.venue_zip}}
+<p>{{event.venue_directions}}</p>
+
+<h4>Event Time</h4>
+{{event.start_time.h}}:{{event.start_time.i}} {{event.start_time.a}} {{event.start_tz}} for {{event.duration_num}}
+{{#ifCond event.duration_unit '==' 1}}minute{{/ifCond}}{{#ifCond event.duration_unit '==' 60}}hour{{/ifCond}}{{#ifCond event.duration_unit '==' 1440}}day{{/ifCond}}{{#ifCond event.duration_num '>' 1}}s{{/ifCond}}
+<h4>Event Date{{#ifCond event.event_dates.length '>' 1}}s{{/ifCond}}</h4>
+<ul class="date_list">
+  {{#each event.event_dates}}
+    <li>{{this.date}}</li>
+  {{/each}}
+</ul>
+
+{{#if event.attendee_volunteer_show}}
+<h4>Volunteer Message</h4>
+<p>{{event.attendee_volunteer_message}}</p>
+{{/if}}
