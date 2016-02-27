@@ -61,6 +61,7 @@ exports.seed = async function(knex, Promise) {
     'bsd_phones': [],
     'bsd_groups': [],
     'bsd_event_types' : [],
+    'bsd_subscriptions': [],
     'zip_codes' : [],
     'sessions' : [],
   }
@@ -178,6 +179,16 @@ exports.seed = async function(knex, Promise) {
         ...timestamps
       })
     })
+
+    data.bsd_subscriptions.push({
+      cons_email_chapter_subscription_id: index,
+      cons_email_id: index,
+      cons_id: index,
+      chapter_id: 1,
+      isunsub: faker.random.boolean(),
+      unsub_dt: formatDate(faker.date.future()),
+      modified_dt: formatDate(faker.date.future())
+    })
   }
 
   log.info('Generating event types...')
@@ -254,7 +265,7 @@ exports.seed = async function(knex, Promise) {
     }
   }
 
-  let insertOrder = ['users', 'zip_codes', 'bsd_groups', 'bsd_event_types', 'bsd_people', 'bsd_events', 'bsd_event_attendees', 'bsd_addresses', 'bsd_person_bsd_groups', 'bsd_emails', 'bsd_phones']
+  let insertOrder = ['users', 'zip_codes', 'bsd_groups', 'bsd_event_types', 'bsd_people', 'bsd_events', 'bsd_event_attendees', 'bsd_addresses', 'bsd_person_bsd_groups', 'bsd_emails', 'bsd_phones', 'bsd_subscriptions']
 
   for (let index = 0; index < insertOrder.length; index++) {
     let key = insertOrder[index]

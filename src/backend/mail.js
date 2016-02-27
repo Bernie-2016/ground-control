@@ -184,7 +184,7 @@ export default class MG {
 
     let message = {
       from: data.senderAddress,
-      'h:Reply-To': data.hostAddress,
+      'h:Reply-To': 'info@berniesanders.com',
       to: data.recipientAddress,
       subject: 'Fwd: HELP! I need more people to come to my phonebank',
       text: content.text
