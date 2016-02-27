@@ -51,7 +51,7 @@ class FastFwdForm extends React.Component {
                             "Hello, neighbors!\n\nI'm hosting a " +
                             this.props.event.eventType.name +
                             " and I need a few more Bernie supporters " +
-                            "to attend to make this event a big success. " + 
+                            "to attend to make this event a big success. " +
                             "Will you please attend my event?\n\nThank you,\n\n" +
                             this.props.event.host.firstName
 
@@ -78,6 +78,7 @@ class FastFwdForm extends React.Component {
             }}
             onSubmit={(formValues) => {
               this.refs.mutationHandler.send({
+                listContainer: this.props.listContainer,
                 eventId: this.props.event.id,
                 ...formValues
               })
@@ -109,6 +110,11 @@ export default Relay.createContainer(FastFwdForm, {
         email
       }
     `,
+    listContainer: () => Relay.QL`
+      fragment on ListContainer {
+        ${CreateFastFwdRequest.getFragment('listContainer')},
+      }
+    `,
     event: () => Relay.QL`
       fragment on Event {
         attendeesCount
@@ -121,7 +127,7 @@ export default Relay.createContainer(FastFwdForm, {
         contactPhone
         createDate
         description
-        duration        
+        duration
         eventIdObfuscated
         eventType {
           id

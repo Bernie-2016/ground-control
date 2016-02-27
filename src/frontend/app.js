@@ -189,6 +189,7 @@ ReactDOM.render(
       path='/event/:id/request_email'
       component={FastFwdForm}
         queries={{
+          ...ListContainerQueries,
           ...EventQueries,
           ...CurrentUserQueries
         }}
