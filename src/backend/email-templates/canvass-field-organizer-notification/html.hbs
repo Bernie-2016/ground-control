@@ -1,0 +1,16 @@
+<p>Hello {{organizerName}},</p>
+
+<p>
+  A volunteer just signed up to lead a canvass in {{event.venue_city}}, {{event.venue_state_cd}}.
+  Please reach out as soon as possible to train the canvass host and provide them with turf and materials.
+</p>
+
+Host Name: {{host.name}}<br/>
+Email Address: {{host.email}}<br/>
+Phone Number: {{host.phone}}
+
+<p>You'll find more information about the event below.</p>
+
+<hr>
+
+{{> eventPreview event=event eventIds=eventIds }}
