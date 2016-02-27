@@ -96,8 +96,15 @@ export default class MG {
       eventIds,
       user: constituent
     }
+    const templateName = 'event-create-confirmation'
 
-    let eventConfirmation = new EmailTemplate(templateDir + '/event-create-confirmation')
+    // Send organizer notification
+    if (data.event.event_type_id == 32){
+      templateName = 'canvass-create-confirmation'
+      await this.sendCanvassCreationNotification(data)
+    }
+
+    let eventConfirmation = new EmailTemplate(templateDir + '/' + templateName)
     let content = await eventConfirmation.render(data)
 
     const message = {
@@ -107,24 +114,25 @@ export default class MG {
       html: content.html
     }
 
-    // Send organizer notification
-    if (data.event.event_type_id == 1)
-      await this.sendCanvassCreationNotification(data)
     return await this.send(message)
   }
 
   async sendCanvassCreationNotification({event, eventIds, user}) {
-    let notificationEmail = new EmailTemplate(templateDir + '/canvass-field-organizer-notification')
-    let content = await notificationEmail.render({event, eventIds, user})
+    // Fetch organizer data
+    const organizerArray = []
+    const organizers = organizerArray.map((organizer) => {
+      if (organizer.State === event.venue_state_cd)
+        return organizer.Name
+    })
+    const organizerName = (organizers.length > 1) ? 'Field Organizers' : organizers[0].Name
 
-    const organizer = {
-      name: '',
-      email: ''
-    }
+    let notificationEmail = new EmailTemplate(templateDir + '/canvass-field-organizer-notification')
+    let content = await notificationEmail.render({event, eventIds, user, organizerName})
 
     const message = {
       from: 'Jacob LeGrone<jacoblegrone@berniesanders.com>',
-      to: organizer.email,
+      'h:Reply-To': 'info@berniesanders.com',
+      to: organizers,
       subject: 'ACTION NEEDED: New canvass event created',
       html: content.html
     }
