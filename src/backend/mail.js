@@ -120,9 +120,9 @@ export default class MG {
 
   async sendCanvassCreationNotification({event, eventIds, user}) {
     // Fetch organizer data
-    let result = await rp('https://sheetsu.com/apis/bd810a50')
+    const result = await rp('https://sheetsu.com/apis/bd810a50')
     const organizerArray = JSON.parse(result).result
-    const organizers = organizerArray.filter((organizer) => (organizer.State === 'NC'))
+    const organizers = organizerArray.filter((organizer) => (organizer.State === event.venue_state_cd))
     const organizerName = (organizers.length > 1) ? 'Field Organizers' : organizers[0].Name.split(' ')[0]
 
     let notificationEmail = new EmailTemplate(templateDir + '/canvass-field-organizer-notification')
