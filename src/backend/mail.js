@@ -12,8 +12,29 @@ import moment from 'moment'
 import rp from 'request-promise'
 
 const templateDir = path.resolve(__dirname, './email-templates')
-const headerHTML = fs.readFileSync(templateDir + '/header.hbs', {encoding: 'utf-8'})
-const footerHTML = fs.readFileSync(templateDir + '/footer.hbs', {encoding: 'utf-8'})
+const partials = [
+  {
+    name: 'header',
+    path: '/header.hbs'
+  },
+  {
+    name: 'footer',
+    path: '/footer.hbs'
+  },
+  {
+    name: 'loginInstructions',
+    path: '/login-instructions.hbs'
+  },
+  {
+    name: 'eventPreview',
+    path: '/event-preview.hbs'
+  }
+]
+const regeisterTemplatePartials = (templates) => {
+  templates.forEach((template) => {
+    Handlebars.registerPartial(template.name, fs.readFileSync(templateDir + template.path, {encoding: 'utf-8'}))
+  })
+}
 
 Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
   switch (operator) {
@@ -38,8 +59,8 @@ Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
   }
 })
 
-Handlebars.registerPartial('header', headerHTML)
-Handlebars.registerPartial('footer', footerHTML)
+regeisterTemplatePartials(partials)
+
 // const messageRichTextTemplate = new EmailTemplate(templateDir + '/message.hbs')
 const messageRichTextTemplate = Handlebars.compile(fs.readFileSync(templateDir + '/message.hbs', {encoding: 'utf-8'}));
 const senderAddress = 'Team Bernie<info@berniesanders.com>'
@@ -51,14 +72,14 @@ export default class MG {
     this.mailgun = Mailgun({apiKey: apiKey, domain: domain})
   }
 
-  async send(message, textOptions={wordwrap: 100}) {
+  async send(message, textOptions={wordwrap: 100}, addHeaderFooter=true) {
     // Add plaintext version of message if it does not exist
     if (!message.text){
       message.text = htmlToText.fromString(message.html, textOptions)
     };
 
     // Add header and footer to html messages
-    if (message.html){
+    if (message.html && addHeaderFooter){
       message.html = messageRichTextTemplate({content: message.html, recipient: message.to});
     }
 
@@ -101,8 +122,15 @@ export default class MG {
 
     // Send organizer notification
     if (data.event.event_type_id == 32){
-      templateName = 'canvass-create-confirmation'
-      await this.sendCanvassCreationNotification(data)
+      // Fetch organizer data
+      const result = await rp('https://sheetsu.com/apis/bd810a50')
+      const organizerArray = JSON.parse(result).result
+      const organizers = organizerArray.filter((organizer) => (organizer.State === data.event.venue_state_cd))
+      if (organizers.length > 0){
+        data.organizers = organizers
+        templateName = 'canvass-create-confirmation'
+        await this.sendCanvassCreationNotification(data)
+      }
     }
 
     let eventConfirmation = new EmailTemplate(templateDir + '/' + templateName)
@@ -118,15 +146,13 @@ export default class MG {
     return await this.send(message)
   }
 
-  async sendCanvassCreationNotification({event, eventIds, user}) {
-    // Fetch organizer data
-    const result = await rp('https://sheetsu.com/apis/bd810a50')
-    const organizerArray = JSON.parse(result).result
-    const organizers = organizerArray.filter((organizer) => (organizer.State === event.venue_state_cd))
+  async sendCanvassCreationNotification({event, eventIds, user, organizers}) {
     const organizerName = (organizers.length > 1) ? 'Field Organizers' : organizers[0].Name.split(' ')[0]
 
+    user.name = user.name || event.cons_name
+    user.phone = user.phone || event.contact_phone
     let notificationEmail = new EmailTemplate(templateDir + '/canvass-field-organizer-notification')
-    let content = await notificationEmail.render({event, eventIds, user, organizerName})
+    let content = await notificationEmail.render({event, eventIds, host: user, organizerName})
 
     const message = {
       from: 'Jacob LeGrone<jacoblegrone@berniesanders.com>',
@@ -136,7 +162,7 @@ export default class MG {
       html: content.html
     }
 
-    return await this.send(message)
+    return await this.send(message, {wordwrap: 100}, false)
   }
 
   async sendEventInstructions(eventId) {
