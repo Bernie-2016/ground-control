@@ -122,16 +122,21 @@ export default class MG {
 
     // Send organizer notification
     if (data.event.event_type_id == 32){
+      templateName = 'canvass-create-confirmation'
+
       // Fetch organizer data
       const result = await rp('https://sheetsu.com/apis/bd810a50')
       const organizerArray = JSON.parse(result).result
       const organizers = organizerArray.filter((organizer) => (organizer.State === data.event.venue_state_cd))
+
       if (organizers.length > 0){
         data.organizers = organizers
-        templateName = 'canvass-create-confirmation'
         await this.sendCanvassCreationNotification(data)
       }
     }
+
+    data.user.name = (data.user.name) ? data.user.name.split(' ')[0] : data.event.cons_name.split(' ')[0]
+    data.user.name = data.user.name || 'there'
 
     let eventConfirmation = new EmailTemplate(templateDir + '/' + templateName)
     let content = await eventConfirmation.render(data)
