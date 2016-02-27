@@ -1227,6 +1227,8 @@ const GraphQLDeleteEvents = mutationWithClientMutationId({
     await knex('bsd_events')
       .whereIn('event_id', localIds)
       .del()
+    await markEventsReviewed(localIds)
+
     return localIds
   }
 })
