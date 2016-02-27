@@ -123,7 +123,7 @@ export default class MG {
     }
 
     const message = {
-      from: senderAddress,
+      from: 'Jacob LeGrone<jacoblegrone@berniesanders.com>',
       to: organizer.email,
       subject: 'ACTION NEEDED: New canvass event created',
       html: content.html
