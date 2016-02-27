@@ -184,6 +184,7 @@ ${userFirstName}`
         return 'never'
       }
     }
+    let country = interviewee.address.country || 'US'
     let phone = interviewee.phone
     let sideBar = (
       <div>
@@ -195,16 +196,16 @@ ${userFirstName}`
         }}>
           {name}
           <br />
-          <a style={{color: BernieColors.darkBlue}} href={`tel:${this.phoneTelLink(phone, interviewee.address.country)}`}>
-            {this.formatPhoneNumber(phone, interviewee.address.country)}
+          <a style={{color: BernieColors.darkBlue}} href={`tel:${this.phoneTelLink(phone, country)}`}>
+            {this.formatPhoneNumber(phone, country)}
           </a>
         </div>
       </div>
     )
 
     let location = `${interviewee.address.city}, ${interviewee.address.state}`
-    if (interviewee.address.country !== 'US')
-      location = location + `, ${interviewee.address.country}`
+    if (country !== 'US')
+      location = location + `, ${country}`
     location = location + `, ${interviewee.address.zip}`
 
     let email =  this.props.currentUser.intervieweeForCallAssignment.email ? <a target='_blank' href={this.generateEventsInfoEmailLink()}>{this.props.currentUser.intervieweeForCallAssignment.email}</a> : 'None'
