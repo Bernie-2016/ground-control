@@ -43,13 +43,13 @@ export let job = async () => {
                     "bsd_event_attendees " +
                   "ON bsd_events.event_id = bsd_event_attendees.event_id " +
                 "WHERE " +
-                    "bsd_events.event_type_id = 31 " +
+                    "bsd_events.event_type_id = 1 " +
                   "AND " +
-                    "bsd_events.start_dt > '" + oneDayFromNow.startOf('day').format('YYYY-MM-DD HH:mm:ss') + "' " +
+                    "bsd_events.start_dt > \'" + oneDayFromNow.startOf('day').format('YYYY-MM-DD HH:mm:ss') + "\' " +
                   "AND " +
-                    "bsd_events.start_dt < '" + fourDaysFromNow.endOf('day').format('YYYY-MM-DD HH:mm:ss') + "' " +
+                    "bsd_events.start_dt < \'" + fourDaysFromNow.endOf('day').format('YYYY-MM-DD HH:mm:ss') + "\' " +
                   "AND " +
-                     "gc_bsd_events.create_dt < '" + moment().startOf('day').format('YYYY-MM-DD HH:mm:ss') + "' " +
+                     "gc_bsd_events.create_dt < \'" + moment().startOf('day').format('YYYY-MM-DD HH:mm:ss') + "\' " +
                   "AND " +
                     "bsd_events.capacity > 2 " +
                   "AND " +
@@ -73,15 +73,15 @@ export let job = async () => {
               "ON " +
                 "bsd_events.event_id = gc_bsd_events.event_id " +
             "WHERE " +
-                "bsd_events.event_type_id = 31 " +
+                "bsd_events.event_type_id = 1 " +
               "AND " +
                 "bsd_events.capacity = 0 " +
               "AND " +
-                "bsd_events.start_dt > '" + oneDayFromNow.startOf('day').format('YYYY-MM-DD HH:mm:ss') + "' " +
+                "bsd_events.start_dt > \'" + oneDayFromNow.startOf('day').format('YYYY-MM-DD HH:mm:ss') + "\' " +
               "AND " +
-                "bsd_events.start_dt < '" + fourDaysFromNow.endOf('day').format('YYYY-MM-DD HH:mm:ss') + "' " +
+                "bsd_events.start_dt < \'" + fourDaysFromNow.endOf('day').format('YYYY-MM-DD HH:mm:ss') + "\' " +
               "AND " +
-                 "gc_bsd_events.create_dt < '" + moment().startOf('day').format('YYYY-MM-DD HH:mm:ss') + "' " +
+                 "gc_bsd_events.create_dt < \'" + moment().startOf('day').format('YYYY-MM-DD HH:mm:ss') + "\' " +
               "AND " +
                 "bsd_events.flag_approval = false " +
               "AND " +
