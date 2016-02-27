@@ -4,6 +4,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Relay from 'react-relay';
 import EventCreate from './components/EventCreate.js'
+import DummyEventCreate from './components/DummyEventCreate.js'
 import {Redirect, IndexRoute, IndexRedirect, Route, Router} from 'react-router';
 import ReactRouterRelay from 'react-router-relay';
 import injectTapEventPlugin from 'react-tap-event-plugin';
@@ -158,6 +159,11 @@ ReactDOM.render(
         component={EventCreate}
         queries={CurrentUserQueries}
         renderLoading={() => <Loading />}
+      />
+      <Route
+        path='events/create'
+        component={DummyEventCreate}
+        renderLoading={() => window.location.reload() }
       />
       <Route
         path='call'
