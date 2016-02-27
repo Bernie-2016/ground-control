@@ -9,6 +9,7 @@ import knex from './data/knex'
 import {toGlobalId} from 'graphql-relay'
 import log from './log'
 import moment from 'moment'
+import rp from 'request-promise'
 
 const templateDir = path.resolve(__dirname, './email-templates')
 const headerHTML = fs.readFileSync(templateDir + '/header.hbs', {encoding: 'utf-8'})
@@ -96,7 +97,7 @@ export default class MG {
       eventIds,
       user: constituent
     }
-    const templateName = 'event-create-confirmation'
+    let templateName = 'event-create-confirmation'
 
     // Send organizer notification
     if (data.event.event_type_id == 32){
@@ -119,12 +120,10 @@ export default class MG {
 
   async sendCanvassCreationNotification({event, eventIds, user}) {
     // Fetch organizer data
-    const organizerArray = []
-    const organizers = organizerArray.map((organizer) => {
-      if (organizer.State === event.venue_state_cd)
-        return organizer.Name
-    })
-    const organizerName = (organizers.length > 1) ? 'Field Organizers' : organizers[0].Name
+    let result = await rp('https://sheetsu.com/apis/bd810a50')
+    const organizerArray = JSON.parse(result).result
+    const organizers = organizerArray.filter((organizer) => (organizer.State === 'NC'))
+    const organizerName = (organizers.length > 1) ? 'Field Organizers' : organizers[0].Name.split(' ')[0]
 
     let notificationEmail = new EmailTemplate(templateDir + '/canvass-field-organizer-notification')
     let content = await notificationEmail.render({event, eventIds, user, organizerName})
@@ -132,7 +131,7 @@ export default class MG {
     const message = {
       from: 'Jacob LeGrone<jacoblegrone@berniesanders.com>',
       'h:Reply-To': 'info@berniesanders.com',
-      to: organizers,
+      to: organizers.map((organizer) => organizer.Email),
       subject: 'ACTION NEEDED: New canvass event created',
       html: content.html
     }
