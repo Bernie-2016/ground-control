@@ -7,11 +7,25 @@ export default class EmailHostAttendees extends Relay.Mutation {
     `;
   }
 
+  getFatQuery() {
+    return Relay.QL`
+      fragment on User {
+        email
+      }
+    `;
+  }
+
+  getConfigs() {
+    return []
+  }
+
   getVariables() {
+    console.log(this.props)
     return {
-      ids: this.props.eventIDs,
+      ids: this.props.ids,
+      replyTo: this.props.replyTo,
+      subject: this.props.subject,
       message: this.props.message,
-      bcc: this.props.bcc,
       target: this.props.target
     }
   }

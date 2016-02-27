@@ -1238,6 +1238,7 @@ ${signature}`
         successMessage='Event(s) marked reviewed'
       />
       <SendEventMail
+        currentUser={this.props.currentUser}
         ids={[]}
         open={true}
         onRequestClose={() => {console.log('close')}}
@@ -1460,6 +1461,11 @@ const getDefaultQuery = () => {
 export default Relay.createContainer(AdminEventsSection, {
   initialVariables: getDefaultQuery(),
   fragments: {
+    currentUser: () => Relay.QL`
+      fragment on User {
+        ${SendEventMail.getFragment('currentUser')}
+      }
+    `,
     listContainer: () => Relay.QL`
       fragment on ListContainer {
         ${EventEdit.getFragment('listContainer')}

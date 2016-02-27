@@ -139,7 +139,10 @@ ReactDOM.render(
       <Route
         path='events'
         component={AdminEventsSection}
-        queries={ListContainerQueries}
+        queries={{
+          ...CurrentUserQueries,
+          ...ListContainerQueries
+        }}
         renderLoading={() => <Loading />}
       />
     </Route>

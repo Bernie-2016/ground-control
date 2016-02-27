@@ -10,7 +10,7 @@ class SendEventMail extends React.Component {
 
     this.state = {
       target: 'host',
-      bcc: [],
+      replyTo: this.props.currentUser.email,
       subject: '',
       message: ''
     }
@@ -31,7 +31,10 @@ class SendEventMail extends React.Component {
           console.log(this.refs)
           this.refs.sendEmailHandler.send({
             ids: this.props.ids,
-            ...this.state
+            replyTo: this.state.replyTo,
+            subject: this.state.subject,
+            message: this.state.message,
+            target: this.state.target
           })
         }}
       />
@@ -50,22 +53,28 @@ class SendEventMail extends React.Component {
           onChange={(event, index, value) => {
             this.setState({target: value})
           }}
-          style={{width: '350px'}}
           floatingLabelStyle={{cursor: 'pointer'}}
         >
           <MenuItem value="host" primaryText="Event Host"/>
           <MenuItem value="attendees" primaryText="Event Attendees"/>
           <MenuItem value="hostAndAttendees" primaryText="Host and Attendees"/>
         </SelectField>
-        <TextField
-          floatingLabelText="From"
-          value={'user@example.com'}
-        />
+        <SelectField
+          floatingLabelText="Reply-To"
+          value={this.state.replyTo}
+          onChange={(event, index, value) => {
+            this.setState({replyTo: value})
+          }}
+          floatingLabelStyle={{cursor: 'pointer'}}
+        >
+          <MenuItem value={this.props.currentUser.email} primaryText={this.props.currentUser.email}/>
+          <MenuItem value="info@berniesanders.com" primaryText="info@berniesanders.com"/>
+        </SelectField>
         <TextField
           floatingLabelText="Subject"
           value={this.state.subject}
-          onChange={(event, index, value) => {
-            this.setState({subject: value})
+          onChange={(event) => {
+            this.setState({subject: event.target.value})
           }}
           fullWidth={true}
         />
