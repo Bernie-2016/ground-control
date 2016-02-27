@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import Relay from 'react-relay'
 import EventPreview from './EventPreview'
 import EventEdit from './EventEdit'
+import SendEventMail from './SendEventMail'
 import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle, SelectField, DropDownMenu, DropDownIcon, Dialog, Tabs, Tab, FlatButton, RaisedButton, IconButton, FontIcon, Checkbox, TextField} from 'material-ui'
 import {Table, Column, ColumnGroup, Cell} from 'fixed-data-table'
 import {BernieText, BernieColors} from './styles/bernie-css'
@@ -1236,6 +1237,12 @@ ${signature}`
         mutationName='reviewEvents'
         successMessage='Event(s) marked reviewed'
       />
+      <SendEventMail
+        ids={[]}
+        open={true}
+        onRequestClose={() => {console.log('close')}}
+        handleCancel={() => {console.log('cancelled')}}
+      />
       {this.renderDeleteModal()}
       {this.renderCreateModal()}
       {this.renderEventPreviewModal()}
@@ -1457,6 +1464,7 @@ export default Relay.createContainer(AdminEventsSection, {
       fragment on ListContainer {
         ${EventEdit.getFragment('listContainer')}
         ${DeleteEvents.getFragment('listContainer')}
+        ${ReviewEvents.getFragment('listContainer')}
         ${EditEvents.getFragment('listContainer')}
         eventTypes {
           id

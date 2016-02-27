@@ -1,13 +1,19 @@
-import React from 'react';
-import Relay from 'react-relay';
+import React from 'react'
+import Relay from 'react-relay'
+import {SelectField, MenuItem, Dialog, FlatButton, TextField} from 'material-ui'
+import MutationHandler from './MutationHandler'
+import EmailHostAttendees from '../mutations/EmailHostAttendees'
 
-export default class SendEventMail extends React.Component {
+class SendEventMail extends React.Component {
   constructor(props) {
     super(props);
-  }
 
-  handleSubmit() {
-    console.log('submitting...')
+    this.state = {
+      target: 'host',
+      bcc: [],
+      subject: '',
+      message: ''
+    }
   }
 
   render() {
@@ -17,10 +23,17 @@ export default class SendEventMail extends React.Component {
         secondary={true}
         onTouchTap={this.props.handleCancel} />,
       <FlatButton
-        label={}
+        label="Send Message"
         primary={true}
-        disabled={}
-        onTouchTap={this.handleSubmit}
+        disabled={false}
+        onTouchTap={() => {
+          console.log('submitting...')
+          console.log(this.refs)
+          this.refs.sendEmailHandler.send({
+            ids: this.props.ids,
+            ...this.state
+          })
+        }}
       />
     ]
 
@@ -33,19 +46,32 @@ export default class SendEventMail extends React.Component {
       >
         <SelectField
           floatingLabelText="Send Email To"
+          value={this.state.target}
           onChange={(event, index, value) => {
-            console.log(value)
+            this.setState({target: value})
           }}
           style={{width: '350px'}}
           floatingLabelStyle={{cursor: 'pointer'}}
-          >
-            <MenuItem value="host" primaryText="Event Host"/>
-            <MenuItem value="attendees" primaryText="Event Attendees"/>
-            <MenuItem value="hostAndAttendees" primaryText="Host and Attendees"/>
-          </SelectField><br />
-          <TextField
+        >
+          <MenuItem value="host" primaryText="Event Host"/>
+          <MenuItem value="attendees" primaryText="Event Attendees"/>
+          <MenuItem value="hostAndAttendees" primaryText="Host and Attendees"/>
+        </SelectField>
+        <TextField
+          floatingLabelText="From"
+          value={'user@example.com'}
+        />
+        <TextField
+          floatingLabelText="Subject"
+          value={this.state.subject}
+          onChange={(event, index, value) => {
+            this.setState({subject: value})
+          }}
+          fullWidth={true}
+        />
+        <TextField
           floatingLabelText="Message Content"
-          value={}
+          value={this.state.message}
           onChange={(event) => {
             this.setState({message: event.target.value});
           }}
@@ -54,8 +80,24 @@ export default class SendEventMail extends React.Component {
           fullWidth={true}
           inputStyle={{backgroundColor: 'rgb(250,250,250)'}}
           ref="message"
-          />
+        />
+        <MutationHandler
+          ref='sendEmailHandler'
+          mutationClass={EmailHostAttendees}
+          mutationName='emailHostAttendees'
+          successMessage='Message Sent.'
+        />
       </Dialog>
     )
   }
 }
+
+export default Relay.createContainer(SendEventMail, {
+  fragments: {
+    currentUser: () => Relay.QL`
+      fragment on User {
+        email
+      }
+    `
+  }
+})
