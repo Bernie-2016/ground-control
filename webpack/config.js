@@ -11,7 +11,7 @@ if (process.env.NODE_ENV === 'production')
 var config = {
   entry: './src/frontend/app.js',
   module: {
-    noParse: /node_modules\/quill\/dist\/quill\.js/,
+    noParse: [/node_modules\/quill\/dist\/quill\.js/, /node_modules\/google-libphonenumber\/dist/],
     loaders: [
       { test: /\.json$/, loader: 'json'},
       { test: /\.css$/, loader: "style!css" },

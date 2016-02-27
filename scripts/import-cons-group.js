@@ -13,9 +13,7 @@ async function main() {
   parsedData.forEach((datum) => {
     data.push({
       cons_group_id: groupId,
-      cons_id: datum['Unique Constituent ID'],
-      create_dt: now,
-      modified_dt: now
+      cons_id: datum['Unique Constituent ID']
     })
   })
   await knex.transaction(async (trx) => {
@@ -23,7 +21,7 @@ async function main() {
       .where('cons_group_id', groupId)
       .delete()
       .transacting(trx)
-    await knex.bulkInsert('bsd_person_bsd_groups', data)
+    await knex.bulkInsert('bsd_person_bsd_groups', data, {transaction: trx})
   })
 }
 
