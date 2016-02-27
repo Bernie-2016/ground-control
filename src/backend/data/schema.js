@@ -1161,16 +1161,11 @@ const GraphQLEditEvents = mutationWithClientMutationId({
           ...event,
           modified_dt: new Date()
         })
-
-      reviewedEvents.push(Number(event.event_id))
     }
 
     if (updateErrors.length > 0){
       message = updateErrors.join(', ')
     }
-
-    if (reviewedEvents.length > 0)
-      await markEventsReviewed(reviewedEvents)
 
     return {events, message}
   }

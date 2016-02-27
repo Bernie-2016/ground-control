@@ -84,7 +84,7 @@ var eventTypes = [
 		id: 'get-out-the-vote',
 		name: 'Get Out the Vote',
 		useShifts: true,
-		adminOnly: false,
+		adminOnly: true,
 		disabled: ['contact_phone', 'public_phone'],
 		defaultValues: {
 			name: 'Get Out the Vote For Bernie!',
