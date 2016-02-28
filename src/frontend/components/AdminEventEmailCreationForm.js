@@ -122,9 +122,9 @@ class AdminEventEmailCreationForm extends React.Component {
         "to help them fill up a " + this.props.event.eventType.name + " they are hosting.\n\n" +
         "It's on " + moment(this.props.event.startDate).format("dddd, MMMM Do [at] h:mma") +
         ". You can get more info and RSVP at this link:\n\n" +
-        publicEventsRootUrl + this.props.event.eventIdObfuscated + "\n\n" + 
+        publicEventsRootUrl + this.props.event.eventIdObfuscated + "\n\n" +
         "Let's blow them away and get folks it help them out -- please sign up if you can!\n\n" +
-        "Thanks,\n" +
+        "Thanks,\n\n" +
         this.props.currentUser.email.split('@')[0].replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();}) + "\n" +
         "Bernie 2016"
 

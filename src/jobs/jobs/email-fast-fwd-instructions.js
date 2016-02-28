@@ -10,75 +10,81 @@ import MG from '../../backend/mail'
 const Mailgun = new MG(process.env.MAILGUN_KEY, process.env.MAILGUN_DOMAIN)
 
 export let job = async () => {
+
   let fourDaysFromNow = moment().add(4, 'days')
+  let oneDayFromNow = moment().add(1, 'days')
   let eventsToEmail = []
   try {
 
     await knex.transaction(async (trx) => {
 
-      var eventsSql = 
+      var eventsSql =
 
           "SELECT " +
-            "gc_bsd_events.event_id " + 
-          "FROM " + 
-            "gc_bsd_events " + 
-          "INNER JOIN " + 
-              "bsd_events " + 
-            "ON " + 
-              "gc_bsd_events.event_id = bsd_events.event_id " + 
-          "WHERE " + 
-              "gc_bsd_events.event_id " + 
-            "IN " + 
-              "( " + 
-                "SELECT " + 
-                  "bsd_events.event_id " + 
-                "FROM " + 
-                  "bsd_events " + 
-                "INNER JOIN " + 
-                    "gc_bsd_events " + 
-                  "ON bsd_events.event_id = gc_bsd_events.event_id " + 
-                "INNER JOIN " + 
-                    "bsd_event_attendees " + 
-                  "ON bsd_events.event_id = bsd_event_attendees.event_id " + 
-                "WHERE " + 
-                    "bsd_events.event_type_id = 31 " + 
+            "gc_bsd_events.event_id " +
+          "FROM " +
+            "gc_bsd_events " +
+          "INNER JOIN " +
+              "bsd_events " +
+            "ON " +
+              "gc_bsd_events.event_id = bsd_events.event_id " +
+          "WHERE " +
+              "gc_bsd_events.event_id " +
+            "IN " +
+              "( " +
+                "SELECT " +
+                  "bsd_events.event_id " +
+                "FROM " +
+                  "bsd_events " +
+                "INNER JOIN " +
+                    "gc_bsd_events " +
+                  "ON bsd_events.event_id = gc_bsd_events.event_id " +
+                "INNER JOIN " +
+                    "bsd_event_attendees " +
+                  "ON bsd_events.event_id = bsd_event_attendees.event_id " +
+                "WHERE " +
+                    "bsd_events.event_type_id = 1 " +
                   "AND " +
-                    "bsd_events.start_dt > '" + fourDaysFromNow.startOf('day').format('YYYY-MM-DD HH:mm:ss') + "' " +
+                    "bsd_events.start_dt > \'" + oneDayFromNow.startOf('day').format('YYYY-MM-DD HH:mm:ss') + "\' " +
                   "AND " +
-                    "bsd_events.start_dt < '" + fourDaysFromNow.endOf('day').format('YYYY-MM-DD HH:mm:ss') + "' " +
-                  "AND " + 
-                    "bsd_events.capacity > 2 " + 
-                  "AND " + 
-                    "bsd_events.flag_approval = false " + 
-                  "AND " + 
-                    "gc_bsd_events.fast_fwd_instructions_sent = false " + 
-                "GROUP BY " + 
-                    "bsd_events.event_id " + 
-                  "HAVING " + 
-                    "(COUNT(event_attendee_id) * 100)::numeric / bsd_events.capacity < 50 " + 
-              ") " + 
- 
-          "UNION " + 
- 
-            "SELECT " + 
-              "bsd_events.event_id " + 
-            "FROM " + 
-              "bsd_events " + 
-            "INNER JOIN " + 
-                "gc_bsd_events " + 
-              "ON " + 
-                "bsd_events.event_id = gc_bsd_events.event_id " + 
-            "WHERE " + 
-                "bsd_events.event_type_id = 31 " + 
-              "AND " + 
-                "bsd_events.capacity = 0 " + 
+                    "bsd_events.start_dt < \'" + fourDaysFromNow.endOf('day').format('YYYY-MM-DD HH:mm:ss') + "\' " +
+                  "AND " +
+                     "gc_bsd_events.create_dt < \'" + moment().startOf('day').format('YYYY-MM-DD HH:mm:ss') + "\' " +
+                  "AND " +
+                    "bsd_events.capacity > 2 " +
+                  "AND " +
+                    "bsd_events.flag_approval = false " +
+                  "AND " +
+                    "gc_bsd_events.fast_fwd_instructions_sent = false " +
+                "GROUP BY " +
+                    "bsd_events.event_id " +
+                  "HAVING " +
+                    "(COUNT(event_attendee_id) * 100)::numeric / bsd_events.capacity < 50 " +
+              ") " +
+
+          "UNION " +
+
+            "SELECT " +
+              "bsd_events.event_id " +
+            "FROM " +
+              "bsd_events " +
+            "INNER JOIN " +
+                "gc_bsd_events " +
+              "ON " +
+                "bsd_events.event_id = gc_bsd_events.event_id " +
+            "WHERE " +
+                "bsd_events.event_type_id = 1 " +
               "AND " +
-                "bsd_events.start_dt > '" + fourDaysFromNow.startOf('day').format('YYYY-MM-DD HH:mm:ss') + "' " +
+                "bsd_events.capacity = 0 " +
               "AND " +
-                "bsd_events.start_dt < '" + fourDaysFromNow.endOf('day').format('YYYY-MM-DD HH:mm:ss') + "' " +
-              "AND " + 
-                "bsd_events.flag_approval = false " + 
-              "AND " + 
+                "bsd_events.start_dt > \'" + oneDayFromNow.startOf('day').format('YYYY-MM-DD HH:mm:ss') + "\' " +
+              "AND " +
+                "bsd_events.start_dt < \'" + fourDaysFromNow.endOf('day').format('YYYY-MM-DD HH:mm:ss') + "\' " +
+              "AND " +
+                 "gc_bsd_events.create_dt < \'" + moment().startOf('day').format('YYYY-MM-DD HH:mm:ss') + "\' " +
+              "AND " +
+                "bsd_events.flag_approval = false " +
+              "AND " +
                 "gc_bsd_events.fast_fwd_instructions_sent = false";
 
 

@@ -1,0 +1,39 @@
+<p>
+  Hi {{user.name}},
+</p>
+
+<p>
+  Thanks so much for stepping up to host a canvass event!
+  Your canvass event will give other volunteers the opportunity to knock on the doors of supporters and undecided voters.
+  We'll provide you with a script, a list of voters that you'll be talking to, and a map of where to go.
+  We'll also train you to use your time effectively out in the field.
+</p>
+
+<p>
+  A field organizer will be in touch with you soon to give you training and materials.
+  If you have any questions right now, feel free to call or stop by one of your local campaign offices:<br/>
+  <a href="http://map.berniesanders.com/#zipcode={{event.venue_zip}}&distance=50&f%5B%5D=campaign-office">map.berniesanders.com</a>
+</p>
+
+<p>
+  If you need to make any changes to your event, login here:<br/>
+  <a href="https://secure.berniesanders.com/page/event/myevents">secure.berniesanders.com/page/event/myevents</a>
+</p>
+
+{{> loginInstructions user=user }}
+
+<p>If you have any trouble logging in, email help@berniesanders.com.</p>
+
+<p>
+  While you’re waiting for an organizer to get in touch, you can start making calls to nearby Bernie supporters and inviting them to attend your event by creating an account or logging in at organize.berniesanders.com.
+</p>
+
+<p>
+  Thank you for everything that you do.
+  <br/>
+  - Team Bernie
+</p>
+
+<hr>
+
+{{> eventPreview event=event eventIds=eventIds }}

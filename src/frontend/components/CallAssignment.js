@@ -10,6 +10,8 @@ import Form from 'react-formal';
 import SubmitCallSurvey from '../mutations/SubmitCallSurvey'
 import CallStatsBar from './CallStatsBar'
 import MutationHandler from './MutationHandler';
+var PNF = require('google-libphonenumber').PhoneNumberFormat;
+var phoneUtil = require('google-libphonenumber').PhoneNumberUtil.getInstance();
 
 const SurveyRenderers = {
   'BSDSurvey': require('./survey-renderers/BSDSurvey'),
@@ -162,11 +164,12 @@ ${userFirstName}`
     return `mailto:${email}?subject=${subject}&body=${message}`
   }
 
+  phoneTelLink(number, country='US') {
+    return phoneUtil.format(phoneUtil.parse(number, country), PNF.INTERNATIONAL);
+  }
 
-  formatPhoneNumber(number) {
-    let sliceStart = 1
-
-    return '(' + number.slice(sliceStart, sliceStart + 3) + ') ' + number.slice(sliceStart + 3, sliceStart + 6) + '-' + number.slice(sliceStart + 6)
+  formatPhoneNumber(number, country='US') {
+    return phoneUtil.format(phoneUtil.parse(number, country), country === 'US' ? PNF.NATIONAL : PNF.INTERNATIONAL);
   }
 
   renderIntervieweeInfo() {
@@ -181,12 +184,8 @@ ${userFirstName}`
         return 'never'
       }
     }
-    let phoneNumber = interviewee.phone
-    if (phoneNumber[0] !== '1')
-      phoneNumber = '1' + phoneNumber
-
-    phoneNumber = phoneNumber.slice(0, 11)
-    let formattedNumber = this.formatPhoneNumber(phoneNumber)
+    let country = interviewee.address.country || 'US'
+    let phone = interviewee.phone
     let sideBar = (
       <div>
         <div style={{
@@ -197,14 +196,18 @@ ${userFirstName}`
         }}>
           {name}
           <br />
-          <a style={{color: BernieColors.darkBlue}} href={`tel:+${phoneNumber}`}>
-            {formattedNumber}
+          <a style={{color: BernieColors.darkBlue}} href={`tel:${this.phoneTelLink(phone, country)}`}>
+            {this.formatPhoneNumber(phone, country)}
           </a>
         </div>
       </div>
     )
 
-    let location = interviewee.address.city + ', ' + interviewee.address.state + ' ' + interviewee.address.zip
+    let location = `${interviewee.address.city}, ${interviewee.address.state}`
+    if (country !== 'US')
+      location = location + `, ${country}`
+    location = location + `, ${interviewee.address.zip}`
+
     let email =  this.props.currentUser.intervieweeForCallAssignment.email ? <a target='_blank' href={this.generateEventsInfoEmailLink()}>{this.props.currentUser.intervieweeForCallAssignment.email}</a> : 'None'
     let content = (
       <div style={BernieText.default}>
@@ -447,6 +450,7 @@ export default Relay.createContainer(CallAssignment, {
             city
             state
             zip
+            country
             localUTCOffset
             latitude
             longitude

@@ -617,6 +617,10 @@ const GraphQLAddress = new GraphQLObjectType({
       type: GraphQLString,
       resolve: (address) => address.state_cd
     },
+    country: {
+      type: GraphQLString,
+      resolve: (address) => address.country
+    },
     zip: { type: GraphQLString },
     latitude: { type: GraphQLFloat },
     longitude: { type: GraphQLFloat },
@@ -1220,6 +1224,8 @@ const GraphQLDeleteEvents = mutationWithClientMutationId({
     await knex('bsd_events')
       .whereIn('event_id', localIds)
       .del()
+    await markEventsReviewed(localIds)
+
     return localIds
   }
 })
