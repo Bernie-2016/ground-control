@@ -26,6 +26,7 @@ import fs from 'fs'
 import handlebars from 'handlebars'
 import throng from 'throng'
 import compression from 'compression'
+import rp from 'request-promise'
 
 const WORKERS = process.env.WEB_CONCURRENCY || 1
 
@@ -344,6 +345,16 @@ function startApp() {
       'get-out-the-vote': { id: 45, staffOnly: false },
       'vol2vol': { id: 47, staffOnly: true },
       'rally': { id: 14, staffOnly: true },
+    }
+
+    if (form['event_type_id'] === 'canvass'){
+      const result = await rp('https://sheetsu.com/apis/bd810a50')
+      const organizerArray = JSON.parse(result).result
+      const organizers = organizerArray.filter((organizer) => (organizer.State === form['venue_state_cd']))
+      if (organizers.length <= 0)
+        res.status(400).send({errors: {
+          'Event Type' : [`Canvasses are not yet supported in ${form['venue_state_cd']}. Please feel free to sign up host another event type!`]
+        }})
     }
 
     // Flag event as needing approval
