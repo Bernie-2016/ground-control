@@ -35,7 +35,6 @@ import knex from './knex'
 import humps from 'humps'
 import log from '../log'
 import MG from '../mail'
-import unique from 'array-unique'
 import rq from 'request-promise'
 
 
@@ -944,7 +943,7 @@ const GraphQLEvent = new GraphQLObjectType({
         // get states to exclude.
         let req = await rq('http://googledoctoapi.forberniesanders.com/1hJadb6JyDekHf5Vzx-77h7sdJRCOB01XUPvEpKIckDs/')
         let officeLocations = JSON.parse(req);
-        let officeStates = unique(officeLocations.map((office) => office['state']))
+        let officeStates = [...new Set(officeLocations.map((office) => office['state']))]
 
         while (foundPeople.length < 250 && radius <= maxRadius) {
           let foundConsIds = foundPeople.map((person) => person.cons_id)

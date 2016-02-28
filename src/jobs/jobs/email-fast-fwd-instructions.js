@@ -6,7 +6,6 @@ import Promise from 'bluebird'
 import importData from '../../backend/data/import-data'
 import moment from 'moment-timezone'
 import MG from '../../backend/mail'
-import unique from 'array-unique'
 import rq from 'request-promise'
 
 const Mailgun = new MG(process.env.MAILGUN_KEY, process.env.MAILGUN_DOMAIN)
@@ -21,7 +20,7 @@ export let job = async () => {
     // get states to exclude.
     let req = await rq('http://googledoctoapi.forberniesanders.com/1hJadb6JyDekHf5Vzx-77h7sdJRCOB01XUPvEpKIckDs/')
     let officeLocations = JSON.parse(req);
-    let officeStates = unique(officeLocations.map((office) => office['state']))
+    let officeStates = [...new Set(officeLocations.map((office) => office['state']))]
 
     await knex.transaction(async (trx) => {
 
