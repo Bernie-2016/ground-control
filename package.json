@@ -22,6 +22,7 @@
     "job": "./run-job"
   },
   "dependencies": {
+    "array-unique": "^0.2.1",
     "async": "^1.5.0",
     "babel": "^5.8.21",
     "babel-core": "^5.8.25",
