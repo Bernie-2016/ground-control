@@ -317,14 +317,30 @@ function startApp() {
   }))
 
   app.get('/events/add-rsvp', wrap(async(req, res) => {
-    let response = null
-    try {
-      response = await BSDClient.addRSVPToEvent(req.query)
-    } catch(ex) {
-      res.status(400).send(ex.toString())
-      return;
+  	const makeRequest = async (query) => {
+  		let response = null
+  		try {
+  		  response = await BSDClient.addRSVPToEvent(query)
+  		} catch(ex) {
+  		  res.status(400).send(ex.toString())
+  		  log.error(ex)
+  		  return
+  		}
+  		res.send(response.body)
+  	}
+
+    log.info(req.query)
+    if (req.query.event_id_obfuscated){
+    	const eventIds = req.query.event_id_obfuscated.split(',')
+    	eventIds.forEach(async (eventId) => {
+    		let event = await knex('bsd_events').where('event_id_obfuscated', eventId).first()
+    		log.info(event)
+    		req.query.event_id_obfuscated = eventId
+    		makeRequest(req.query)
+    	})
     }
-    res.send(response.body)
+    else
+    	makeRequest(req.query)
   }))
 
   app.post('/events/create', wrap(async (req, res) => {
