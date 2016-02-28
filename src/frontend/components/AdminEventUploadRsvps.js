@@ -19,7 +19,8 @@ export default class AdminEventUploadRsvps extends React.Component {
       borderStyle: 'dashed',
       borderRadius: 5,
       position: 'relative',
-      textAlign: 'center'
+      textAlign: 'center',
+      overflow: 'scroll'
     },
     dropzoneActiveStyle: {
       borderStyle: 'solid',
@@ -148,9 +149,11 @@ export default class AdminEventUploadRsvps extends React.Component {
             paddingBottom: 20,
             borderBottom: '1px dashed ' + BernieColors.green
           }}>
-            <div style={{...BernieText.title, fontSize: '1.2em', color: BernieColors.green}}>Drop your CSVs of RSVPs here!</div>
+            <div style={{...BernieText.title, fontSize: '1.2em', color: BernieColors.green}}>
+              Drop your CSVs of RSVPs here!
+            </div>
             <div style={{...BernieText.default, fontSize: '0.65em'}}>
-            CSV with column headers - any of the values under "Query Parameters" <a href="https://www.bluestatedigital.com/page/api/doc#----------------------graph-addrsvp-----------------">here</a>.
+              CSV with column headers - any of the values under "Query Parameters" <a href="https://www.bluestatedigital.com/page/api/doc#----------------------graph-addrsvp-----------------" target="_blank">here</a>.
             </div>
           </div>
           {this.renderFileProgress()}
