@@ -435,22 +435,16 @@ function startApp() {
     // Use time/duration or shifts
     let startHour = null
     if (form['use_shifts']){
-      // try {
-        startHour = (form['start_time']['a'][0] == 'pm') ? Number(form['start_time']['h'][0]) + 12 : form['start_time']['h'][0];
-        form['days'] = [];
-        form['days'].push({})
-        form['days'][0]['shifts'] = form['start_time']['h'].map((item, index) => {
-          return ({
-              start_time: `${(form['start_time']['a'][index] == 'pm') ? Number(form['start_time']['h'][index]) + 12 : form['start_time']['h'][index]}:${form['start_time']['i'][index]}:00`,
-              end_time: `${(form['end_time']['a'][index] == 'pm') ? Number(form['end_time']['h'][index]) + 12 : form['end_time']['h'][index]}:${form['end_time']['i'][index]}:00`,
-              capacity: form['capacity']
-            })
+      startHour = (form['start_time']['a'][0] == 'pm') ? Number(form['start_time']['h'][0]) + 12 : form['start_time']['h'][0];
+      form['days'] = [];
+      form['days'].push({})
+      form['days'][0]['shifts'] = form['start_time']['h'].map((item, index) => {
+        return ({
+          start_time: `${(form['start_time']['a'][index] == 'pm') ? Number(form['start_time']['h'][index]) + 12 : form['start_time']['h'][index]}:${form['start_time']['i'][index]}:00`,
+          end_time: `${(form['end_time']['a'][index] == 'pm') ? Number(form['end_time']['h'][index]) + 12 : form['end_time']['h'][index]}:${form['end_time']['i'][index]}:00`,
+          capacity: form['capacity']
         })
-
-      // }
-      // catch(ex) {
-      //   res.status(400).send({'errors': ex})
-      // }
+      })
     }
     else
       startHour = (form['start_time']['a'] == 'pm') ? Number(form['start_time']['h']) + 12 : form['start_time']['h']
