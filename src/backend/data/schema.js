@@ -1761,8 +1761,18 @@ let RootQuery = new GraphQLObjectType({
       },
       resolve: async (root, {id}, {rootValue}) => {
         authRequired(rootValue)
-        let localId = fromGlobalId(id).id
-        return knex('fast_fwd_request').where('id', localId)
+        let localId = fromGlobalId(id)
+        if (localId.type === 'FastFwdRequest')
+          return knex('fast_fwd_request').where('id', localId)
+        else {
+          if (localId.type !== 'Event')
+            localId = id
+          else
+            localId = localId.id
+          let event = await rootValue.loaders.bsdEvents.load(localId)
+          return knex('fast_fwd_request')
+            .where('event_id', event.event_id)
+        }
       }
     },
     node: nodeField
