@@ -71,10 +71,11 @@ export default class AdminEventUploadRsvps extends React.Component {
   ])
 
   createRSVPs(row, fileName, [...eventIdKeys]) {
-    row.event_id_obfuscated = eventIdKeys
+    const obfuscatedIds = eventIdKeys
       .filter((key) => row[key])
       .map((key) => row[key])
-      .join(',')
+
+    row.event_id_obfuscated = [row.event_id_obfuscated, ...obfuscatedIds].join(',')
 
     Object.keys(row).forEach((key) => {
       if (!this.allowedKeys.has(key))
@@ -124,6 +125,7 @@ export default class AdminEventUploadRsvps extends React.Component {
         this.setState({filesProcessed: currentFiles})
 
         for (let i=0; i<data.length; i++){
+          console.log(data[i])
           this.createRSVPs(data[i], file.name, eventIdKeys)
         }
       }
