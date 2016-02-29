@@ -126,7 +126,7 @@ class AdminEventsSection extends React.Component {
       userMessage: '',
       deletionConfirmationMessage: null,
       deletionReasonIndex: null,
-      actionButtons: new Set(['delete', 'demote', 'approve', 'edit', 'email', 'downloadRSVPs']),
+      actionButtons: new Set(['delete', 'demote', 'approve', 'edit', 'fastForward', 'downloadRSVPs']),
       undoAction: function(){console.log('undo')}
     }
 
@@ -370,12 +370,12 @@ class AdminEventsSection extends React.Component {
           },
         icon: 'edit',
       },
-      email: {
-        title: 'email',
+      fastForward: {
+        title: 'make fast forward request',
         execute: () => {
-            this._handleEventEmail([rowIndex])
+            this._handleFastForwardRequest([rowIndex])
           },
-        icon: 'email',
+        icon: 'fast_forward',
         disabled: (data[rowIndex].node.flagApproval === true || data[rowIndex].node.isSearchable === 0)
       },
       downloadRSVPs: {
@@ -1086,7 +1086,7 @@ ${signature}`
     this._deselectRows({indexesToRemove: eventIndexes})
   }
 
-  _handleEventEmail = (eventIndex) => {
+  _handleFastForwardRequest = (eventIndex) => {
     let eventId = events[eventIndex].node.id
 
     this.props.history.push(`/admin/events/${eventId}/emails/create`)
