@@ -4,6 +4,7 @@ import {hash} from '../../../bcrypt-promise';
 import Promise from 'bluebird'
 import loadZips from '../shared/load-zips'
 import importData from '../../import-data'
+import moment from 'moment'
 
 const NUM_PERSONS=25345;
 const NUM_EVENTS=15432;
@@ -258,7 +259,12 @@ exports.seed = async function(knex, Promise) {
     if (faker.random.boolean()){
     	data.bsd_event_shifts.push({
     		event_id: index,
-    		start_time: startDate
+    		event_shift_id: data.bsd_event_shifts.length,
+    		start_dt: moment(startDate).format('YYYY-MM-DD HH:mm:ss'),
+    		start_time: moment(startDate).format('HH:mm:ss'),
+    		end_dt: moment(startDate).format('YYYY-MM-DD HH:mm:ss'),
+    		end_time: moment(startDate).format('HH:mm:ss'),
+    		capacity: faker.random.number({min: 0, max: 300})
       })
     }
 
