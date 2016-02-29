@@ -1463,6 +1463,19 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
       recipientAddress: adminEmail
     })
 
+    let existingLookup = await knex.table('fast_fwd_request')
+            .select('email_sent_dt')
+            .where('event_id', parseInt(fromGlobalId(eventId).id, 10));
+
+    if (existingLookup.length > 0 && existingLookup[0]['email_sent_dt']){
+
+      throw new GraphQLError({
+        status: 403,
+        message: 'Fast Forward has already been sent for this event.'
+      })
+
+    }
+
     knex.transaction(async (trx) => {
       for (let i = 0; i < recipients.length; i++) {
         let recipientId = fromGlobalId(recipients[i]).id
@@ -1490,11 +1503,11 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
 
     // somewhat hackish; catches Test Mode.
     // don't mark it as sent until it goes out to volunteers.
-    if(recipients.length > 1){
+    if(recipients.length > 0){
       await knex.table('fast_fwd_request')
               .where('event_id', fromGlobalId(eventId).id)
               .update({
-                'email_sent_dt': new Date()
+                'email_sent_dt': moment().format('YYYY-MM-DD HH:mm:ss')
               })
     }
 
