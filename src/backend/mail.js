@@ -121,7 +121,7 @@ export default class MG {
     let templateName = 'event-create-confirmation'
 
     // Send organizer notification
-    if (data.event.event_type_id == 32){
+    if (data.event.event_type_id == 32 && data.event.is_official !== '1'){
       templateName = 'canvass-create-confirmation'
 
       // Fetch organizer data

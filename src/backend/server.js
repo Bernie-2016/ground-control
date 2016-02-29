@@ -317,14 +317,37 @@ function startApp() {
   }))
 
   app.get('/events/add-rsvp', wrap(async(req, res) => {
-    let response = null
-    try {
-      response = await BSDClient.addRSVPToEvent(req.query)
-    } catch(ex) {
-      res.status(400).send(ex.toString())
-      return;
+  	const makeRequest = async (query) => {
+  		log.debug(query)
+  		let response = null
+  		try {
+  		  response = await BSDClient.addRSVPToEvent(query)
+  		} catch(ex) {
+  		  res.status(400).send(ex.toString())
+  		  log.error(ex)
+  		  return
+  		}
+  		res.send(response.body)
+  	}
+
+    if (req.query.event_id_obfuscated){
+    	const eventIds = req.query.event_id_obfuscated.split(',')
+    	eventIds.forEach(async (eventId) => {
+    		if (!eventId)
+    			return
+    		const shift = await knex('bsd_event_shifts')
+    			.join('bsd_events', 'bsd_event_shifts.event_id', 'bsd_events.event_id')
+    			.where('bsd_events.event_id_obfuscated', eventId)
+    			.orderBy('bsd_event_shifts.start_dt', 'asc')
+    			.first()
+    		if (shift)
+    			req.query.shift_ids = shift.event_shift_id
+    		req.query.event_id_obfuscated = eventId
+    		makeRequest(req.query)
+    	})
     }
-    res.send(response.body)
+    else
+    	makeRequest(req.query)
   }))
 
   app.post('/events/create', wrap(async (req, res) => {
