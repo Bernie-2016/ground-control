@@ -4,6 +4,7 @@ import {hash} from '../../../bcrypt-promise';
 import Promise from 'bluebird'
 import loadZips from '../shared/load-zips'
 import importData from '../../import-data'
+import moment from 'moment'
 
 const NUM_PERSONS=25345;
 const NUM_EVENTS=15432;
@@ -55,6 +56,7 @@ exports.seed = async function(knex, Promise) {
     'bsd_people': [],
     'bsd_addresses' : [],
     'bsd_events' : [],
+    'bsd_event_shifts' : [],
     'bsd_event_attendees': [],
     'bsd_person_bsd_groups' : [],
     'bsd_emails': [],
@@ -175,8 +177,7 @@ exports.seed = async function(knex, Promise) {
     Object.keys(groups).forEach((key) => {
       data.bsd_person_bsd_groups.push({
         cons_id: index,
-        cons_group_id: key,
-        ...timestamps
+        cons_group_id: key
       })
     })
 
@@ -219,6 +220,7 @@ exports.seed = async function(knex, Promise) {
     let capacity = faker.random.arrayElement([0, faker.random.number({min:0, max:100})]);
 
     let zip = faker.random.arrayElement(data.zip_codes);
+    let startDate = formatDate(faker.date.future());
     data.bsd_events.push({
       event_id: index,
       event_id_obfuscated: faker.internet.password(5),
@@ -238,7 +240,7 @@ exports.seed = async function(knex, Promise) {
       venue_addr2: nully(faker.address.secondaryAddress()),
       venue_country: faker.address.countryCode(),
       venue_directions: nully(faker.lorem.paragraph()),
-      start_dt: formatDate(faker.date.future()),
+      start_dt: startDate,
       duration: faker.random.number({min:1, max:1600}),
       capacity: capacity,
       start_tz: faker.random.arrayElement(['US/Central', 'US/Eastern', 'US/Pacific', 'US/Mountain']),
@@ -253,6 +255,18 @@ exports.seed = async function(knex, Promise) {
       ...timestamps
     })
 
+    if (faker.random.boolean()){
+    	data.bsd_event_shifts.push({
+    		event_id: index,
+    		event_shift_id: data.bsd_event_shifts.length,
+    		start_dt: moment(startDate).format('YYYY-MM-DD HH:mm:ss'),
+    		start_time: moment(startDate).format('HH:mm:ss'),
+    		end_dt: moment(startDate).format('YYYY-MM-DD HH:mm:ss'),
+    		end_time: moment(startDate).format('HH:mm:ss'),
+    		capacity: faker.random.number({min: 0, max: 300})
+      })
+    }
+
     let numAttendees = faker.random.number({min:0, max:capacity})
     for (let attendeeIndex = 0; attendeeIndex < numAttendees; attendeeIndex++) {
       data.bsd_event_attendees.push({
@@ -265,7 +279,7 @@ exports.seed = async function(knex, Promise) {
     }
   }
 
-  let insertOrder = ['users', 'zip_codes', 'bsd_groups', 'bsd_event_types', 'bsd_people', 'bsd_events', 'bsd_event_attendees', 'bsd_addresses', 'bsd_person_bsd_groups', 'bsd_emails', 'bsd_phones', 'bsd_subscriptions']
+  let insertOrder = ['users', 'zip_codes', 'bsd_groups', 'bsd_event_types', 'bsd_people', 'bsd_events', 'bsd_event_shifts', 'bsd_event_attendees', 'bsd_addresses', 'bsd_person_bsd_groups', 'bsd_emails', 'bsd_phones', 'bsd_subscriptions']
 
   for (let index = 0; index < insertOrder.length; index++) {
     let key = insertOrder[index]

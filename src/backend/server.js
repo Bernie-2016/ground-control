@@ -317,14 +317,37 @@ function startApp() {
   }))
 
   app.get('/events/add-rsvp', wrap(async(req, res) => {
-    let response = null
-    try {
-      response = await BSDClient.addRSVPToEvent(req.query)
-    } catch(ex) {
-      res.status(400).send(ex.toString())
-      return;
+  	const makeRequest = async (query) => {
+  		log.debug(query)
+  		let response = null
+  		try {
+  		  response = await BSDClient.addRSVPToEvent(query)
+  		} catch(ex) {
+  		  res.status(400).send(ex.toString())
+  		  log.error(ex)
+  		  return
+  		}
+  		res.send(response.body)
+  	}
+
+    if (req.query.event_id_obfuscated){
+    	const eventIds = req.query.event_id_obfuscated.split(',')
+    	eventIds.forEach(async (eventId) => {
+    		if (!eventId)
+    			return
+    		const shift = await knex('bsd_event_shifts')
+    			.join('bsd_events', 'bsd_event_shifts.event_id', 'bsd_events.event_id')
+    			.where('bsd_events.event_id_obfuscated', eventId)
+    			.orderBy('bsd_event_shifts.start_dt', 'asc')
+    			.first()
+    		if (shift)
+    			req.query.shift_ids = shift.event_shift_id
+    		req.query.event_id_obfuscated = eventId
+    		makeRequest(req.query)
+    	})
     }
-    res.send(response.body)
+    else
+    	makeRequest(req.query)
   }))
 
   app.post('/events/create', wrap(async (req, res) => {
@@ -336,13 +359,13 @@ function startApp() {
     const eventIdMap = {
       'volunteer-meeting': { id: 24, staffOnly: false },
       'ballot-access': { id: 30, staffOnly: false },
-      'phonebank': { id: 31, staffOnly: false },
-      'canvass': { id: 32, staffOnly: false },
+      'phonebank': { id: 31, staffOnly: false, requirePhone: true },
+      'canvass': { id: 32, staffOnly: false, requirePhone: true },
       'barnstorm': { id: 41, staffOnly: false },
-      'carpool-to-nevada': { id: 39, staffOnly: false },
+      'carpool-to-nevada': { id: 39, staffOnly: false, requirePhone: true },
       'carpool': { id: 39, staffOnly: false },
       'official-barnstorm': { id: 41, staffOnly: true },
-      'get-out-the-vote': { id: 45, staffOnly: false },
+      'get-out-the-vote': { id: 45, staffOnly: false, requirePhone: true },
       'vol2vol': { id: 47, staffOnly: true },
       'rally': { id: 14, staffOnly: true },
     }
@@ -393,7 +416,7 @@ function startApp() {
       src = 'unknown source'
 
     // Require phone number for RSVPs to phonebanks
-    if (form['event_type_id'] === 'phonebank' || form['event_type_id'] === 'carpool-to-nevada') {
+    if (eventIdMap[form['event_type_id']].requirePhone) {
       form['attendee_require_phone'] = 1;
     }
 
@@ -435,22 +458,16 @@ function startApp() {
     // Use time/duration or shifts
     let startHour = null
     if (form['use_shifts']){
-      // try {
-        startHour = (form['start_time']['a'][0] == 'pm') ? Number(form['start_time']['h'][0]) + 12 : form['start_time']['h'][0];
-        form['days'] = [];
-        form['days'].push({})
-        form['days'][0]['shifts'] = form['start_time']['h'].map((item, index) => {
-          return ({
-              start_time: `${(form['start_time']['a'][index] == 'pm') ? Number(form['start_time']['h'][index]) + 12 : form['start_time']['h'][index]}:${form['start_time']['i'][index]}:00`,
-              end_time: `${(form['end_time']['a'][index] == 'pm') ? Number(form['end_time']['h'][index]) + 12 : form['end_time']['h'][index]}:${form['end_time']['i'][index]}:00`,
-              capacity: form['capacity']
-            })
+      startHour = (form['start_time']['a'][0] == 'pm') ? Number(form['start_time']['h'][0]) + 12 : form['start_time']['h'][0];
+      form['days'] = [];
+      form['days'].push({})
+      form['days'][0]['shifts'] = form['start_time']['h'].map((item, index) => {
+        return ({
+          start_time: `${(form['start_time']['a'][index] == 'pm') ? Number(form['start_time']['h'][index]) + 12 : form['start_time']['h'][index]}:${form['start_time']['i'][index]}:00`,
+          end_time: `${(form['end_time']['a'][index] == 'pm') ? Number(form['end_time']['h'][index]) + 12 : form['end_time']['h'][index]}:${form['end_time']['i'][index]}:00`,
+          capacity: form['capacity']
         })
-
-      // }
-      // catch(ex) {
-      //   res.status(400).send({'errors': ex})
-      // }
+      })
     }
     else
       startHour = (form['start_time']['a'] == 'pm') ? Number(form['start_time']['h']) + 12 : form['start_time']['h']

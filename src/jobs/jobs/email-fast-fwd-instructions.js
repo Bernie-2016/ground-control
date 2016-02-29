@@ -6,6 +6,7 @@ import Promise from 'bluebird'
 import importData from '../../backend/data/import-data'
 import moment from 'moment-timezone'
 import MG from '../../backend/mail'
+import rq from 'request-promise'
 
 const Mailgun = new MG(process.env.MAILGUN_KEY, process.env.MAILGUN_DOMAIN)
 
@@ -15,6 +16,11 @@ export let job = async () => {
   let oneDayFromNow = moment().add(1, 'days')
   let eventsToEmail = []
   try {
+
+    // get states to exclude.
+    let req = await rq('http://googledoctoapi.forberniesanders.com/1hJadb6JyDekHf5Vzx-77h7sdJRCOB01XUPvEpKIckDs/')
+    let officeLocations = JSON.parse(req);
+    let officeStates = [...new Set(officeLocations.map((office) => office['state']))]
 
     await knex.transaction(async (trx) => {
 
@@ -43,7 +49,7 @@ export let job = async () => {
                     "bsd_event_attendees " +
                   "ON bsd_events.event_id = bsd_event_attendees.event_id " +
                 "WHERE " +
-                    "bsd_events.event_type_id = 1 " +
+                    "bsd_events.event_type_id = 31 " +
                   "AND " +
                     "bsd_events.start_dt > \'" + oneDayFromNow.startOf('day').format('YYYY-MM-DD HH:mm:ss') + "\' " +
                   "AND " +
@@ -56,6 +62,8 @@ export let job = async () => {
                     "bsd_events.flag_approval = false " +
                   "AND " +
                     "gc_bsd_events.fast_fwd_instructions_sent = false " +
+                  "AND " +
+                    "bsd_events.venue_state_cd NOT IN (\'" + officeStates.join('\', \'') + "\') " +
                 "GROUP BY " +
                     "bsd_events.event_id " +
                   "HAVING " +
@@ -73,7 +81,7 @@ export let job = async () => {
               "ON " +
                 "bsd_events.event_id = gc_bsd_events.event_id " +
             "WHERE " +
-                "bsd_events.event_type_id = 1 " +
+                "bsd_events.event_type_id = 31 " +
               "AND " +
                 "bsd_events.capacity = 0 " +
               "AND " +
@@ -85,8 +93,9 @@ export let job = async () => {
               "AND " +
                 "bsd_events.flag_approval = false " +
               "AND " +
-                "gc_bsd_events.fast_fwd_instructions_sent = false";
-
+                "gc_bsd_events.fast_fwd_instructions_sent = false " +
+              "AND " +
+                "bsd_events.venue_state_cd NOT IN (\'" + officeStates.join('\', \'') + "\')";
 
       eventsToEmail = await knex.raw(eventsSql).transacting(trx);
 

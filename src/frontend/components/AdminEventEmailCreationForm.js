@@ -133,7 +133,10 @@ class AdminEventEmailCreationForm extends React.Component {
         <MutationHandler ref='mutationHandler'
                          successMessage='Event email sent!'
                          mutationClass={CreateAdminEventEmail}
-                         mutationName='createAdminEventEmail' />
+                         mutationName='createAdminEventEmail'
+                         onSuccess={() => {
+                            this.props.history.push('/admin/events#query[numEvents]=100&query[sortField]=startDate&query[sortDirection]=ASC&query[status]=FAST_FWD_REQUEST')
+                         }} />
         <div style={BernieText.title}>
           Send Event Email
         </div>
