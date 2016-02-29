@@ -42,13 +42,42 @@ export default class AdminEventUploadRsvps extends React.Component {
     filesProcessed: {},
   }
 
-  createRSVPs(data, fileName) {
-    if (data.length === 0)
-      return;
+  allowedKeys = new Set([
+    'event_id',
+    'event_id_obfuscated',
+    'will_attend',
+    'guid',
+    'email',
+    'zip',
+    'country',
+    'shift_ids',
+    'phone',
+    'employer',
+    'occupation',
+    'addr1',
+    'addr2',
+    'addr3',
+    'city',
+    'comment',
+    'firstname',
+    'guests',
+    'is_potential_volunteer',
+    'is_reminder_sent',
+    'lastname',
+    'pledge_amt',
+    'pledge_method',
+    'state_cd',
+    'zip_4'
+  ])
 
-    let row = data[0]
-    delete row['firstname']
-    delete row['lastname']
+  createRSVPs(row, fileName, eventIdKeys) {
+    // delete row['firstname']
+    // delete row['lastname']
+
+    Object.keys(row).forEach((key) => {
+      if (!this.allowedKeys.has(key))
+        delete row[key]
+    })
     let url = `/events/add-rsvp?${qs.stringify(row)}`
 
     superagent.get(url, (err, res) => {
@@ -61,16 +90,29 @@ export default class AdminEventUploadRsvps extends React.Component {
       }
       filesProcessed[fileName] = processObj
       this.setState(filesProcessed)
-      this.createRSVPs(data.slice(1), fileName)
     })
   }
 
   onDrop = (files) => {
+    let eventIdKeys = []
+    const transformFields = (chunk) => {
+      eventIdKeys = chunk.match(/(Event\s\d+\sID)/)
+
+      return chunk
+        .replace(/Email Address/i, 'email')
+        .replace(/First Name/i, 'firstname')
+        .replace(/Last Name/i, 'lastname')
+        .replace(/Phone Number/i, 'phone')
+        .replace(/Zip/i, 'zip')
+        .replace(/DWID/i, 'guid')
+    }
+
     files.forEach((file) => {
       let reader = new FileReader();
       reader.onload = (e) => {
         let text = reader.result;
-        let data = Papa.parse(text, {header: true}).data
+        let data = Papa.parse(text, {header: true, beforeFirstChunk: transformFields}).data
+        console.log(data[0].lastname)
         let processObj = {
           totalRows: data.length,
           processedRows: 0,
@@ -79,7 +121,10 @@ export default class AdminEventUploadRsvps extends React.Component {
         let currentFiles = this.state.filesProcessed
         currentFiles[file.name] = processObj
         this.setState({filesProcessed: currentFiles})
-        this.createRSVPs(data, file.name)
+
+        for (let i=0; i<data.length; i++){
+          this.createRSVPs(data[i], file.name, eventIdKeys)
+        }
       }
       reader.readAsText(file, 'utf8');
     })
@@ -88,7 +133,6 @@ export default class AdminEventUploadRsvps extends React.Component {
   renderFileProgress() {
     let count = 0
     let renderErrors = (fileObj) => {
-      console.log(fileObj.errors)
       if (fileObj.errors.length === 0)
         return <div></div>
       return (
