@@ -177,8 +177,7 @@ exports.seed = async function(knex, Promise) {
     Object.keys(groups).forEach((key) => {
       data.bsd_person_bsd_groups.push({
         cons_id: index,
-        cons_group_id: key,
-        ...timestamps
+        cons_group_id: key
       })
     })
 
