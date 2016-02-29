@@ -106,6 +106,7 @@ class AdminEventEmailCreationForm extends React.Component {
   }
 
   render() {
+
     let recipients = []
 
     if (!this.state.testMode) {

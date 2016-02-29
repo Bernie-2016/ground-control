@@ -2,11 +2,6 @@ import Relay from 'react-relay'
 
 export default class CreateFastFwdRequest extends Relay.Mutation {
   static fragments = {
-    listContainer: () => Relay.QL`
-      fragment on ListContainer {
-        id
-      }
-    `
   }
 
   getMutation() {
@@ -16,13 +11,6 @@ export default class CreateFastFwdRequest extends Relay.Mutation {
   }
 
   getFatQuery() {
-    return Relay.QL`
-      fragment on CreateFastFwdRequestPayload {
-        listContainer {
-          id
-        }
-      }
-    `
   }
 
   getConfigs() {
