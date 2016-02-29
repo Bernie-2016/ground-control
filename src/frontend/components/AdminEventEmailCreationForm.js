@@ -155,6 +155,7 @@ class AdminEventEmailCreationForm extends React.Component {
                 eventId: this.props.event.id,
                 ...formValues
               })
+              this.props.history.push('/admin/events#query[numEvents]=100&query[sortField]=startDate&query[sortDirection]=ASC&query[status]=FAST_FWD_REQUEST')
             }}
           >
             <Form.Field
