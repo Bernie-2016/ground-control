@@ -359,13 +359,13 @@ function startApp() {
     const eventIdMap = {
       'volunteer-meeting': { id: 24, staffOnly: false },
       'ballot-access': { id: 30, staffOnly: false },
-      'phonebank': { id: 31, staffOnly: false },
-      'canvass': { id: 32, staffOnly: false },
+      'phonebank': { id: 31, staffOnly: false, requirePhone: true },
+      'canvass': { id: 32, staffOnly: false, requirePhone: true },
       'barnstorm': { id: 41, staffOnly: false },
-      'carpool-to-nevada': { id: 39, staffOnly: false },
+      'carpool-to-nevada': { id: 39, staffOnly: false, requirePhone: true },
       'carpool': { id: 39, staffOnly: false },
       'official-barnstorm': { id: 41, staffOnly: true },
-      'get-out-the-vote': { id: 45, staffOnly: false },
+      'get-out-the-vote': { id: 45, staffOnly: false, requirePhone: true },
       'vol2vol': { id: 47, staffOnly: true },
       'rally': { id: 14, staffOnly: true },
     }
@@ -416,7 +416,7 @@ function startApp() {
       src = 'unknown source'
 
     // Require phone number for RSVPs to phonebanks
-    if (form['event_type_id'] === 'phonebank' || form['event_type_id'] === 'carpool-to-nevada') {
+    if (eventIdMap[form['event_type_id']].requirePhone) {
       form['attendee_require_phone'] = 1;
     }
 
