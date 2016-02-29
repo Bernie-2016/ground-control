@@ -59,20 +59,22 @@ export default class AdminEventUploadRsvps extends React.Component {
     'addr3',
     'city',
     'comment',
-    'firstname',
+    // 'firstname',
     'guests',
     'is_potential_volunteer',
     'is_reminder_sent',
-    'lastname',
+    // 'lastname',
     'pledge_amt',
     'pledge_method',
     'state_cd',
     'zip_4'
   ])
 
-  createRSVPs(row, fileName, eventIdKeys) {
-    // delete row['firstname']
-    // delete row['lastname']
+  createRSVPs(row, fileName, [...eventIdKeys]) {
+    row.event_id_obfuscated = eventIdKeys
+      .filter((key) => row[key])
+      .map((key) => row[key])
+      .join(',')
 
     Object.keys(row).forEach((key) => {
       if (!this.allowedKeys.has(key))
@@ -94,9 +96,9 @@ export default class AdminEventUploadRsvps extends React.Component {
   }
 
   onDrop = (files) => {
-    let eventIdKeys = []
+    let eventIdKeys
     const transformFields = (chunk) => {
-      eventIdKeys = chunk.match(/(Event\s\d+\sID)/)
+      eventIdKeys = new Set(chunk.match(/(Event\s\d+\sID)/g))
 
       return chunk
         .replace(/Email Address/i, 'email')
@@ -112,7 +114,6 @@ export default class AdminEventUploadRsvps extends React.Component {
       reader.onload = (e) => {
         let text = reader.result;
         let data = Papa.parse(text, {header: true, beforeFirstChunk: transformFields}).data
-        console.log(data[0].lastname)
         let processObj = {
           totalRows: data.length,
           processedRows: 0,
