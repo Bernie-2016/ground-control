@@ -1522,9 +1522,9 @@ const GraphQLCreateFastFwdRequest = mutationWithClientMutationId({
     hostMessage: { type: new GraphQLNonNull(GraphQLString) },
   },
   outputFields: {
-    listContainer: {
-      type: GraphQLListContainer,
-      resolve: () => SharedListContainer
+    status: {
+      type: GraphQLBoolean,
+      resolve: (status) => status
     }
   },
   mutateAndGetPayload: async ({hostMessage, eventId}, {rootValue}) => {
@@ -1547,10 +1547,7 @@ const GraphQLCreateFastFwdRequest = mutationWithClientMutationId({
       return updatedRecord
     }
 
-    return await knex.insertAndFetch('fast_fwd_request', {
-        host_message: hostMessage,
-        event_id: intEventId
-      })
+    return true;
 
   }
 })

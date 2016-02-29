@@ -11,15 +11,15 @@ export default class CreateFastFwdRequest extends Relay.Mutation {
   }
 
   getFatQuery() {
+    return Relay.QL`
+      fragment on CreateFastFwdRequestPayload {
+        status
+      }
+    `
   }
 
   getConfigs() {
-    return [{
-      type: 'FIELDS_CHANGE',
-      fieldIDs: {
-        listContainer: this.props.listContainer.id
-      }
-    }]
+    return []
   }
 
   getVariables() {
