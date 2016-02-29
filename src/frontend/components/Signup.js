@@ -23,7 +23,7 @@ export default class Signup extends React.Component {
   redirectToNext() {
     let queryDict = {};
     location.search.substr(1).split("&").forEach((item) => {
-      queryDict[item.split("=")[0]] = item.split("=").slice[0].join('=')
+      queryDict[item.split("=")[0]] = item.split("=").slice(0).join('=')
     })
     this.props.history.push(queryDict.next || '/call')
   }
