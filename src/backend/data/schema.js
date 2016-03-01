@@ -326,11 +326,10 @@ const GraphQLListContainer = new GraphQLObjectType({
           .where(eventFilters)
           .limit(first)
 
-        if (status === 'pendingReview'){
+        if (status === 'pendingReview')
           events = events
             .join('gc_bsd_events', 'bsd_events.event_id', 'gc_bsd_events.event_id')
             .where('gc_bsd_events.pending_review', true)
-        }
         else if (status === 'pendingApproval')
           events = events.where('flag_approval', true)
         else if (status === 'approved')
@@ -532,8 +531,6 @@ const GraphQLUser = new GraphQLObjectType({
             query = query
               .from('bsd_person_gc_bsd_groups as bsd_people')
               .where('gc_bsd_group_id', group.id)
-//            if (shouldOrder)
-//              query = query.orderBy('bsd_people.id')
           } else {
             query = query.from('bsd_people')
           }
@@ -1235,6 +1232,72 @@ const GraphQLDeleteEvents = mutationWithClientMutationId({
   }
 })
 
+const GraphQLEmailHostAttendees = mutationWithClientMutationId({
+  name: 'EmailHostAttendees',
+  inputFields: {
+    ids: { type: new GraphQLNonNull(new GraphQLList(GraphQLString)) },
+    replyTo: { type: GraphQLString },
+    bcc: { type: new GraphQLList(GraphQLString) },
+    subject: { type: GraphQLString },
+    message: { type: GraphQLString },
+    target: { type: new GraphQLEnumType({
+      name: 'GraphQLEmailTarget',
+      values: {
+        HOST: { value: 'host' },
+        ATTENDEES: { value: 'attendees' },
+        HOST_AND_ATTENDEES: { value: 'hostAndAttendees' }
+      }
+    })},
+  },
+  outputFields: {
+      success: {
+        type: GraphQLListContainer,
+        resolve: ({success}) => success
+      },
+      message: {
+        type: GraphQLListContainer,
+        resolve: ({message}) => message
+      }
+  },
+  mutateAndGetPayload: async ({ids, replyTo, bcc, subject, message, target}, {rootValue}) => {
+    adminRequired(rootValue)
+    let localIds = ids.map((id) => fromGlobalId(id).id)
+    let recipients = []
+
+    if (target === 'host' || target === 'hostAndAttendees'){
+      const hostIds = await knex('bsd_events').select('creator_cons_id').whereIn('event_id', localIds);
+
+      for (let i = 0; i < hostIds.length; i++) {
+        let host = await rootValue.loaders.bsdPeople.load(hostIds[i].creator_cons_id);
+        let recipient = await getPrimaryEmail(host)
+        recipients.push(recipient)
+      }
+    }
+    if (target === 'attendees' || target === 'hostAndAttendees'){
+      const attendeeIds = await knex('bsd_event_attendees').select('attendee_cons_id', 'event_id').whereIn('event_id', localIds);
+
+      for (let i = 0; i < attendeeIds.length; i++) {
+        let attendee = await rootValue.loaders.bsdPeople.load(attendeeIds[i].attendee_cons_id);
+        let recipient = await getPrimaryEmail(attendee)
+        recipients.push(recipient)
+      }
+    }
+
+    const email = {
+      from: 'info@berniesanders.com',
+      'h:Reply-To': replyTo,
+      to: recipients,
+      bcc: replyTo,
+      subject: subject,
+      text: message
+    }
+
+    const result = await Mailgun.send(email)
+
+    return {success: true, message: `Message sent to ${recipients.length} recipients.`}
+  }
+})
+
 const markEventsReviewed = async (ids, pendingReview=false) => {
   await knex('gc_bsd_events')
     .whereIn('event_id', ids)
@@ -1712,6 +1775,7 @@ let RootMutation = new GraphQLObjectType({
     submitCallSurvey: GraphQLSubmitCallSurvey,
     createCallAssignment: GraphQLCreateCallAssignment,
     deleteEvents: GraphQLDeleteEvents,
+    emailHostAttendees: GraphQLEmailHostAttendees,
     createAdminEventEmail: GraphQLCreateAdminEventEmail,
     createFastFwdRequest: GraphQLCreateFastFwdRequest
   })
