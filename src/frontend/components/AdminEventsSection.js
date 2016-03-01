@@ -122,7 +122,7 @@ const approvalFilterOptions = {
   },
   FAST_FWD_REQUEST: {
     text: 'FastFwd Requests',
-    actions: ['delete', 'demote', 'edit', 'email', 'downloadRSVPs']
+    actions: ['fastForward']
   }
 }
 
