@@ -126,8 +126,7 @@ class AdminEventEmailCreationForm extends React.Component {
         publicEventsRootUrl + this.props.event.eventIdObfuscated + "\n\n" +
         "Let's blow them away and get folks it help them out -- please sign up if you can!\n\n" +
         "Thanks,\n\n" +
-        this.props.currentUser.email.split('@')[0].replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();}) + "\n" +
-        "Bernie 2016"
+        "Team Bernie"
 
     return (
       <div style={this.styles.pageContainer}>
@@ -146,7 +145,7 @@ class AdminEventEmailCreationForm extends React.Component {
           <GCForm
             schema={this.formSchema}
             defaultValue={{
-              senderEmail: this.props.currentUser.email,
+              senderEmail: "info@berniesanders.com",
               senderMessage: defaultSenderMessage,
               hostEmail: this.props.event.host.email,
               hostMessage: this.props.event.fastFwdRequest ? this.props.event.fastFwdRequest.hostMessage : ''
