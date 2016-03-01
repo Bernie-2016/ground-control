@@ -13,7 +13,7 @@ export default class CreateFastFwdRequest extends Relay.Mutation {
   getFatQuery() {
     return Relay.QL`
       fragment on CreateFastFwdRequestPayload {
-        status
+        fastFwdRequest
       }
     `
   }

@@ -1521,12 +1521,11 @@ const GraphQLCreateFastFwdRequest = mutationWithClientMutationId({
     eventId: globalIdField('Event', (obj) => obj.event_id),
     hostMessage: { type: new GraphQLNonNull(GraphQLString) },
   },
-  outputFields: {
-    status: {
-      type: GraphQLBoolean,
-      resolve: (status) => status
+  outputFields: () => ({
+    fastFwdRequest: {
+      type: GraphQLFastFwdRequest
     }
-  },
+  }),
   mutateAndGetPayload: async ({hostMessage, eventId}, {rootValue}) => {
 
     let intEventId = fromGlobalId(eventId).id
@@ -1544,10 +1543,13 @@ const GraphQLCreateFastFwdRequest = mutationWithClientMutationId({
       let updatedRecord = await knex.table('fast_fwd_request')
                             .where('event_id', intEventId)
 
-      return updatedRecord
+      return updatedRecord;
     }
 
-    return true;
+    return await knex.insertAndFetch('fast_fwd_request', {
+                    host_message: hostMessage,
+                    event_id: intEventId
+                  })
 
   }
 })
