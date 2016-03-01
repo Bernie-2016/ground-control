@@ -550,7 +550,6 @@ class AdminEventsSection extends React.Component {
       pendingReview
     })
 
-    this.props.relay.forceFetch()
     this.setState({showEventPreview: false})
     this._deselectRows({indexesToRemove: indexes})
   }
