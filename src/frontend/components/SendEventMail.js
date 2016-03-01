@@ -29,7 +29,7 @@ class SendEventMail extends React.Component {
         disabled={this.state.subject === '' || this.state.message === ''}
         onTouchTap={() => {
           this.refs.sendEmailHandler.send({
-            ids: this.props.eventId,
+            ids: this.props.event.id,
             replyTo: this.state.replyTo,
             bcc: [this.props.currentUser.email],
             subject: this.state.subject,
@@ -56,8 +56,8 @@ class SendEventMail extends React.Component {
           floatingLabelStyle={{cursor: 'pointer'}}
         >
           <MenuItem value="HOST" primaryText="Event Host"/>
-          <MenuItem value="ATTENDEES" primaryText="Event Attendees"/>
-          <MenuItem value="HOST_AND_ATTENDEES" primaryText="Host and Attendees"/>
+          <MenuItem value="ATTENDEES" primaryText="Event Attendees" disabled={!(this.props.event && this.props.event.attendeesCount > 0)} />
+          <MenuItem value="HOST_AND_ATTENDEES" primaryText="Host and Attendees" disabled={!(this.props.event && this.props.event.attendeesCount > 0)} />
         </SelectField>
         <SelectField
           floatingLabelText="Send Replies To"

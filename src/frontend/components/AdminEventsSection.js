@@ -1260,7 +1260,7 @@ ${signature}`
       />
       <SendEventMail
         currentUser={this.props.currentUser}
-        eventId={this.state.activeEventIndex ? events[this.state.activeEventIndex].node.id : null}
+        event={this.state.activeEventIndex ? events[this.state.activeEventIndex].node : null}
         open={this.state.showSendEventEmailDialog}
         onRequestClose={() => {
           this.setState({showSendEventEmailDialog: false})
