@@ -28,8 +28,6 @@ class SendEventMail extends React.Component {
         primary={true}
         disabled={this.state.subject === '' || this.state.message === ''}
         onTouchTap={() => {
-          console.log('submitting...')
-          console.log(this.refs)
           this.refs.sendEmailHandler.send({
             ids: this.props.eventId,
             replyTo: this.state.replyTo,
