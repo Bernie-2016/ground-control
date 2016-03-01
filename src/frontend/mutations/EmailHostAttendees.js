@@ -9,14 +9,6 @@ export default class EmailHostAttendees extends Relay.Mutation {
 
   getFatQuery() {
     return Relay.QL`
-      fragment on User {
-        email
-      }
-    `;
-  }
-
-  getFatQuery() {
-    return Relay.QL`
       fragment on EmailHostAttendeesPayload {
         success,
         message
@@ -29,7 +21,6 @@ export default class EmailHostAttendees extends Relay.Mutation {
   }
 
   getVariables() {
-    console.log(this.props)
     return {
       ids: this.props.ids,
       replyTo: this.props.replyTo,
