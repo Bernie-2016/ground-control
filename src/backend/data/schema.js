@@ -940,11 +940,6 @@ const GraphQLEvent = new GraphQLObjectType({
         let backoff = 1000;
         let foundPeople = [];
 
-        // get states to exclude.
-        let req = await rq('http://googledoctoapi.forberniesanders.com/1hJadb6JyDekHf5Vzx-77h7sdJRCOB01XUPvEpKIckDs/')
-        let officeLocations = JSON.parse(req);
-        let officeStates = [...new Set(officeLocations.map((office) => office['state']))]
-
         while (foundPeople.length < 250 && radius <= maxRadius) {
           let foundConsIds = foundPeople.map((person) => person.cons_id)
           let query = knex('bsd_addresses')
@@ -956,7 +951,6 @@ const GraphQLEvent = new GraphQLObjectType({
             .where('bsd_emails.is_primary', true)
             .where('bsd_subscriptions.isunsub', false)
             .whereNotIn('bsd_people.cons_id', foundConsIds)
-            .whereNotIn('bsd_addresses.state_cd', officeStates)
             .whereRaw(`st_dwithin(bsd_addresses.geom, '${event.geom}', ${radius})`)
             .whereNull('communications.id')
             .limit(250)

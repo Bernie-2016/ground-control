@@ -17,11 +17,6 @@ export let job = async () => {
   let eventsToEmail = []
   try {
 
-    // get states to exclude.
-    let req = await rq('http://googledoctoapi.forberniesanders.com/1hJadb6JyDekHf5Vzx-77h7sdJRCOB01XUPvEpKIckDs/')
-    let officeLocations = JSON.parse(req);
-    let officeStates = [...new Set(officeLocations.map((office) => office['state']))]
-
     await knex.transaction(async (trx) => {
 
       var eventsSql =
@@ -62,8 +57,6 @@ export let job = async () => {
                     "bsd_events.flag_approval = false " +
                   "AND " +
                     "gc_bsd_events.fast_fwd_instructions_sent = false " +
-                  "AND " +
-                    "bsd_events.venue_state_cd NOT IN (\'" + officeStates.join('\', \'') + "\') " +
                 "GROUP BY " +
                     "bsd_events.event_id " +
                   "HAVING " +
@@ -93,9 +86,7 @@ export let job = async () => {
               "AND " +
                 "bsd_events.flag_approval = false " +
               "AND " +
-                "gc_bsd_events.fast_fwd_instructions_sent = false " +
-              "AND " +
-                "bsd_events.venue_state_cd NOT IN (\'" + officeStates.join('\', \'') + "\')";
+                "gc_bsd_events.fast_fwd_instructions_sent = false";
 
       eventsToEmail = await knex.raw(eventsSql).transacting(trx);
 
