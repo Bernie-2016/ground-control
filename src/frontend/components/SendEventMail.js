@@ -9,7 +9,7 @@ class SendEventMail extends React.Component {
     super(props);
 
     this.state = {
-      target: 'host',
+      target: 'HOST',
       replyTo: this.props.currentUser.email,
       subject: '',
       message: ''
@@ -21,17 +21,19 @@ class SendEventMail extends React.Component {
       <FlatButton
         label="Cancel"
         secondary={true}
-        onTouchTap={this.props.handleCancel} />,
+        onTouchTap={this.props.onRequestClose} 
+      />,
       <FlatButton
         label="Send Message"
         primary={true}
-        disabled={false}
+        disabled={this.state.subject === '' || this.state.message === ''}
         onTouchTap={() => {
           console.log('submitting...')
           console.log(this.refs)
           this.refs.sendEmailHandler.send({
-            ids: this.props.ids,
+            ids: this.props.eventIds,
             replyTo: this.state.replyTo,
+            bcc: [this.props.currentUser.email],
             subject: this.state.subject,
             message: this.state.message,
             target: this.state.target
@@ -55,12 +57,12 @@ class SendEventMail extends React.Component {
           }}
           floatingLabelStyle={{cursor: 'pointer'}}
         >
-          <MenuItem value="host" primaryText="Event Host"/>
-          <MenuItem value="attendees" primaryText="Event Attendees"/>
-          <MenuItem value="hostAndAttendees" primaryText="Host and Attendees"/>
+          <MenuItem value="HOST" primaryText="Event Host"/>
+          <MenuItem value="ATTENDEES" primaryText="Event Attendees"/>
+          <MenuItem value="HOST_AND_ATTENDEES" primaryText="Host and Attendees"/>
         </SelectField>
         <SelectField
-          floatingLabelText="Reply-To"
+          floatingLabelText="Send Replies To"
           value={this.state.replyTo}
           onChange={(event, index, value) => {
             this.setState({replyTo: value})

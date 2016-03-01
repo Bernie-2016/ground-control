@@ -118,6 +118,7 @@ class AdminEventsSection extends React.Component {
       showEventPreview: false,
       showCreateEventDialog: false,
       showFiltersDialog: false,
+      showSendEventEmailDialog: true,
       windowWidth: window.innerWidth,
       windowHeight: window.innerHeight,
       selectedRows: [],
@@ -1239,10 +1240,11 @@ ${signature}`
       />
       <SendEventMail
         currentUser={this.props.currentUser}
-        ids={[]}
-        open={true}
-        onRequestClose={() => {console.log('close')}}
-        handleCancel={() => {console.log('cancelled')}}
+        eventIds={[]}
+        open={this.state.showSendEventEmailDialog}
+        onRequestClose={() => {
+          this.setState({showSendEventEmailDialog: false})
+        }}
       />
       {this.renderDeleteModal()}
       {this.renderCreateModal()}

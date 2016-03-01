@@ -1243,6 +1243,7 @@ const GraphQLEmailHostAttendees = mutationWithClientMutationId({
   inputFields: {
     ids: { type: new GraphQLNonNull(new GraphQLList(GraphQLString)) },
     replyTo: { type: GraphQLString },
+    bcc: { type: new GraphQLList(GraphQLString) },
     subject: { type: GraphQLString },
     message: { type: GraphQLString },
     target: { type: new GraphQLEnumType({
@@ -1254,9 +1255,18 @@ const GraphQLEmailHostAttendees = mutationWithClientMutationId({
       }
     })},
   },
-  mutateAndGetPayload: async ({ids, replyTo, subject, message, target}, {rootValue}) => {
+  outputFields: {
+      success: {
+        type: GraphQLListContainer,
+        resolve: ({success}) => success
+      },
+      message: {
+        type: GraphQLListContainer,
+        resolve: ({message}) => message
+      }
+  },
+  mutateAndGetPayload: async ({ids, replyTo, bcc, subject, message, target}, {rootValue}) => {
     adminRequired(rootValue)
-    log.info(ids, replyTo, subject)
     let localIds = ids.map((id) => fromGlobalId(id).id)
     let recipients = []
 
@@ -1283,11 +1293,14 @@ const GraphQLEmailHostAttendees = mutationWithClientMutationId({
       from: 'info@berniesanders.com',
       'h:Reply-To': replyTo,
       to: recipients,
+      bcc: replyTo,
       subject: subject,
       text: message
     }
 
-    return await Mailgun.send(email)
+    const result = await Mailgun.send(email)
+
+    return {success: true, message: `Message sent to ${recipients.length} recipients.`}
   }
 })
 
