@@ -464,7 +464,7 @@ export default class BSD {
       if (key === 'start_tz')
         inputs['local_timezone'] = event[key]
       else if (key === 'start_dt') {
-        eventDate['start_datetime_system'] = moment(event['start_dt']).tz(event['start_tz']).format('YYYY-MM-DD HH:mm:ss')
+        eventDate['start_datetime_system'] = moment.tz(event['start_dt'], 'UTC').tz(event['start_tz']).format('YYYY-MM-DD HH:mm:ss')
       }
       else if (key === 'start_datetime_system')
         eventDate['start_datetime_system'] = event['start_datetime_system']

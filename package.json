@@ -33,6 +33,7 @@
     "bluebird": "^2.10.2",
     "body-parser": "1.14.1",
     "classnames": "^2.2.3",
+    "colors": "^1.1.2",
     "compression": "^1.6.1",
     "connect-session-knex": "^1.0.17",
     "cron": "^1.1.0",
