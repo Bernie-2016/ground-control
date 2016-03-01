@@ -31,7 +31,7 @@ class SendEventMail extends React.Component {
           console.log('submitting...')
           console.log(this.refs)
           this.refs.sendEmailHandler.send({
-            ids: this.props.eventIds,
+            ids: this.props.eventId,
             replyTo: this.state.replyTo,
             bcc: [this.props.currentUser.email],
             subject: this.state.subject,
