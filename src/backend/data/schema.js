@@ -473,129 +473,112 @@ const GraphQLUser = new GraphQLObjectType({
       resolve: async (user, {callAssignmentId}, {rootValue}) => {
         let localId = fromGlobalId(callAssignmentId).id
 
-        let assignedCall = await knex('bsd_assigned_calls').where({
-          'caller_id': user.id,
-          'call_assignment_id': localId
-        }).first()
+        await knex('bsd_assigned_calls')
+          .where('caller_id', user.id)
+          .delete()
+        let callAssignment = await rootValue.loaders.bsdCallAssignments.load(localId)
+        let allOffsets = [-10, -9, -8, -7, -6, -5, -4]
+        let validOffsets = []
+        // So that I can program late at night
+        if (process.env.NODE_ENV === 'development')
+          validOffsets = allOffsets
 
-        if (assignedCall) {
-          return rootValue.loaders.bsdPeople.load(assignedCall.interviewee_id)
-        } else {
-          let callAssignment = await rootValue.loaders.bsdCallAssignments.load(localId)
-          let allOffsets = [-10, -9, -8, -7, -6, -5, -4]
-          let validOffsets = []
-          // So that I can program late at night
-          if (process.env.NODE_ENV === 'development')
-            validOffsets = allOffsets
+        allOffsets.forEach((offset) => {
+          let time = moment().utcOffset(offset)
 
-          allOffsets.forEach((offset) => {
-            let time = moment().utcOffset(offset)
+          if (time.hours() >= 9 && time.hours() < 21)
+            validOffsets.push(offset)
+        })
 
-            if (time.hours() >= 9 && time.hours() < 21)
-              validOffsets.push(offset)
+        if (validOffsets.length === 0)
+          return null
+
+        let group = await rootValue.loaders.gcBsdGroups.load(callAssignment.interviewee_group)
+
+        let previousCallsSubquery = knex('bsd_calls')
+          .select('interviewee_id')
+          // Don't call people we have successfully canvassed
+          .where(function() {
+            this.where('completed', true)
+              .where('call_assignment_id', localId)
+          })
+          .orWhereIn('reason_not_completed', ['WRONG_NUMBER', 'DISCONNECTED_NUMBER', 'OTHER_LANGUAGE'])
+          .orWhere(function() {
+            this.whereIn('reason_not_completed', ['NO_PICKUP', 'CALL_BACK'])
+              .where('attempted_at', '>', new Date(new Date() - 24 * 60 * 60 * 1000))
+          })
+          .orWhere(function() {
+            this.where('call_assignment_id', localId)
+              .where('reason_not_completed', 'NOT_INTERESTED')
           })
 
-          if (validOffsets.length === 0)
-            return null
+        let query = knex.select('bsd_people.cons_id')
 
-          let group = await rootValue.loaders.gcBsdGroups.load(callAssignment.interviewee_group)
-
-          let previousCallsSubquery = knex('bsd_calls')
-            .select('interviewee_id')
-            .where(function() {
-              this.where('completed', true)
-                .where('attempted_at', '>', new Date(new Date() - 14 * 24 * 60 * 60 * 1000))
-            })
-            .orWhere(function() {
-              this.whereIn('reason_not_completed', ['NOT_INTERESTED'])
-                .where('attempted_at', '>', new Date(new Date() - 21 * 24 * 60 * 60 * 1000))
-            })
-            .orWhere(function() {
-              this.whereIn('reason_not_completed', ['NO_PICKUP', 'CALL_BACK'])
-                .where('attempted_at', '>', new Date(new Date() - 7 * 24 * 60 * 60 * 1000))
-            })
-            .orWhereIn('reason_not_completed', ['WRONG_NUMBER', 'DISCONNECTED_NUMBER', 'OTHER_LANGUAGE'])
-            .orWhere(function() {
-              this.where('call_assignment_id', localId)
-                .where('reason_not_completed', 'NOT_INTERESTED')
-            })
-
-          let query = knex.select('bsd_people.cons_id')
-
-          if (group.cons_group_id) {
-            query = query
-              .from('bsd_person_bsd_groups as bsd_people')
-              .where('bsd_people.cons_group_id', group.cons_group_id)
-          } else if (group.query && group.query !== EVERYONE_GROUP) {
-            let shouldOrder = group.query.indexOf('order by') !== -1
-            query = query
-              .from('bsd_person_gc_bsd_groups as bsd_people')
-              .where('gc_bsd_group_id', group.id)
-          } else {
-            query = query.from('bsd_people')
-          }
-
-          let assignedCallsSubquery = knex('bsd_assigned_calls')
-            .select('interviewee_id')
-
-          let userAddress = await knex('bsd_emails')
-            .select('bsd_emails.cons_id', 'zip_codes.timezone_offset', 'bsd_addresses.latitude', 'bsd_addresses.longitude')
-            .innerJoin('bsd_addresses', 'bsd_emails.cons_id', 'bsd_addresses.cons_id')
-            .innerJoin('zip_codes', 'zip_codes.zip', 'bsd_addresses.zip')
-            .where('bsd_emails.email', user.email)
-            .where('bsd_addresses.is_primary', true)
-            .first()
-
+        if (group.cons_group_id) {
           query = query
-            .join('bsd_phones', 'bsd_people.cons_id', 'bsd_phones.cons_id')
-            .join('bsd_addresses', 'bsd_people.cons_id', 'bsd_addresses.cons_id')
-            .join('zip_codes', 'zip_codes.zip', 'bsd_addresses.zip')
-            // Doing these subqueries instead of a left outer join because a left outer join seems to make the whole thing run really slow if I add any sort of sorting at the end of this query.
-            .whereNotIn('bsd_people.cons_id', previousCallsSubquery)
-            .whereNotIn('bsd_people.cons_id', assignedCallsSubquery)
-            .whereNotIn('bsd_addresses.state_cd', ['IA', 'NH', 'NV', 'SC'])
-            .whereIn('zip_codes.timezone_offset', validOffsets)
-            .where('bsd_phones.is_primary', true)
-            .where('bsd_addresses.is_primary', true)
-            .limit(1)
-            .first()
-
-          if (userAddress)
-            query = query.whereNot('bsd_people.cons_id', userAddress.cons_id)
-
-          // No geo sort for now, still seeing timeouts in production probably from this
-          // if (userAddress && validOffsets.indexOf(userAddress.timezone_offset) !== -1 && userAddress.latitude && userAddress.longitude)
-          // query = query.orderByRaw(`"bsd_addresses"."geom" <-> st_transform(st_setsrid(st_makepoint(${userAddress.longitude}, ${userAddress.latitude}), 4326), 900913)`)
-
-          log.info(`Running query: ${query}`)
-
-          let person = await query
-          let timestamp = new Date()
-
-          if (person) {
-            // Do this check again to avoid race conditions
-            let assignedCall = await knex('bsd_assigned_calls').where({
-              'caller_id': user.id,
-              'call_assignment_id': localId
-            }).first()
-
-            if (assignedCall)
-              return rootValue.loaders.bsdPeople.load(assignedCall.interviewee_id)
-
-            await knex('bsd_assigned_calls')
-              .insert({
-                caller_id: user.id,
-                interviewee_id: person.cons_id,
-                call_assignment_id: localId,
-                create_dt: timestamp,
-                modified_dt: timestamp
-            })
-
-            return rootValue.loaders.bsdPeople.load(person.cons_id)
-          }
-
-          return null
+            .from('bsd_person_bsd_groups as bsd_people')
+            .where('bsd_people.cons_group_id', group.cons_group_id)
+        } else if (group.query && group.query !== EVERYONE_GROUP) {
+          let shouldOrder = group.query.indexOf('order by') !== -1
+          query = query
+            .from('bsd_person_gc_bsd_groups as bsd_people')
+            .where('gc_bsd_group_id', group.id)
+        } else {
+          query = query.from('bsd_people')
         }
+
+        let assignedCallsSubquery = knex('bsd_assigned_calls')
+          .select('interviewee_id')
+
+        let userAddress = await knex('bsd_emails')
+          .select('bsd_emails.cons_id')
+          .where('bsd_emails.email', user.email)
+          .first()
+
+        query = query
+          .join('bsd_phones', 'bsd_people.cons_id', 'bsd_phones.cons_id')
+          .join('bsd_addresses', 'bsd_people.cons_id', 'bsd_addresses.cons_id')
+          .join('zip_codes', 'zip_codes.zip', 'bsd_addresses.zip')
+          .whereNotIn('bsd_people.cons_id', previousCallsSubquery)
+          .whereNotIn('bsd_people.cons_id', assignedCallsSubquery)
+          .whereNotIn('bsd_addresses.state_cd', ['IA', 'NH', 'NV', 'SC'])
+          .whereIn('zip_codes.timezone_offset', validOffsets)
+          .where('bsd_phones.is_primary', true)
+          .where('bsd_addresses.is_primary', true)
+          .limit(1)
+          .first()
+
+        if (userAddress)
+          query = query.whereNot('bsd_people.cons_id', userAddress.cons_id)
+
+        log.info(`Running query: ${query}`)
+
+        let person = await query
+        let timestamp = new Date()
+
+        if (person) {
+          // Do this check again to avoid race conditions
+          let assignedCall = await knex('bsd_assigned_calls').where({
+            'caller_id': user.id,
+            'call_assignment_id': localId
+          }).first()
+
+          if (assignedCall)
+            return rootValue.loaders.bsdPeople.load(assignedCall.interviewee_id)
+
+          await knex('bsd_assigned_calls')
+            .insert({
+              caller_id: user.id,
+              interviewee_id: person.cons_id,
+              call_assignment_id: localId,
+              create_dt: timestamp,
+              modified_dt: timestamp
+          })
+
+          return rootValue.loaders.bsdPeople.load(person.cons_id)
+        }
+
+        return null
       }
     }
   }),
