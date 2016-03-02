@@ -14,6 +14,7 @@ import AdminEventsSection from './components/AdminEventsSection';
 import AdminEventUploadRsvps from './components/AdminEventUploadRsvps';
 import AdminCallAssignmentsSection from './components/AdminCallAssignmentsSection';
 import AdminCallAssignmentCreationForm from './components/AdminCallAssignmentCreationForm';
+import RSVPEventPage from './components/RSVPEventPage';
 import FastFwdForm from './components/FastFwdForm';
 import GCTextField from './components/forms/GCTextField';
 import GCPhoneField from './components/forms/GCPhoneField';
@@ -169,6 +170,15 @@ ReactDOM.render(
         path='events/create'
         component={DummyEventCreate}
         renderLoading={() => window.location.reload() }
+      />
+      <Route
+        path='events/:id'
+        component={RSVPEventPage}
+        queries={{
+          ...EventQueries,
+          ...CurrentUserQueries
+        }}
+        renderLoading={() => <Loading />}
       />
       <Route
         path='call'
