@@ -316,6 +316,10 @@ function startApp() {
     res.redirect('https://script.google.com/macros/s/AKfycbwVZHnRZ5CJkzFID91QYcsLNFLkPgstd7XjS9o1QSEAh3tC2vY/exec')
   }))
 
+  app.get('/nda', wrap(async (req, res) => {
+    res.redirect('https://docs.google.com/forms/d/1cyoAcumEd4Co5Fqj9pOUnQtIUo_rfRzQ7oVqACFe5Rs/viewform')
+  }))
+
   app.get('/events/add-rsvp', wrap(async(req, res) => {
   	const makeRequest = async (query) => {
   		log.debug(query)
