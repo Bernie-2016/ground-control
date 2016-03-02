@@ -15,48 +15,7 @@ const momentWithOffset = (startDate, utcOffset) => {
 
 export default class EventPreview extends React.Component {
   constructor(props) {
-    super(props);
-    // this.handleKeyDown = this.handleKeyDown.bind(this);
-    // document.addEventListener('keydown', this.handleKeyDown);
-  }
-
-  handleKeyDown(event){
-    switch(event.keyIdentifier){
-      case 'Down':
-      case 'Right':
-        // View next event
-        this.props.onChangeEventIndex(1);
-        break;
-      case 'Up':
-      case 'Left':
-        // View previous event
-        this.props.onChangeEventIndex(-1);
-        break;
-      case 'U+0041':
-        // 'A' was pressed; approve and move to next event
-        this.props.onEventConfirm([this.props.eventIndex]);
-        break;
-      case 'U+0045':
-        // 'E' was pressed; open edit tab
-        this.props.onTabRequest(this.props.eventIndex, 1);
-        break;
-      case 'U+0050':
-        // 'P' was pressed; open preview tab
-        this.props.onTabRequest(this.props.eventIndex, 0);
-        break;
-      case 'U+0044':
-        // 'D' was pressed; delete this event
-        this.props.onEventDelete([this.props.eventIndex]);
-        break;
-      default:
-        //Statements executed when none of the values match the value of the expression
-        console.log(event.keyIdentifier);
-        break;
-    }
-  }
-
-  componentWillUnmount(){
-    document.removeEventListener('keydown', this.handleKeyDown);
+    super(props)
   }
 
   stripScripts = (s) => {
@@ -70,7 +29,18 @@ export default class EventPreview extends React.Component {
     return {__html: div.innerHTML}
   }
 
-    render() {
+  renderHost() {
+    if (this.props.event.host)
+      return (
+        <div>
+          <InfoHeader content='Event Host' />
+          <p>{`${this.props.event.host.firstName} ${this.props.event.host.lastName}`}</p>
+        </div>
+      )
+    return null
+  }
+
+  render() {
     let event = this.props.event
     let isOfficial = null;
     if (event.isOfficial){
@@ -96,8 +66,7 @@ export default class EventPreview extends React.Component {
           <h1 style={BernieText.title}>{event.name}</h1>
           {isOfficial}
 
-          <InfoHeader content='Event Host' />
-          <p>{event.host ? `${event.host.firstName} ${event.host.lastName}` : 'No Host Info'}</p>
+          {this.renderHost()}
 
           <InfoHeader content='Event Type' />
           <p>{event.eventType.name}</p>
