@@ -291,7 +291,7 @@ export default class MG {
       fastFwdURL: 'https://organize.berniesanders.com/event/' +
                       toGlobalId('Event', event.event_id)
                       + '/request_email',
-      eventDate: moment(event.event_start_dt).format('dddd, MMMM Do [at] h:mma'),
+      eventDate: moment(event.event_start_dt).format('dddd, MMMM Do'),
       eventDay: moment(event.event_start_dt).format('dddd'),
     }
 

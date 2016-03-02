@@ -43,6 +43,10 @@ export let job = async () => {
                 "INNER JOIN " +
                     "bsd_event_attendees " +
                   "ON bsd_events.event_id = bsd_event_attendees.event_id " +
+                "INNER JOIN " +
+                    "bsd_emails " +
+                  "ON " +
+                    "bsd_emails.cons_id = bsd_events.creator_cons_id " +
                 "WHERE " +
                     "bsd_events.event_type_id = 31 " +
                   "AND " +
@@ -57,6 +61,8 @@ export let job = async () => {
                     "bsd_events.flag_approval = false " +
                   "AND " +
                     "gc_bsd_events.fast_fwd_instructions_sent = false " +
+                  "AND " +
+                    "bsd_emails.email NOT ILIKE '%@berniesanders.com%' " +
                 "GROUP BY " +
                     "bsd_events.event_id " +
                   "HAVING " +
@@ -73,6 +79,10 @@ export let job = async () => {
                 "gc_bsd_events " +
               "ON " +
                 "bsd_events.event_id = gc_bsd_events.event_id " +
+            "INNER JOIN " +
+                "bsd_emails " +
+              "ON " +
+                "bsd_emails.cons_id = bsd_events.creator_cons_id " +
             "WHERE " +
                 "bsd_events.event_type_id = 31 " +
               "AND " +
@@ -86,7 +96,9 @@ export let job = async () => {
               "AND " +
                 "bsd_events.flag_approval = false " +
               "AND " +
-                "gc_bsd_events.fast_fwd_instructions_sent = false";
+                "gc_bsd_events.fast_fwd_instructions_sent = false " +
+              "AND " +
+                    "bsd_emails.email NOT ILIKE '%@berniesanders.com%'";
 
       eventsToEmail = await knex.raw(eventsSql).transacting(trx);
 
