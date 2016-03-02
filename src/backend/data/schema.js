@@ -1799,6 +1799,17 @@ let RootQuery = new GraphQLObjectType({
         return rootValue.user
       }
     },
+    person: {
+      type: GraphQLPerson,
+      resolve: async (parent, {email}, {rootValue}) => {
+        authRequired(rootValue)
+        const relatedPerson = await knex('bsd_emails')
+          .select('cons_id')
+          .where(email)
+          .first()
+        return relatedPerson ? rootValue.loaders.bsdPeople.load(relatedPerson.cons_id) : null
+      }
+    },
     callAssignment: {
       type: GraphQLCallAssignment,
       args: {
