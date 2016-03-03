@@ -1027,6 +1027,7 @@ const GraphQLSurvey = new GraphQLObjectType({
     fullURL: {
       type: GraphQLString,
       resolve: async (survey, _, {rootValue}) => {
+        log.info(`Getting slug for ${survey, survey.signup_form_id}`)
         let underlyingSurvey = await rootValue.loaders.bsdSurveys.load(survey.signup_form_id)
         let slug = underlyingSurvey.signup_form_slug
         return url.resolve('https://' + process.env.BSD_HOST, '/page/s/' + slug)
