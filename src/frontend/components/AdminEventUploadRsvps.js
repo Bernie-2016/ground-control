@@ -148,7 +148,6 @@ export default class AdminEventUploadRsvps extends React.Component {
           fontSize: '0.5em',
           paddingLeft: 10,
           width: 470,
-          overflow: 'scroll'
         }}>
           {fileObj.errors.map((error) => {
             return (
@@ -156,6 +155,7 @@ export default class AdminEventUploadRsvps extends React.Component {
                 {`${error.email}, Zip: ${error.zip}, Phone: ${error.phone}`}
                 <br />
                 <span style={{color: BernieColors.red}}>{error.error}</span>
+                <hr />
               </div>
             )
           })}
@@ -169,14 +169,15 @@ export default class AdminEventUploadRsvps extends React.Component {
         <RaisedButton
           label="Download & Fix Errors"
           primary={true}
+          style={{marginTop: '1em', marginBottom: '1em'}}
           onTouchTap={() => {
-            const csv = Papa.unparse(fileObj.errors)
+            const csv = Papa.unparse(fileObj.errors)  
 
             // modify file name to include 'errors'
             fileName = fileName.split('.')
             const fileExtension = fileName[fileName.length - 1]
             fileName[fileName.length - 1] = 'errors'
-            fileName.push(fileExtension)
+            fileName.push(fileExtension)  
 
             // download the file
             downloadCSV(csv, fileName.join('.'))
@@ -204,7 +205,7 @@ export default class AdminEventUploadRsvps extends React.Component {
       )
     })
     return (
-      <div style={{marginTop: 20}}>
+      <div>
         {fileNodes}
       </div>
     )
