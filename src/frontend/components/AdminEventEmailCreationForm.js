@@ -118,7 +118,9 @@ class AdminEventEmailCreationForm extends React.Component {
 
     let disableSubmit = (this.props.event.nearbyPeople.length === 0)
 
-    let defaultSenderMessage = "Hey it's Jon from Bernie 2016 national staff.\n\n" +
+    let adminAlias = {'jonwarnow': 'Jon', 'willeaston': 'Will', 'jonculver': 'Jon'}[this.props.currentUser.email.split('@')[0].toLowerCase()]
+
+    let defaultSenderMessage = "Hey everyone, it's " + adminAlias + " from Bernie 2016 national staff.\n\n" +
         "A local volunteer in " + this.props.event.venueCity + " has asked me " +
         "to help them find some nearby Bernie supporters to attend an event they are hosting " +
         "on " + moment(this.props.event.startDate).format("dddd, MMMM Do") + ".\n\n" +

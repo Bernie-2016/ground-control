@@ -55,9 +55,19 @@ class FastFwdForm extends React.Component {
                 possible your event was deleted. Please email <a href="mailto:help@berniesanders.com">help@berniesanders.com</a> if you need help.</p>
               </div>
 
+
+    let event_type_name = 'volunteer event';
+
+    if(this.props.event.eventType.name.toLowerCase().indexOf('phone bank') > -1){
+      event_type_name = 'phone bank party'
+    }
+
+    if(this.props.event.eventType.name.toLowerCase().indexOf('barnstorm') > -1){
+      event_type_name = 'Barnstorm event'
+    }    
+
     let defaultHostMessage = this.props.event.fastFwdRequest ? this.props.event.fastFwdRequest.hostMessage :
-                            "Hello, neighbors!\n\nI'm hosting a " +
-                            this.props.event.eventType.name +
+                            "Hello, neighbors!\n\nI'm hosting a " + event_type_name +
                             " and I need a few more Bernie supporters " +
                             "to attend to make this event a big success. " +
                             "Will you please attend my event?\n\nThank you,\n\n" +

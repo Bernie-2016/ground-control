@@ -243,7 +243,7 @@ export default class MG {
     let content = await template.render(data)
 
     let message = {
-      from: data.senderAddress,
+      from: 'Team Bernie <' + data.senderAddress + '>',
       'h:Reply-To': 'info@berniesanders.com',
       to: data.recipientAddress,
       subject: 'Fwd: HELP! I need more people to come to my phonebank',
