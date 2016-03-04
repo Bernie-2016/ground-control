@@ -145,7 +145,6 @@ export default class AdminEventUploadRsvps extends React.Component {
         <div style={{
           ...BernieText.default,
           borderTop: '1px solid ' + BernieColors.red,
-          color: BernieColors.red,
           fontSize: '0.5em',
           paddingLeft: 10,
           width: 470,
@@ -154,7 +153,9 @@ export default class AdminEventUploadRsvps extends React.Component {
           {fileObj.errors.map((error) => {
             return (
               <div>
-                {`${error.email}, ${error.zip}, ${error.phone}`}
+                {`${error.email}, Zip: ${error.zip}, Phone: ${error.phone}`}
+                <br />
+                <span style={{color: BernieColors.red}}>{error.error}</span>
               </div>
             )
           })}
