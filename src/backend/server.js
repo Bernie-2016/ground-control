@@ -316,18 +316,23 @@ function startApp() {
     res.redirect('https://script.google.com/macros/s/AKfycbwVZHnRZ5CJkzFID91QYcsLNFLkPgstd7XjS9o1QSEAh3tC2vY/exec')
   }))
 
-  app.get('/events/add-rsvp', wrap(async(req, res) => {
+  app.get('/nda', wrap(async (req, res) => {
+    res.redirect('https://docs.google.com/forms/d/1cyoAcumEd4Co5Fqj9pOUnQtIUo_rfRzQ7oVqACFe5Rs/viewform')
+  }))
+
+  app.post('/events/add-rsvp', wrap(async(req, res) => {
   	const makeRequest = async (query) => {
   		log.debug(query)
   		let response = null
   		try {
   		  response = await BSDClient.addRSVPToEvent(query)
   		} catch(ex) {
-  		  res.status(400).send(ex.toString())
+  			query.error = JSON.parse(ex.message).error_description || ex.toString()
+  		  res.status(400).json(query)
   		  log.error(ex)
   		  return
   		}
-  		res.send(response.body)
+  		res.json(response.body)
   	}
 
     if (req.query.event_id_obfuscated){

@@ -40,6 +40,7 @@ export default class Signup extends React.Component {
           <Form.Field
             name='email'
             label='E-mail Address'
+            hintText='Email'
             floatingLabelText={false}
           />
           <br />
@@ -47,6 +48,7 @@ export default class Signup extends React.Component {
             name='password'
             type='password'
             label='Password'
+            hintText='Password'
             floatingLabelText={false}
           />
           <br />
