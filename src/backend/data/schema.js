@@ -1531,7 +1531,8 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
           senderAddress: senderEmail,
           hostMessage: hostMessage,
           senderMessage: senderMessage,
-          recipientAddress: recipientEmail
+          recipientAddress: recipientEmail,
+          hostEmailSubject: hostEmailSubject
         })
 
         await knex.insertAndFetch(
