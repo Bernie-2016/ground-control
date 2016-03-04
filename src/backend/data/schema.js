@@ -923,6 +923,7 @@ const GraphQLEvent = new GraphQLObjectType({
         while (foundPeople.length < 250 && radius <= maxRadius) {
           let foundConsIds = foundPeople.map((person) => person.cons_id)
           let query = knex('bsd_addresses')
+            .distinct('bsd_emails.email')
             .select('bsd_people.*')
             .join('bsd_people', 'bsd_addresses.cons_id', 'bsd_people.cons_id')
             .join('bsd_emails', 'bsd_people.cons_id', 'bsd_emails.cons_id')
@@ -1471,6 +1472,7 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
     hostEmail: { type: new GraphQLNonNull(GraphQLString) },
     senderEmail: { type: new GraphQLNonNull(GraphQLString) },
     adminEmail: { type: new GraphQLNonNull(GraphQLString) },
+    hostEmailSubject: { type: new GraphQLNonNull(GraphQLString) },
     hostMessage: { type: new GraphQLNonNull(GraphQLString) },
     senderMessage: { type: new GraphQLNonNull(GraphQLString) },
     recipients: { type: new GraphQLList(GraphQLString) },
@@ -1483,7 +1485,7 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
       resolve: () => SharedListContainer
     }
   },
-  mutateAndGetPayload: async ({hostEmail, senderEmail, adminEmail, hostMessage, senderMessage, recipients, toolPassword, eventId}, {rootValue}) => {
+  mutateAndGetPayload: async ({hostEmail, senderEmail, adminEmail, hostEmailSubject, hostMessage, senderMessage, recipients, toolPassword, eventId}, {rootValue}) => {
 
     adminRequired(rootValue)
 
@@ -1501,7 +1503,8 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
       senderAddress: senderEmail,
       hostMessage: hostMessage,
       senderMessage: senderMessage,
-      recipientAddress: adminEmail
+      recipientAddress: adminEmail,
+      hostEmailSubject: hostEmailSubject
     })
 
     let existingLookup = await knex.table('fast_fwd_request')

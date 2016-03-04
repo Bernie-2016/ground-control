@@ -246,7 +246,7 @@ export default class MG {
       from: 'Team Bernie <' + data.senderAddress + '>',
       'h:Reply-To': 'info@berniesanders.com',
       to: data.recipientAddress,
-      subject: 'Fwd: HELP! I need more people to come to my phonebank',
+      subject: 'Fwd: ' + data.hostEmailSubject,
       text: content.text
     }
 

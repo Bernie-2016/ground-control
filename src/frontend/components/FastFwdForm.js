@@ -64,7 +64,7 @@ class FastFwdForm extends React.Component {
 
     if(this.props.event.eventType.name.toLowerCase().indexOf('barnstorm') > -1){
       event_type_name = 'Barnstorm event'
-    }    
+    }
 
     let defaultHostMessage = this.props.event.fastFwdRequest ? this.props.event.fastFwdRequest.hostMessage :
                             "Hello, neighbors!\n\nI'm hosting a " + event_type_name +
