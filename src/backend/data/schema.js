@@ -1166,6 +1166,11 @@ const GraphQLEditEvents = mutationWithClientMutationId({
       let event = await knex('bsd_events')
         .where('event_id', newEventData.event_id)
         .first()
+
+      // Mark event reviewed if no longer pending approval
+      if (event.flag_approval === true && newEventData.flag_approval === false)
+        reviewedEvents.push(Number(event.event_id))
+
       event = {
         ...event,
         ...newEventData
@@ -1220,6 +1225,9 @@ const GraphQLEditEvents = mutationWithClientMutationId({
     if (updateErrors.length > 0){
       message = updateErrors.join(', ')
     }
+
+    if (reviewedEvents.length > 0)
+      await markEventsReviewed(reviewedEvents)
 
     return {events, message}
   }
