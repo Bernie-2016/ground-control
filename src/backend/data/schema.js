@@ -283,6 +283,14 @@ const addWhere = ({ query, property, value, operator='=', method='where' }) => {
   return query[method](property, operator, value)
 }
 
+const GraphQLSortDirectionInput = new GraphQLEnumType({
+  name: 'GraphQLSortDirection',
+  values: {
+    ASC: { value: 'asc' },
+    DESC: { value: 'desc' }
+  }
+})
+
 const GraphQLListContainer = new GraphQLObjectType({
   name: 'ListContainer',
   fields: () => ({
@@ -309,13 +317,7 @@ const GraphQLListContainer = new GraphQLObjectType({
           }
         })},
         sortField: { type: GraphQLString },
-        sortDirection: { type: new GraphQLEnumType({
-          name: 'GraphQLSortDirection',
-          values: {
-            ASC: { value: 'asc' },
-            DESC: { value: 'desc' }
-          }
-        })}
+        sortDirection: { type: GraphQLSortDirectionInput }
       },
       resolve: async (event, {first, eventFilterOptions, hostFilterOptions, status, sortField, sortDirection}, {rootValue}) => {
         let eventFilters = eventFromAPIFields(eventFilterOptions)
@@ -362,6 +364,43 @@ const GraphQLListContainer = new GraphQLObjectType({
         }
 
         return connectionFromArray(await events, {first})
+      }
+    },
+    people: {
+      type: GraphQLPersonConnection,
+      args: {
+        ...connectionArgs,
+        personFilters: { type: GraphQLPersonInput },
+        sortField: { type: GraphQLString },
+        sortDirection: { type: GraphQLSortDirectionInput }
+      },
+      resolve: async (root, {first, personFilters, sortField, sortDirection}, {rootValue}) => {
+        if (Object.keys(personFilters).length === 0)
+          first = 0
+
+        let people = knex('bsd_people')
+          .orderBy(sortField, sortDirection)
+        	.limit(first)
+
+        Object.keys(personFilters).forEach((key) => {
+          if (key === 'email'){
+            people = people.join('bsd_emails', 'bsd_people.cons_id', 'bsd_emails.cons_id')
+            people = addWhere({query: people, property: `bsd_emails.${key}`, value: personFilters[key]})
+          }
+          else if (key === 'phone'){
+            people = people.join('bsd_phones', 'bsd_people.cons_id', 'bsd_phones.cons_id')
+            people = addWhere({query: people, property: `bsd_phones.${key}`, value: phoneFormatter.format(personFilters[key], 'NNNNNNNNNN')})
+          }
+          else if (key === 'zip'){
+            people = people.join('bsd_addresses', 'bsd_people.cons_id', 'bsd_addresses.cons_id')
+            people = addWhere({query: people, property: `bsd_addresses.${key}`, value: personFilters[key]})
+          }
+          else {
+            people = addWhere({query: people, property: `bsd_people.${key}`, value: personFilters[key]})
+          }
+        })
+
+        return connectionFromArray(await people, {first})
       }
     },
     callAssignments: {
@@ -709,6 +748,16 @@ const GraphQLPerson = new GraphQLObjectType({
 
         return query
       }
+    },
+    hostedEvents: {
+      type: new GraphQLList(GraphQLEvent),
+      resolve: async (person, {rootValue}) => {
+
+        let query = knex('bsd_events')
+          .whereNot('creator_cons_id', person.cons_id)
+
+        return query
+      }
     }
   }),
   interfaces: [nodeInterface]
@@ -729,7 +778,10 @@ const GraphQLPersonInput = new GraphQLInputObjectType({
     employer: { type: GraphQLString },
     occupation: { type: GraphQLString },
     phone: { type: GraphQLString },
-    email: { type: GraphQLString }
+    email: { type: GraphQLString },
+    city: { type: GraphQLString },
+    state: { type: GraphQLString },
+    zip: { type: GraphQLString }
   }
 })
 
@@ -962,6 +1014,13 @@ let {
 } = connectionDefinitions({
   name: 'Event',
   nodeType: GraphQLEvent
+})
+
+let {
+  connectionType: GraphQLPersonConnection,
+} = connectionDefinitions({
+  name: 'Person',
+  nodeType: GraphQLPerson
 })
 
 const GraphQLCallAssignment = new GraphQLObjectType({
