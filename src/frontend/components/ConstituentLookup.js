@@ -47,12 +47,12 @@ class ConstituentLookup extends React.Component {
       )
     return people.map((person) => {
       person = person.node
-      console.log(person.hostedEvents)
+      const location = (person.address) ? `${person.address.city} ${person.address.state}` : ''
       return (
         <Card key={person.id}>
           <CardHeader
             title={`${person.firstName || ''} ${person.middleName || ''} ${person.lastName || ''}`}
-            subtitle={`${person.address.city} ${person.address.state} - ${person.email}`}
+            subtitle={(location) ? `${location} - ${person.email}` : person.email}
             avatar={
               <FontIcon
                 className="material-icons"
@@ -65,7 +65,7 @@ class ConstituentLookup extends React.Component {
           <CardText expandable={true}>
             Phone: {person.phone}
             <br />
-            Zip Code: {person.address.zip}
+            {(person.address) ? `Zip Code: ${person.address.zip}` : ''}
           </CardText>
         </Card>
       )
