@@ -332,6 +332,7 @@ const GraphQLListContainer = new GraphQLObjectType({
           events = events
             .join('gc_bsd_events', 'bsd_events.event_id', 'gc_bsd_events.event_id')
             .where('gc_bsd_events.pending_review', true)
+            .where('bsd_events.flag_approval', false)
         else if (status === 'pendingApproval')
           events = events.where('flag_approval', true)
         else if (status === 'approved')
