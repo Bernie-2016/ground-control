@@ -122,6 +122,10 @@ class EventEdit extends React.Component {
         .default(event.capacity)
         .min(0)
         .required(),
+
+      hostEmail: yup.string()
+        .default((event.host) ? event.host.email : ''),
+
       contactPhone: yup.string()
         .default(event.contactPhone),
 
@@ -269,6 +273,11 @@ class EventEdit extends React.Component {
         <InfoHeader content='Event Host' />
         {(event.host && event.host.firstName && event.host.lastName) ? `${event.host.firstName} ${event.host.lastName}` : 'no host name available'}<br />
         {(event.host && event.host.email) ? `${event.host.email}` : 'no host email available'}<br/>
+        <Form.Field
+          name="hostEmail"
+          type="email"
+          label="Host Email"
+        /><br />
 
         <Form.Field
           name="contactPhone"
