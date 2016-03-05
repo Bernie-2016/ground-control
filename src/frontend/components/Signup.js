@@ -41,6 +41,7 @@ export default class Signup extends React.Component {
             name='email'
             label='E-mail Address'
             hintText='Email'
+            type='email'
             floatingLabelText={false}
           />
           <br />
