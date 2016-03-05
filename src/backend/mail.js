@@ -251,6 +251,7 @@ export default class MG {
       'h:Reply-To': 'info@berniesanders.com',
       to: data.recipientAddress,
       subject: 'Fwd: ' + data.hostEmailSubject,
+      html: content.html,
       text: content.text
     }
 
@@ -308,7 +309,8 @@ export default class MG {
       'h:Reply-To': 'info@berniesanders.com',
       to: event.email,
       subject: 'Find volunteers in your area for your upcoming event!',
-      text: content.text
+      text: content.text,
+      html: content.html
     }
 
     return await this.send(message)
