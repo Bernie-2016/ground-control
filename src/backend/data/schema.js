@@ -1178,8 +1178,9 @@ const GraphQLEditEvents = mutationWithClientMutationId({
         }
       })
 
-      // Require phone number for RSVPs to phonebanks
-      if (event['event_type_id'] == '31' || event['event_type_id'] == '39'){
+      // Require phone number for RSVPs
+      const eventIdsRequiringPhone = new Set([31, 32, 39, 45])
+      if (eventIdsRequiringPhone.has(Number(event['event_type_id']))) {
         event['attendee_require_phone'] = 1
       }
 
