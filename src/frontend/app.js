@@ -67,6 +67,7 @@ Relay.injectNetworkLayer(new GCNetworkLayer('/graphql'), {
 Form.addInputTypes({
   string: GCTextField,
   number: GCTextField,
+  email: GCTextField,
   boolean: GCBooleanField,
   radio: GCRadioButtonsField,
   select: GCSelectField,
