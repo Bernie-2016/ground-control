@@ -380,8 +380,10 @@ const GraphQLListContainer = new GraphQLObjectType({
           first = 0
 
         let people = knex('bsd_people')
-          .orderBy(sortField, sortDirection)
         	.limit(first)
+
+        if (sortField && sortDirection)
+          people = people.orderBy(sortField, sortDirection)
 
         Object.keys(personFilters).forEach((key) => {
           if (key === 'email'){
