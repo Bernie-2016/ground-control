@@ -239,6 +239,10 @@ export default class MG {
   }
 
   async sendAdminEventInvite(data) {
+
+    data.senderMessageHtml = data.senderMessage.replace(/\n{2,}/g, "</p><p style=\"font-family: Arial; font-size: 17px; line-height: 140%;\">").replace(/\n{1}/, "<br />").replace(/^/, "<p style=\"font-family: Arial; font-size: 17px; line-height: 140%;\">").replace(/$/, "</p>")
+    data.hostMessageHtml = data.hostMessage.replace(/\n{2,}/g, "</p><p style=\"font-family: Arial; font-size: 17px; line-height: 140%;\">").replace(/\n{1}/, "<br />").replace(/^/, "<p style=\"font-family: Arial; font-size: 17px; line-height: 140%;\">").replace(/$/, "</p>")
+
     let template = new EmailTemplate(templateDir + '/admin-event-invitation')
     let content = await template.render(data)
 
@@ -293,6 +297,7 @@ export default class MG {
                       + '/request_email',
       eventDate: moment(event.event_start_dt).format('dddd, MMMM Do'),
       eventDay: moment(event.event_start_dt).format('dddd'),
+      recipientAddress: event.email
     }
 
     let template = new EmailTemplate(templateDir + '/send-fast-fwd-instructions')
