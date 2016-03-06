@@ -132,8 +132,8 @@ class EventEdit extends React.Component {
         .min(0)
         .required(),
 
-      hostEmail: yup.string()
-        .default((event.host) ? event.host.email : ''),
+      hostEmail: yup.string().email()
+        .default((event.host) ? event.host.email : null),
 
       contactPhone: yup.string()
         .default(event.contactPhone),
