@@ -18,6 +18,12 @@ const momentWithOffset = (startDate, utcOffset) => {
 };
 
 class EventEdit extends React.Component {
+
+  componentDidMount() {
+    let {email} = this.props.event.host
+    this.props.relay.setVariables({personFilters: {email}})
+  }
+
   eventTypes() {
     let allTypes = {}
     this.props.listContainer.eventTypes.forEach((eventType) => {
@@ -53,7 +59,10 @@ class EventEdit extends React.Component {
   }
 
   renderForm() {
-    let event = this.props.event;
+    let event = this.props.event
+    const people = this.props.listContainer.people.edges
+    const host = (people.length === 0) ? null : people[0].node
+    
     const eventSchema = yup.object({
       name: yup
         .string()
@@ -122,6 +131,10 @@ class EventEdit extends React.Component {
         .default(event.capacity)
         .min(0)
         .required(),
+
+      hostEmail: yup.string().email()
+        .default((event.host) ? event.host.email : null),
+
       contactPhone: yup.string()
         .default(event.contactPhone),
 
@@ -157,6 +170,10 @@ class EventEdit extends React.Component {
           data.description = this.refs.quill.getEditorContents();
           data.duration = data.duration.h * 60 + data.duration.m;
           data.isSearchable = Number(data.isSearchable);
+          if (host)
+            data.hostId = host.id
+          delete data.hostEmail
+
           this.props.onSubmit(data)
         }}
       >
@@ -267,8 +284,17 @@ class EventEdit extends React.Component {
         />
 
         <InfoHeader content='Event Host' />
-        {(event.host && event.host.firstName && event.host.lastName) ? `${event.host.firstName} ${event.host.lastName}` : 'no host name available'}<br />
-        {(event.host && event.host.email) ? `${event.host.email}` : 'no host email available'}<br/>
+        {(host) ? `${host.firstName} ${host.lastName}` : 'No host name available'}<br />
+
+        <Form.Field
+          name="hostEmail"
+          type="email"
+          label="Host Email"
+          errorText={(host) ? null : 'No account found'}
+          onChange={(value) => {
+            this.props.relay.setVariables({personFilters: {email: value}})
+          }}
+        /><br />
 
         <Form.Field
           name="contactPhone"
@@ -353,12 +379,29 @@ class EventEdit extends React.Component {
 }
 
 export default Relay.createContainer(EventEdit, {
+  initialVariables: {
+    personFilters: {},
+  },
   fragments: {
     listContainer: () => Relay.QL`
       fragment on ListContainer {
         eventTypes {
           id
           name
+        }
+        people(
+          first: 1
+          personFilters: $personFilters
+        ) {
+          edges {
+            cursor
+            node {
+              id
+              firstName
+              lastName
+              email
+            }
+          }
         }
       }
     `
