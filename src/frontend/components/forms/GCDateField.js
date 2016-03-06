@@ -14,10 +14,11 @@ export default class GCDateField extends GCFormField {
       value={fakeDate}
       floatingLabelText={this.floatingLabelText()}
       onChange={(_, date) => {
-        let newDate = moment(date)
+        let newDate = moment(date).toObject()
         newDate['hours'] = oldDate['hours']
         newDate['minutes'] = oldDate['minutes']
         newDate['seconds'] = oldDate['seconds']
+        console.log(newDate, oldDate)
         newDate = moment(newDate)
           .add(moment().utcOffset() - this.props.utcOffset, 'minutes')
           .toDate()
