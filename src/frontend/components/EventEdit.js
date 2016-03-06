@@ -20,8 +20,10 @@ const momentWithOffset = (startDate, utcOffset) => {
 class EventEdit extends React.Component {
 
   componentDidMount() {
-    let {email} = this.props.event.host
-    this.props.relay.setVariables({personFilters: {email}})
+    if (this.props.event.host){
+      let {email} = this.props.event.host
+      this.props.relay.setVariables({personFilters: {email}})
+    }
   }
 
   eventTypes() {
