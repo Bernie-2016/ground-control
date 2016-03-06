@@ -170,6 +170,10 @@ class EventEdit extends React.Component {
           data.description = this.refs.quill.getEditorContents();
           data.duration = data.duration.h * 60 + data.duration.m;
           data.isSearchable = Number(data.isSearchable);
+          if (host)
+            data.hostId = host.id
+          delete data.hostEmail
+
           this.props.onSubmit(data)
         }}
       >
