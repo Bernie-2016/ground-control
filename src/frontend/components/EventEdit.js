@@ -291,7 +291,7 @@ class EventEdit extends React.Component {
           type="email"
           label="Host Email"
           errorText={(host) ? null : 'No account found'}
-          onBlur={(value) => {
+          onChange={(value) => {
             this.props.relay.setVariables({personFilters: {email: value}})
           }}
         /><br />
