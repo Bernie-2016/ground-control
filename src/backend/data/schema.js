@@ -666,7 +666,8 @@ const GraphQLAddress = new GraphQLObjectType({
       type: GraphQLInt,
       resolve: async (address) => {
         let tz = TZLookup(address.latitude, address.longitude)
-        return moment().tz(tz).format('Z')
+        tz = moment().tz(tz);
+        return tz ? tz.utcOffset() : 0
       }
     },
     people: {
