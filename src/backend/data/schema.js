@@ -380,8 +380,10 @@ const GraphQLListContainer = new GraphQLObjectType({
           first = 0
 
         let people = knex('bsd_people')
-          .orderBy(sortField, sortDirection)
         	.limit(first)
+
+        if (sortField && sortDirection)
+          people = people.orderBy(sortField, sortDirection)
 
         Object.keys(personFilters).forEach((key) => {
           if (key === 'email'){
@@ -1166,6 +1168,11 @@ const GraphQLEditEvents = mutationWithClientMutationId({
       let event = await knex('bsd_events')
         .where('event_id', newEventData.event_id)
         .first()
+
+      // Mark event reviewed if no longer pending approval
+      if (event.flag_approval === true && newEventData.flag_approval === false)
+        reviewedEvents.push(Number(event.event_id))
+
       event = {
         ...event,
         ...newEventData
@@ -1178,8 +1185,9 @@ const GraphQLEditEvents = mutationWithClientMutationId({
         }
       })
 
-      // Require phone number for RSVPs to phonebanks
-      if (event['event_type_id'] == '31' || event['event_type_id'] == '39'){
+      // Require phone number for RSVPs
+      const eventIdsRequiringPhone = new Set([31, 32, 39, 45])
+      if (eventIdsRequiringPhone.has(Number(event['event_type_id']))) {
         event['attendee_require_phone'] = 1
       }
 
@@ -1219,6 +1227,9 @@ const GraphQLEditEvents = mutationWithClientMutationId({
     if (updateErrors.length > 0){
       message = updateErrors.join(', ')
     }
+
+    if (reviewedEvents.length > 0)
+      await markEventsReviewed(reviewedEvents)
 
     return {events, message}
   }

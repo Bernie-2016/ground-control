@@ -41,15 +41,16 @@ var eventTypes = [
 		defaultValues: {
 			public_phone: 1,
 			venue_name: 'My car',
-			name: 'Carpool to Help Bernie Win!',
+			name: 'Carpool to [CITY] to Help Bernie Win!',
 			is_searchable: true,
 			rsvp_use_reminder_email: true,
 			rsvp_email_reminder_hours: 24,
-			duration_num: 40,
+			duration_num: 2,
+			duration_unit: 60,
 			attendee_volunteer_message: 'If you can chip in for gas and snacks, please sign up as a volunteer. Thanks!',
 			host_receive_rsvp_emails: true,
 			attendee_volunteer_show: true,
-			description: '<a href="http://bernie.to/distance-faq">Click here to view Carpool FAQs</a><p>Join me and other Bernie supporters for a road trip!</p><p>I’ll be leaving on [WRITE YOUR DEPARTURE DATE/TIME HERE] and returning on [WRITE YOUR RETURN DATE/TIME HERE]. The campaign isn’t providing housing, so we’ll figure out a hotel or something.</p><p>We’re going to hit the road for Bernie to the help out in the crucial final days before the election. Bernie staff on the ground will train us and plug us into the campaign so that we can be as effective as possible.</p><p>Victory will require all of us pitching in, so sign up and let’s go the distance for Bernie!</p>'
+			description: '<a href="http://bernie.to/distance-faq">Click here to view Carpool FAQs</a><p>Join me and other Bernie supporters for a road trip!</p><p>I’ll be leaving on [WRITE YOUR DEPARTURE DATE/TIME HERE] and returning on [WRITE YOUR RETURN DATE/TIME HERE].</p><p>We’re going to hit the road for Bernie to the help out in the crucial final days before the election. When we arrive at the local field office, Bernie staff on the ground will train us and plug us into the campaign so that we can be as effective as possible.</p>'
 		}
 	},
 	{
