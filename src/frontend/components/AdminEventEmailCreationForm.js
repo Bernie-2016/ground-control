@@ -137,8 +137,8 @@ class AdminEventEmailCreationForm extends React.Component {
     }
 
     let defaultSenderMessage = "Hey everyone, it's " + adminName + " from Bernie 2016 national staff.\n\n" +
-        this.props.event.host.firstName + ", local volunteer in " + this.props.event.venueCity + " has asked me " +
-        "to help them find some nearby Bernie supporters to attend an event they are hosting " +
+        this.props.event.host.firstName + ", a local volunteer in " + this.props.event.venueCity + ", has asked me " +
+        "to help find some nearby Bernie supporters to attend an event " +
         "on " + moment(this.props.event.startDate).format("dddd, MMMM Do") + ".\n\n" +
         "See their email below or just get more info and RSVP at this link:\n\n" +
         publicEventsRootUrl + this.props.event.eventIdObfuscated + "\n\n" +
