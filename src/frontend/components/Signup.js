@@ -154,7 +154,7 @@ export default class Signup extends React.Component {
     let errorElement = <div></div>
 
     if (this.state.errorMessage) {
-      errorElement = <div style={this.styles.errorMessage}>{this.state.errorMessage}</div>
+      errorElement = <div style={this.styles.errorMessage}>{this.state.errorMessage} </div>
     }
 
     return (
@@ -191,6 +191,7 @@ export default class Signup extends React.Component {
                 color: BernieColors.white,
                 marginTop: 10
               }}>
+              <a href="https://www.bluestatedigital.com/ctl/Core/AdminResetPass">Reset Password?</a>
               </div>
           </GCForm>
         </div>
