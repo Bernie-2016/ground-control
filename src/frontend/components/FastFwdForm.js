@@ -9,7 +9,7 @@ import MutationHandler from './MutationHandler'
 import CreateFastFwdRequest from '../mutations/CreateFastFwdRequest'
 import yup from 'yup'
 
-const publicEventsRootUrl = process.env.PUBLIC_EVENTS_ROOT_URL
+const publicEventsRootUrl = 'https://secure.berniesanders.com/page/event/detail/'
 
 class FastFwdForm extends React.Component {
   styles = {
