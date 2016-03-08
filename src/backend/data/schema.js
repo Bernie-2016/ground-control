@@ -283,6 +283,14 @@ const addWhere = ({ query, property, value, operator='=', method='where' }) => {
   return query[method](property, operator, value)
 }
 
+const GraphQLSortDirectionInput = new GraphQLEnumType({
+  name: 'GraphQLSortDirection',
+  values: {
+    ASC: { value: 'asc' },
+    DESC: { value: 'desc' }
+  }
+})
+
 const GraphQLListContainer = new GraphQLObjectType({
   name: 'ListContainer',
   fields: () => ({
@@ -309,13 +317,7 @@ const GraphQLListContainer = new GraphQLObjectType({
           }
         })},
         sortField: { type: GraphQLString },
-        sortDirection: { type: new GraphQLEnumType({
-          name: 'GraphQLSortDirection',
-          values: {
-            ASC: { value: 'asc' },
-            DESC: { value: 'desc' }
-          }
-        })}
+        sortDirection: { type: GraphQLSortDirectionInput }
       },
       resolve: async (event, {first, eventFilterOptions, hostFilterOptions, status, sortField, sortDirection}, {rootValue}) => {
         let eventFilters = eventFromAPIFields(eventFilterOptions)
@@ -330,6 +332,7 @@ const GraphQLListContainer = new GraphQLObjectType({
           events = events
             .join('gc_bsd_events', 'bsd_events.event_id', 'gc_bsd_events.event_id')
             .where('gc_bsd_events.pending_review', true)
+            .where('bsd_events.flag_approval', false)
         else if (status === 'pendingApproval')
           events = events.where('flag_approval', true)
         else if (status === 'approved')
@@ -362,6 +365,45 @@ const GraphQLListContainer = new GraphQLObjectType({
         }
 
         return connectionFromArray(await events, {first})
+      }
+    },
+    people: {
+      type: GraphQLPersonConnection,
+      args: {
+        ...connectionArgs,
+        personFilters: { type: GraphQLPersonInput },
+        sortField: { type: GraphQLString },
+        sortDirection: { type: GraphQLSortDirectionInput }
+      },
+      resolve: async (root, {first, personFilters, sortField, sortDirection}, {rootValue}) => {
+        if (Object.keys(personFilters).length === 0)
+          first = 0
+
+        let people = knex('bsd_people')
+        	.limit(first)
+
+        if (sortField && sortDirection)
+          people = people.orderBy(sortField, sortDirection)
+
+        Object.keys(personFilters).forEach((key) => {
+          if (key === 'email'){
+            people = people.join('bsd_emails', 'bsd_people.cons_id', 'bsd_emails.cons_id')
+            people = addWhere({query: people, property: `bsd_emails.${key}`, value: personFilters[key]})
+          }
+          else if (key === 'phone'){
+            people = people.join('bsd_phones', 'bsd_people.cons_id', 'bsd_phones.cons_id')
+            people = addWhere({query: people, property: `bsd_phones.${key}`, value: phoneFormatter.format(personFilters[key], 'NNNNNNNNNN')})
+          }
+          else if (key === 'zip'){
+            people = people.join('bsd_addresses', 'bsd_people.cons_id', 'bsd_addresses.cons_id')
+            people = addWhere({query: people, property: `bsd_addresses.${key}`, value: personFilters[key]})
+          }
+          else {
+            people = addWhere({query: people, property: `bsd_people.${key}`, value: personFilters[key]})
+          }
+        })
+
+        return connectionFromArray(await people, {first})
       }
     },
     callAssignments: {
@@ -709,6 +751,16 @@ const GraphQLPerson = new GraphQLObjectType({
 
         return query
       }
+    },
+    hostedEvents: {
+      type: new GraphQLList(GraphQLEvent),
+      resolve: async (person, {rootValue}) => {
+
+        let query = knex('bsd_events')
+          .whereNot('creator_cons_id', person.cons_id)
+
+        return query
+      }
     }
   }),
   interfaces: [nodeInterface]
@@ -729,7 +781,10 @@ const GraphQLPersonInput = new GraphQLInputObjectType({
     employer: { type: GraphQLString },
     occupation: { type: GraphQLString },
     phone: { type: GraphQLString },
-    email: { type: GraphQLString }
+    email: { type: GraphQLString },
+    city: { type: GraphQLString },
+    state: { type: GraphQLString },
+    zip: { type: GraphQLString }
   }
 })
 
@@ -923,6 +978,7 @@ const GraphQLEvent = new GraphQLObjectType({
         while (foundPeople.length < 250 && radius <= maxRadius) {
           let foundConsIds = foundPeople.map((person) => person.cons_id)
           let query = knex('bsd_addresses')
+            .distinct('bsd_emails.email')
             .select('bsd_people.*')
             .join('bsd_people', 'bsd_addresses.cons_id', 'bsd_people.cons_id')
             .join('bsd_emails', 'bsd_people.cons_id', 'bsd_emails.cons_id')
@@ -961,6 +1017,13 @@ let {
 } = connectionDefinitions({
   name: 'Event',
   nodeType: GraphQLEvent
+})
+
+let {
+  connectionType: GraphQLPersonConnection,
+} = connectionDefinitions({
+  name: 'Person',
+  nodeType: GraphQLPerson
 })
 
 const GraphQLCallAssignment = new GraphQLObjectType({
@@ -1105,6 +1168,11 @@ const GraphQLEditEvents = mutationWithClientMutationId({
       let event = await knex('bsd_events')
         .where('event_id', newEventData.event_id)
         .first()
+
+      // Mark event reviewed if no longer pending approval
+      if (event.flag_approval === true && newEventData.flag_approval === false)
+        reviewedEvents.push(Number(event.event_id))
+
       event = {
         ...event,
         ...newEventData
@@ -1117,8 +1185,9 @@ const GraphQLEditEvents = mutationWithClientMutationId({
         }
       })
 
-      // Require phone number for RSVPs to phonebanks
-      if (event['event_type_id'] == '31' || event['event_type_id'] == '39'){
+      // Require phone number for RSVPs
+      const eventIdsRequiringPhone = new Set([31, 32, 39, 45])
+      if (eventIdsRequiringPhone.has(Number(event['event_type_id']))) {
         event['attendee_require_phone'] = 1
       }
 
@@ -1158,6 +1227,9 @@ const GraphQLEditEvents = mutationWithClientMutationId({
     if (updateErrors.length > 0){
       message = updateErrors.join(', ')
     }
+
+    if (reviewedEvents.length > 0)
+      await markEventsReviewed(reviewedEvents)
 
     return {events, message}
   }
@@ -1471,6 +1543,7 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
     hostEmail: { type: new GraphQLNonNull(GraphQLString) },
     senderEmail: { type: new GraphQLNonNull(GraphQLString) },
     adminEmail: { type: new GraphQLNonNull(GraphQLString) },
+    hostEmailSubject: { type: new GraphQLNonNull(GraphQLString) },
     hostMessage: { type: new GraphQLNonNull(GraphQLString) },
     senderMessage: { type: new GraphQLNonNull(GraphQLString) },
     recipients: { type: new GraphQLList(GraphQLString) },
@@ -1483,7 +1556,7 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
       resolve: () => SharedListContainer
     }
   },
-  mutateAndGetPayload: async ({hostEmail, senderEmail, adminEmail, hostMessage, senderMessage, recipients, toolPassword, eventId}, {rootValue}) => {
+  mutateAndGetPayload: async ({hostEmail, senderEmail, adminEmail, hostEmailSubject, hostMessage, senderMessage, recipients, toolPassword, eventId}, {rootValue}) => {
 
     adminRequired(rootValue)
 
@@ -1501,7 +1574,8 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
       senderAddress: senderEmail,
       hostMessage: hostMessage,
       senderMessage: senderMessage,
-      recipientAddress: adminEmail
+      recipientAddress: adminEmail,
+      hostEmailSubject: hostEmailSubject
     })
 
     let existingLookup = await knex.table('fast_fwd_request')
@@ -1528,7 +1602,8 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
           senderAddress: senderEmail,
           hostMessage: hostMessage,
           senderMessage: senderMessage,
-          recipientAddress: recipientEmail
+          recipientAddress: recipientEmail,
+          hostEmailSubject: hostEmailSubject
         })
 
         await knex.insertAndFetch(

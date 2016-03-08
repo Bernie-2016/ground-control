@@ -239,14 +239,19 @@ export default class MG {
   }
 
   async sendAdminEventInvite(data) {
+
+    data.senderMessageHtml = data.senderMessage.replace(/\n{2,}/g, "</p><p style=\"font-family: Arial; font-size: 17px; line-height: 140%;\">").replace(/\n{1}/, "<br />").replace(/^/, "<p style=\"font-family: Arial; font-size: 17px; line-height: 140%;\">").replace(/$/, "</p>")
+    data.hostMessageHtml = data.hostMessage.replace(/\n{2,}/g, "</p><p style=\"font-family: Arial; font-size: 17px; line-height: 140%;\">").replace(/\n{1}/, "<br />").replace(/^/, "<p style=\"font-family: Arial; font-size: 17px; line-height: 140%;\">").replace(/$/, "</p>")
+
     let template = new EmailTemplate(templateDir + '/admin-event-invitation')
     let content = await template.render(data)
 
     let message = {
-      from: data.senderAddress,
+      from: 'Team Bernie <' + data.senderAddress + '>',
       'h:Reply-To': 'info@berniesanders.com',
       to: data.recipientAddress,
-      subject: 'Fwd: HELP! I need more people to come to my phonebank',
+      subject: 'Fwd: ' + data.hostEmailSubject,
+      html: content.html,
       text: content.text
     }
 
@@ -293,6 +298,7 @@ export default class MG {
                       + '/request_email',
       eventDate: moment(event.event_start_dt).format('dddd, MMMM Do'),
       eventDay: moment(event.event_start_dt).format('dddd'),
+      recipientAddress: event.email
     }
 
     let template = new EmailTemplate(templateDir + '/send-fast-fwd-instructions')
@@ -303,7 +309,8 @@ export default class MG {
       'h:Reply-To': 'info@berniesanders.com',
       to: event.email,
       subject: 'Find volunteers in your area for your upcoming event!',
-      text: content.text
+      text: content.text,
+      html: content.html
     }
 
     return await this.send(message)

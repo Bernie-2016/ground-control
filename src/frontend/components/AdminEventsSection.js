@@ -43,7 +43,7 @@ const convertType = (value) => {
     return true
   else if (value === 'false')
     return false
-  else if (value != '' && !isNaN(value))
+  else if (value != '' && !isNaN(value) && String(Number(value)) === value)
     return Number(value)
   else if (value)
     return String(value)
@@ -790,21 +790,18 @@ ${signature}`
         primary={true}
         onTouchTap={() => {
           let filtersArray = jQuery(this.refs.eventSearchForm).serializeArray();
-          let eventFiltersObject = {};
-          let hostFiltersObject = {};
+          let eventFiltersObject = {}
+          let hostFiltersObject = {}
 
           filtersArray.forEach((filter) => {
-            console.log(filter)
             const currentValue = convertType(filter.value)
-            if (currentValue != undefined){
+            if (currentValue !== undefined && currentValue !== ''){
               if (containsInput(filterInputs, filter.name))
                 eventFiltersObject[filter.name] = currentValue
               if (containsInput(hostFilterInputs, filter.name))
                 hostFiltersObject[filter.name] = currentValue
             }
-          });
-
-          console.log(eventFiltersObject, hostFiltersObject);
+          })
 
           this._handleRequestFiltersChange({newVars: eventFiltersObject, doNotPreserveOldFilters: true});
           this._handleRequestFiltersChange({filterKey: 'hostFilters', newVars: hostFiltersObject, doNotPreserveOldFilters: true});

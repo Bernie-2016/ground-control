@@ -12,6 +12,7 @@ import AdminDashboard from './components/AdminDashboard';
 import AdminEventEmailCreationForm from './components/AdminEventEmailCreationForm'
 import AdminEventsSection from './components/AdminEventsSection';
 import AdminEventUploadRsvps from './components/AdminEventUploadRsvps';
+import ConstituentLookup from './components/ConstituentLookup';
 import AdminCallAssignmentsSection from './components/AdminCallAssignmentsSection';
 import AdminCallAssignmentCreationForm from './components/AdminCallAssignmentCreationForm';
 import FastFwdForm from './components/FastFwdForm';
@@ -66,6 +67,7 @@ Relay.injectNetworkLayer(new GCNetworkLayer('/graphql'), {
 Form.addInputTypes({
   string: GCTextField,
   number: GCTextField,
+  email: GCTextField,
   boolean: GCBooleanField,
   radio: GCRadioButtonsField,
   select: GCSelectField,
@@ -144,6 +146,14 @@ ReactDOM.render(
         component={AdminEventsSection}
         queries={{
           ...CurrentUserQueries,
+          ...ListContainerQueries
+        }}
+        renderLoading={() => <Loading />}
+      />
+      <Route
+        path='constituent-lookup'
+        component={ConstituentLookup}
+        queries={{
           ...ListContainerQueries
         }}
         renderLoading={() => <Loading />}

@@ -320,18 +320,19 @@ function startApp() {
     res.redirect('https://docs.google.com/forms/d/1cyoAcumEd4Co5Fqj9pOUnQtIUo_rfRzQ7oVqACFe5Rs/viewform')
   }))
 
-  app.get('/events/add-rsvp', wrap(async(req, res) => {
+  app.post('/events/add-rsvp', wrap(async(req, res) => {
   	const makeRequest = async (query) => {
   		log.debug(query)
   		let response = null
   		try {
   		  response = await BSDClient.addRSVPToEvent(query)
   		} catch(ex) {
-  		  res.status(400).send(ex.toString())
+  			query.error = JSON.parse(ex.message).error_description || ex.toString()
+  		  res.status(400).json(query)
   		  log.error(ex)
   		  return
   		}
-  		res.send(response.body)
+  		res.json(response.body)
   	}
 
     if (req.query.event_id_obfuscated){
@@ -367,7 +368,7 @@ function startApp() {
       'canvass': { id: 32, staffOnly: false, requirePhone: true },
       'barnstorm': { id: 41, staffOnly: false },
       'carpool-to-nevada': { id: 39, staffOnly: false, requirePhone: true },
-      'carpool': { id: 39, staffOnly: false },
+      'carpool': { id: 39, staffOnly: false, requirePhone: true },
       'official-barnstorm': { id: 41, staffOnly: true },
       'get-out-the-vote': { id: 45, staffOnly: false, requirePhone: true },
       'vol2vol': { id: 47, staffOnly: true },

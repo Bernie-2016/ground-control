@@ -52,7 +52,8 @@ class AdminEventEmailCreationForm extends React.Component {
     senderEmail: yup.string().email().required(),
     hostMessage: yup.string().required(),
     senderMessage: yup.string().required(),
-    toolPassword: yup.string().required()
+    toolPassword: yup.string().required(),
+    hostEmailSubject: yup.string().required()
   })
 
   state = {
@@ -118,7 +119,24 @@ class AdminEventEmailCreationForm extends React.Component {
 
     let disableSubmit = (this.props.event.nearbyPeople.length === 0)
 
-    let defaultSenderMessage = "Hey it's Jon from Bernie 2016 national staff.\n\n" +
+    let adminAlias = this.props.currentUser.email.split('@')[0]
+    let adminName = adminAlias.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();})
+    let adminAliases = {'jonwarnow': 'Jon', 'willeaston': 'Will', 'jonculver': 'Jon'}
+    if (adminAliases.hasOwnProperty(adminAlias.toLowerCase())){
+      adminName = adminAliases[adminAlias.toLowerCase()];
+    }
+
+    let eventTypeName = 'volunteer event';
+
+    if(this.props.event.eventType.name.toLowerCase().indexOf('phone bank') > -1){
+      eventTypeName = 'phone bank party'
+    }
+
+    if(this.props.event.eventType.name.toLowerCase().indexOf('barnstorm') > -1){
+      eventTypeName = 'Barnstorm event'
+    }
+
+    let defaultSenderMessage = "Hey everyone, it's " + adminName + " from Bernie 2016 national staff.\n\n" +
         "A local volunteer in " + this.props.event.venueCity + " has asked me " +
         "to help them find some nearby Bernie supporters to attend an event they are hosting " +
         "on " + moment(this.props.event.startDate).format("dddd, MMMM Do") + ".\n\n" +
@@ -134,7 +152,9 @@ class AdminEventEmailCreationForm extends React.Component {
                          mutationClass={CreateAdminEventEmail}
                          mutationName='createAdminEventEmail'
                          onSuccess={() => {
-                            this.props.history.push('/admin/events#query[numEvents]=100&query[sortField]=startDate&query[sortDirection]=ASC&query[status]=FAST_FWD_REQUEST')
+                            if(!this.state.testMode){
+                              this.props.history.push('/admin/events#query[numEvents]=100&query[sortField]=startDate&query[sortDirection]=ASC&query[status]=FAST_FWD_REQUEST')
+                            }
                          }} />
         <div style={BernieText.title}>
           Send Event Email
@@ -147,6 +167,7 @@ class AdminEventEmailCreationForm extends React.Component {
               senderEmail: "info@berniesanders.com",
               senderMessage: defaultSenderMessage,
               hostEmail: this.props.event.host.email,
+              hostEmailSubject: 'HELP! I need more people to come to my ' + eventTypeName,
               hostMessage: this.props.event.fastFwdRequest ? this.props.event.fastFwdRequest.hostMessage : ''
             }}
             onSubmit={(formValues) => {
@@ -168,6 +189,13 @@ class AdminEventEmailCreationForm extends React.Component {
               multiLine={true}
               rows={5}
               label="Message From Sender"
+            />
+            <br />
+            <Form.Field
+              name='hostEmailSubject'
+              multiLine={true}
+              rows={2}
+              label='Host Email Subject'
             />
             <br />
             <Form.Field
