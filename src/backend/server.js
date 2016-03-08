@@ -110,29 +110,74 @@ function startApp() {
       passReqToCallback: true
     },
     wrap(async (req, email, password, done) => {
+      let bsdUser = await BSDClient.getConstituentByEmail(email);
       let user = await knex('users')
         .where('email', email.toLowerCase())
-        .first()
+        .first();
 
-      if (!user || user.password === null) {
-        let hashedPassword = await hash(password)
+      //Create password
+      let hashedPassword = await hash(password);
+      //Check bsdCredentials
+      let bsdCredentialsResponse = await BSDClient.checkCredentials(email, password);
+      let bsdCredentialsValid = (bsdCredentialsResponse !== "invalid username or password");
 
+      //If BSD credentials are incorrect, give error message with a link to reset password via BSD
+      if (bsdUser && !bsdCredentialsValid) {
+        return done(null, false, {
+          message: 'Incorrect password.',
+          "url": "https://www.bluestatedigital.com/ctl/Core/AdminResetPass"
+        });
+      }
+
+      //If BSD constituent does not exist, create a new BSD constituent AND ground-control user with those credentials
+      else if (!user || user.password === null) {
+
+        //Create a new BSD User
+        //let newBSDUser = await BSDClient.createConstituent(email);
+
+        //Set the new BSD User's password
+        await BSDClient.setConstituentPassword(email, password);
+
+        //Create a new GC User
         if (!user) {
           let newUser = await knex.insertAndFetch('users', {
             email: email.toLowerCase(),
             password: hashedPassword
-          })
-
+          });
+          //Finished, return the new GC user
           return done(null, newUser)
-        } else {
+        }
+        //Update existing GC User that has a null password
+        else {
           await knex('users')
             .where('email', email.toLowerCase())
-            .update({password: hashedPassword})
+            .update({password: hashedPassword});
 
           return done(null, user)
         }
-      } else if (!await compare(password, user.password)) {
-        return done(null, false, { message: 'Incorrect password.' })
+      }
+      // If same credentials, create a new ground-control user with those credentials
+      else if (bsdCredentialsValid) {
+        if (!user) {
+          let newUser = await knex.insertAndFetch('users', {
+            email: email.toLowerCase(),
+            password: hashedPassword
+          });
+        }
+
+        // If account credentials are correct but the password for ground-control is incorrect, update the ground-control password and log in
+        else if (!await compare(password, user.password)) {
+          await knex('users')
+            .where('email', email.toLowerCase())
+            .update({password: hashedPassword});
+
+          return done(null, user)
+        }
+
+      }
+
+      else if (!await compare(password, user.password)) {
+        return done(null, false, {message: 'Incorrect password.'})
       }
 
       return done(null, user)
