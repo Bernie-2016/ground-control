@@ -130,7 +130,10 @@ function startApp() {
       }
 
       //If BSD constituent does not exist, create a new BSD constituent AND ground-control user with those credentials
-      else if (!user || user.password === null) {
+      else if (!bsdUser &&(!user || user.password === null)) {
+
+        //Create a new BSD User
+        let newBSDUser = await BSDClient.createConstituent(email);
 
         //Set the new BSD User's password
         await BSDClient.setConstituentPassword(email, password);
