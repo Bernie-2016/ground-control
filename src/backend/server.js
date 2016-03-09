@@ -116,10 +116,10 @@ function startApp() {
         .first();
 
       //Create password
-      let hashedPassword = await hash(password);
+      let hashedPassword = await hash(password)
       //Check bsdCredentials
-      let bsdCredentialsResponse = await BSDClient.checkCredentials(email, password);
-      let bsdCredentialsValid = (bsdCredentialsResponse !== "invalid username or password");
+      let bsdCredentialsResponse = await BSDClient.checkCredentials(email, password)
+      let bsdCredentialsValid = (typeof bsdCredentialsResponse === 'object' && bsdCredentialsResponse.api.cons)
 
       //If BSD credentials are incorrect, give error message with a link to reset password via BSD
       if (bsdUser && !bsdCredentialsValid) {
