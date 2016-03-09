@@ -9,6 +9,8 @@ import MutationHandler from './MutationHandler'
 import CreateFastFwdRequest from '../mutations/CreateFastFwdRequest'
 import yup from 'yup'
 
+const publicEventsRootUrl = 'https://secure.berniesanders.com/page/event/detail/'
+
 class FastFwdForm extends React.Component {
   styles = {
     detailsContainer: {
@@ -70,7 +72,9 @@ class FastFwdForm extends React.Component {
                             "Hello, neighbors!\n\nI'm hosting a " + event_type_name +
                             " and I need a few more Bernie supporters " +
                             "to attend to make this event a big success. " +
-                            "Will you please attend my event?\n\nThank you,\n\n" +
+                            "Will you please attend my event?\n\n" +
+                            publicEventsRootUrl + this.props.event.eventIdObfuscated + "\n\n" +
+                            "Thank you,\n\n" +
                             this.props.event.host.firstName
 
     return (
