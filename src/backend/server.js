@@ -130,6 +130,7 @@ function startApp() {
       }
 
       //If BSD constituent does not exist, create a new BSD constituent AND ground-control user with those credentials
+      //TODO: fix dead branch of user.password. Right now it will only update a nullified password if there is no bsdUser
       else if (!bsdUser &&(!user || user.password === null)) {
 
         //Create a new BSD User
@@ -148,6 +149,7 @@ function startApp() {
           return done(null, newUser)
         }
         //Update existing GC User that has a null password
+        //FIXME dead branch
         else {
           await knex('users')
             .where('email', email.toLowerCase())
