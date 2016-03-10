@@ -11,7 +11,7 @@ before_script:
   - psql -c "CREATE EXTENSION postgis;" -d ground_control
   - npm run migrate
   - npm run seed
-  - npm install code-climate-test-reporter codecov.io -g
+  - npm install codeclimate-test-reporter codecov.io -g
 after_success:
   - codeclimate-test-reporter < ./coverage/lcov.info
   - cat ./coverage/lcov.info | codecov
