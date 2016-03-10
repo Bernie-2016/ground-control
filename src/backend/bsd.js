@@ -356,14 +356,14 @@ export default class BSD {
   }
 
   async checkCredentials(email, password) {
+    let response
     try{
-      let response = await this.request('/account/check_credentials', {userid: email, password: password}, 'POST');
+      response = await this.request('/account/check_credentials', {userid: email, password: password}, 'POST');
     }
     catch(e){
       return 'invalid username or password'
     }
-    let response = await parseStringPromise(response);
-    return response
+    return await parseStringPromise(response)
   }
 
   async addRSVPToEvent(rsvpDetails) {
