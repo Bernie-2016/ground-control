@@ -22,6 +22,7 @@
     "test": "./node_modules/.bin/babel-istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- tests/backend/ -R spec",
     "prefrontendtest": "./node_modules/.bin/selenium-standalone install",
     "frontendtest": "./node_modules/.bin/nightwatch",
+    "docs": "node lib/tests/aquit/testDocs.js && ./node_modules/.bin/esdoc -c esdoc.json",
     "job": "./run-job"
   },
   "dependencies": {
@@ -104,9 +105,12 @@
     "yup": "^0.11.0"
   },
   "devDependencies": {
+    "acquit": "^0.4.1",
     "babel-eslint": "latest",
     "babel-istanbul": "^0.6.1",
     "chai": "^3.5.0",
+    "esdoc": "^0.4.6",
+    "esdoc-es7-plugin": "0.0.3",
     "eslint": "latest",
     "eslint-plugin-react": "latest",
     "foreman": "latest",
