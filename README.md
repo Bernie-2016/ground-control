@@ -1,7 +1,4 @@
-# Ground Control
-[![Build Status](https://travis-ci.org/PhearZero/ground-control.svg?branch=master)](https://travis-ci.org/PhearZero/ground-control)
-[![esdoc](https://doc.esdoc.org/github.com/PhearZero/ground-control/badge.svg)](https://doc.esdoc.org/github.com/PhearZero/ground-control/)
-[![codecov.io](https://codecov.io/github/PhearZero/ground-control/coverage.svg?branch=master)](https://codecov.io/github/PhearZero/ground-control?branch=master)
+# Ground Control [![Build Status](https://travis-ci.org/PhearZero/ground-control.svg?branch=master)](https://travis-ci.org/PhearZero/ground-control) [![esdoc](https://doc.esdoc.org/github.com/PhearZero/ground-control/badge.svg)](https://doc.esdoc.org/github.com/PhearZero/ground-control/) [![codecov.io](https://codecov.io/github/PhearZero/ground-control/coverage.svg?branch=master)](https://codecov.io/github/PhearZero/ground-control?branch=master)
 
 
 ![codecov.io](https://codecov.io/github/PhearZero/ground-control/branch.svg?branch=master)
