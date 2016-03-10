@@ -75,7 +75,7 @@ class FastFwdForm extends React.Component {
                             "Will you please attend my event?\n\n" +
                             publicEventsRootUrl + this.props.event.eventIdObfuscated + "\n\n" +
                             "Thank you,\n\n" +
-                            this.props.event.host.firstName
+                            this.props.event.host ? this.props.event.host.firstName : ""
 
     return (
       <div style={this.styles.pageContainer}>
