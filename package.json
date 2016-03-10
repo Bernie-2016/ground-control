@@ -106,7 +106,6 @@
   "devDependencies": {
     "babel-eslint": "latest",
     "chai": "^3.5.0",
-    "codecov.io": "^0.1.6",
     "eslint": "latest",
     "eslint-plugin-react": "latest",
     "foreman": "latest",
