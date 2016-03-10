@@ -11,8 +11,11 @@ before_script:
   - psql -c "CREATE EXTENSION postgis;" -d ground_control
   - npm run migrate
   - npm run seed
-after_script:
+before_install:
+  - pip install codecov
+after_success:
   - codeclimate-test-reporter < lcov.info
+  - codecov
 addons:
   apt:
     sources:
