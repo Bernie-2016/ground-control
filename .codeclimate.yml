@@ -27,6 +27,7 @@ ratings:
   - "**.py"
   - "**.rb"
 exclude_paths:
+- src/backend/data/migrations/**/*
 - src/frontend/public/admin/events/static/**/*
 - bin/**/*
 - tests/**/*
