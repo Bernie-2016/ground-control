@@ -19,7 +19,7 @@
     "knex": "./node_modules/.bin/knex --knexfile ./src/backend/data/knexfile.js",
     "migrate": "./node_modules/.bin/knex migrate:latest --knexfile ./src/backend/data/knexfile.js",
     "seed": "./node_modules/.bin/knex seed:run --knexfile ./src/backend/data/knexfile.js",
-    "test": "./node_modules/.bin/istanbul cover node_modules/mocha/bin/_mocha -- tests/backend/ -R spec",
+    "test": "./node_modules/.bin/istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- tests/backend/ -R spec",
     "prefrontendtest": "./node_modules/.bin/selenium-standalone install",
     "frontendtest": "./node_modules/.bin/nightwatch",
     "job": "./run-job"
