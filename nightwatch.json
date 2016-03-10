@@ -1,0 +1,47 @@
+{
+  "src_folders": ["./tests/frontend"],
+  "output_folder": "./reports",
+
+  "selenium": {
+    "start_process": true,
+    "server_path": "./node_modules/selenium-standalone/.selenium/selenium-server/2.50.1-server.jar",
+    "log_path": "reports",
+    "host": "127.0.0.1",
+    "port": 4444,
+    "cli_args": {
+      "webdriver.chrome.driver": "./node_modules/selenium-standalone/.selenium/chromedriver/2.21-x64-chromedriver",
+      "webdriver.ie.driver": "./node_modules/selenium-standalone/.selenium/iedriver/2.50.0-x64-IEDriverServer.exe"
+    }
+  },
+
+  "test_settings": {
+    "default": {
+      "launch_url": "http://www.google.com",
+      "selenium_port": 4444,
+      "selenium_host": "localhost",
+      "silent": true,
+      "sync_test_names": true,
+      "screenshots": {
+        "enabled": true,
+        "path": "./tests/frontend/screenshots/chrome"
+      },
+      "desiredCapabilities": {
+        "browserName": "chrome"
+      },
+      "globals": {
+        "waitForConditionTimeout": 60000
+      }
+    },
+    "firefox": {
+      "desiredCapabilities": {
+        "browserName": "firefox"
+      },
+      "screenshots": {
+        "enabled": true,
+        "on_failure": true,
+        "path": "./tests/frontend/screenshots/firefox"
+      }
+
+    }
+  }
+}

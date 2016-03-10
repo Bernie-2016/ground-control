@@ -19,6 +19,8 @@
     "knex": "knex --knexfile ./src/backend/data/knexfile.js",
     "migrate": "knex migrate:latest --knexfile ./src/backend/data/knexfile.js",
     "seed": "knex seed:run --knexfile ./src/backend/data/knexfile.js",
+    "pretest": "node ./node_modules/selenium-standalone/bin/selenium-standalone install",
+    "test": "node ./node_modules/nightwatch/bin/nightwatch",
     "job": "./run-job"
   },
   "dependencies": {
@@ -89,7 +91,7 @@
     "react-select": "^1.0.0-beta8",
     "react-tap-event-plugin": "^0.2.1",
     "relay": "^0.8.0",
-    "request-promise": "^1.0.1",
+    "request-promise": "^2.0.0",
     "retry": "^0.8.0",
     "rollbar": "^0.5.11",
     "style-loader": "^0.13.0",
@@ -101,11 +103,15 @@
     "yup": "^0.11.0"
   },
   "devDependencies": {
-    "foreman": "latest",
-    "nodemon": "latest",
+    "babel-eslint": "latest",
+    "chai": "^3.5.0",
     "eslint": "latest",
     "eslint-plugin-react": "latest",
-    "babel-eslint": "latest",
+    "foreman": "latest",
+    "mocha": "^2.4.5",
+    "nightwatch": "^0.8.16",
+    "nodemon": "latest",
+    "selenium-standalone": "^5.0.0",
     "webpack-dev-server": "1.10.1"
   }
 }
