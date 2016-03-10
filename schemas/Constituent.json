@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "Constituent",
+  "type": "object",
+  "properties": {
+    "id": {
+      "id": "id",
+      "type": "string"
+    },
+    "modified_dt": {
+      "id": "modified_dt",
+      "type": "string"
+    },
+    "firstname": {
+      "id": "firstname",
+      "type": "string"
+    },
+    "middlename": {
+      "id": "middlename",
+      "type": "string"
+    },
+    "lastname": {
+      "id": "lastname",
+      "type": "string"
+    },
+    "has_account": {
+      "id": "has_account",
+      "type": "string"
+    },
+    "is_banned": {
+      "id": "is_banned",
+      "type": "string"
+    },
+    "create_dt": {
+      "id": "create_dt",
+      "type": "string"
+    },
+    "prefix": {
+      "id": "prefix",
+      "type": "string"
+    },
+    "suffix": {
+      "id": "suffix",
+      "type": "string"
+    },
+    "gender": {
+      "id": "gender",
+      "type": "string"
+    },
+    "source": {
+      "id": "source",
+      "type": "string"
+    },
+    "subsource": {
+      "id": "subsource",
+      "type": "string"
+    },
+    "cons_addr": {
+      "id": "cons_addr",
+      "type": "array",
+      "items": []
+    },
+    "cons_phone": {
+      "id": "cons_phone",
+      "type": "array",
+      "items": []
+    },
+    "cons_email": {
+      "id": "cons_email",
+      "type": "array",
+      "items": {
+        "id": "0",
+        "type": "object",
+        "properties": {
+          "email": {
+            "id": "email",
+            "type": "string"
+          },
+          "email_type": {
+            "id": "email_type",
+            "type": "string"
+          },
+          "is_subscribed": {
+            "id": "is_subscribed",
+            "type": "string"
+          },
+          "is_primary": {
+            "id": "is_primary",
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
