@@ -5,6 +5,14 @@ node_js:
   - "4.0"
 env:
   - CXX=g++-4.8
+before_script:
+  - psql -c 'create database ground_control;' -U postgres
+  - psql -c "CREATE ROLE ground_control WITH LOGIN SUPERUSER;" -d ground_control
+  - psql -U postgres -c "CREATE EXTENSION postgis;"
+  - npm run migrate
+  - npm run seed
+after_script:
+  - codeclimate-test-reporter < lcov.info
 addons:
   apt:
     sources:
@@ -13,3 +21,6 @@ addons:
     - g++-4.8
   code_climate:
       repo_token: 2547a3526652c13e1519be7efaf7f277c545b774c93a7552845eef4781ae1a0e
+  postgresql: "9.3"
+services:
+  - postgresql
