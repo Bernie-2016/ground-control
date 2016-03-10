@@ -4714,62 +4714,14 @@
       "resolved": "https://registry.npmjs.org/growl/-/growl-1.8.1.tgz"
     },
     "handlebars": {
-      "version": "3.0.3",
-      "from": "https://registry.npmjs.org/handlebars/-/handlebars-3.0.3.tgz",
-      "resolved": "https://registry.npmjs.org/handlebars/-/handlebars-3.0.3.tgz",
+      "version": "4.0.5",
+      "from": "handlebars@4.0.5",
+      "resolved": "https://registry.npmjs.org/handlebars/-/handlebars-4.0.5.tgz",
       "dependencies": {
-        "optimist": {
-          "version": "0.6.1",
-          "from": "https://registry.npmjs.org/optimist/-/optimist-0.6.1.tgz",
-          "resolved": "https://registry.npmjs.org/optimist/-/optimist-0.6.1.tgz",
-          "dependencies": {
-            "minimist": {
-              "version": "0.0.10",
-              "from": "https://registry.npmjs.org/minimist/-/minimist-0.0.10.tgz",
-              "resolved": "https://registry.npmjs.org/minimist/-/minimist-0.0.10.tgz"
-            },
-            "wordwrap": {
-              "version": "0.0.3",
-              "from": "https://registry.npmjs.org/wordwrap/-/wordwrap-0.0.3.tgz",
-              "resolved": "https://registry.npmjs.org/wordwrap/-/wordwrap-0.0.3.tgz"
-            }
-          }
-        },
         "source-map": {
-          "version": "0.1.43",
-          "from": "https://registry.npmjs.org/source-map/-/source-map-0.1.43.tgz",
-          "resolved": "https://registry.npmjs.org/source-map/-/source-map-0.1.43.tgz",
-          "dependencies": {
-            "amdefine": {
-              "version": "1.0.0",
-              "from": "https://registry.npmjs.org/amdefine/-/amdefine-1.0.0.tgz",
-              "resolved": "https://registry.npmjs.org/amdefine/-/amdefine-1.0.0.tgz"
-            }
-          }
-        },
-        "uglify-js": {
-          "version": "2.3.6",
-          "from": "https://registry.npmjs.org/uglify-js/-/uglify-js-2.3.6.tgz",
-          "resolved": "https://registry.npmjs.org/uglify-js/-/uglify-js-2.3.6.tgz",
-          "dependencies": {
-            "async": {
-              "version": "0.2.10",
-              "from": "https://registry.npmjs.org/async/-/async-0.2.10.tgz",
-              "resolved": "https://registry.npmjs.org/async/-/async-0.2.10.tgz"
-            },
-            "optimist": {
-              "version": "0.3.7",
-              "from": "https://registry.npmjs.org/optimist/-/optimist-0.3.7.tgz",
-              "resolved": "https://registry.npmjs.org/optimist/-/optimist-0.3.7.tgz",
-              "dependencies": {
-                "wordwrap": {
-                  "version": "0.0.3",
-                  "from": "https://registry.npmjs.org/wordwrap/-/wordwrap-0.0.3.tgz",
-                  "resolved": "https://registry.npmjs.org/wordwrap/-/wordwrap-0.0.3.tgz"
-                }
-              }
-            }
-          }
+          "version": "0.4.4",
+          "from": "source-map@>=0.4.4 <0.5.0",
+          "resolved": "https://registry.npmjs.org/source-map/-/source-map-0.4.4.tgz"
         }
       }
     },
