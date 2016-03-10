@@ -1,3 +1,4 @@
+sudo: false
 language: node_js
 node_js:
   - "stable"
@@ -11,8 +12,6 @@ before_script:
   - psql -c "CREATE EXTENSION postgis;" -d ground_control
   - npm run migrate
   - npm run seed
-before_install:
-  - pip install codecov
 after_success:
   - codeclimate-test-reporter < lcov.info
   - codecov
