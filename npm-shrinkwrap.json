@@ -4511,8 +4511,7 @@
         },
         "minimatch": {
           "version": "2.0.10",
-          "from": "minimatch@>=2.0.0 <3.0.0",
-          "resolved": "https://registry.npmjs.org/minimatch/-/minimatch-2.0.10.tgz"
+          "from": "minimatch@>=2.0.0 <3.0.0"
         }
       }
     },
@@ -5080,6 +5079,11 @@
       "version": "0.0.1",
       "from": "isarray@0.0.1",
       "resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz"
+    },
+    "isexe": {
+      "version": "1.1.2",
+      "from": "isexe@>=1.1.1 <2.0.0",
+      "resolved": "https://registry.npmjs.org/isexe/-/isexe-1.1.2.tgz"
     },
     "isobject": {
       "version": "2.0.0",

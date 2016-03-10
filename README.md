@@ -1,5 +1,8 @@
 # Ground Control 
 
+![codecov.io](https://codecov.io/github/PhearZero/ground-control/branch.svg?branch=master)
+
+
 [![Build Status](https://travis-ci.org/PhearZero/ground-control.svg?branch=master)](https://travis-ci.org/PhearZero/ground-control)
 [![Code Climate](https://codeclimate.com/github/PhearZero/ground-control/badges/gpa.svg)](https://codeclimate.com/github/PhearZero/ground-control)
 [![Dependency Status](https://david-dm.org/PhearZero/ground-control.svg)](https://david-dm.org/PhearZero/ground-control/)
