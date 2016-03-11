@@ -11,6 +11,8 @@ import yup from 'yup'
 import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider'
 import {BernieTheme} from './styles/bernie-theme';
 
+const publicEventsRootUrl = 'https://secure.berniesanders.com/page/event/detail/'
+
 class FastFwdForm extends React.Component {
   styles = {
     detailsContainer: {
@@ -72,8 +74,10 @@ class FastFwdForm extends React.Component {
                             "Hello, neighbors!\n\nI'm hosting a " + event_type_name +
                             " and I need a few more Bernie supporters " +
                             "to attend to make this event a big success. " +
-                            "Will you please attend my event?\n\nThank you,\n\n" +
-                            this.props.event.host.firstName
+                            "Will you please attend my event?\n\n" +
+                            publicEventsRootUrl + this.props.event.eventIdObfuscated + "\n\n" +
+                            "Thank you,\n\n" +
+                            (this.props.event.host ? this.props.event.host.firstName: "")
 
     return (
       <MuiThemeProvider muiTheme={Styles.getMuiTheme(BernieTheme)}>

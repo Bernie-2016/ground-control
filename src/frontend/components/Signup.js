@@ -67,7 +67,7 @@ export default class Signup extends React.Component {
             if (!err) {
               this.redirectToNext();
             } else {
-              this.setState({errorMessage: 'Incorrect e-mail or password'});
+              this.setState({errorMessage: 'Email or password not recognized.'});
             }
           })
       }
@@ -82,10 +82,7 @@ export default class Signup extends React.Component {
       padding: '15px 15px 15px 15px'
     },
     paragraph: {
-      paddingTop: '0.5em',
-      paddingBottom: '0.5em',
-      paddingLeft: '0.5em',
-      paddingRight: '0.5em',
+      padding: '0.5em'
     },
     introContainer: {
       display: 'flex',
@@ -100,16 +97,14 @@ export default class Signup extends React.Component {
       width: '12em'
     },
     container: {
-      padding: 40,
-      paddingTop: 40,
-      paddingRight: 40,
-      paddingBottom: 40,
+      padding: '40px'
     },
     errorMessage: {
       ...BernieText.default,
-      color: BernieColors.red,
+      color: BernieColors.lightRed,
       fontSize: '0.8em',
-      marginTop: 15
+      marginTop: 15,
+      textAlign: 'center'
     }
   }
 
@@ -151,10 +146,12 @@ export default class Signup extends React.Component {
     let formTitle = signupState.formTitle;
     let formSchema = signupState.formSchema;
     let submitHandler = signupState.onSubmit;
-    let errorElement = <div></div>
+    let errorElement = <div></div>;
+    let passwordResetElement = <div></div>;
 
     if (this.state.errorMessage) {
-      errorElement = <div style={this.styles.errorMessage}>{this.state.errorMessage}</div>
+      errorElement = <div style={this.styles.errorMessage}>{this.state.errorMessage}</div>;
+      passwordResetElement = <div style={{...this.styles.errorMessage, marginTop: 0}}><a style={{color: BernieColors.lightRed}} target="_blank" href="https://secure.berniesanders.com/page/user/forgot">Click here to request a password reset</a></div>;
     }
 
     return (
@@ -173,6 +170,7 @@ export default class Signup extends React.Component {
           >
             {formTitle}
             {errorElement}
+            {passwordResetElement}
             <Paper zDepth={0} style={{
               padding: '15px 15px 15px 15px',
               marginTop: 15,

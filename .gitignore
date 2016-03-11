@@ -10,3 +10,4 @@ src/frontend/public/index.html
 *-compiled.js.map
 
 newrelic_agent.log
+.envrc

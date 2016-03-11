@@ -497,7 +497,13 @@ const GraphQLUser = new GraphQLObjectType({
         let query = knex('bsd_calls').where('caller_id', user.id)
 
         if (forAssignmentId) {
-          let localId = fromGlobalId(forAssignmentId).id
+
+          let localId = fromGlobalId(forAssignmentId)
+          if (localId.type !== 'CallAssignment')
+            localId = forAssignmentId
+          else
+            localId = localId.id
+
           query = query.where('call_assignment_id', localId)
         }
 
@@ -513,12 +519,17 @@ const GraphQLUser = new GraphQLObjectType({
         callAssignmentId: { type: GraphQLString }
       },
       resolve: async (user, {callAssignmentId}, {rootValue}) => {
-        let localId = fromGlobalId(callAssignmentId).id
+
+        let localCallAssignmentId = fromGlobalId(callAssignmentId)
+        if (localCallAssignmentId.type !== 'CallAssignment')
+          localCallAssignmentId = callAssignmentId
+        else
+          localCallAssignmentId = localCallAssignmentId.id
 
         await knex('bsd_assigned_calls')
           .where('caller_id', user.id)
           .delete()
-        let callAssignment = await rootValue.loaders.bsdCallAssignments.load(localId)
+        let callAssignment = await rootValue.loaders.bsdCallAssignments.load(localCallAssignmentId)
         let allOffsets = [-10, -9, -8, -7, -6, -5, -4]
         let validOffsets = []
         // So that I can program late at night
@@ -542,7 +553,7 @@ const GraphQLUser = new GraphQLObjectType({
           // Don't call people we have successfully canvassed
           .where(function() {
             this.where('completed', true)
-              .where('call_assignment_id', localId)
+              .where('call_assignment_id', localCallAssignmentId)
           })
           .orWhereIn('reason_not_completed', ['WRONG_NUMBER', 'DISCONNECTED_NUMBER', 'OTHER_LANGUAGE'])
           .orWhere(function() {
@@ -550,7 +561,7 @@ const GraphQLUser = new GraphQLObjectType({
               .where('attempted_at', '>', new Date(new Date() - 24 * 60 * 60 * 1000))
           })
           .orWhere(function() {
-            this.where('call_assignment_id', localId)
+            this.where('call_assignment_id', localCallAssignmentId)
               .where('reason_not_completed', 'NOT_INTERESTED')
           })
 
@@ -602,7 +613,7 @@ const GraphQLUser = new GraphQLObjectType({
           // Do this check again to avoid race conditions
           let assignedCall = await knex('bsd_assigned_calls').where({
             'caller_id': user.id,
-            'call_assignment_id': localId
+            'call_assignment_id': localCallAssignmentId
           }).first()
 
           if (assignedCall)
@@ -612,7 +623,7 @@ const GraphQLUser = new GraphQLObjectType({
             .insert({
               caller_id: user.id,
               interviewee_id: person.cons_id,
-              call_assignment_id: localId,
+              call_assignment_id: localCallAssignmentId,
               create_dt: timestamp,
               modified_dt: timestamp
           })
@@ -1401,7 +1412,12 @@ const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
 
     let caller = rootValue.user
     let localIntervieweeId = fromGlobalId(intervieweeId).id
-    let localCallAssignmentId = fromGlobalId(callAssignmentId).id
+
+    let localCallAssignmentId = fromGlobalId(callAssignmentId)
+    if (localCallAssignmentId.type !== 'CallAssignment')
+      localCallAssignmentId = callAssignmentId
+    else
+      localCallAssignmentId = localCallAssignmentId.id
 
     return knex.transaction(async (trx) => {
       // To ensure that the assigned call exists
@@ -1866,7 +1882,11 @@ let RootQuery = new GraphQLObjectType({
       },
       resolve: async (root, {id}, {rootValue}) => {
         authRequired(rootValue)
-        let localId = fromGlobalId(id).id
+        let localId = fromGlobalId(id)
+        if (localId.type !== 'CallAssignment')
+          localId = id
+        else
+          localId = localId.id
         return rootValue.loaders.bsdCallAssignments.load(localId)
       }
     },
