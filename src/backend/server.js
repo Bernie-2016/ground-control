@@ -191,15 +191,8 @@ function startApp() {
 
   function eventDataLoader() {
       return new DataLoader(async (keys) => {
-        let eventIds = keys.map((key) => {
-          return key.toString().match(/^\d+$/) ? key : null
-        }).filter((key) => key !== null)
-        let obfuscatedIds = keys.filter((key) => {
-          return eventIds.indexOf(key) === -1
-        })
-
         let rows = await knex('bsd_events')
-          .whereIn('event_id_obfuscated', obfuscatedIds)
+          .whereIn('event_id_obfuscated', keys)
         return keys.map((key) => {
           return rows.find((row) =>
             row['event_id'].toString() === key.toString() || row['event_id_obfuscated'] === key.toString()
