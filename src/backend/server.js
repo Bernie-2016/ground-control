@@ -158,8 +158,7 @@ function startApp() {
         })
 
         let rows = await knex('bsd_events')
-          .whereIn('event_id', eventIds)
-          .orWhereIn('event_id_obfuscated', obfuscatedIds)
+          .whereIn('event_id_obfuscated', obfuscatedIds)
         return keys.map((key) => {
           return rows.find((row) =>
             row['event_id'].toString() === key.toString() || row['event_id_obfuscated'] === key.toString()
