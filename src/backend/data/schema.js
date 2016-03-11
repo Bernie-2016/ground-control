@@ -1346,15 +1346,15 @@ const GraphQLEmailHostAttendees = mutationWithClientMutationId({
       for (let i = 0; i < attendeeIds.length; i++) {
         let attendee = await rootValue.loaders.bsdPeople.load(attendeeIds[i].attendee_cons_id);
         let recipient = await getPrimaryEmail(attendee)
-        recipients.push(recipient)
+        if (recipient)
+          recipients.push(recipient)
       }
     }
 
     const email = {
       from: 'info@berniesanders.com',
       'h:Reply-To': replyTo,
-      to: recipients,
-      bcc: replyTo,
+      bcc: [replyTo, ...recipients],
       subject: subject,
       text: message
     }
