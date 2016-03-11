@@ -1,11 +1,9 @@
 import React from 'react';
 import BernieLogo from './BernieLogo';
 import {BernieColors, BernieText} from './styles/bernie-css';
-import {BernieTheme} from './styles/bernie-theme';
 import {AppBar, Styles, Tabs, Tab} from 'material-ui';
 import superagent from 'superagent';
 
-@Styles.ThemeDecorator(Styles.ThemeManager.getMuiTheme(BernieTheme))
 export default class TopNav extends React.Component {
   static propTypes = {
     logoColors: React.PropTypes.shape({

@@ -12,7 +12,6 @@ const style = {
   marginLeft: 20,
 }
 
-@Styles.ThemeDecorator(Styles.ThemeManager.getMuiTheme(BernieTheme))
 class ConstituentLookup extends React.Component {
   constructor(props) {
     super(props)

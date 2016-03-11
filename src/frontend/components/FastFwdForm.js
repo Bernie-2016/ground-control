@@ -8,6 +8,8 @@ import EventPreview from './EventPreview'
 import MutationHandler from './MutationHandler'
 import CreateFastFwdRequest from '../mutations/CreateFastFwdRequest'
 import yup from 'yup'
+import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider'
+import {BernieTheme} from './styles/bernie-theme';
 
 class FastFwdForm extends React.Component {
   styles = {
@@ -74,47 +76,49 @@ class FastFwdForm extends React.Component {
                             this.props.event.host.firstName
 
     return (
-      <div style={this.styles.pageContainer}>
-        <MutationHandler ref='mutationHandler'
-                         successMessage='Your message has been saved.'
-                         mutationClass={CreateFastFwdRequest}
-                         mutationName='createFastFwdRequest' />
-        <div style={BernieText.title}>
-          Fast Fwd: Send a message to bring volunteers to your event
+      <MuiThemeProvider muiTheme={Styles.getMuiTheme(BernieTheme)}>
+        <div style={this.styles.pageContainer}>
+          <MutationHandler ref='mutationHandler'
+                           successMessage='Your message has been saved.'
+                           mutationClass={CreateFastFwdRequest}
+                           mutationName='createFastFwdRequest' />
+          <div style={BernieText.title}>
+            Fast Fwd: Send a message to bring volunteers to your event
+          </div>
+
+          <Paper zDepth={1} style={this.styles.detailsContainer}>
+            <p style={BernieText.secondaryTitle}>Your Event Details:</p>
+            <EventPreview event={this.props.event} />
+          </Paper>
+
+          <Paper zDepth={2} style={this.styles.formContainer}>
+            <GCForm
+              schema={this.formSchema}
+              defaultValue={{
+                hostMessage: this.props.event.hostMessage || defaultHostMessage
+              }}
+              onSubmit={(formValues) => {
+                this.refs.mutationHandler.send({
+                  eventId: this.props.event.id,
+                  ...formValues
+                })
+              }}
+            >
+              <p style={BernieText.inputLabel}>Author a message below about your event and why people should come out.
+                We'll forward it on to potential attendees in your area.</p>
+              <Form.Field
+                name='hostMessage'
+                multiLine={true}
+                rows={12}
+                label="Message From Host"
+              />
+              <br />
+              <br />
+              <Form.Button type='submit' label='Submit' fullWidth={true} />
+            </GCForm>
+          </Paper>
         </div>
-
-        <Paper zDepth={1} style={this.styles.detailsContainer}>
-          <p style={BernieText.secondaryTitle}>Your Event Details:</p>
-          <EventPreview event={this.props.event} />
-        </Paper>
-
-        <Paper zDepth={2} style={this.styles.formContainer}>
-          <GCForm
-            schema={this.formSchema}
-            defaultValue={{
-              hostMessage: this.props.event.hostMessage || defaultHostMessage
-            }}
-            onSubmit={(formValues) => {
-              this.refs.mutationHandler.send({
-                eventId: this.props.event.id,
-                ...formValues
-              })
-            }}
-          >
-            <p style={BernieText.inputLabel}>Author a message below about your event and why people should come out.
-              We'll forward it on to potential attendees in your area.</p>
-            <Form.Field
-              name='hostMessage'
-              multiLine={true}
-              rows={12}
-              label="Message From Host"
-            />
-            <br />
-            <br />
-            <Form.Button type='submit' label='Submit' fullWidth={true} />
-          </GCForm>
-        </Paper>
-      </div>
+      </MuiThemeProvider>
     )
   }
 }
