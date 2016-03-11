@@ -10,8 +10,8 @@ import {Card, CardActions, CardExpandable, CardTitle, CardHeader, CardText, Flat
 import InfoHeader from './InfoHeader'
 import {USTimeZones} from './data/USTimeZones';
 
-require('react-quill/node_modules/quill/dist/quill.base.css');
-require('react-quill/node_modules/quill/dist/quill.snow.css');
+require('quill/dist/quill.base.css');
+require('quill/dist/quill.snow.css');
 
 const momentWithOffset = (startDate, utcOffset) => {
   return moment(startDate).utcOffset(utcOffset)
