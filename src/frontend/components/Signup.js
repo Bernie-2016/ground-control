@@ -7,9 +7,9 @@ import Form from 'react-formal';
 import yup from 'yup';
 import superagent from 'superagent';
 import {Styles} from 'material-ui';
+import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider'
 import {BernieTheme} from './styles/bernie-theme';
 
-@Styles.ThemeDecorator(Styles.ThemeManager.getMuiTheme(BernieTheme))
 export default class Signup extends React.Component {
   state = {
     formState: 'signup',
@@ -197,6 +197,10 @@ export default class Signup extends React.Component {
   }
 
   render() {
-    return this.renderSplash();
+    return (
+      <MuiThemeProvider muiTheme={Styles.getMuiTheme(BernieTheme)}>
+        {this.renderSplash()}
+      </MuiThemeProvider>
+    )
   }
 }
