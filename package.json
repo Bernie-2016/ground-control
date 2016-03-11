@@ -77,6 +77,7 @@
     "pg-copy-streams": "^0.3.0",
     "phone-formatter": "0.0.2",
     "qs": "https://registry.npmjs.org/qs/-/qs-6.1.0.tgz",
+    "quill": "^0.20.1",
     "radium": "^0.14.3",
     "react": "^0.14.2",
     "react-dom": "^0.14.0",
