@@ -19,7 +19,7 @@
     "knex": "./node_modules/.bin/knex --knexfile ./src/backend/data/knexfile.js",
     "migrate": "./node_modules/.bin/knex migrate:latest --knexfile ./src/backend/data/knexfile.js",
     "seed": "./node_modules/.bin/knex seed:run --knexfile ./src/backend/data/knexfile.js",
-    "test": "./node_modules/.bin/babel-istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- tests/backend/ -R spec",
+    "test": "./node_modules/.bin/snyk test && ./node_modules/.bin/babel-istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- tests/backend/ -R spec",
     "prefrontendtest": "./node_modules/.bin/selenium-standalone install",
     "frontendtest": "./node_modules/.bin/nightwatch",
     "docs": "node lib/tests/aquit/testDocs.js && ./node_modules/.bin/esdoc -c esdoc.json",
@@ -96,6 +96,7 @@
     "request-promise": "^2.0.1",
     "retry": "^0.8.0",
     "rollbar": "^0.5.11",
+    "snyk": "^1.11.3",
     "style-loader": "^0.13.0",
     "superagent": "^1.4.0",
     "throng": "^1.0.1",
@@ -118,6 +119,7 @@
     "nightwatch": "^0.8.16",
     "nodemon": "latest",
     "selenium-standalone": "^5.0.0",
+    "snyk": "^1.11.3",
     "webpack-dev-server": "1.10.1"
   }
 }
