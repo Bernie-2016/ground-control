@@ -22,7 +22,7 @@
     "test": "./node_modules/.bin/snyk test && ./node_modules/.bin/babel-istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- tests/backend/ -R spec",
     "prefrontendtest": "./node_modules/.bin/selenium-standalone install",
     "frontendtest": "./node_modules/.bin/nightwatch",
-    "docs": "node lib/tests/aquit/testDocs.js && ./node_modules/.bin/esdoc -c esdoc.json",
+    "docs": "node lib/tests/acquit/testDocs.js && ./node_modules/.bin/esdoc -c esdoc.json",
     "job": "./run-job"
   },
   "dependencies": {
@@ -97,7 +97,6 @@
     "request-promise": "^2.0.1",
     "retry": "^0.8.0",
     "rollbar": "^0.5.11",
-    "snyk": "^1.11.3",
     "style-loader": "^0.13.0",
     "superagent": "^1.4.0",
     "throng": "^1.0.1",

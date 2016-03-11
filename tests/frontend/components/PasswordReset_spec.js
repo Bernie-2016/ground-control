@@ -7,21 +7,21 @@ var knex = Base.backend.Knex;
  * Automated Browser Tests
  */
 module.exports = new FrontEndTest(function (Test) {
-  var testUsers = [
-    {
-      email: "one@example.com",
-      passowrd: "one"
-    },
-    {
-      email: "two@example.com",
-      passowrd: "two"
-    },
-    {
-      email: "three@example.com",
-      passowrd: "three"
-    }
-
-  ];
+  //var testUsers = [
+  //  {
+  //    email: "one@example.com",
+  //    password: "one"
+  //  },
+  //  {
+  //    email: "two@example.com",
+  //    password: "two"
+  //  },
+  //  {
+  //    email: "three@example.com",
+  //    password: "three"
+  //  }
+  //
+  //];
 
 
   return {
