@@ -10,7 +10,11 @@ class AdminDashboard extends React.Component {
   tabs = [
     {
       value: '/admin/call-assignments',
-      label: 'Call Assignments'
+      label: 'Calls'
+    },
+    {
+      value: '/admin/constituent-lookup',
+      label: 'People'
     },
     {
       value: '/admin/events',
