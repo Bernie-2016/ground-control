@@ -82,10 +82,7 @@ export default class Signup extends React.Component {
       padding: '15px 15px 15px 15px'
     },
     paragraph: {
-      paddingTop: '0.5em',
-      paddingBottom: '0.5em',
-      paddingLeft: '0.5em',
-      paddingRight: '0.5em',
+      padding: '0.5em'
     },
     introContainer: {
       display: 'flex',
@@ -100,10 +97,7 @@ export default class Signup extends React.Component {
       width: '12em'
     },
     container: {
-      padding: 40,
-      paddingTop: 40,
-      paddingRight: 40,
-      paddingBottom: 40,
+      padding: '40px'
     },
     errorMessage: {
       ...BernieText.default,
