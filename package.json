@@ -107,6 +107,9 @@
     "xml2js": "^0.4.15",
     "yup": "^0.11.0"
   },
+  "optionalDependencies": {
+    "fsevents": "^1.0.8"
+  },
   "devDependencies": {
     "acquit": "^0.4.1",
     "babel-eslint": "latest",
