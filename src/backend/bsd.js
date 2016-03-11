@@ -4,7 +4,6 @@ import crypto from 'crypto';
 import querystring from 'querystring';
 import {parseString} from 'xml2js';
 import Promise from 'bluebird';
-import qs from 'querystring';
 import log from './log';
 import moment from 'moment-timezone';
 import knex from './data/knex';
@@ -373,7 +372,7 @@ export default class BSD {
       'guests': 0
     }
     let host = this.baseURL.protocol + '//' + this.baseURL.host
-    let URL = host + '/page/graph/addrsvp' + '?' + qs.stringify(params)
+    let URL = host + '/page/graph/addrsvp' + '?' + querystring.stringify(params)
 
     let options = {
       uri: URL,
