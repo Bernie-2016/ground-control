@@ -1,7 +1,7 @@
 import React from 'react'
 import Relay from 'react-relay'
 import {BernieColors, BernieText} from './styles/bernie-css'
-import {Paper, Slider, Toggle} from 'material-ui'
+import {Paper, Slider, Toggle, Styles} from 'material-ui'
 import GCForm from './forms/GCForm'
 import Form from 'react-formal'
 import EventPreview from './EventPreview'
