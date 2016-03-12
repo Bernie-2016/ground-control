@@ -77,7 +77,9 @@ export default class AdminEventUploadRsvps extends React.Component {
       .filter((key) => row[key])
       .map((key) => row[key])
 
-    row.event_id_obfuscated = [row.event_id_obfuscated, ...obfuscatedIds].join(',')
+    const event_id_obfuscated = [row.event_id_obfuscated, ...obfuscatedIds].join(',')
+    if (event_id_obfuscated)
+      row.event_id_obfuscated = event_id_obfuscated
 
     Object.keys(row).forEach((key) => {
       if (!this.allowedKeys.has(key))

@@ -1,7 +1,8 @@
 import React from 'react';
 import Relay from 'react-relay';
-import {List, ListItem, Styles} from 'material-ui';
+import {Subheader, List, ListItem, Styles} from 'material-ui';
 import moment from 'moment';
+import {BernieColors} from './styles/bernie-css';
 
 export class CallAssignmentList extends React.Component {
   static propTypes = {
@@ -28,7 +29,13 @@ export class CallAssignmentList extends React.Component {
 
   render() {
     return (
-      <List subheader={this.props.subheader}>
+      <List>
+        <div style={{
+          color: BernieColors.gray,
+          marginLeft: 15
+        }}>
+          {this.props.subheader}
+        </div>
         {this.renderCallAssignments()}
       </List>
     );

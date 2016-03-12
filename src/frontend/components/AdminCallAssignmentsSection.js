@@ -14,7 +14,7 @@ class AdminCallAssignmentAdmin extends React.Component {
         <RaisedButton label="Create Assignment"
           fullWidth={true}
           primary={true}
-          onTouchTap={() => this.props.history.push('/admin/call-assignments/create')}
+          onTouchTap={() => this.props.history.push('/admin/call-assignments')}
         />
         <CallAssignmentList
           callAssignments={this.props.listContainer.callAssignments}

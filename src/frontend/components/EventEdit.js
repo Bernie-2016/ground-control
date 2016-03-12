@@ -10,12 +10,8 @@ import {Card, CardActions, CardExpandable, CardTitle, CardHeader, CardText, Flat
 import InfoHeader from './InfoHeader'
 import {USTimeZones} from './data/USTimeZones';
 
-require('react-quill/node_modules/quill/dist/quill.base.css');
-require('react-quill/node_modules/quill/dist/quill.snow.css');
-
-const momentWithOffset = (startDate, utcOffset) => {
-  return moment(startDate).utcOffset(utcOffset)
-};
+require('quill/dist/quill.base.css');
+require('quill/dist/quill.snow.css');
 
 class EventEdit extends React.Component {
 
@@ -85,7 +81,7 @@ class EventEdit extends React.Component {
         .nullable(),
 
       startDate: yup.date()
-        .default(momentWithOffset(event.startDate, event.localUTCOffset).toDate())
+        .default(event.startDate)
         .required(),
 
       localTimezone: yup.string()
@@ -202,8 +198,15 @@ class EventEdit extends React.Component {
 
         <Form.Field
           name='startDate'
-          label='Start Date/Time'
-          type='datetime'
+          label='Start Date'
+          type='date'
+          utcOffset={event.localUTCOffset}
+        />
+
+        <Form.Field
+          name='startDate'
+          label='Start Time'
+          type='time'
           utcOffset={event.localUTCOffset}
         />
 

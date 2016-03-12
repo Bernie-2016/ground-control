@@ -9,7 +9,7 @@ import {Table, Column, ColumnGroup, Cell} from 'fixed-data-table'
 import {BernieText, BernieColors} from './styles/bernie-css'
 import moment from 'moment'
 import json2csv from 'json2csv'
-import qs from 'qs'
+import qs from 'querystring'
 import {states} from './data/states'
 import {USTimeZones} from './data/USTimeZones'
 
@@ -145,6 +145,7 @@ class AdminEventsSection extends React.Component {
       selectedRows: [],
       indexesMarkedForDeletion: [],
       activeEventIndex: null,
+      activeEvent: null,
       previewTabIndex: 0,
       userMessage: '',
       deletionConfirmationMessage: null,
@@ -1102,7 +1103,10 @@ ${signature}`
   }
 
   _handleSendEmail = (eventIndex) => {
-    this.setState({showSendEventEmailDialog: true, activeEventIndex: eventIndex})
+    this.setState({
+      showSendEventEmailDialog: true,
+      activeEvent: events[eventIndex].node
+    })
   }
 
   _handleFastForwardRequest = (eventIndex) => {
@@ -1256,7 +1260,7 @@ ${signature}`
       />
       <SendEventMail
         currentUser={this.props.currentUser}
-        event={this.state.activeEventIndex ? events[this.state.activeEventIndex].node : null}
+        event={this.state.activeEvent}
         open={this.state.showSendEventEmailDialog}
         onRequestClose={() => {
           this.setState({showSendEventEmailDialog: false})

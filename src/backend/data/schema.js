@@ -663,10 +663,11 @@ const GraphQLAddress = new GraphQLObjectType({
     latitude: { type: GraphQLFloat },
     longitude: { type: GraphQLFloat },
     localUTCOffset: {
-      type: GraphQLString,
+      type: GraphQLInt,
       resolve: async (address) => {
         let tz = TZLookup(address.latitude, address.longitude)
-        return moment().tz(tz).format('Z')
+        tz = moment().tz(tz);
+        return tz ? tz.utcOffset() : 0
       }
     },
     people: {
@@ -899,10 +900,10 @@ const GraphQLEvent = new GraphQLObjectType({
       }
     },
     localUTCOffset: {
-      type: GraphQLString,
+      type: GraphQLInt,
       resolve: (event) => {
         let tz = moment().tz(event.start_tz);
-        return tz ? tz.format('Z') : '+0000'
+        return tz ? tz.utcOffset() : 0
       }
     },
     startDate: {
@@ -1346,15 +1347,16 @@ const GraphQLEmailHostAttendees = mutationWithClientMutationId({
       for (let i = 0; i < attendeeIds.length; i++) {
         let attendee = await rootValue.loaders.bsdPeople.load(attendeeIds[i].attendee_cons_id);
         let recipient = await getPrimaryEmail(attendee)
-        recipients.push(recipient)
+        if (recipient)
+          recipients.push(recipient)
       }
     }
 
     const email = {
       from: 'info@berniesanders.com',
       'h:Reply-To': replyTo,
-      to: recipients,
-      bcc: replyTo,
+      to: 'info@berniesanders.com',
+      bcc: [replyTo, ...recipients],
       subject: subject,
       text: message
     }

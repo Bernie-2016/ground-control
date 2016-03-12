@@ -10,7 +10,7 @@ class SendEventMail extends React.Component {
 
     this.state = {
       target: 'HOST',
-      replyTo: this.props.currentUser.email,
+      replyTo: 'info@berniesanders.com',
       subject: '',
       message: ''
     }
