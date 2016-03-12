@@ -368,21 +368,29 @@ function startApp() {
   		res.json(response.body)
   	}
 
+    const getShiftsAndRSVP = (idType='event_id_obfuscated') => {
+      log.info('running', req.query)
+      const eventIds = req.query[idType].split(',')
+      eventIds.forEach(async (eventId) => {
+        if (!eventId)
+          return
+        const shift = await knex('bsd_event_shifts')
+          .join('bsd_events', 'bsd_event_shifts.event_id', 'bsd_events.event_id')
+          .where(`bsd_events.${idType}`, eventId)
+          .orderBy('bsd_event_shifts.start_dt', 'asc')
+          .first()
+        if (shift)
+          req.query.shift_ids = shift.event_shift_id
+        req.query[idType] = eventId
+        makeRequest(req.query)
+      })
+    }
+
     if (req.query.event_id_obfuscated){
-    	const eventIds = req.query.event_id_obfuscated.split(',')
-    	eventIds.forEach(async (eventId) => {
-    		if (!eventId)
-    			return
-    		const shift = await knex('bsd_event_shifts')
-    			.join('bsd_events', 'bsd_event_shifts.event_id', 'bsd_events.event_id')
-    			.where('bsd_events.event_id_obfuscated', eventId)
-    			.orderBy('bsd_event_shifts.start_dt', 'asc')
-    			.first()
-    		if (shift)
-    			req.query.shift_ids = shift.event_shift_id
-    		req.query.event_id_obfuscated = eventId
-    		makeRequest(req.query)
-    	})
+      getShiftsAndRSVP()
+    }
+    else if (req.query.event_id){
+      getShiftsAndRSVP('event_id')
     }
     else
     	makeRequest(req.query)
