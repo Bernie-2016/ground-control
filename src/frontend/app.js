@@ -16,6 +16,7 @@ import ConstituentLookup from './components/ConstituentLookup';
 import AdminCallAssignmentsSection from './components/AdminCallAssignmentsSection';
 import AdminCallAssignmentCreationForm from './components/AdminCallAssignmentCreationForm';
 import FastFwdForm from './components/FastFwdForm';
+import EventsDashboard from './components/EventsDashboard';
 import GCTextField from './components/forms/GCTextField';
 import GCPhoneField from './components/forms/GCPhoneField';
 import GCDateField from './components/forms/GCDateField';
@@ -198,6 +199,13 @@ ReactDOM.render(
           renderLoading={() => <Loading />}
         />
       </Route>
+      <Route
+        path='events'
+        component={EventsDashboard}
+        queries={{
+          ...ListContainerQueries
+        }}
+      />
     </Route>
     <Route
       path='/event/:id/request_email'
