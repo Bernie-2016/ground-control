@@ -1,9 +1,11 @@
 import React from 'react'
 import Dropzone from 'react-dropzone';
 import {BernieText, BernieColors} from './styles/bernie-css'
+import {RaisedButton} from 'material-ui'
 import Papa from 'papaparse'
 import qs from 'querystring'
 import superagent from 'superagent'
+import downloadCSV from '../helpers/downloadCSV'
 
 export default class AdminEventUploadRsvps extends React.Component {
   styles = {
@@ -19,7 +21,8 @@ export default class AdminEventUploadRsvps extends React.Component {
       borderStyle: 'dashed',
       borderRadius: 5,
       position: 'relative',
-      textAlign: 'center'
+      textAlign: 'center',
+      overflow: 'scroll'
     },
     dropzoneActiveStyle: {
       borderStyle: 'solid',
@@ -41,35 +44,83 @@ export default class AdminEventUploadRsvps extends React.Component {
     filesProcessed: {},
   }
 
-  createRSVPs(data, fileName) {
-    if (data.length === 0)
-      return;
+  allowedKeys = new Set([
+    'event_id',
+    'event_id_obfuscated',
+    'will_attend',
+    'guid',
+    'email',
+    'zip',
+    'country',
+    'shift_ids',
+    'phone',
+    'employer',
+    'occupation',
+    'addr1',
+    'addr2',
+    'addr3',
+    'city',
+    'comment',
+    // 'firstname', // not sure why first and last name don't work, but they're also not immediately necessary
+    'guests',
+    'is_potential_volunteer',
+    'is_reminder_sent',
+    // 'lastname',
+    'pledge_amt',
+    'pledge_method',
+    'state_cd',
+    'zip_4'
+  ])
 
-    let row = data[0]
-    delete row['firstname']
-    delete row['lastname']
+  createRSVPs(row, fileName, [...eventIdKeys]) {
+    const obfuscatedIds = eventIdKeys
+      .filter((key) => row[key])
+      .map((key) => row[key])
+
+    const event_id_obfuscated = [row.event_id_obfuscated, ...obfuscatedIds].join(',')
+    if (event_id_obfuscated)
+      row.event_id_obfuscated = event_id_obfuscated
+
+    Object.keys(row).forEach((key) => {
+      if (!this.allowedKeys.has(key))
+        delete row[key]
+    })
     let url = `/events/add-rsvp?${qs.stringify(row)}`
 
-    superagent.get(url, (err, res) => {
+    superagent.post(url, (err, res) => {
       let filesProcessed = this.state.filesProcessed
       let processObj = filesProcessed[fileName]
       processObj.processedRows += 1
 
+      console.log(res.body)
+
       if (err) {
-        processObj.errors.push(JSON.stringify(row))
+        processObj.errors.push(res.body)
       }
       filesProcessed[fileName] = processObj
       this.setState(filesProcessed)
-      this.createRSVPs(data.slice(1), fileName)
     })
   }
 
   onDrop = (files) => {
+    let eventIdKeys
+    const transformFields = (chunk) => {
+      eventIdKeys = new Set(chunk.match(/(Event\s\d+\sID)/g))
+
+      return chunk
+        .replace(/Email Address/i, 'email')
+        .replace(/First Name/i, 'firstname')
+        .replace(/Last Name/i, 'lastname')
+        .replace(/Phone Number/i, 'phone')
+        .replace(/Zip/i, 'zip')
+        .replace(/DWID/i, 'guid')
+    }
+
     files.forEach((file) => {
       let reader = new FileReader();
       reader.onload = (e) => {
         let text = reader.result;
-        let data = Papa.parse(text, {header: true}).data
+        let data = Papa.parse(text, {header: true, beforeFirstChunk: transformFields}).data
         let processObj = {
           totalRows: data.length,
           processedRows: 0,
@@ -78,7 +129,10 @@ export default class AdminEventUploadRsvps extends React.Component {
         let currentFiles = this.state.filesProcessed
         currentFiles[file.name] = processObj
         this.setState({filesProcessed: currentFiles})
-        this.createRSVPs(data, file.name)
+
+        for (let i=0; i<data.length; i++){
+          this.createRSVPs(data[i], file.name, eventIdKeys)
+        }
       }
       reader.readAsText(file, 'utf8');
     })
@@ -87,27 +141,50 @@ export default class AdminEventUploadRsvps extends React.Component {
   renderFileProgress() {
     let count = 0
     let renderErrors = (fileObj) => {
-      console.log(fileObj.errors)
       if (fileObj.errors.length === 0)
         return <div></div>
       return (
         <div style={{
           ...BernieText.default,
           borderTop: '1px solid ' + BernieColors.red,
-          color: BernieColors.red,
           fontSize: '0.5em',
           paddingLeft: 10,
           width: 470,
-          overflow: 'scroll'
         }}>
           {fileObj.errors.map((error) => {
             return (
               <div>
-                {error}
+                {`${error.email}, Zip: ${error.zip}, Phone: ${error.phone}`}
+                <br />
+                <span style={{color: BernieColors.red}}>{error.error}</span>
+                <hr />
               </div>
             )
           })}
         </div>
+      )
+    }
+    let renderDownloadErrors = (fileObj, fileName) => {
+      if (fileObj.errors.length === 0)
+        return <div></div>
+      return (
+        <RaisedButton
+          label="Download & Fix Errors"
+          primary={true}
+          style={{marginTop: '1em', marginBottom: '1em'}}
+          onTouchTap={() => {
+            const csv = Papa.unparse(fileObj.errors)  
+
+            // modify file name to include 'errors'
+            fileName = fileName.split('.')
+            const fileExtension = fileName[fileName.length - 1]
+            fileName[fileName.length - 1] = 'errors'
+            fileName.push(fileExtension)  
+
+            // download the file
+            downloadCSV(csv, fileName.join('.'))
+          }}
+        />
       )
     }
     let fileNodes = Object.keys(this.state.filesProcessed).map((fileName) => {
@@ -125,11 +202,12 @@ export default class AdminEventUploadRsvps extends React.Component {
             {fileName}: {fileObj.processedRows}/{fileObj.totalRows}
             {renderErrors(fileObj)}
           </div>
+          {renderDownloadErrors(fileObj, fileName)}
         </div>
       )
     })
     return (
-      <div style={{marginTop: 20}}>
+      <div>
         {fileNodes}
       </div>
     )
@@ -142,15 +220,19 @@ export default class AdminEventUploadRsvps extends React.Component {
           onDrop={this.onDrop}
           style={this.styles.dropzoneStyle}
           activeStyle={this.styles.dropzoneActiveStyle}
-          rejectStyle={this.styles.dropzoneRejectStyle}>
+          rejectStyle={this.styles.dropzoneRejectStyle}
+          disableClick={true}
+        >
           <div style={{
             paddingTop: 20,
             paddingBottom: 20,
             borderBottom: '1px dashed ' + BernieColors.green
           }}>
-            <div style={{...BernieText.title, fontSize: '1.2em', color: BernieColors.green}}>Drop your CSVs of RSVPs here!</div>
+            <div style={{...BernieText.title, fontSize: '1.2em', color: BernieColors.green}}>
+              Drop your CSVs of RSVPs here!
+            </div>
             <div style={{...BernieText.default, fontSize: '0.65em'}}>
-            CSV with column headers - any of the values under "Query Parameters" <a href="https://www.bluestatedigital.com/page/api/doc#----------------------graph-addrsvp-----------------">here</a>.
+              CSV with column headers - any of the values under "Query Parameters" <a href="https://www.bluestatedigital.com/page/api/doc#----------------------graph-addrsvp-----------------" target="_blank">here</a>.
             </div>
           </div>
           {this.renderFileProgress()}

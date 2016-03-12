@@ -7,9 +7,9 @@ import Form from 'react-formal';
 import yup from 'yup';
 import superagent from 'superagent';
 import {Styles} from 'material-ui';
+import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider'
 import {BernieTheme} from './styles/bernie-theme';
 
-@Styles.ThemeDecorator(Styles.ThemeManager.getMuiTheme(BernieTheme))
 export default class Signup extends React.Component {
   state = {
     formState: 'signup',
@@ -23,7 +23,7 @@ export default class Signup extends React.Component {
   redirectToNext() {
     let queryDict = {};
     location.search.substr(1).split("&").forEach((item) => {
-      queryDict[item.split("=")[0]] = item.split("=")[1]
+      queryDict[item.split("=")[0]] = item.split("=").slice(1).join('=')
     })
     this.props.history.push(queryDict.next || '/call')
   }
@@ -40,6 +40,8 @@ export default class Signup extends React.Component {
           <Form.Field
             name='email'
             label='E-mail Address'
+            hintText='Email'
+            type='email'
             floatingLabelText={false}
           />
           <br />
@@ -47,6 +49,7 @@ export default class Signup extends React.Component {
             name='password'
             type='password'
             label='Password'
+            hintText='Password'
             floatingLabelText={false}
           />
           <br />
@@ -64,7 +67,7 @@ export default class Signup extends React.Component {
             if (!err) {
               this.redirectToNext();
             } else {
-              this.setState({errorMessage: 'Incorrect e-mail or password'});
+              this.setState({errorMessage: 'Email or password not recognized.'});
             }
           })
       }
@@ -79,10 +82,7 @@ export default class Signup extends React.Component {
       padding: '15px 15px 15px 15px'
     },
     paragraph: {
-      paddingTop: '0.5em',
-      paddingBottom: '0.5em',
-      paddingLeft: '0.5em',
-      paddingRight: '0.5em',
+      padding: '0.5em'
     },
     introContainer: {
       display: 'flex',
@@ -97,16 +97,14 @@ export default class Signup extends React.Component {
       width: '12em'
     },
     container: {
-      padding: 40,
-      paddingTop: 40,
-      paddingRight: 40,
-      paddingBottom: 40,
+      padding: '40px'
     },
     errorMessage: {
       ...BernieText.default,
-      color: BernieColors.red,
+      color: BernieColors.lightRed,
       fontSize: '0.8em',
-      marginTop: 15
+      marginTop: 15,
+      textAlign: 'center'
     }
   }
 
@@ -119,17 +117,14 @@ export default class Signup extends React.Component {
               ...BernieText.secondaryTitle,
               display: 'block'
             }}>
-              Make Calls
+              Organize
             </div>
             <div style={BernieText.title}>
               It takes a nation of millions to move us forward
             </div>
             <div style={BernieText.default}>
               <p style={this.styles.paragraph}>
-                Bernie has said time and time again that the only way to bring about meaningful change in the White House is if millions of us get involved.  We know that making one-on-one calls is the most effective way to mobilize people, and we need your help making it happen.
-                </p>
-                <p style={this.styles.paragraph}>
-                  Once you sign up, we'll post assignments regularly.  You will be talking to people who have already signed up to be a part of this campaign - your job is to make sure everyone is able to live up to their potential. With your help, we can grow this into a movement of millions.
+                Bernie has said time and time again that the only way to bring about meaningful change in the White House is if all of us stand up and say enough is enough.
                 </p>
 
                 <p style={this.styles.paragraph}>
@@ -151,10 +146,12 @@ export default class Signup extends React.Component {
     let formTitle = signupState.formTitle;
     let formSchema = signupState.formSchema;
     let submitHandler = signupState.onSubmit;
-    let errorElement = <div></div>
+    let errorElement = <div></div>;
+    let passwordResetElement = <div></div>;
 
     if (this.state.errorMessage) {
-      errorElement = <div style={this.styles.errorMessage}>{this.state.errorMessage}</div>
+      errorElement = <div style={this.styles.errorMessage}>{this.state.errorMessage}</div>;
+      passwordResetElement = <div style={{...this.styles.errorMessage, marginTop: 0}}><a style={{color: BernieColors.lightRed}} target="_blank" href="https://secure.berniesanders.com/page/user/forgot">Click here to request a password reset</a></div>;
     }
 
     return (
@@ -173,6 +170,7 @@ export default class Signup extends React.Component {
           >
             {formTitle}
             {errorElement}
+            {passwordResetElement}
             <Paper zDepth={0} style={{
               padding: '15px 15px 15px 15px',
               marginTop: 15,
@@ -199,6 +197,10 @@ export default class Signup extends React.Component {
   }
 
   render() {
-    return this.renderSplash();
+    return (
+      <MuiThemeProvider muiTheme={Styles.getMuiTheme(BernieTheme)}>
+        {this.renderSplash()}
+      </MuiThemeProvider>
+    )
   }
 }

@@ -26,6 +26,7 @@ import fs from 'fs'
 import handlebars from 'handlebars'
 import throng from 'throng'
 import compression from 'compression'
+import rp from 'request-promise'
 
 const WORKERS = process.env.WEB_CONCURRENCY || 1
 
@@ -109,29 +110,70 @@ function startApp() {
       passReqToCallback: true
     },
     wrap(async (req, email, password, done) => {
+      let bsdUser = await BSDClient.getConstituentByEmail(email);
       let user = await knex('users')
         .where('email', email.toLowerCase())
-        .first()
+        .first();
 
-      if (!user || user.password === null) {
-        let hashedPassword = await hash(password)
+      //Create password
+      let hashedPassword = await hash(password)
+      //Check bsdCredentials
+      let bsdCredentialsResponse = await BSDClient.checkCredentials(email, password)
+      let bsdCredentialsValid = (typeof bsdCredentialsResponse === 'object' && bsdCredentialsResponse.api.cons)
 
+      //If BSD credentials are incorrect, give error message with a link to reset password via BSD
+      if (bsdUser && !bsdCredentialsValid) {
+        return done(null, false, {
+          message: 'Incorrect password.',
+          "url": "https://www.bluestatedigital.com/ctl/Core/AdminResetPass"
+        });
+      }
+
+      //If BSD constituent does not exist, create a new BSD constituent AND ground-control user with those credentials
+      else if (!bsdUser &&(!user || user.password === null)) {
+
+        //Create a new BSD User
+        let newBSDUser = await BSDClient.createConstituent(email);
+
+        //Set the new BSD User's password
+        await BSDClient.setConstituentPassword(email, password);
+
+        //Create a new GC User
         if (!user) {
           let newUser = await knex.insertAndFetch('users', {
             email: email.toLowerCase(),
             password: hashedPassword
-          })
-
+          });
+          //Finished, return the new GC user
           return done(null, newUser)
-        } else {
+        }
+        //Update existing GC User that has a null password
+        else {
           await knex('users')
             .where('email', email.toLowerCase())
-            .update({password: hashedPassword})
+            .update({password: hashedPassword});
 
           return done(null, user)
         }
-      } else if (!await compare(password, user.password)) {
-        return done(null, false, { message: 'Incorrect password.' })
+      }
+      // If same credentials, create a new ground-control user with those credentials
+      else if (bsdCredentialsValid) {
+        if (!user) {
+          let newUser = await knex.insertAndFetch('users', {
+            email: email.toLowerCase(),
+            password: hashedPassword
+          });
+        }
+
+        // If account credentials are correct but the password for ground-control is incorrect, update the ground-control password and log in
+        else if (!await compare(password, user.password)) {
+          await knex('users')
+            .where('email', email.toLowerCase())
+            .update({password: hashedPassword});
+
+          return done(null, user)
+        }
+
       }
 
       return done(null, user)
@@ -149,16 +191,8 @@ function startApp() {
 
   function eventDataLoader() {
       return new DataLoader(async (keys) => {
-        let eventIds = keys.map((key) => {
-          return key.toString().match(/^\d+$/) ? key : null
-        }).filter((key) => key !== null)
-        let obfuscatedIds = keys.filter((key) => {
-          return eventIds.indexOf(key) === -1
-        })
-
         let rows = await knex('bsd_events')
-          .whereIn('event_id', eventIds)
-          .orWhereIn('event_id_obfuscated', obfuscatedIds)
+          .whereIn('event_id_obfuscated', keys)
         return keys.map((key) => {
           return rows.find((row) =>
             row['event_id'].toString() === key.toString() || row['event_id_obfuscated'] === key.toString()
@@ -315,15 +349,51 @@ function startApp() {
     res.redirect('https://script.google.com/macros/s/AKfycbwVZHnRZ5CJkzFID91QYcsLNFLkPgstd7XjS9o1QSEAh3tC2vY/exec')
   }))
 
-  app.get('/events/add-rsvp', wrap(async(req, res) => {
-    let response = null
-    try {
-      response = await BSDClient.addRSVPToEvent(req.query)
-    } catch(ex) {
-      res.status(400).send(ex.toString())
-      return;
+  app.get('/nda', wrap(async (req, res) => {
+    res.redirect('https://docs.google.com/forms/d/1cyoAcumEd4Co5Fqj9pOUnQtIUo_rfRzQ7oVqACFe5Rs/viewform')
+  }))
+
+  app.post('/events/add-rsvp', wrap(async(req, res) => {
+  	const makeRequest = async (query) => {
+  		log.debug(query)
+  		let response = null
+  		try {
+  		  response = await BSDClient.addRSVPToEvent(query)
+  		} catch(ex) {
+  			query.error = JSON.parse(ex.message).error_description || ex.toString()
+  		  res.status(400).json(query)
+  		  log.error(ex)
+  		  return
+  		}
+  		res.json(response.body)
+  	}
+
+    const getShiftsAndRSVP = (idType='event_id_obfuscated') => {
+      log.info('running', req.query)
+      const eventIds = req.query[idType].split(',')
+      eventIds.forEach(async (eventId) => {
+        if (!eventId)
+          return
+        const shift = await knex('bsd_event_shifts')
+          .join('bsd_events', 'bsd_event_shifts.event_id', 'bsd_events.event_id')
+          .where(`bsd_events.${idType}`, eventId)
+          .orderBy('bsd_event_shifts.start_dt', 'asc')
+          .first()
+        if (shift)
+          req.query.shift_ids = shift.event_shift_id
+        req.query[idType] = eventId
+        makeRequest(req.query)
+      })
     }
-    res.send(response.body)
+
+    if (req.query.event_id_obfuscated){
+      getShiftsAndRSVP()
+    }
+    else if (req.query.event_id){
+      getShiftsAndRSVP('event_id')
+    }
+    else
+    	makeRequest(req.query)
   }))
 
   app.post('/events/create', wrap(async (req, res) => {
@@ -335,15 +405,25 @@ function startApp() {
     const eventIdMap = {
       'volunteer-meeting': { id: 24, staffOnly: false },
       'ballot-access': { id: 30, staffOnly: false },
-      'phonebank': { id: 31, staffOnly: false },
-      'canvass': { id: 32, staffOnly: false },
+      'phonebank': { id: 31, staffOnly: false, requirePhone: true },
+      'canvass': { id: 32, staffOnly: false, requirePhone: true },
       'barnstorm': { id: 41, staffOnly: false },
-      'carpool-to-nevada': { id: 39, staffOnly: false },
-      'carpool': { id: 39, staffOnly: false },
+      'carpool-to-nevada': { id: 39, staffOnly: false, requirePhone: true },
+      'carpool': { id: 39, staffOnly: false, requirePhone: true },
       'official-barnstorm': { id: 41, staffOnly: true },
-      'get-out-the-vote': { id: 45, staffOnly: false },
+      'get-out-the-vote': { id: 45, staffOnly: false, requirePhone: true },
       'vol2vol': { id: 47, staffOnly: true },
       'rally': { id: 14, staffOnly: true },
+    }
+
+    if (form['event_type_id'] === 'canvass'){
+      const result = await rp('https://sheetsu.com/apis/bd810a50')
+      const organizerArray = JSON.parse(result).result
+      const organizers = organizerArray.filter((organizer) => (organizer.State === form['venue_state_cd']))
+      if (organizers.length <= 0)
+        res.status(400).send({errors: {
+          'Event Type' : [`Canvasses are not yet supported in ${form['venue_state_cd']}. Please feel free to sign up host another event type!`]
+        }})
     }
 
     // Flag event as needing approval
@@ -366,27 +446,25 @@ function startApp() {
       return
     }
 
-    // Require phone number for RSVPs to phonebanks
-    if (form['event_type_id'] === 'phonebank' || form['event_type_id'] === 'carpool-to-nevada') {
-      form['attendee_require_phone'] = 1;
-    }
-
-    let src = null
+    let src = 'unknown source'
     if (req.headers && req.headers.referer) {
       src = req.headers.referer.split(req.headers.origin)
       if (src)
         src = src[1]
     }
-
     if (!src) {
       // Sometimes the above results in undefined.
       // The sourceurl header is set from the client, so we don't necessarily want to trust it.
       src = req.headers.sourceurl;
       log.debug('Missing header data', req.headers);
     }
-
     if (!src)
       src = 'unknown source'
+
+    // Require phone number for RSVPs to phonebanks
+    if (eventIdMap[form['event_type_id']].requirePhone) {
+      form['attendee_require_phone'] = 1;
+    }
 
     form['event_dates'] = JSON.parse(form[ 'event_dates' ])
     let dateCount = form['event_dates'].length
@@ -397,6 +475,7 @@ function startApp() {
       }})
       return
     }
+
     form['event_type_id'] = isNaN(form['event_type_id']) ? String(eventIdMap[form['event_type_id']].id) : String(form['event_type_id'])
     if (process.env.NODE_ENV === 'development')
       form['event_type_id'] = '1'
@@ -422,18 +501,34 @@ function startApp() {
 
     form['creator_cons_id'] = constituent.id
 
+    // Use time/duration or shifts
     let startHour = null
-    if (form['start_time']['a'] == 'pm') {
-      startHour = Number(form['start_time']['h']) + 12
-    } else {
-      startHour = form['start_time']['h']
+    if (form['use_shifts']){
+      startHour = (form['start_time']['a'][0] == 'pm') ? Number(form['start_time']['h'][0]) + 12 : form['start_time']['h'][0];
+      form['days'] = [];
+      form['days'].push({})
+      form['days'][0]['shifts'] = form['start_time']['h'].map((item, index) => {
+        return ({
+          start_time: `${(form['start_time']['a'][index] == 'pm') ? Number(form['start_time']['h'][index]) + 12 : form['start_time']['h'][index]}:${form['start_time']['i'][index]}:00`,
+          end_time: `${(form['end_time']['a'][index] == 'pm') ? Number(form['end_time']['h'][index]) + 12 : form['end_time']['h'][index]}:${form['end_time']['i'][index]}:00`,
+          capacity: form['capacity']
+        })
+      })
     }
+    else
+      startHour = (form['start_time']['a'] == 'pm') ? Number(form['start_time']['h']) + 12 : form['start_time']['h']
 
     let createdEventIds = []
 
     for (let index = 0; index < dateCount; index++) {
       let result = null
-
+      if (form.hasOwnProperty('days')){
+        if (form['use_shifts'])
+          form.days[0].start_datetime_system = `${form['event_dates'][index]['date']} ${startHour}:${form['start_time']['i'][0]}:00`
+        else
+          form.days[0].start_datetime_system = `${form['event_dates'][index]['date']} ${startHour}:${form['start_time']['i']}:00`
+      }
+      log.info(form)
       try {
         result = await BSDClient.createEvent({
           ...form,

@@ -1,0 +1,7 @@
+#!/usr/bin/env node
+require('babel/register');
+require('dotenv').config()
+
+var job_module = require('./src/jobs/jobs/' + process.argv[2]);
+
+job_module.job();

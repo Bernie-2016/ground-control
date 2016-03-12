@@ -3,12 +3,13 @@ import ReactDOM from 'react-dom'
 import Relay from 'react-relay'
 import EventPreview from './EventPreview'
 import EventEdit from './EventEdit'
+import SendEventMail from './SendEventMail'
 import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle, SelectField, DropDownMenu, DropDownIcon, Dialog, Tabs, Tab, FlatButton, RaisedButton, IconButton, FontIcon, Checkbox, TextField} from 'material-ui'
 import {Table, Column, ColumnGroup, Cell} from 'fixed-data-table'
 import {BernieText, BernieColors} from './styles/bernie-css'
 import moment from 'moment'
 import json2csv from 'json2csv'
-import qs from 'qs'
+import qs from 'querystring'
 import {states} from './data/states'
 import {USTimeZones} from './data/USTimeZones'
 
@@ -42,7 +43,7 @@ const convertType = (value) => {
     return true
   else if (value === 'false')
     return false
-  else if (value != '' && !isNaN(value))
+  else if (value != '' && !isNaN(value) && String(Number(value)) === value)
     return Number(value)
   else if (value)
     return String(value)
@@ -106,6 +107,26 @@ const KeyboardActionsInfo = () => (
   </div>
 )
 
+const approvalFilterOptions = {
+  PENDING_APPROVAL: {
+    text: 'Pending Approval',
+    actions: ['delete', 'approve', 'edit', 'email']
+  },
+  PENDING_REVIEW: {
+    text: 'Pending Review',
+    actions: ['delete', 'demote', 'approve', 'edit', 'email']
+  },
+  APPROVED: {
+    text: 'Public Events',
+    actions: ['delete', 'demote', 'edit', 'email', 'fastForward', 'downloadRSVPs']
+  },
+  FAST_FWD_REQUEST: {
+    text: 'FastFwd Requests',
+    actions: ['fastForward']
+  }
+}
+
+let availableActions = []
 let events = []
 
 class AdminEventsSection extends React.Component {
@@ -117,16 +138,18 @@ class AdminEventsSection extends React.Component {
       showEventPreview: false,
       showCreateEventDialog: false,
       showFiltersDialog: false,
+      showSendEventEmailDialog: false,
       windowWidth: window.innerWidth,
       windowHeight: window.innerHeight,
+      actionsCount: 5,
       selectedRows: [],
       indexesMarkedForDeletion: [],
       activeEventIndex: null,
+      activeEvent: null,
       previewTabIndex: 0,
       userMessage: '',
       deletionConfirmationMessage: null,
       deletionReasonIndex: null,
-      actionButtons: new Set(['delete', 'demote', 'approve', 'edit', 'email', 'downloadRSVPs']),
       undoAction: function(){console.log('undo')}
     }
 
@@ -351,8 +374,7 @@ class AdminEventsSection extends React.Component {
         execute: () => {
             this._handleEventConfirmation([rowIndex])
           },
-        icon: 'event_available',
-        disabled: this.props.relay.variables.status === 'APPROVED'
+        icon: 'event_available'
       },
       demote: {
         title: 'move to approval queue',
@@ -360,23 +382,29 @@ class AdminEventsSection extends React.Component {
             this._handleEventConfirmation([rowIndex], true)
           },
         icon: 'event_busy',
-        hoverColor: BernieColors.red,
-        disabled: this.props.relay.variables.status === 'PENDING_APPROVAL'
+        hoverColor: BernieColors.red
       },
       edit: {
         title: 'edit',
         execute: () => {
             this._handleEventPreviewOpen(rowIndex, 1);
           },
-        icon: 'edit',
+        icon: 'edit'
       },
       email: {
-        title: 'email',
+        title: 'send email',
         execute: () => {
-            this._handleEventEmail([rowIndex])
+            this._handleSendEmail(rowIndex)
           },
-        icon: 'email',
-        disabled: (data[rowIndex].node.flagApproval === true || data[rowIndex].node.isSearchable === 0)
+        icon: 'email'
+      },
+      fastForward: {
+        title: 'make fast forward request',
+        execute: () => {
+            this._handleFastForwardRequest([rowIndex])
+          },
+        icon: 'fast_forward',
+        disabled: (data[rowIndex].node.isSearchable === 0)
       },
       downloadRSVPs: {
         title: 'download RSVPs',
@@ -388,27 +416,26 @@ class AdminEventsSection extends React.Component {
       }
     }
 
-    const getActionButtons = (actionTypes) => {
-      return actionTypes.map((key) => {
-        const type = actions[key]
-        return (
-          <IconButton
-            title={type.title}
-            onTouchTap={type.execute}
-            disabled={(type.disabled !== undefined) ? type.disabled : false}
-            key={key}
-          >
-            <FontIcon className="material-icons" color={iconColor} hoverColor={type.hoverColor || BernieColors.blue}>{type.icon}</FontIcon>
-          </IconButton>
-        )
-      })
+    const renderActionButtons = () => {
+      return approvalFilterOptions[this.props.relay.variables.status].actions.map((type) => {
+          return (
+            <IconButton
+              title={actions[type].title}
+              onTouchTap={actions[type].execute}
+              disabled={(actions[type].disabled !== undefined) ? actions[type].disabled : false}
+              key={type}
+            >
+              <FontIcon className="material-icons" color={iconColor} hoverColor={actions[type].hoverColor || BernieColors.blue}>{actions[type].icon}</FontIcon>
+            </IconButton>
+          )
+        })
     }
 
     return (
       <Cell {...props} style={cellStyle}>
       <div style={{position: 'relative', left: '-5px'}}>
 
-        {getActionButtons([...this.state.actionButtons])}
+        {renderActionButtons()}
 
       </div>
       </Cell>
@@ -416,15 +443,8 @@ class AdminEventsSection extends React.Component {
   }
 
   renderToolbar() {
-    const approvalFilterOptions = [
-      {value: 'PENDING_APPROVAL', 'text': 'Pending Approval'},
-      {value: 'PENDING_REVIEW', 'text': 'Pending Review'},
-      {value: 'APPROVED', 'text': 'Public Events'},
-      {value: 'FAST_FWD_REQUEST', 'text': 'FastFwd Requests'}
-    ]
 
-    const approvalFilterMenuItems = approvalFilterOptions.map((item) => <MenuItem value={item.value} key={item.value} primaryText={item.text} />)
-
+    const approvalFilterMenuItems = Object.keys(approvalFilterOptions).map((item) => <MenuItem value={item} key={item} primaryText={approvalFilterOptions[item].text} />)
     const resultLengthOptions = [ 10, 25, 50, 100, 500]
     const resultLengthMenuItems = resultLengthOptions.map((value) => <MenuItem value={value} key={value} primaryText={`${value} Events`} />)
 
@@ -531,7 +551,6 @@ class AdminEventsSection extends React.Component {
       pendingReview
     })
 
-    this.props.relay.forceFetch()
     this.setState({showEventPreview: false})
     this._deselectRows({indexesToRemove: indexes})
   }
@@ -772,21 +791,18 @@ ${signature}`
         primary={true}
         onTouchTap={() => {
           let filtersArray = jQuery(this.refs.eventSearchForm).serializeArray();
-          let eventFiltersObject = {};
-          let hostFiltersObject = {};
+          let eventFiltersObject = {}
+          let hostFiltersObject = {}
 
           filtersArray.forEach((filter) => {
-            console.log(filter)
             const currentValue = convertType(filter.value)
-            if (currentValue != undefined){
+            if (currentValue !== undefined && currentValue !== ''){
               if (containsInput(filterInputs, filter.name))
                 eventFiltersObject[filter.name] = currentValue
               if (containsInput(hostFilterInputs, filter.name))
                 hostFiltersObject[filter.name] = currentValue
             }
-          });
-
-          console.log(eventFiltersObject, hostFiltersObject);
+          })
 
           this._handleRequestFiltersChange({newVars: eventFiltersObject, doNotPreserveOldFilters: true});
           this._handleRequestFiltersChange({filterKey: 'hostFilters', newVars: hostFiltersObject, doNotPreserveOldFilters: true});
@@ -1086,9 +1102,15 @@ ${signature}`
     this._deselectRows({indexesToRemove: eventIndexes})
   }
 
-  _handleEventEmail = (eventIndex) => {
-    let eventId = events[eventIndex].node.id
+  _handleSendEmail = (eventIndex) => {
+    this.setState({
+      showSendEventEmailDialog: true,
+      activeEvent: events[eventIndex].node
+    })
+  }
 
+  _handleFastForwardRequest = (eventIndex) => {
+    let eventId = events[eventIndex].node.eventIdObfuscated
     this.props.history.push(`/admin/events/${eventId}/emails/create`)
   }
 
@@ -1236,6 +1258,14 @@ ${signature}`
         mutationName='reviewEvents'
         successMessage='Event(s) marked reviewed'
       />
+      <SendEventMail
+        currentUser={this.props.currentUser}
+        event={this.state.activeEvent}
+        open={this.state.showSendEventEmailDialog}
+        onRequestClose={() => {
+          this.setState({showSendEventEmailDialog: false})
+        }}
+      />
       {this.renderDeleteModal()}
       {this.renderCreateModal()}
       {this.renderEventPreviewModal()}
@@ -1274,7 +1304,7 @@ ${signature}`
             header={<this.HeaderCell content="Manage" />}
             cell={<this.ActionCell data={events} col="actions" />}
             fixed={true}
-            width={this.state.actionButtons.size * 48 + 16}
+            width={approvalFilterOptions[this.props.relay.variables.status].actions.length * 48 + 16}
             align='center'
           />
         </ColumnGroup>
@@ -1453,10 +1483,16 @@ const getDefaultQuery = () => {
 export default Relay.createContainer(AdminEventsSection, {
   initialVariables: getDefaultQuery(),
   fragments: {
+    currentUser: () => Relay.QL`
+      fragment on User {
+        ${SendEventMail.getFragment('currentUser')}
+      }
+    `,
     listContainer: () => Relay.QL`
       fragment on ListContainer {
         ${EventEdit.getFragment('listContainer')}
         ${DeleteEvents.getFragment('listContainer')}
+        ${ReviewEvents.getFragment('listContainer')}
         ${EditEvents.getFragment('listContainer')}
         eventTypes {
           id

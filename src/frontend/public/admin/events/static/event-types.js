@@ -26,12 +26,14 @@ var eventTypes = [
 	{
 		id: 'volunteer-meeting',
 		name: 'Volunteer Activity or Meeting',
-		adminOnly: false
+		adminOnly: false,
+		disabled: ['use_shifts']
 	},
 	{
 		id: 'carpool',
 		name: 'Carpool to an early voting state',
 		adminOnly: false,
+		disabled: ['use_shifts'],
 		labels: {
 			'host_receive_rsvp_emails': 'Receive an email when people join my carpool',
 			'attendee_volunteer_show': 'Ask riders to help out',
@@ -39,15 +41,16 @@ var eventTypes = [
 		defaultValues: {
 			public_phone: 1,
 			venue_name: 'My car',
-			name: 'Carpool to Help Bernie Win!',
+			name: 'Carpool to [CITY] to Help Bernie Win!',
 			is_searchable: true,
 			rsvp_use_reminder_email: true,
 			rsvp_email_reminder_hours: 24,
-			duration_num: 40,
+			duration_num: 2,
+			duration_unit: 60,
 			attendee_volunteer_message: 'If you can chip in for gas and snacks, please sign up as a volunteer. Thanks!',
 			host_receive_rsvp_emails: true,
 			attendee_volunteer_show: true,
-			description: '<a href="http://bernie.to/distance-faq">Click here to view Carpool FAQs</a><p>Join me and other Bernie supporters for a road trip!</p><p>I’ll be leaving on [WRITE YOUR DEPARTURE DATE/TIME HERE] and returning on [WRITE YOUR RETURN DATE/TIME HERE]. The campaign isn’t providing housing, so we’ll figure out a hotel or something.</p><p>We’re going to hit the road for Bernie to the help out in the crucial final days before the election. Bernie staff on the ground will train us and plug us into the campaign so that we can be as effective as possible.</p><p>Victory will require all of us pitching in, so sign up and let’s go the distance for Bernie!</p>'
+			description: '<a href="http://bernie.to/distance-faq">Click here to view Carpool FAQs</a><p>Join me and other Bernie supporters for a road trip!</p><p>I’ll be leaving on [WRITE YOUR DEPARTURE DATE/TIME HERE] and returning on [WRITE YOUR RETURN DATE/TIME HERE].</p><p>We’re going to hit the road for Bernie to the help out in the crucial final days before the election. When we arrive at the local field office, Bernie staff on the ground will train us and plug us into the campaign so that we can be as effective as possible.</p>'
 		}
 	},
 	{
@@ -57,7 +60,8 @@ var eventTypes = [
 			name: 'Bernie Ballot Blast - PA Support Bernie and his Delegates and Collect Petition Signatures',
 			description: 'We only have 3 weeks to get all the needed signatures to get Bernie on the Ballot and get his Delegates nominated for the Democratic Convention.  Sign up for your local events scheduled between January 26th and February 10th.  We can\'t do this without you and you can make the difference in Pennsylvania, one of the most important swing states.  Come join the movement!',
 		},
-		adminOnly: false
+		adminOnly: false,
+		disabled: ['use_shifts']
 	},
 	{
 		id: 'phonebank',
@@ -74,6 +78,7 @@ var eventTypes = [
 		defaultValues: {
 			name: 'Door knocking for Bernie',
 			description: 'You\'re invited to join your neighbors and supporters to knock on the doors of supporters and undecided voters. We\'ll provide you with a script, a list of voters that you\'ll be talking to, and a map of where to go. We\'ll also train you to use your time effectively out in the field. You\'ll be able to talk to real people about how this country belongs to all of us, not just the billionaire class. Our victory starts with us knocking on doors together.',
+			is_official: true
 		},
 		adminOnly: false
 	},
@@ -81,11 +86,12 @@ var eventTypes = [
 		id: 'get-out-the-vote',
 		name: 'Get Out the Vote',
 		useShifts: true,
-		adminOnly: false,
+		adminOnly: true,
 		disabled: ['contact_phone', 'public_phone'],
 		defaultValues: {
 			name: 'Get Out the Vote For Bernie!',
 			description: 'Join other volunteers in the area to help get out the vote for Bernie. You’ll get training, materials, and anything else you might need to put Bernie over the top in the upcoming election. This is the final push, so let’s give it all we’ve got!',
+			is_official: true,
 			is_searchable: true,
 			host_receive_rsvp_emails: false,
 			attendee_volunteer_show: false,
@@ -112,7 +118,7 @@ var eventTypes = [
 			cons_email: userEmail,
 			rsvp_email_reminder_hours: '24',
 		},
-		disabled: ['attendee_volunteer_show'],
+		disabled: ['attendee_volunteer_show', 'use_shifts'],
 		adminOnly: false
 	},
 	{
@@ -132,7 +138,7 @@ var eventTypes = [
 			cons_name: 'Bernie 2016',
 			cons_email: userEmail
 		},
-		disabled: ['contact_phone', 'public_phone'],
+		disabled: ['contact_phone', 'public_phone', 'use_shifts'],
 		adminOnly: true
 	},
 	{
@@ -192,6 +198,76 @@ var eventTypes = [
 	$(form.event_type_id).on("change", function(e){
 		setDefaults(e.target.value);
 	});
+
+	$(form.use_shifts).on("change", function(e){
+		if (this.checked){
+			$("#date-input-group")
+				.hide()
+				.find("input, select")
+				.attr("disabled", true);
+			$("#shift-wrapper")
+				.show()
+				.find("input, select")
+				.removeAttr("disabled");
+		}
+		else{
+			$("#shift-wrapper")
+				.hide()
+				.find("input, select")
+				.attr("disabled", true);
+			$("#date-input-group")
+				.show()
+				.find("input, select")
+				.removeAttr("disabled");
+		}
+	});
+
+	$("#add-shift").on("click", function(e){
+		$(".shift-input-group")
+			.last()
+			.clone()
+			.appendTo("#shift-inputs");
+		if ($(".shift-input-group").length > 2)
+			$("#remove-shift").show();
+	});
+
+	$("#remove-shift").on("click", function(e){
+		$(".shift-input-group")
+			.last()
+			.remove()
+		if ($(".shift-input-group").length <= 2)
+			$(this).hide();
+	});
+
+	function generateShiftInputs(){
+
+		var start = $(".time-inputs")
+			.first()
+			.clone();
+		var end = $(".time-inputs")
+			.first()
+			.clone()
+			.append("<br/>");
+		end.find(".time-type").each(function() {
+			$(this).html("End");
+		});
+		end.find("select").each(function() {
+			$(this).attr("name", 'end_time[' + $(this).attr('name').split("[")[1]);
+		});
+
+		start.appendTo(".shift-input-group");
+		end.appendTo(".shift-input-group");
+
+		$("#add-shift").click();
+
+		$("#shift-wrapper")
+			.hide()
+			.find("input, select")
+			.attr("disabled", true);
+	}
+
+	generateShiftInputs();
+
 })();
 
 var disabledInputs = [];
@@ -249,7 +325,11 @@ function setDefaults(eventTypeId){
 				name: disabled[i],
 				required: $(input).prop('required')
 			});
-			$(input).val('').removeProp('required').attr('disabled','disabled');
+			if (input.checked)
+				$(input).attr('checked', false).change()
+			else
+				$(input).val('').change()
+			$(input).removeProp('required').attr('disabled','disabled');
 		}
 	};
 }
@@ -293,7 +373,7 @@ function updateFormValue(property, value) {
 		    form[property].placeholder = value;
 	  	}
 
-		  if (property === 'attendee_volunteer_show' || property === 'duration_allday')
+		  if (property === 'attendee_volunteer_show' || property === 'duration_allday' || property === 'use_shifts')
 		  	$('[name="' + property + '"]').change()
 		  break
 	}

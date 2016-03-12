@@ -1,11 +1,11 @@
 import React from 'react';
 import Relay from 'react-relay';
 import {Styles} from 'material-ui';
+import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider'
 import TopNav from './TopNav';
 import {BernieTheme} from './styles/bernie-theme';
 import {BernieColors} from './styles/bernie-css';
 
-@Styles.ThemeDecorator(Styles.ThemeManager.getMuiTheme(BernieTheme))
 class Dashboard extends React.Component {
   tabs = [{
       value:'/call-assignments',
@@ -50,9 +50,9 @@ class Dashboard extends React.Component {
   render() {
     // No volunteer navigation for now.
     return (
-      <div>
+      <MuiThemeProvider muiTheme={Styles.getMuiTheme(BernieTheme)}>
         {this.props.children}
-      </div>
+      </MuiThemeProvider>
     )
   }
 }

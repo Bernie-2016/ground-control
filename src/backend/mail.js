@@ -8,10 +8,33 @@ import htmlToText from 'html-to-text'
 import knex from './data/knex'
 import {toGlobalId} from 'graphql-relay'
 import log from './log'
+import moment from 'moment'
+import rp from 'request-promise'
 
 const templateDir = path.resolve(__dirname, './email-templates')
-const headerHTML = fs.readFileSync(templateDir + '/header.hbs', {encoding: 'utf-8'})
-const footerHTML = fs.readFileSync(templateDir + '/footer.hbs', {encoding: 'utf-8'})
+const partials = [
+  {
+    name: 'header',
+    path: '/header.hbs'
+  },
+  {
+    name: 'footer',
+    path: '/footer.hbs'
+  },
+  {
+    name: 'loginInstructions',
+    path: '/login-instructions.hbs'
+  },
+  {
+    name: 'eventPreview',
+    path: '/event-preview.hbs'
+  }
+]
+const regeisterTemplatePartials = (templates) => {
+  templates.forEach((template) => {
+    Handlebars.registerPartial(template.name, fs.readFileSync(templateDir + template.path, {encoding: 'utf-8'}))
+  })
+}
 
 Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
   switch (operator) {
@@ -36,8 +59,8 @@ Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
   }
 })
 
-Handlebars.registerPartial('header', headerHTML)
-Handlebars.registerPartial('footer', footerHTML)
+regeisterTemplatePartials(partials)
+
 // const messageRichTextTemplate = new EmailTemplate(templateDir + '/message.hbs')
 const messageRichTextTemplate = Handlebars.compile(fs.readFileSync(templateDir + '/message.hbs', {encoding: 'utf-8'}));
 const senderAddress = 'Team Bernie<info@berniesanders.com>'
@@ -49,14 +72,14 @@ export default class MG {
     this.mailgun = Mailgun({apiKey: apiKey, domain: domain})
   }
 
-  async send(message, textOptions={wordwrap: 100}) {
+  async send(message, textOptions={wordwrap: 100}, addHeaderFooter=true) {
     // Add plaintext version of message if it does not exist
     if (!message.text){
       message.text = htmlToText.fromString(message.html, textOptions)
     };
 
     // Add header and footer to html messages
-    if (message.html){
+    if (message.html && addHeaderFooter){
       message.html = messageRichTextTemplate({content: message.html, recipient: message.to});
     }
 
@@ -95,11 +118,30 @@ export default class MG {
       eventIds,
       user: constituent
     }
+    let templateName = 'event-create-confirmation'
 
-    let eventConfirmation = new EmailTemplate(templateDir + '/event-create-confirmation')
+    // Send organizer notification
+    if (data.event.event_type_id == 32 && data.event.is_official !== '1'){
+      templateName = 'canvass-create-confirmation'
+
+      // Fetch organizer data
+      const result = await rp('https://sheetsu.com/apis/bd810a50')
+      const organizerArray = JSON.parse(result).result
+      const organizers = organizerArray.filter((organizer) => (organizer.State === data.event.venue_state_cd))
+
+      if (organizers.length > 0){
+        data.organizers = organizers
+        await this.sendCanvassCreationNotification(data)
+      }
+    }
+
+    data.user.name = (data.user.name) ? data.user.name.split(' ')[0] : data.event.cons_name.split(' ')[0]
+    data.user.name = data.user.name || 'there'
+
+    let eventConfirmation = new EmailTemplate(templateDir + '/' + templateName)
     let content = await eventConfirmation.render(data)
 
-    let message = {
+    const message = {
       from: senderAddress,
       to: form.cons_email,
       subject: 'Event Creation Confirmation',
@@ -107,6 +149,25 @@ export default class MG {
     }
 
     return await this.send(message)
+  }
+
+  async sendCanvassCreationNotification({event, eventIds, user, organizers}) {
+    const organizerName = (organizers.length > 1) ? 'Field Organizers' : organizers[0].Name.split(' ')[0]
+
+    user.name = user.name || event.cons_name
+    user.phone = user.phone || event.contact_phone
+    let notificationEmail = new EmailTemplate(templateDir + '/canvass-field-organizer-notification')
+    let content = await notificationEmail.render({event, eventIds, host: user, organizerName})
+
+    const message = {
+      from: 'Jacob LeGrone<jacoblegrone@berniesanders.com>',
+      'h:Reply-To': 'info@berniesanders.com',
+      to: organizers.map((organizer) => organizer.Email),
+      subject: 'ACTION NEEDED: New canvass event created',
+      html: content.html
+    }
+
+    return await this.send(message, {wordwrap: 100}, false)
   }
 
   async sendEventInstructions(eventId) {
@@ -178,14 +239,19 @@ export default class MG {
   }
 
   async sendAdminEventInvite(data) {
+
+    data.senderMessageHtml = data.senderMessage.replace(/\n{2,}/g, "</p><p style=\"font-family: Arial; font-size: 17px; line-height: 140%;\">").replace(/\n{1}/, "<br />").replace(/^/, "<p style=\"font-family: Arial; font-size: 17px; line-height: 140%;\">").replace(/$/, "</p>")
+    data.hostMessageHtml = data.hostMessage.replace(/\n{2,}/g, "</p><p style=\"font-family: Arial; font-size: 17px; line-height: 140%;\">").replace(/\n{1}/, "<br />").replace(/^/, "<p style=\"font-family: Arial; font-size: 17px; line-height: 140%;\">").replace(/$/, "</p>")
+
     let template = new EmailTemplate(templateDir + '/admin-event-invitation')
     let content = await template.render(data)
 
     let message = {
-      from: data.senderAddress,
-      'h:Reply-To': data.hostAddress,
+      from: 'Team Bernie <' + data.senderAddress + '>',
+      'h:Reply-To': 'info@berniesanders.com',
       to: data.recipientAddress,
-      subject: 'Fwd: HELP! I need more people to come to my phonebank',
+      subject: 'Fwd: ' + data.hostEmailSubject,
+      html: content.html,
       text: content.text
     }
 
@@ -227,18 +293,23 @@ export default class MG {
 
     let data = {
       hostFirstName: name,
-      sender: eventTypeData.sender,
       fastFwdURL: 'https://organize.berniesanders.com/event/' +
                       toGlobalId('Event', event.event_id)
-                      + '/request_email'
+                      + '/request_email',
+      eventDate: moment(event.event_start_dt).format('dddd, MMMM Do'),
+      eventDay: moment(event.event_start_dt).format('dddd'),
+      recipientAddress: event.email
     }
+
     let template = new EmailTemplate(templateDir + '/send-fast-fwd-instructions')
     let content = await template.render(data)
+
     let message = {
       from: 'Team Bernie<info@berniesanders.com>',
       'h:Reply-To': 'info@berniesanders.com',
       to: event.email,
       subject: 'Find volunteers in your area for your upcoming event!',
+      text: content.text,
       html: content.html
     }
 

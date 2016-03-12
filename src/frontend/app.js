@@ -4,6 +4,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Relay from 'react-relay';
 import EventCreate from './components/EventCreate.js'
+import DummyEventCreate from './components/DummyEventCreate.js'
 import {Redirect, IndexRoute, IndexRedirect, Route, Router} from 'react-router';
 import ReactRouterRelay from 'react-router-relay';
 import injectTapEventPlugin from 'react-tap-event-plugin';
@@ -11,6 +12,7 @@ import AdminDashboard from './components/AdminDashboard';
 import AdminEventEmailCreationForm from './components/AdminEventEmailCreationForm'
 import AdminEventsSection from './components/AdminEventsSection';
 import AdminEventUploadRsvps from './components/AdminEventUploadRsvps';
+import ConstituentLookup from './components/ConstituentLookup';
 import AdminCallAssignmentsSection from './components/AdminCallAssignmentsSection';
 import AdminCallAssignmentCreationForm from './components/AdminCallAssignmentCreationForm';
 import FastFwdForm from './components/FastFwdForm';
@@ -18,7 +20,7 @@ import GCTextField from './components/forms/GCTextField';
 import GCPhoneField from './components/forms/GCPhoneField';
 import GCDateField from './components/forms/GCDateField';
 import GCDateTimeField from './components/forms/GCDateTimeField';
-//import GCTimeField from './components/forms/GCTimeField';
+import GCTimeField from './components/forms/GCTimeField';
 import GCPasswordField from './components/forms/GCPasswordField';
 import GCRadioButtonsField from './components/forms/GCRadioButtonsField';
 import GCSelectField from './components/forms/GCSelectField';
@@ -49,10 +51,12 @@ window.onerror = (msg, file, line, col, error) => {
   }
 
   log.error(error)
-  setTimeout(() => {
-    alert('Whoops! Something went wrong. We\'re looking into it, but in the meantime please refresh your browser.')
-    document.location.reload(true)
-  }, 2000)
+
+  if (window.location.href.split('/')[2].split(':')[0] !== 'localhost')
+    setTimeout(() => {
+      alert('Whoops! Something went wrong. We\'re looking into it, but in the meantime please refresh your browser.')
+      document.location.reload(true)
+    }, 2000)
 };
 
 injectTapEventPlugin();
@@ -63,13 +67,14 @@ Relay.injectNetworkLayer(new GCNetworkLayer('/graphql'), {
 Form.addInputTypes({
   string: GCTextField,
   number: GCTextField,
+  email: GCTextField,
   boolean: GCBooleanField,
   radio: GCRadioButtonsField,
   select: GCSelectField,
   array: GCCheckboxesField,
   password: GCPasswordField,
   date: GCDateField,
-//  time: GCTimeField, <-- broken
+  time: GCTimeField,
   datetime: GCDateTimeField,
   phone: GCPhoneField
 });
@@ -110,8 +115,7 @@ ReactDOM.render(
         component={AdminCallAssignmentsSection}
         queries={ListContainerQueries}
       >
-        <Route
-          path='create'
+        <IndexRoute
           component={AdminCallAssignmentCreationForm}
           queries={ListContainerQueries}
         />
@@ -139,7 +143,18 @@ ReactDOM.render(
       <Route
         path='events'
         component={AdminEventsSection}
-        queries={ListContainerQueries}
+        queries={{
+          ...CurrentUserQueries,
+          ...ListContainerQueries
+        }}
+        renderLoading={() => <Loading />}
+      />
+      <Route
+        path='constituent-lookup'
+        component={ConstituentLookup}
+        queries={{
+          ...ListContainerQueries
+        }}
         renderLoading={() => <Loading />}
       />
     </Route>
@@ -158,6 +173,11 @@ ReactDOM.render(
         component={EventCreate}
         queries={CurrentUserQueries}
         renderLoading={() => <Loading />}
+      />
+      <Route
+        path='events/create'
+        component={DummyEventCreate}
+        renderLoading={() => window.location.reload() }
       />
       <Route
         path='call'

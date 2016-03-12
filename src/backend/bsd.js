@@ -4,7 +4,6 @@ import crypto from 'crypto';
 import querystring from 'querystring';
 import {parseString} from 'xml2js';
 import Promise from 'bluebird';
-import qs from 'querystring';
 import log from './log';
 import moment from 'moment-timezone';
 import knex from './data/knex';
@@ -356,14 +355,14 @@ export default class BSD {
   }
 
   async checkCredentials(email, password) {
+    let response
     try{
-      let response = await this.request('/account/check_credentials', {userid: email, password: password}, 'POST');
+      response = await this.request('/account/check_credentials', {userid: email, password: password}, 'POST');
     }
     catch(e){
       return 'invalid username or password'
     }
-    let response = await parseStringPromise(response);
-    return response
+    return await parseStringPromise(response)
   }
 
   async addRSVPToEvent(rsvpDetails) {
@@ -373,7 +372,7 @@ export default class BSD {
       'guests': 0
     }
     let host = this.baseURL.protocol + '//' + this.baseURL.host
-    let URL = host + '/page/graph/addrsvp' + '?' + qs.stringify(params)
+    let URL = host + '/page/graph/addrsvp' + '?' + querystring.stringify(params)
 
     let options = {
       uri: URL,
@@ -464,7 +463,7 @@ export default class BSD {
       if (key === 'start_tz')
         inputs['local_timezone'] = event[key]
       else if (key === 'start_dt') {
-        eventDate['start_datetime_system'] = moment(event['start_dt']).tz(event['start_tz']).format('YYYY-MM-DD HH:mm:ss')
+        eventDate['start_datetime_system'] = moment.tz(event['start_dt'], 'UTC').tz(event['start_tz']).format('YYYY-MM-DD HH:mm:ss')
       }
       else if (key === 'start_datetime_system')
         eventDate['start_datetime_system'] = event['start_datetime_system']
@@ -513,6 +512,7 @@ export default class BSD {
 
   async createEvent(event) {
     let params = this.apiInputsFromEvent(event)
+    log.debug(params)
     let response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'POST');
     if (response.validation_errors)
       throw new BSDValidationError(JSON.stringify(response.validation_errors))

@@ -6,16 +6,21 @@ import GCFormField from './GCFormField'
 
 export default class GCDateField extends GCFormField {
   render() {
-    let oldDate = moment(this.props.value).utcOffset(this.props.utcOffset);
+    let fakeDate = moment(this.props.value)
+      .add(this.props.utcOffset - moment().utcOffset(), 'minutes')
+      .toDate()
+    let oldDate = moment(fakeDate).toObject()
+
     return <DatePicker
-      {...this.props}
+      value={fakeDate}
       floatingLabelText={this.floatingLabelText()}
-      hintText={this.props.label}
       onChange={(_, date) => {
-        let newDate = moment(date).utcOffset(this.props.utcOffset);
-        newDate.set('hour', oldDate.get('hour'))
-        newDate.set('minute', oldDate.get('minute'))
-        newDate.set('second', oldDate.get('second'))
+        let newDate = moment(date).toObject()
+        newDate['hours'] = oldDate['hours']
+        newDate['minutes'] = oldDate['minutes']
+        newDate['seconds'] = oldDate['seconds']
+        newDate = moment(newDate)
+          .add(moment().utcOffset() - this.props.utcOffset, 'minutes')
         this.props.onChange(newDate.toDate())
       }}
     />
