@@ -1065,11 +1065,13 @@ const GraphQLCallAssignment = new GraphQLObjectType({
     relatedEvent: {
       type: GraphQLEvent,
       resolve: async (assignment, _, {rootValue}) => {
-        let eventId = await knex('gc_bsd_events').where('gc_bsd_events.turn_out_assignment', assignment.id)
-          .select('event_id')
+        let eventId = await knex('gc_bsd_events')
+          .join('bsd_events', 'gc_bsd_events.event_id', 'bsd_events.event_id')
+          .where('gc_bsd_events.turn_out_assignment', assignment.id)
+          .select('bsd_events.event_id_obfuscated')
           .first()
 
-        return eventId ? rootValue.loaders.bsdEvents.load(eventId.event_id) : null
+        return eventId ? rootValue.loaders.bsdEvents.load(eventId.event_id_obfuscated) : null
       }
     },
     query: {
