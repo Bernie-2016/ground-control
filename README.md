@@ -4,7 +4,7 @@
 
 ### OS X
 
-In OS X, we currently run everything locally using a Procfile and node-foreman. To get started, install [Node.js](https://nodejs.org/en/download/) and [Homebrew](http://brew.sh/). Then clone this repository and cd into ground-control. Then do the following:
+In OS X, we currently run everything locally using a Procfile and node-foreman. To get started, install [Node.js 5.x](https://nodejs.org/en/download/stable/) and [Homebrew](http://brew.sh/). Then clone this repository and cd into ground-control. Then do the following:
 
 ```
 npm install
