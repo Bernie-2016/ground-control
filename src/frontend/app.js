@@ -115,8 +115,7 @@ ReactDOM.render(
         component={AdminCallAssignmentsSection}
         queries={ListContainerQueries}
       >
-        <Route
-          path='create'
+        <IndexRoute
           component={AdminCallAssignmentCreationForm}
           queries={ListContainerQueries}
         />
