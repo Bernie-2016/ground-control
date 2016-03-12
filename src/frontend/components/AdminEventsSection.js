@@ -9,7 +9,7 @@ import {Table, Column, ColumnGroup, Cell} from 'fixed-data-table'
 import {BernieText, BernieColors} from './styles/bernie-css'
 import moment from 'moment'
 import json2csv from 'json2csv'
-import qs from 'querystring'
+import qs from 'qs'
 import {states} from './data/states'
 import {USTimeZones} from './data/USTimeZones'
 
