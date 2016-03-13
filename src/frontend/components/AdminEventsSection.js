@@ -477,18 +477,20 @@ class AdminEventsSection extends React.Component {
                 this._handleQueryChange({status: value});
               }
             }
+            autoWidth={true}
+            style={{marginRight: 0}}
           >
             {approvalFilterMenuItems}
           </DropDownMenu>
           <DropDownMenu
             value={this.props.relay.variables.numEvents}
             onChange={this._handleEventRequestLengthChange}
-            autoWidth={false}
-            style={{width: '140px', marginRight: '0'}}
+            autoWidth={true}
+            style={{marginRight: 0, marginLeft: 0}}
           >
             {resultLengthMenuItems}
           </DropDownMenu>
-
+          <ToolbarSeparator style={{marginLeft: 0}} />
           <RaisedButton
             label="Filter"
             labelPosition="after"
@@ -498,25 +500,29 @@ class AdminEventsSection extends React.Component {
           >
             <FontIcon className="material-icons" style={{position: 'relative', top: '6px', left: '6px'}}>filter_list</FontIcon>
           </RaisedButton>
+          
+        </ToolbarGroup>
+        <ToolbarGroup key={1} float="right">
           <RaisedButton
             label="RSVPs"
             labelPosition="after"
             onTouchTap={() => {
               this.props.history.push('/admin/events/upload-rsvps')
             }}
+            style={{marginRight: 0}}
           >
-            <FontIcon className="material-icons" style={{position: 'relative', top: '6px', left: '6px'}}>file_upload</FontIcon>
+            <FontIcon className="material-icons" style={{position: 'relative', top: '7px', left: '6px'}}>file_upload</FontIcon>
           </RaisedButton>
-
-        </ToolbarGroup>
-        <ToolbarGroup key={1} float="right">
           <RaisedButton
             label="Create"
+            labelPosition="after"
             onTouchTap={() => {
               //this._handleEventCreation(this.state.selectedRows);
               window.location = '/admin/events/create'
             }}
-          />
+          >
+            <FontIcon className="material-icons" style={{position: 'relative', top: '7px', left: '6px'}}>add</FontIcon>
+          </RaisedButton>
           <ToolbarSeparator style={{marginLeft: 0}} />
           <RaisedButton
             label="Delete"
