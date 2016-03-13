@@ -36,7 +36,7 @@ class Dashboard extends React.Component {
       <TopNav
         zDepth={0}
         barColor={BernieColors.lightGray}
-        tabColor='blue'
+        tabColor={BernieColors.darkGray}
         selectedTabColor={BernieColors.gray}
         logoColors={{
           primary: BernieColors.blue,
