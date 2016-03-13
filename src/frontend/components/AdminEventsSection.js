@@ -739,7 +739,7 @@ ${signature}`
             this.setState({deletionConfirmationMessage: event.target.value});
           }}
           multiLine={true}
-          rowsMax={11}
+          rowsMax={6}
           fullWidth={true}
           inputStyle={{backgroundColor: 'rgb(250,250,250)'}}
           ref="deleteConfirmationInput"
@@ -754,7 +754,7 @@ ${signature}`
         open={this.state.showDeleteEventDialog}
         onRequestClose={this._handleDeleteModalRequestClose}
       >
-      {deleteMessage}
+        {deleteMessage}
       </Dialog>
     )
   }
