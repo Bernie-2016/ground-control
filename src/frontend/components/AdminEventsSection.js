@@ -9,7 +9,7 @@ import {Table, Column, ColumnGroup, Cell} from 'fixed-data-table'
 import {BernieText, BernieColors} from './styles/bernie-css'
 import moment from 'moment'
 import json2csv from 'json2csv'
-import qs from 'querystring'
+import qs from 'qs'
 import {states} from './data/states'
 import {USTimeZones} from './data/USTimeZones'
 
@@ -477,18 +477,20 @@ class AdminEventsSection extends React.Component {
                 this._handleQueryChange({status: value});
               }
             }
+            autoWidth={true}
+            style={{marginRight: 0}}
           >
             {approvalFilterMenuItems}
           </DropDownMenu>
           <DropDownMenu
             value={this.props.relay.variables.numEvents}
             onChange={this._handleEventRequestLengthChange}
-            autoWidth={false}
-            style={{width: '140px', marginRight: '0'}}
+            autoWidth={true}
+            style={{marginRight: 0, marginLeft: 0}}
           >
             {resultLengthMenuItems}
           </DropDownMenu>
-
+          <ToolbarSeparator style={{marginLeft: 0}} />
           <RaisedButton
             label="Filter"
             labelPosition="after"
@@ -498,25 +500,29 @@ class AdminEventsSection extends React.Component {
           >
             <FontIcon className="material-icons" style={{position: 'relative', top: '6px', left: '6px'}}>filter_list</FontIcon>
           </RaisedButton>
+          
+        </ToolbarGroup>
+        <ToolbarGroup key={1} float="right">
           <RaisedButton
-            label="Upload RSVPs"
+            label="RSVPs"
             labelPosition="after"
             onTouchTap={() => {
               this.props.history.push('/admin/events/upload-rsvps')
             }}
+            style={{marginRight: 0}}
           >
-            <FontIcon className="material-icons" style={{position: 'relative', top: '6px', left: '6px'}}>file_upload</FontIcon>
+            <FontIcon className="material-icons" style={{position: 'relative', top: '7px', left: '6px'}}>file_upload</FontIcon>
           </RaisedButton>
-
-        </ToolbarGroup>
-        <ToolbarGroup key={1} float="right">
           <RaisedButton
             label="Create"
+            labelPosition="after"
             onTouchTap={() => {
               //this._handleEventCreation(this.state.selectedRows);
               window.location = '/admin/events/create'
             }}
-          />
+          >
+            <FontIcon className="material-icons" style={{position: 'relative', top: '7px', left: '6px'}}>add</FontIcon>
+          </RaisedButton>
           <ToolbarSeparator style={{marginLeft: 0}} />
           <RaisedButton
             label="Delete"
@@ -527,13 +533,22 @@ class AdminEventsSection extends React.Component {
             }}
           />
           <RaisedButton
+            label='Unapprove'
+            style={{marginLeft: 0}}
+            secondary={false}
+            disabled={(this.state.selectedRows.length == 0 || this.props.relay.variables.status === 'PENDING_APPROVAL')}
+            onTouchTap={() => {
+              this._handleEventConfirmation(this.state.selectedRows, true);
+            }}
+          />
+          <RaisedButton
             label={(this.props.relay.variables.status === 'PENDING_REVIEW') ? 'Mark Reviewed' : 'Mark Approved'}
             style={{marginLeft: 0}}
             secondary={true}
             disabled={(this.state.selectedRows.length == 0 || this.props.relay.variables.status === 'APPROVED')}
             onTouchTap={() => {
-          this._handleEventConfirmation(this.state.selectedRows);
-        }}
+              this._handleEventConfirmation(this.state.selectedRows);
+            }}
           />
         </ToolbarGroup>
       </Toolbar>
@@ -1110,7 +1125,7 @@ ${signature}`
   }
 
   _handleFastForwardRequest = (eventIndex) => {
-    let eventId = events[eventIndex].node.id
+    let eventId = events[eventIndex].node.eventIdObfuscated
     this.props.history.push(`/admin/events/${eventId}/emails/create`)
   }
 

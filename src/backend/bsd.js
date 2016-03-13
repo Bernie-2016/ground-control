@@ -2,6 +2,7 @@ import requestPromise from 'request-promise';
 import url from 'url';
 import crypto from 'crypto';
 import querystring from 'querystring';
+import qs from 'querystring';
 import {parseString} from 'xml2js';
 import Promise from 'bluebird';
 import log from './log';
@@ -372,7 +373,7 @@ export default class BSD {
       'guests': 0
     }
     let host = this.baseURL.protocol + '//' + this.baseURL.host
-    let URL = host + '/page/graph/addrsvp' + '?' + querystring.stringify(params)
+    let URL = host + '/page/graph/addrsvp' + '?' + qs.stringify(params)
 
     let options = {
       uri: URL,

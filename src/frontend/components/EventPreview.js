@@ -3,14 +3,14 @@ import Relay from 'react-relay';
 import GCForm from './forms/GCForm';
 import Form from 'react-formal';
 import yup from 'yup';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import {Card, CardActions, CardExpandable, CardTitle, CardHeader, CardText, FlatButton, TextField, DropDownMenu, SelectField, DatePicker, TimePicker, Checkbox} from 'material-ui';
 import {BernieText, BernieColors} from './styles/bernie-css';
 import GCSelectField from './forms/GCSelectField'
 import InfoHeader from './InfoHeader'
 
-const momentWithOffset = (startDate, utcOffset) => {
-  return moment(startDate).utcOffset(utcOffset)
+const momentWithTimezone = (startDate, timeZone) => {
+  return moment(startDate).tz(timeZone)
 };
 
 export default class EventPreview extends React.Component {
@@ -110,7 +110,7 @@ export default class EventPreview extends React.Component {
           <p dangerouslySetInnerHTML={this.stripScripts(event.description)}></p>
 
           <InfoHeader content='Event Date & Time' />
-          <p>{momentWithOffset(event.startDate, event.localUTCOffset).format('LLLL')} <span style={{color: BernieColors.gray}}>{event.localTimezone} time</span></p>
+          <p>{momentWithTimezone(event.startDate, event.localTimezone).format('LLLL')} <span style={{color: BernieColors.gray}}>{event.localTimezone} time</span></p>
           <p>Duration: {Math.floor(event.duration / 60)} hours {event.duration % 60} minutes</p>
 
           <InfoHeader content='Event Location' />
