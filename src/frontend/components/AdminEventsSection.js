@@ -499,7 +499,7 @@ class AdminEventsSection extends React.Component {
             <FontIcon className="material-icons" style={{position: 'relative', top: '6px', left: '6px'}}>filter_list</FontIcon>
           </RaisedButton>
           <RaisedButton
-            label="Upload RSVPs"
+            label="RSVPs"
             labelPosition="after"
             onTouchTap={() => {
               this.props.history.push('/admin/events/upload-rsvps')
@@ -527,13 +527,22 @@ class AdminEventsSection extends React.Component {
             }}
           />
           <RaisedButton
+            label='Unapprove'
+            style={{marginLeft: 0}}
+            secondary={false}
+            disabled={(this.state.selectedRows.length == 0 || this.props.relay.variables.status === 'PENDING_APPROVAL')}
+            onTouchTap={() => {
+              this._handleEventConfirmation(this.state.selectedRows, true);
+            }}
+          />
+          <RaisedButton
             label={(this.props.relay.variables.status === 'PENDING_REVIEW') ? 'Mark Reviewed' : 'Mark Approved'}
             style={{marginLeft: 0}}
             secondary={true}
             disabled={(this.state.selectedRows.length == 0 || this.props.relay.variables.status === 'APPROVED')}
             onTouchTap={() => {
-          this._handleEventConfirmation(this.state.selectedRows);
-        }}
+              this._handleEventConfirmation(this.state.selectedRows);
+            }}
           />
         </ToolbarGroup>
       </Toolbar>
