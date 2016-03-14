@@ -17,6 +17,7 @@ class SendEventMail extends React.Component {
   }
 
   render() {
+    let me = this;
     const standardActions = [
       <FlatButton
         label="Cancel"
@@ -29,12 +30,12 @@ class SendEventMail extends React.Component {
         disabled={this.state.subject === '' || this.state.message === ''}
         onTouchTap={() => {
           this.refs.sendEmailHandler.send({
-            ids: this.props.event.id,
-            replyTo: this.state.replyTo,
-            bcc: [this.props.currentUser.email],
-            subject: this.state.subject,
-            message: this.state.message,
-            target: this.state.target
+            ids: me.props.event.id,
+            replyTo: me.state.replyTo,
+            bcc: [me.props.currentUser.email],
+            subject: me.state.subject,
+            message: me.state.message,
+            target: me.state.target
           })
         }}
       />
@@ -72,7 +73,6 @@ class SendEventMail extends React.Component {
         </SelectField>
         <TextField
           floatingLabelText="Subject"
-          value={this.state.subject}
           onChange={(event) => {
             this.setState({subject: event.target.value})
           }}
@@ -80,7 +80,6 @@ class SendEventMail extends React.Component {
         />
         <TextField
           floatingLabelText="Message Content"
-          value={this.state.message}
           onChange={(event) => {
             this.setState({message: event.target.value});
           }}
