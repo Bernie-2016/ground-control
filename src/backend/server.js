@@ -166,12 +166,10 @@ function startApp() {
         }
 
         // If account credentials are correct but the password for ground-control is incorrect, update the ground-control password and log in
-        else if (!await compare(password, user.password)) {
+        else {
           await knex('users')
             .where('email', email.toLowerCase())
             .update({password: hashedPassword});
-
-          return done(null, user)
         }
 
       }

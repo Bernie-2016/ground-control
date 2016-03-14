@@ -9,7 +9,7 @@ import {Table, Column, ColumnGroup, Cell} from 'fixed-data-table'
 import {BernieText, BernieColors} from './styles/bernie-css'
 import moment from 'moment'
 import json2csv from 'json2csv'
-import qs from 'querystring'
+import qs from 'qs'
 import {states} from './data/states'
 import {USTimeZones} from './data/USTimeZones'
 
@@ -477,18 +477,20 @@ class AdminEventsSection extends React.Component {
                 this._handleQueryChange({status: value});
               }
             }
+            autoWidth={true}
+            style={{marginRight: 0}}
           >
             {approvalFilterMenuItems}
           </DropDownMenu>
           <DropDownMenu
             value={this.props.relay.variables.numEvents}
             onChange={this._handleEventRequestLengthChange}
-            autoWidth={false}
-            style={{width: '140px', marginRight: '0'}}
+            autoWidth={true}
+            style={{marginRight: 0, marginLeft: 0}}
           >
             {resultLengthMenuItems}
           </DropDownMenu>
-
+          <ToolbarSeparator style={{marginLeft: 0}} />
           <RaisedButton
             label="Filter"
             labelPosition="after"
@@ -498,25 +500,29 @@ class AdminEventsSection extends React.Component {
           >
             <FontIcon className="material-icons" style={{position: 'relative', top: '6px', left: '6px'}}>filter_list</FontIcon>
           </RaisedButton>
+          
+        </ToolbarGroup>
+        <ToolbarGroup key={1} float="right">
           <RaisedButton
-            label="Upload RSVPs"
+            label="RSVPs"
             labelPosition="after"
             onTouchTap={() => {
               this.props.history.push('/admin/events/upload-rsvps')
             }}
+            style={{marginRight: 0}}
           >
-            <FontIcon className="material-icons" style={{position: 'relative', top: '6px', left: '6px'}}>file_upload</FontIcon>
+            <FontIcon className="material-icons" style={{position: 'relative', top: '7px', left: '6px'}}>file_upload</FontIcon>
           </RaisedButton>
-
-        </ToolbarGroup>
-        <ToolbarGroup key={1} float="right">
           <RaisedButton
             label="Create"
+            labelPosition="after"
             onTouchTap={() => {
               //this._handleEventCreation(this.state.selectedRows);
               window.location = '/admin/events/create'
             }}
-          />
+          >
+            <FontIcon className="material-icons" style={{position: 'relative', top: '7px', left: '6px'}}>add</FontIcon>
+          </RaisedButton>
           <ToolbarSeparator style={{marginLeft: 0}} />
           <RaisedButton
             label="Delete"
@@ -527,13 +533,22 @@ class AdminEventsSection extends React.Component {
             }}
           />
           <RaisedButton
+            label='Unapprove'
+            style={{marginLeft: 0}}
+            secondary={false}
+            disabled={(this.state.selectedRows.length == 0 || this.props.relay.variables.status === 'PENDING_APPROVAL')}
+            onTouchTap={() => {
+              this._handleEventConfirmation(this.state.selectedRows, true);
+            }}
+          />
+          <RaisedButton
             label={(this.props.relay.variables.status === 'PENDING_REVIEW') ? 'Mark Reviewed' : 'Mark Approved'}
             style={{marginLeft: 0}}
             secondary={true}
             disabled={(this.state.selectedRows.length == 0 || this.props.relay.variables.status === 'APPROVED')}
             onTouchTap={() => {
-          this._handleEventConfirmation(this.state.selectedRows);
-        }}
+              this._handleEventConfirmation(this.state.selectedRows);
+            }}
           />
         </ToolbarGroup>
       </Toolbar>
@@ -597,12 +612,12 @@ ${signature}`
         message: `Thank you for submitting your event to Bernie 2016 Events Central.
 ​
 Please note we do not approve fundraisers without prior campaign contact.
-​
-You can resubmit your event following guidelines at BernieSanders.com/plan.
-​
-Also, we recommend you read our guide Organizing with Forming a PAC (https://docs.google.com/document/d/1IgbYG_DY3slh67OMua3t-KjuqMWvggp-ucCr-HcwAZo/edit) - this explains a few things related to fundraising and group costs, and refers you to the FEC for all other fundraising questions.
-​
-You can resubmit your event following guidelines at BernieSanders.com/plan.
+
+In order to host a fundraiser, all donations must be collected from individuals through our website or by check with a donation form attached. Due to legal parameters, event hosts cannot co-mingle personal funds with contributions and, as a result, Bernie 2016 cannot collaborate with ticketed events. In addition, any space rental or production services utilized for the event must be purchased at market price by an individual (not a company itself as a donation) and filed as an in-kind donation. Event costs cannot exceed $1,000.
+
+If you would like to adapt your event to comply with the above parameters please email emilycavanagh@berniesanders.com. Once all legal parameters are met, you may resubmit your event at BernieSanders.com/plan.
+
+If you do not wish to comply with the regulations above, we recommend you read our guide, Organizing without Forming a PAC (https://docs.google.com/document/d/1IgbYG_DY3slh67OMua3t-KjuqMWvggp-ucCr-HcwAZo/edit) - this explains the specifications for independent fundraising not associated with Bernie 2016 and refers you to the FEC for all other fundraising questions.
 ​
 Thank you again for your support and for helping to spread Bernie's message!
 
@@ -724,7 +739,7 @@ ${signature}`
             this.setState({deletionConfirmationMessage: event.target.value});
           }}
           multiLine={true}
-          rowsMax={11}
+          rowsMax={6}
           fullWidth={true}
           inputStyle={{backgroundColor: 'rgb(250,250,250)'}}
           ref="deleteConfirmationInput"
@@ -739,7 +754,7 @@ ${signature}`
         open={this.state.showDeleteEventDialog}
         onRequestClose={this._handleDeleteModalRequestClose}
       >
-      {deleteMessage}
+        {deleteMessage}
       </Dialog>
     )
   }
