@@ -610,30 +610,12 @@ ${signature}`
       {
         reason: 'Event is a Fundraiser',
         message: `Thank you for submitting your event to Bernie 2016 Events Central.
-​
-Please note we do not approve fundraisers without prior campaign contact.
 
-In order to host a fundraiser, all donations must be collected from individuals through our website or by check with a donation form attached. Due to legal parameters, event hosts cannot co-mingle personal funds with contributions and, as a result, Bernie 2016 cannot collaborate with ticketed events. In addition, any space rental or production services utilized for the event must be purchased at market price by an individual (not a company itself as a donation) and filed as an in-kind donation. Event costs cannot exceed $1,000.
+Please note we do not currently approve fundraising events from volunteers and volunteer groups. This is due to complicated FEC requirements.
 
-If you would like to adapt your event to comply with the above parameters please email emilycavanagh@berniesanders.com. Once all legal parameters are met, you may resubmit your event at BernieSanders.com/plan.
+We recommend you read our guide Organizing without Forming a PAC - this explains a few things related to fundraising and group costs, and refers you to the FEC for all other fundraising questions.
 
-If you do not wish to comply with the regulations above, we recommend you read our guide, Organizing without Forming a PAC (https://docs.google.com/document/d/1IgbYG_DY3slh67OMua3t-KjuqMWvggp-ucCr-HcwAZo/edit) - this explains the specifications for independent fundraising not associated with Bernie 2016 and refers you to the FEC for all other fundraising questions.
-​
 Thank you again for your support and for helping to spread Bernie's message!
-
-${signature}`
-      },
-      {
-        reason: 'Event mentions the sale of merchandise',
-        message: `Thank you for submitting your event to Bernie 2016 Events Central.
-
-Please note we do not approve events that feature merchandise sales, neither official nor unofficial merchandise sales are sanctioned by the campaign at your event. This is due to complicated FEC requirements for fundraising.
-
-We recommend you read our guide Organizing with Forming a PAC - this explains a few things related to fundraising and group costs, and refers you to the FEC for all other fundraising questions.
-
-You can resubmit your event following guidelines at berniesanders.com/plan.
-
-Thank you again for your support and for helping to spread Bernie’s message!
 
 ${signature}`
       },
@@ -655,12 +637,17 @@ Thank you again for your support and for helping to spread Bernie’s message!
 ${signature}`
       },
       {
-        reason: 'Canvass event in non-canvass state',
-        message: `Thank you for submitting your canvass event.  At the moment, we're not running volunteer-led canvasses in that area, however we do have other very important tasks where we'd like your help.
+        reason: 'Canvass event in non-staff state',
+        message: `We're not supporting new canvass events in your state right now, but we encourage you to join an already scheduled canvass or GOTV event in your area.
 
-In particular, we're asking volunteers to host phone banks to call voters in states with upcoming caucuses/primaries. You can create your phone bank event right here: https://organize.berniesanders.com/events/create#type=phonebank
+Canvass events can be found here: http://map.berniesanders.com/#zipcode=&distance=50&sort=time&f%5B%5D=canvassing
 
-Again, thank you so much for your willingness to help spread Bernie's message.
+GOTV events can be found here:
+http://map.berniesanders.com/#zipcode=&distance=50&sort=time&f%5B%5D=gotv
+
+If you'd like to create your own event we encourage you to phone bank, which is an extremely efficient way to reach voters. You can create and host a phone bank event here: https://organize.berniesanders.com/events/create#type=phonebank
+
+Thank you so much for helping to spread Bernie's message!
 
 ${signature}`
       },
