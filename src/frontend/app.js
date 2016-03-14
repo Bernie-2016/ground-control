@@ -167,7 +167,7 @@ ReactDOM.render(
       path='/'
       component={Dashboard}
       queries={CurrentUserQueries}
-      >
+     >
       <IndexRedirect to='/call' />
       <Route
         path='events/create/v2'
@@ -203,6 +203,7 @@ ReactDOM.render(
         path='events'
         component={EventsDashboard}
         queries={{
+        	...CurrentUserQueries,
           ...ListContainerQueries
         }}
       />
