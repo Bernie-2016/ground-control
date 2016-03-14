@@ -629,11 +629,11 @@ ${signature}`
 
 Please note we do not approve events that feature merchandise sales, neither official nor unofficial merchandise sales are sanctioned by the campaign at your event. This is due to complicated FEC requirements for fundraising.
 
-We recommend you read our guide Organizing with Forming a PAC - this explains a few things related to fundraising and group costs, and refers you to the FEC for all other fundraising questions.
+We recommend you read our guide Organizing without Forming a PAC - this explains a few things related to fundraising and group costs, and refers you to the FEC for all other fundraising questions.
 
-You can resubmit your event following guidelines at berniesanders.com/plan.
+You have 48 hours to edit your event and remove the merchandise language.
 
-Thank you again for your support and for helping to spread Bernie’s message!
+Thank you again for your support and for helping to spread Bernie's message!
 
 ${signature}`
       },
