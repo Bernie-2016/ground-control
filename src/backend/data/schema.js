@@ -1923,15 +1923,8 @@ let RootQuery = new GraphQLObjectType({
           else
             localId = localId.id
           let event = await rootValue.loaders.bsdEvents.load(localId)
-
-          if(event){
-            eventId = event.event_id
-          } else {
-            eventId = localId
-          }
-
           return knex('fast_fwd_request')
-            .where('event_id', eventId)
+            .where('event_id', event.event_id)
         }
       }
     },
