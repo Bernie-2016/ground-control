@@ -17,6 +17,7 @@ import AdminCallAssignmentsSection from './components/AdminCallAssignmentsSectio
 import AdminCallAssignmentCreationForm from './components/AdminCallAssignmentCreationForm';
 import FastFwdForm from './components/FastFwdForm';
 import EventsDashboard from './components/EventsDashboard';
+import EventView from './components/EventView';
 import GCTextField from './components/forms/GCTextField';
 import GCPhoneField from './components/forms/GCPhoneField';
 import GCDateField from './components/forms/GCDateField';
@@ -206,6 +207,27 @@ ReactDOM.render(
         	...CurrentUserQueries,
         }}
       />
+      <Route
+        path='events'
+        component={CallAssignmentsDashboard}
+        queries={CurrentUserQueries}
+      >
+        <IndexRoute
+          component={EventsDashboard}
+          queries={{
+        		...CurrentUserQueries,
+        	}}
+        />
+        <Route
+          path=':id'
+          component={EventView}
+          queries={{
+            ...EventQueries,
+            ...CurrentUserQueries
+          }}
+          renderLoading={() => <Loading />}
+        />
+      </Route>
     </Route>
     <Route
       path='/event/:id/request_email'

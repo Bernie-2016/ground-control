@@ -51,7 +51,10 @@ class EventsDashboard extends React.Component {
             <div dangerouslySetInnerHTML={stripScripts(event.description)}></div>
           </CardText>
           <CardActions expandable={true}>
-            <FlatButton label="Open"/>
+            <FlatButton
+              label='View'
+              onTouchTap={() => this.props.history.push('/events/' + event.eventIdObfuscated)}
+            />
             <FlatButton label="Edit"/>
             <FlatButton label="Delete"/>
             <FlatButton label="Upload Sign In Sheets"/>
