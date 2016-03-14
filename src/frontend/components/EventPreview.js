@@ -72,6 +72,9 @@ export default class EventPreview extends React.Component {
 
     render() {
     let event = this.props.event
+    let formattedDateTime = momentWithTimezone(event.startDate, event.localTimezone)
+    formattedDateTime = formattedDateTime ? formattedDateTime.format('LLLL') : event.startDate
+
     let isOfficial = null;
     if (event.isOfficial){
       const officialStyle = {
@@ -110,7 +113,7 @@ export default class EventPreview extends React.Component {
           <p dangerouslySetInnerHTML={this.stripScripts(event.description)}></p>
 
           <InfoHeader content='Event Date & Time' />
-          <p>{momentWithTimezone(event.startDate, event.localTimezone).format('LLLL')} <span style={{color: BernieColors.gray}}>{event.localTimezone} time</span></p>
+          <p>{formattedDateTime} <span style={{color: BernieColors.gray}}>{event.localTimezone} time</span></p>
           <p>Duration: {Math.floor(event.duration / 60)} hours {event.duration % 60} minutes</p>
 
           <InfoHeader content='Event Location' />
