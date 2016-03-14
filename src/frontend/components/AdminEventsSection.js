@@ -613,7 +613,7 @@ ${signature}`
 
 Please note we do not currently approve fundraising events from volunteers and volunteer groups. This is due to complicated FEC requirements.
 
-We recommend you read our guide Organizing without Forming a PAC - this explains a few things related to fundraising and group costs, and refers you to the FEC for all other fundraising questions.
+We recommend you read our guide Organizing without Forming a PAC (https://docs.google.com/document/d/1IgbYG_DY3slh67OMua3t-KjuqMWvggp-ucCr-HcwAZo/edit) - this explains a few things related to fundraising and group costs, and refers you to the FEC for all other fundraising questions.
 
 Thank you again for your support and for helping to spread Bernie's message!
 
