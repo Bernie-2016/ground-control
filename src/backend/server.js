@@ -269,6 +269,9 @@ function startApp() {
         return res.redirect(['https://', req.get('Host'), req.url].join(''))
       }
 
+      res.header("Access-Control-Allow-Origin", "map.berniesanders.com, bernie2016events.org")
+      res.header("Access-Control-Allow-Headers", "Content-Type")
+      res.header('Access-Control-Allow-Methods', 'POST')
       next()
     })
   }
