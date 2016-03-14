@@ -18,6 +18,7 @@ import AdminCallAssignmentCreationForm from './components/AdminCallAssignmentCre
 import FastFwdForm from './components/FastFwdForm';
 import EventsDashboard from './components/EventsDashboard';
 import EventView from './components/EventView';
+import EventDataUpload from './components/EventDataUpload';
 import GCTextField from './components/forms/GCTextField';
 import GCPhoneField from './components/forms/GCPhoneField';
 import GCDateField from './components/forms/GCDateField';
@@ -221,6 +222,15 @@ ReactDOM.render(
         <Route
           path=':id'
           component={EventView}
+          queries={{
+            ...EventQueries,
+            ...CurrentUserQueries
+          }}
+          renderLoading={() => <Loading />}
+        />
+        <Route
+          path=':id/upload'
+          component={EventDataUpload}
           queries={{
             ...EventQueries,
             ...CurrentUserQueries
