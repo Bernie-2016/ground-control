@@ -8,6 +8,7 @@ import {Card, CardActions, CardExpandable, CardTitle, CardHeader, CardText, Flat
 import {BernieText, BernieColors} from './styles/bernie-css';
 import GCSelectField from './forms/GCSelectField'
 import InfoHeader from './InfoHeader'
+import stripScripts from '../helpers/stripScripts'
 
 const momentWithTimezone = (startDate, timeZone) => {
   return moment(startDate).tz(timeZone)
@@ -59,17 +60,6 @@ export default class EventPreview extends React.Component {
     document.removeEventListener('keydown', this.handleKeyDown);
   }
 
-  stripScripts = (s) => {
-    let div = document.createElement('div');
-    div.innerHTML = s;
-    let scripts = div.getElementsByTagName('script');
-    let i = scripts.length;
-    while (i--) {
-      scripts[i].parentNode.removeChild(scripts[i]);
-    }
-    return {__html: div.innerHTML}
-  }
-
     render() {
     let event = this.props.event
     let isOfficial = null;
@@ -107,7 +97,7 @@ export default class EventPreview extends React.Component {
           <p>Number of RSVPs: {event.attendeesCount}</p>
 
           <InfoHeader content='Event Description' />
-          <p dangerouslySetInnerHTML={this.stripScripts(event.description)}></p>
+          <p dangerouslySetInnerHTML={stripScripts(event.description)}></p>
 
           <InfoHeader content='Event Date & Time' />
           <p>{momentWithTimezone(event.startDate, event.localTimezone).format('LLLL')} <span style={{color: BernieColors.gray}}>{event.localTimezone} time</span></p>
