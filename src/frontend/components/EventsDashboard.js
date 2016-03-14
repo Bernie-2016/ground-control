@@ -1,6 +1,6 @@
 import React from 'react'
 import Relay from 'react-relay'
-import {Styles, Divider, RaisedButton, FlatButton, Card, CardHeader, CardText, CardActions, FontIcon} from 'material-ui'
+import {Styles, Divider, RaisedButton, FlatButton, Card, CardTitle, CardText, CardActions, FontIcon} from 'material-ui'
 import GCForm from './forms/GCForm'
 import Form from 'react-formal'
 import yup from 'yup'
@@ -42,7 +42,7 @@ class EventsDashboard extends React.Component {
       const formattedDate = offsetDate.format('l LT')
       return (
         <Card key={event.id} style={{width: '100%'}}>
-          <CardHeader
+          <CardTitle
             title={event.name}
             subtitle={formattedDate}
             actAsExpander={true}
