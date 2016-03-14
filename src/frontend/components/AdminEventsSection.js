@@ -610,15 +610,11 @@ ${signature}`
       {
         reason: 'Event is a Fundraiser',
         message: `Thank you for submitting your event to Bernie 2016 Events Central.
-​
-Please note we do not approve fundraisers without prior campaign contact.
 
-In order to host a fundraiser, all donations must be collected from individuals through our website or by check with a donation form attached. Due to legal parameters, event hosts cannot co-mingle personal funds with contributions and, as a result, Bernie 2016 cannot collaborate with ticketed events. In addition, any space rental or production services utilized for the event must be purchased at market price by an individual (not a company itself as a donation) and filed as an in-kind donation. Event costs cannot exceed $1,000.
+Please note we do not currently approve fundraising events from volunteers and volunteer groups. This is due to complicated FEC requirements.
 
-If you would like to adapt your event to comply with the above parameters please email emilycavanagh@berniesanders.com. Once all legal parameters are met, you may resubmit your event at BernieSanders.com/plan.
+We recommend you read our guide Organizing without Forming a PAC - this explains a few things related to fundraising and group costs, and refers you to the FEC for all other fundraising questions.
 
-If you do not wish to comply with the regulations above, we recommend you read our guide, Organizing without Forming a PAC (https://docs.google.com/document/d/1IgbYG_DY3slh67OMua3t-KjuqMWvggp-ucCr-HcwAZo/edit) - this explains the specifications for independent fundraising not associated with Bernie 2016 and refers you to the FEC for all other fundraising questions.
-​
 Thank you again for your support and for helping to spread Bernie's message!
 
 ${signature}`
@@ -655,7 +651,7 @@ Thank you again for your support and for helping to spread Bernie’s message!
 ${signature}`
       },
       {
-        reason: 'Canvass event in non-canvass state',
+        reason: 'Canvass event in non-staff state',
         message: `We're not supporting new canvass events in your state right now, but we encourage you to join an already scheduled canvass or GOTV event in your area.
 
 Canvass events can be found here: http://map.berniesanders.com/#zipcode=&distance=50&sort=time&f%5B%5D=canvassing
