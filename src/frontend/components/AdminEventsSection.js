@@ -656,11 +656,16 @@ ${signature}`
       },
       {
         reason: 'Canvass event in non-canvass state',
-        message: `Thank you for submitting your canvass event.  At the moment, we're not running volunteer-led canvasses in that area, however we do have other very important tasks where we'd like your help.
+        message: `We're not supporting new canvass events in your state right now, but we encourage you to join an already scheduled canvass or GOTV event in your area.
 
-In particular, we're asking volunteers to host phone banks to call voters in states with upcoming caucuses/primaries. You can create your phone bank event right here: https://organize.berniesanders.com/events/create#type=phonebank
+Canvass events can be found here: http://map.berniesanders.com/#zipcode=&distance=50&sort=time&f%5B%5D=canvassing
 
-Again, thank you so much for your willingness to help spread Bernie's message.
+GOTV events can be found here:
+http://map.berniesanders.com/#zipcode=&distance=50&sort=time&f%5B%5D=gotv
+
+If you'd like to create your own event we encourage you to phone bank, which is an extremely efficient way to reach voters. You can create and host a phone bank event here: https://organize.berniesanders.com/events/create#type=phonebank
+
+Thank you so much for helping to spread Bernie's message!
 
 ${signature}`
       },
