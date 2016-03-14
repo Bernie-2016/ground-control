@@ -3,7 +3,7 @@ import Relay from 'react-relay'
 import {SelectField, MenuItem, Dialog, FlatButton, TextField} from 'material-ui'
 import MutationHandler from './MutationHandler'
 import EmailHostAttendees from '../mutations/EmailHostAttendees'
-
+import linkedState from 'react-link';
 class SendEventMail extends React.Component {
   constructor(props) {
     super(props);
@@ -17,7 +17,6 @@ class SendEventMail extends React.Component {
   }
 
   render() {
-    let me = this;
     const standardActions = [
       <FlatButton
         label="Cancel"
@@ -30,12 +29,12 @@ class SendEventMail extends React.Component {
         disabled={this.state.subject === '' || this.state.message === ''}
         onTouchTap={() => {
           this.refs.sendEmailHandler.send({
-            ids: me.props.event.id,
-            replyTo: me.state.replyTo,
-            bcc: [me.props.currentUser.email],
-            subject: me.state.subject,
-            message: me.state.message,
-            target: me.state.target
+            ids: this.props.event.id,
+            replyTo: this.state.replyTo,
+            bcc: [this.props.currentUser.email],
+            subject: this.state.subject,
+            message: this.state.message,
+            target: this.state.target
           })
         }}
       />
@@ -63,26 +62,19 @@ class SendEventMail extends React.Component {
         <SelectField
           floatingLabelText="Send Replies To"
           value={this.state.replyTo}
-          onChange={(event, index, value) => {
-            this.setState({replyTo: value})
-          }}
           floatingLabelStyle={{cursor: 'pointer'}}
         >
           <MenuItem value={this.props.currentUser.email} primaryText={this.props.currentUser.email}/>
           <MenuItem value="info@berniesanders.com" primaryText="info@berniesanders.com"/>
         </SelectField>
         <TextField
+          valueLink={linkedState(this, 'subject')}
           floatingLabelText="Subject"
-          onChange={(event) => {
-            this.setState({subject: event.target.value})
-          }}
           fullWidth={true}
         />
         <TextField
+          valueLink={linkedState(this, 'message')}
           floatingLabelText="Message Content"
-          onChange={(event) => {
-            this.setState({message: event.target.value});
-          }}
           multiLine={true}
           rowsMax={11}
           fullWidth={true}
