@@ -620,20 +620,6 @@ Thank you again for your support and for helping to spread Bernie's message!
 ${signature}`
       },
       {
-        reason: 'Event mentions the sale of merchandise',
-        message: `Thank you for submitting your event to Bernie 2016 Events Central.
-
-Please note we do not approve events that feature merchandise sales, neither official nor unofficial merchandise sales are sanctioned by the campaign at your event. This is due to complicated FEC requirements for fundraising.
-
-We recommend you read our guide Organizing without Forming a PAC - this explains a few things related to fundraising and group costs, and refers you to the FEC for all other fundraising questions.
-
-You have 48 hours to edit your event and remove the merchandise language.
-
-Thank you again for your support and for helping to spread Bernie's message!
-
-${signature}`
-      },
-      {
         reason: 'Event mentions ballot / petitions',
         message: `Thank you for your interest in helping gather petition signatures to help get Bernie on the ballot! The campaign currently does not need signatures to qualify for the ballot in your state. But don’t worry, there are other ways you can volunteer to help the campaign.
 
