@@ -33,9 +33,8 @@ class EventsDashboard extends React.Component {
   }
 
   renderEvents() {
-    const events = this.props.listContainer.events.edges || []
+    const events = this.props.currentUser.relatedPerson.hostedEvents || []
     return events.map((event) => {
-      event = event.node
       const utcOffset = event.localUTCOffset || 0
       const timezone = event.localTimezone || 'UTC'
       const offsetDate = moment(event.startDate).utcOffset(utcOffset)
@@ -63,7 +62,7 @@ class EventsDashboard extends React.Component {
   }
 
   render() {
-    console.log(this.props.listContainer)
+    console.log(this.props)
     return (
       <div style={{height: this.state.windowHeight - 56, width: '100%', top: 56, position: 'absolute', overflow: 'scroll'}}>
         {this.renderEvents()}
@@ -73,85 +72,63 @@ class EventsDashboard extends React.Component {
 }
 
 export default Relay.createContainer(EventsDashboard, {
-  initialVariables: {
-    numEvents: 100,
-    sortField: 'startDate',
-    sortDirection: 'ASC',
-    status: 'PENDING_REVIEW',
-    filters: {},
-    hostFilters: {}
-  },
   fragments: {
     currentUser: () => Relay.QL`
       fragment on User {
         id
         email
-      }
-    `,
-    listContainer: () => Relay.QL`
-      fragment on ListContainer {
-        events(
-          first: $numEvents
-          eventFilterOptions: $filters
-          hostFilterOptions: $hostFilters
-          status: $status
-          sortField: $sortField
-          sortDirection: $sortDirection
-        ) {
-          edges {
-            cursor
-            node {
-              name
+        relatedPerson {
+          hostedEvents {
+            name
+            id
+            host {
               id
-              host {
-                id
-                firstName
-                lastName
-                email
-              }
-              eventType {
-                id
-                name
-              }
-              eventIdObfuscated
-              flagApproval
-              isOfficial
-              description
-              venueName
-              latitude
-              longitude
-              venueZip
-              venueCity
-              venueState
-              venueAddr1
-              venueAddr2
-              venueCountry
-              venueDirections
-              createDate
-              startDate
-              localTimezone
-              localUTCOffset
-              duration
-              capacity
-              attendeeVolunteerShow
-              attendeeVolunteerMessage
-              isSearchable
-              publicPhone
-              contactPhone
-              hostReceiveRsvpEmails
-              rsvpUseReminderEmail
-              rsvpEmailReminderHours
-              attendeesCount
-              attendees {
-                firstName
-                lastName
-                phone
-                email
-                address {
-                  city
-                  state
-                  zip
-                }
+              firstName
+              lastName
+              email
+            }
+            eventType {
+              id
+              name
+            }
+            eventIdObfuscated
+            flagApproval
+            isOfficial
+            description
+            venueName
+            latitude
+            longitude
+            venueZip
+            venueCity
+            venueState
+            venueAddr1
+            venueAddr2
+            venueCountry
+            venueDirections
+            createDate
+            startDate
+            localTimezone
+            localUTCOffset
+            duration
+            capacity
+            attendeeVolunteerShow
+            attendeeVolunteerMessage
+            isSearchable
+            publicPhone
+            contactPhone
+            hostReceiveRsvpEmails
+            rsvpUseReminderEmail
+            rsvpEmailReminderHours
+            attendeesCount
+            attendees {
+              firstName
+              lastName
+              phone
+              email
+              address {
+                city
+                state
+                zip
               }
             }
           }

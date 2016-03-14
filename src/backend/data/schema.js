@@ -769,7 +769,7 @@ const GraphQLPerson = new GraphQLObjectType({
       resolve: async (person, {rootValue}) => {
 
         let query = knex('bsd_events')
-          .whereNot('creator_cons_id', person.cons_id)
+          .where('creator_cons_id', person.cons_id)
 
         return query
       }

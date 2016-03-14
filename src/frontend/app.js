@@ -204,7 +204,6 @@ ReactDOM.render(
         component={EventsDashboard}
         queries={{
         	...CurrentUserQueries,
-          ...ListContainerQueries
         }}
       />
     </Route>
