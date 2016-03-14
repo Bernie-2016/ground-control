@@ -54,8 +54,8 @@ export const BernieText = {
     // fontSize: '1em',
     fontWeight: 'normal',
     lineHeight: 1,
-    marginTop: '2em',
-    marginBottom: '1em'
+    marginTop: '1.2em',
+    marginBottom: '0.3em'
   },
 
   menuItem: {
