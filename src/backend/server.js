@@ -387,7 +387,7 @@ function startApp() {
 
   app.post('/events/add-rsvp', wrap(async(req, res) => {
     log.debug(req)
-    
+
   	const makeRequest = async (query) => {
   		log.debug(query)
   		let response = null
@@ -403,8 +403,8 @@ function startApp() {
   	}
 
     const getShiftsAndRSVP = (idType='event_id_obfuscated') => {
-      log.info('running', req.query)
-      const eventIds = req.query[idType].split(',')
+      log.info('running', req.body)
+      const eventIds = req.body[idType].split(',')
       eventIds.forEach(async (eventId) => {
         if (!eventId)
           return
@@ -414,20 +414,20 @@ function startApp() {
           .orderBy('bsd_event_shifts.start_dt', 'asc')
           .first()
         if (shift)
-          req.query.shift_ids = shift.event_shift_id
-        req.query[idType] = eventId
-        makeRequest(req.query)
+          req.body.shift_ids = shift.event_shift_id
+        req.body[idType] = eventId
+        makeRequest(req.body)
       })
     }
 
-    if (req.query.event_id_obfuscated){
+    if (req.body.event_id_obfuscated){
       getShiftsAndRSVP()
     }
-    else if (req.query.event_id){
+    else if (req.body.event_id){
       getShiftsAndRSVP('event_id')
     }
     else
-    	makeRequest(req.query)
+    	makeRequest(req.body)
   }))
 
   app.post('/events/create', wrap(async (req, res) => {
