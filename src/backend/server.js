@@ -68,6 +68,14 @@ function startApp() {
     tablename: 'sessions'
   })
 
+  async function createNewBSDUser(email, password) {
+    //Create a new BSD User
+    await BSDClient.createConstituent(email);
+
+    //Set the new BSD User's password
+    await BSDClient.setConstituentPassword(email, password);
+  }
+
   function isAuthenticated(req, res, next) {
     if (req.user)
       return next()
@@ -121,22 +129,33 @@ function startApp() {
       let bsdCredentialsResponse = await BSDClient.checkCredentials(email, password)
       let bsdCredentialsValid = (typeof bsdCredentialsResponse === 'object' && bsdCredentialsResponse.api.cons)
 
+      //If user exists and credentials are valid but no BSD user, create new BSD constituent and log in
+      if (user && !bsdUser) {
+        if (await compare(password, user.password)) {
+          // Create new BSD User and log in
+          await createNewBSDUser(email, password)
+          return done(null, user)
+        }
+        else {
+          // Login is invalid
+          return done(null, false, {
+            message: 'Incorrect password.',
+            "url": "https://www.bluestatedigital.com/ctl/Core/AdminResetPass"
+          });
+        }
+      }
       //If BSD credentials are incorrect, give error message with a link to reset password via BSD
-      if (bsdUser && !bsdCredentialsValid) {
+      else if (bsdUser && !bsdCredentialsValid) {
         return done(null, false, {
           message: 'Incorrect password.',
           "url": "https://www.bluestatedigital.com/ctl/Core/AdminResetPass"
         });
       }
-
       //If BSD constituent does not exist, create a new BSD constituent AND ground-control user with those credentials
       else if (!bsdUser &&(!user || user.password === null)) {
 
-        //Create a new BSD User
-        let newBSDUser = await BSDClient.createConstituent(email);
-
-        //Set the new BSD User's password
-        await BSDClient.setConstituentPassword(email, password);
+        // Create new BSD User
+        await createNewBSDUser(email, password)
 
         //Create a new GC User
         if (!user) {
