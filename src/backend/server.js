@@ -386,6 +386,8 @@ function startApp() {
   }))
 
   app.post('/events/add-rsvp', wrap(async(req, res) => {
+    log.debug(req)
+    
   	const makeRequest = async (query) => {
   		log.debug(query)
   		let response = null
