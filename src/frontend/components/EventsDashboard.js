@@ -45,7 +45,7 @@ class EventsDashboard extends React.Component {
       const offsetDate = moment(event.startDate).utcOffset(utcOffset)
       const formattedDate = offsetDate.format('l LT')
       return (
-        <Card key={event.id} style={{width: '100%'}}>
+        <Card key={event.id} style={{margin: 5, width: this.state.windowWidth - 10}}>
           <CardTitle
             title={event.name}
             subtitle={formattedDate}
