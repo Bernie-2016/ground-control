@@ -131,9 +131,21 @@ function startApp() {
 
       //If user exists and credentials are valid but no BSD user, create new BSD constituent and log in
       if (user && !bsdUser) {
-        if (await compare(password, user.password)) {
+        if (user.password === null || user.password === undefined) {
           // Create new BSD User and log in
           await createNewBSDUser(email, password)
+
+          // Set user's new password
+          await knex('users')
+            .where('email', email.toLowerCase())
+            .update({password: hashedPassword})
+
+          return done(null, user)
+        }
+        else if (await compare(password, user.password)) {
+          // Create new BSD User and log in
+          await createNewBSDUser(email, password)
+
           return done(null, user)
         }
         else {
