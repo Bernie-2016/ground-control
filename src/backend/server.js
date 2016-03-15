@@ -386,16 +386,15 @@ function startApp() {
   }))
 
   app.post('/events/add-rsvp', wrap(async(req, res) => {
-    log.debug(req)
 
-  	const makeRequest = async (query) => {
-  		log.debug(query)
+  	const makeRequest = async (body) => {
+  		log.debug(body)
   		let response = null
   		try {
-  		  response = await BSDClient.addRSVPToEvent(query)
+  		  response = await BSDClient.addRSVPToEvent(body)
   		} catch(ex) {
-  			query.error = JSON.parse(ex.message).error_description || ex.toString()
-  		  res.status(400).json(query)
+  			body.error = JSON.parse(ex.message).error_description || ex.toString()
+  		  res.status(400).json(body)
   		  log.error(ex)
   		  return
   		}
@@ -403,7 +402,6 @@ function startApp() {
   	}
 
     const getShiftsAndRSVP = (idType='event_id_obfuscated') => {
-      log.info('running', req.body)
       const eventIds = req.body[idType].split(',')
       eventIds.forEach(async (eventId) => {
         if (!eventId)
