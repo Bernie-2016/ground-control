@@ -73,7 +73,6 @@ class EventsDashboard extends React.Component {
   }
 
   render() {
-    console.log(this.props)
     return (
       <div style={{height: this.state.windowHeight - 56, width: '100%', top: 56, position: 'absolute', overflow: 'scroll'}}>
         {this.renderEvents()}
