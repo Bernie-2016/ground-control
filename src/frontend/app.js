@@ -237,6 +237,15 @@ ReactDOM.render(
           }}
           renderLoading={() => <Loading />}
         />
+        <Route
+          path=':id/request-email'
+          component={FastFwdForm}
+            queries={{
+              ...EventQueries,
+              ...CurrentUserQueries
+            }}
+            renderLoading={() => <Loading />}
+        />
       </Route>
     </Route>
     <Route

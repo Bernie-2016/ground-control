@@ -63,6 +63,10 @@ class EventsDashboard extends React.Component {
             <FlatButton label="Edit"/>
             <FlatButton label="Delete"/>
             <FlatButton
+              label="Send Turnout Email"
+              onTouchTap={() => this.props.history.push('/events/' + event.eventIdObfuscated + '/request-email')}
+            />
+            <FlatButton
               label="Upload Sign In Sheets"
               onTouchTap={() => this.props.history.push('/events/' + event.eventIdObfuscated + '/upload')}
             />
