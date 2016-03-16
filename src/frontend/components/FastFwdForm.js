@@ -40,10 +40,6 @@ class FastFwdForm extends React.Component {
     }
   }
 
-  formSchema = yup.object({
-    hostMessage: yup.string().required(),
-  })
-
   state = {
     testMode: false,
     recipientLimit: null
@@ -79,6 +75,10 @@ class FastFwdForm extends React.Component {
                             "Thank you,\n\n" +
                             (this.props.event.host ? this.props.event.host.firstName: "")
 
+    let formSchema = yup.object({
+      hostMessage: yup.string().default(this.props.event.hostMessage || defaultHostMessage).required(),
+    })
+
     return (
       <MuiThemeProvider muiTheme={Styles.getMuiTheme(BernieTheme)}>
         <div style={this.styles.pageContainer}>
@@ -97,9 +97,11 @@ class FastFwdForm extends React.Component {
 
           <Paper zDepth={2} style={this.styles.formContainer}>
             <GCForm
-              schema={this.formSchema}
-              defaultValue={{
-                hostMessage: this.props.event.hostMessage || defaultHostMessage
+              schema={formSchema}
+              defaultValue={formSchema.default()}
+              value = {this.state.model}
+              onChange={ model => {
+                this.setState({ model })
               }}
               onSubmit={(formValues) => {
                 this.refs.mutationHandler.send({
