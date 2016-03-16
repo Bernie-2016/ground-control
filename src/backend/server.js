@@ -388,6 +388,9 @@ function startApp() {
   app.post('/events/add-rsvp', wrap(async(req, res) => {
     log.debug('received request...')
     log.debug(req.body)
+    log.debug(req.query)
+    if (req.query)
+      req.body = req.query
 
     res.header("Access-Control-Allow-Origin", "*")
     res.header("Access-Control-Allow-Headers", "*")
