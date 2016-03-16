@@ -1,4 +1,14 @@
-# Ground Control
+# Ground Control [![Build Status](https://travis-ci.org/BernieBots/ground-control.svg?branch=master)](https://travis-ci.org/BernieBots/ground-control) [![esdoc](https://doc.esdoc.org/github.com/BernieBots/ground-control/badge.svg)](https://doc.esdoc.org/github.com/BernieBots/ground-control/) [![codecov.io](https://codecov.io/github/BernieBots/ground-control/coverage.svg?branch=master)](https://codecov.io/github/BernieBots/ground-control?branch=master)
+
+
+![codecov.io](https://codecov.io/github/BernieBots/ground-control/branch.svg?branch=master)
+
+
+[![Code Climate](https://codeclimate.com/github/BernieBots/ground-control/badges/gpa.svg)](https://codeclimate.com/github/BernieBots/ground-control)
+[![Dependency Status](https://david-dm.org/BernieBots/ground-control.svg)](https://david-dm.org/BernieBots/ground-control/)
+[![devDependency Status](https://david-dm.org/BernieBots/ground-control/dev-status.svg)](https://david-dm.org/BernieBots/ground-control#info=devDependencies)
+[![Issue Count](https://codeclimate.com/github/BernieBots/ground-control/badges/issue_count.svg)](https://codeclimate.com/github/BernieBots/ground-control)
+[![Known Vulnerabilities](https://snyk.io/test/github/BernieBots/ground-control/badge.svg?)](https://snyk.io/test/github/BernieBots/ground-control)
 
 ## Getting started
 

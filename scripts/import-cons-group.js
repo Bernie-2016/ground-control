@@ -26,7 +26,9 @@ async function main() {
   parsedData.forEach((datum) => {
     data.push({
       cons_group_id: groupId,
-      cons_id: datum['Unique Constituent ID']
+      cons_id: datum['Unique Constituent ID'],
+      create_dt: now,
+      modified_dt: now
     })
   })
   await knex.transaction(async (trx) => {
@@ -51,6 +53,12 @@ async function main() {
           throw err
       }
     }
+      cons_id: datum['Unique Constituent ID'],
+      create_dt: now,
+      modified_dt: now
+    })
+  })
+  await knex.transaction(async (trx) => {
     await knex('bsd_person_bsd_groups')
       .where('cons_group_id', groupId)
       .delete()
