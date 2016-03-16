@@ -388,6 +388,10 @@ function startApp() {
   app.post('/events/add-rsvp', wrap(async(req, res) => {
     log.debug('received request...')
 
+    res.header("Access-Control-Allow-Origin", "*")
+    res.header("Access-Control-Allow-Headers", "*")
+    res.header('Access-Control-Allow-Methods', '*')
+
   	const makeRequest = async (body) => {
   		log.debug(body)
   		let response = null
