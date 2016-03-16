@@ -385,7 +385,7 @@ function startApp() {
     res.redirect('https://docs.google.com/forms/d/1cyoAcumEd4Co5Fqj9pOUnQtIUo_rfRzQ7oVqACFe5Rs/viewform')
   }))
 
-  app.post('/events/add-rsvp', wrap(async(req, res) => {
+  app.post('/events/add-rsvp', async (req, res) => {
     log.debug('received request...')
     log.debug(req.body)
     log.debug(req.query)
@@ -435,7 +435,7 @@ function startApp() {
     }
     else
     	makeRequest(req.body)
-  }))
+  })
 
   app.post('/events/create', wrap(async (req, res) => {
 
