@@ -300,9 +300,6 @@ function startApp() {
         return res.redirect(['https://', req.get('Host'), req.url].join(''))
       }
 
-      res.header("Access-Control-Allow-Origin", "http://www.bernie2016events.org")
-      res.header("Access-Control-Allow-Headers", "Content-Type")
-      res.header('Access-Control-Allow-Methods', 'POST')
       next()
     })
   }
@@ -385,15 +382,19 @@ function startApp() {
     res.redirect('https://docs.google.com/forms/d/1cyoAcumEd4Co5Fqj9pOUnQtIUo_rfRzQ7oVqACFe5Rs/viewform')
   }))
 
-  app.post('/events/add-rsvp', wrap(async(req, res) => {
-  	const makeRequest = async (query) => {
-  		log.debug(query)
+  app.post('/events/add-rsvp', async (req, res) => {
+    res.header("Access-Control-Allow-Origin", "*")
+    res.header("Access-Control-Allow-Headers", "*")
+    res.header('Access-Control-Allow-Methods', '*')
+    
+  	const makeRequest = async (body) => {
+  		log.debug(body)
   		let response = null
   		try {
-  		  response = await BSDClient.addRSVPToEvent(query)
+  		  response = await BSDClient.addRSVPToEvent(body)
   		} catch(ex) {
-  			query.error = JSON.parse(ex.message).error_description || ex.toString()
-  		  res.status(400).json(query)
+  			body.error = JSON.parse(ex.message).error_description || ex.toString()
+  		  res.status(400).json(body)
   		  log.error(ex)
   		  return
   		}
@@ -401,8 +402,7 @@ function startApp() {
   	}
 
     const getShiftsAndRSVP = (idType='event_id_obfuscated') => {
-      log.info('running', req.query)
-      const eventIds = req.query[idType].split(',')
+      const eventIds = req.body[idType].split(',')
       eventIds.forEach(async (eventId) => {
         if (!eventId)
           return
@@ -412,21 +412,21 @@ function startApp() {
           .orderBy('bsd_event_shifts.start_dt', 'asc')
           .first()
         if (shift)
-          req.query.shift_ids = shift.event_shift_id
-        req.query[idType] = eventId
-        makeRequest(req.query)
+          req.body.shift_ids = shift.event_shift_id
+        req.body[idType] = eventId
+        makeRequest(req.body)
       })
     }
 
-    if (req.query.event_id_obfuscated){
+    if (req.body.event_id_obfuscated){
       getShiftsAndRSVP()
     }
-    else if (req.query.event_id){
+    else if (req.body.event_id){
       getShiftsAndRSVP('event_id')
     }
     else
-    	makeRequest(req.query)
-  }))
+    	makeRequest(req.body)
+  })
 
   app.post('/events/create', wrap(async (req, res) => {
 

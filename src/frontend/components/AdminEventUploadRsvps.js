@@ -87,19 +87,22 @@ export default class AdminEventUploadRsvps extends React.Component {
     })
     let url = `/events/add-rsvp?${qs.stringify(row)}`
 
-    superagent.post(url, (err, res) => {
-      let filesProcessed = this.state.filesProcessed
-      let processObj = filesProcessed[fileName]
-      processObj.processedRows += 1
+    superagent.post('/events/add-rsvp')
+      .set('Accept', 'application/json')
+      .send(row)
+      .end((err, res) => {
+        let filesProcessed = this.state.filesProcessed
+        let processObj = filesProcessed[fileName]
+        processObj.processedRows += 1
 
-      console.log(res.body)
+        console.log(res.body) 
 
-      if (err) {
-        processObj.errors.push(res.body)
-      }
-      filesProcessed[fileName] = processObj
-      this.setState(filesProcessed)
-    })
+        if (err) {
+          processObj.errors.push(res.body)
+        }
+        filesProcessed[fileName] = processObj
+        this.setState(filesProcessed)
+      })
   }
 
   onDrop = (files) => {
