@@ -36,6 +36,10 @@ class EventDataUpload extends React.Component {
     }
   }
 
+  formSchema = yup.object({
+    notes: yup.string().required(),
+  })
+
   render() {
     const event = this.props.event
     let formattedDateTime = momentWithTimezone(event.startDate, event.localTimezone)
@@ -61,7 +65,30 @@ class EventDataUpload extends React.Component {
 
           <div style={this.styles.formContainer}>
             <Paper style={{padding: 15}}>
-              <h1>Upload Form</h1>
+              <GCForm
+                schema={this.formSchema}
+                defaultValue={{
+                  notes: null
+                }}
+                onSubmit={(formValues) => {
+                  this.refs.mutationHandler.send({
+                    eventId: this.props.event.id,
+                    ...formValues
+                  })
+                }}
+              >
+                <h3 style={BernieText.secondaryTitle}>Upload Event Data</h3>
+                <Form.Field
+                  name='notes'
+                  multiLine={true}
+                  fullWidth={true}
+                  rows={5}
+                  label="Notes"
+                />
+                <br />
+                <br />
+                <Form.Button type='submit' label='Submit' fullWidth={true} />
+              </GCForm>
             </Paper>
           </div>
 
