@@ -41,7 +41,7 @@ var eventTypes = [
 		defaultValues: {
 			public_phone: 1,
 			venue_name: 'My car',
-			name: 'Carpool From HOME CITY to DESTINATION CITY',
+			name: 'Carpool From [HOME CITY] to [DESTINATION CITY]',
 			is_searchable: true,
 			rsvp_use_reminder_email: true,
 			rsvp_email_reminder_hours: 24,
