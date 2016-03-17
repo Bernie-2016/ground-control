@@ -31,9 +31,9 @@ var eventTypes = [
 	},
 	{
 		id: 'carpool',
-		name: 'Carpool to an early voting state',
+		name: 'Carpool',
 		adminOnly: false,
-		disabled: ['use_shifts'],
+		disabled: ['use_shifts', 'attendee_volunteer_show', 'host_receive_rsvp_emails'],
 		labels: {
 			'host_receive_rsvp_emails': 'Receive an email when people join my carpool',
 			'attendee_volunteer_show': 'Ask riders to help out',
@@ -41,7 +41,7 @@ var eventTypes = [
 		defaultValues: {
 			public_phone: 1,
 			venue_name: 'My car',
-			name: 'Carpool to [CITY] to Help Bernie Win!',
+			name: 'Carpool From [HOME CITY] to [DESTINATION CITY]',
 			is_searchable: true,
 			rsvp_use_reminder_email: true,
 			rsvp_email_reminder_hours: 24,
@@ -50,7 +50,7 @@ var eventTypes = [
 			attendee_volunteer_message: 'If you can chip in for gas and snacks, please sign up as a volunteer. Thanks!',
 			host_receive_rsvp_emails: true,
 			attendee_volunteer_show: true,
-			description: '<a href="http://bernie.to/distance-faq">Click here to view Carpool FAQs</a><p>Join me and other Bernie supporters for a road trip!</p><p>I’ll be leaving on [WRITE YOUR DEPARTURE DATE/TIME HERE] and returning on [WRITE YOUR RETURN DATE/TIME HERE].</p><p>We’re going to hit the road for Bernie to the help out in the crucial final days before the election. When we arrive at the local field office, Bernie staff on the ground will train us and plug us into the campaign so that we can be as effective as possible.</p>'
+			description: '<a href="http://bernie.to/distance-faq">Click here to view Carpool FAQs</a><p>Join me and other Bernie supporters for a road trip!</p><p>I’ll be leaving on [WRITE YOUR DEPARTURE DATE/TIME HERE] and returning on [WRITE YOUR RETURN DATE/TIME HERE].</p><p>We’re going to hit the road for Bernie to the help out in the crucial final days before the election. Bernie staff on the ground will train us and plug us into the campaign so that we can be as effective as possible.</p><p>Victory will require all of us pitching in, so sign up and let’s go on a Bernie Journey!</p>'
 		}
 	},
 	{

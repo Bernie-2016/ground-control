@@ -50,7 +50,6 @@ function startApp() {
     }
   }
 
-  const inDevEnv = (process.env.NODE_ENV === 'development')
   const KnexSessionStore = KnexSessionStoreFactory(session)
   const Mailgun = new MG(process.env.MAILGUN_KEY, process.env.MAILGUN_DOMAIN)
   const BSDClient = new BSD(process.env.BSD_HOST, process.env.BSD_API_ID, process.env.BSD_API_SECRET)
@@ -102,6 +101,9 @@ function startApp() {
   }
 
   let isStaff = async (userId) => {
+    if (!userId) {
+      return false
+    }
     const user = await knex('users').where('id', userId).first()
     if (user && user.email){
       let domain = user.email.split('@')
@@ -345,29 +347,12 @@ function startApp() {
   )
 
   app.get('/events/create', wrap(async (req, res) => {
-    let userIsAuthed = false
     let userIsAdmin = false
-    let userEmail = null
     if (req.user && req.user.id) {
       userIsAdmin = await isStaff(req.user.id)
-      userIsAuthed = true
-      userEmail = await knex('users')
-        .select('email')
-        .where('id', req.user.id)
-        .first()
     }
-    if (inDevEnv) {
-      const temp = fs.readFileSync(templateDir + '/create_event.hbs', { encoding: 'utf-8' });
-      const page = handlebars.compile(temp);
-      res.send(page({
-        is_public: !userIsAdmin,
-        is_logged_in: userIsAuthed,
-        events_root_url: publicEventsRootUrl,
-        gcUser: req.user
-      }));
-      return
-    }
-    res.send(createEventPage({ is_public: !userIsAdmin, is_logged_in: userIsAuthed, events_root_url: publicEventsRootUrl, gcUser: req.user }));
+
+    res.send(createEventPage({ is_public: !userIsAdmin, events_root_url: publicEventsRootUrl, gcUser: req.user }));
   }))
 
   app.get('/admin/events/create', isAuthenticated, wrap(async (req, res) => {
