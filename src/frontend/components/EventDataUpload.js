@@ -17,6 +17,15 @@ const momentWithTimezone = (startDate, timeZone) => {
 }
 
 class EventDataUpload extends React.Component {
+
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      fileType: null
+    }
+  }
+
   styles = {
     detailsContainer: {
       float: 'left',
@@ -156,9 +165,6 @@ class EventDataUpload extends React.Component {
             <div style={{padding: 15}}>
               <GCForm
                 schema={this.formSchema}
-                defaultValue={{
-                  fileType: null
-                }}
                 onSubmit={(formValues) => {
                   this.refs.mutationHandler.send({
                     eventId: this.props.event.id,
@@ -176,6 +182,10 @@ class EventDataUpload extends React.Component {
                     eventPhotos: 'Event Photos',
                     signInSheets: 'Sign-In Sheets',
                     phonebankEventForms: 'Phonebank Event Forms'
+                  }}
+                  value={this.state.fileType}
+                  onChange={(fileType) => {
+                    this.setState({fileType})
                   }}
                 />
 
