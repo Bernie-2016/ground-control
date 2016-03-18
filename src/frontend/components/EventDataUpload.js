@@ -50,6 +50,7 @@ class EventDataUpload extends React.Component {
       fontSize: '1.5em',
       color: BernieColors.green,
       margin: '0 auto',
+      marginTop: '1em',
       width: '100%',
       minHeight: 300,
       borderWidth: 2,
@@ -82,6 +83,39 @@ class EventDataUpload extends React.Component {
   formSchema = yup.object({
     fileType: yup.string().required()
   })
+
+  renderDropZone() {
+    if (this.state.fileType !== null){
+      return (
+        <Dropzone
+          ref="dropzone"
+          onDrop={this.onDrop}
+          style={this.styles.dropzoneStyle}
+          activeStyle={this.styles.dropzoneActiveStyle}
+          rejectStyle={this.styles.dropzoneRejectStyle}
+          disableClick={true}
+        >
+          <div style={{
+            paddingTop: 20,
+            paddingBottom: 20,
+            borderBottom: '1px dashed ' + BernieColors.green
+          }}>
+            <div style={{...BernieText.title, fontSize: '1.2em', color: BernieColors.green}}>
+              Drop your Event Files here!
+            </div>
+            <div style={{...BernieText.default, fontSize: '0.65em'}}>
+              <FlatButton
+                label="Select Files to Upload"
+                onTouchTap={() => this.refs.dropzone.open()}
+              />
+            </div>
+          </div>
+        </Dropzone>
+      )
+    }
+    else
+      return <div></div>
+  }
 
   onDrop = (files) => {
     files.forEach((file) => {
@@ -189,34 +223,8 @@ class EventDataUpload extends React.Component {
                   }}
                 />
 
-                <Dropzone
-                  ref="dropzone"
-                  onDrop={this.onDrop}
-                  style={this.styles.dropzoneStyle}
-                  activeStyle={this.styles.dropzoneActiveStyle}
-                  rejectStyle={this.styles.dropzoneRejectStyle}
-                  disableClick={true}
-                >
-                  <div style={{
-                    paddingTop: 20,
-                    paddingBottom: 20,
-                    borderBottom: '1px dashed ' + BernieColors.green
-                  }}>
-                    <div style={{...BernieText.title, fontSize: '1.2em', color: BernieColors.green}}>
-                      Drop your Event Files here!
-                    </div>
-                    <div style={{...BernieText.default, fontSize: '0.65em'}}>
-                      <FlatButton
-                        label="Select Files to Upload"
-                        onTouchTap={() => this.refs.dropzone.open()}
-                      />
-                    </div>
-                  </div>
-                </Dropzone>
+                {this.renderDropZone()}
 
-                <br />
-                <br />
-                <Form.Button type='submit' label='Submit' fullWidth={true} />
               </GCForm>
             </div>
           </div>
