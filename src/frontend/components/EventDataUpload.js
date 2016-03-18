@@ -71,7 +71,7 @@ class EventDataUpload extends React.Component {
   }
 
   formSchema = yup.object({
-    notes: yup.string().required(),
+    fileType: yup.string().required()
   })
 
   onDrop = (files) => {
@@ -157,7 +157,7 @@ class EventDataUpload extends React.Component {
               <GCForm
                 schema={this.formSchema}
                 defaultValue={{
-                  notes: null
+                  fileType: null
                 }}
                 onSubmit={(formValues) => {
                   this.refs.mutationHandler.send({
@@ -168,10 +168,15 @@ class EventDataUpload extends React.Component {
               >
                 <h3 style={BernieText.secondaryTitle}>Upload Event Data</h3>
                 <Form.Field
-                  name='notes'
-                  multiLine={true}
+                  name='fileType'
+                  type='select'
+                  label='What are you uploading?'
                   fullWidth={true}
-                  label="Notes"
+                  choices={{
+                    eventPhotos: 'Event Photos',
+                    signInSheets: 'Sign-In Sheets',
+                    phonebankEventForms: 'Phonebank Event Forms'
+                  }}
                 />
 
                 <Dropzone
