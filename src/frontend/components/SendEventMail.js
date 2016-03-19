@@ -3,7 +3,7 @@ import Relay from 'react-relay'
 import {SelectField, MenuItem, Dialog, FlatButton, TextField} from 'material-ui'
 import MutationHandler from './MutationHandler'
 import EmailHostAttendees from '../mutations/EmailHostAttendees'
-
+import linkedState from 'react-link';
 class SendEventMail extends React.Component {
   constructor(props) {
     super(props);
@@ -62,28 +62,19 @@ class SendEventMail extends React.Component {
         <SelectField
           floatingLabelText="Send Replies To"
           value={this.state.replyTo}
-          onChange={(event, index, value) => {
-            this.setState({replyTo: value})
-          }}
           floatingLabelStyle={{cursor: 'pointer'}}
         >
           <MenuItem value={this.props.currentUser.email} primaryText={this.props.currentUser.email}/>
           <MenuItem value="info@berniesanders.com" primaryText="info@berniesanders.com"/>
         </SelectField>
         <TextField
+          valueLink={linkedState(this, 'subject')}
           floatingLabelText="Subject"
-          value={this.state.subject}
-          onChange={(event) => {
-            this.setState({subject: event.target.value})
-          }}
           fullWidth={true}
         />
         <TextField
+          valueLink={linkedState(this, 'message')}
           floatingLabelText="Message Content"
-          value={this.state.message}
-          onChange={(event) => {
-            this.setState({message: event.target.value});
-          }}
           multiLine={true}
           rowsMax={11}
           fullWidth={true}

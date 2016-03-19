@@ -47,15 +47,6 @@ class AdminEventEmailCreationForm extends React.Component {
     }
   }
 
-  formSchema = yup.object({
-    hostEmail: yup.string().email().required(),
-    senderEmail: yup.string().email().required(),
-    hostMessage: yup.string().required(),
-    senderMessage: yup.string().required(),
-    toolPassword: yup.string().required(),
-    hostEmailSubject: yup.string().required()
-  })
-
   state = {
     testMode: false,
     recipientLimit: null
@@ -145,6 +136,17 @@ class AdminEventEmailCreationForm extends React.Component {
         "Thanks,\n\n" +
         "Team Bernie"
 
+    const baseString = yup.string();
+
+    let modelSchema = yup.object({
+      hostEmail: baseString.default(this.props.event.host.email).email().default(this.props.event.host.email).required(),
+      senderEmail: baseString.default("info@berniesanders.com").email().required(),
+      hostMessage: baseString.default(this.props.event.fastFwdRequest ? this.props.event.fastFwdRequest.hostMessage : '').required(),
+      senderMessage: baseString.default(defaultSenderMessage).required(),
+      toolPassword: baseString.required(),
+      hostEmailSubject: baseString.default('HELP! I need more people to come to my ' + eventTypeName).required()
+    });
+
     return (
       <div style={this.styles.pageContainer}>
         <MutationHandler ref='mutationHandler'
@@ -162,13 +164,11 @@ class AdminEventEmailCreationForm extends React.Component {
 
         <Paper zDepth={2} style={this.styles.formContainer}>
           <GCForm
-            schema={this.formSchema}
-            defaultValue={{
-              senderEmail: "info@berniesanders.com",
-              senderMessage: defaultSenderMessage,
-              hostEmail: this.props.event.host.email,
-              hostEmailSubject: 'HELP! I need more people to come to my ' + eventTypeName,
-              hostMessage: this.props.event.fastFwdRequest ? this.props.event.fastFwdRequest.hostMessage : ''
+            schema={modelSchema}
+            defaultValue = {modelSchema.default()}
+            value = {this.state.model}
+            onChange={ model => {
+              this.setState({ model })
             }}
             onSubmit={(formValues) => {
               this.refs.mutationHandler.send({
