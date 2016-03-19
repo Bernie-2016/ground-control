@@ -235,7 +235,9 @@ export default class AdminEventUploadRsvps extends React.Component {
               Drop your CSVs of RSVPs here!
             </div>
             <div style={{...BernieText.default, fontSize: '0.65em'}}>
-              CSV with column headers - any of the values under "Query Parameters" <a href="https://www.bluestatedigital.com/page/api/doc#----------------------graph-addrsvp-----------------" target="_blank">here</a>.
+              <a href="https://docs.google.com/a/berniesanders.com/spreadsheets/d/1eUrirsw6fM0WF5IHZl3PAUgiC1LJB6-KSiCDTwj3JI4/edit?usp=sharing" target="_blank">Click here for a valid .csv sample</a>
+              <br />
+              You can add more columns specified under "Query Parameters" <a href="https://www.bluestatedigital.com/page/api/doc#----------------------graph-addrsvp-----------------" target="_blank">here</a>.
             </div>
           </div>
           {this.renderFileProgress()}
