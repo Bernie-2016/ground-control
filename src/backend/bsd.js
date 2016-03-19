@@ -368,9 +368,9 @@ export default class BSD {
 
   async addRSVPToEvent(rsvpDetails) {
     let params = {
+      'will_attend': 1,
+      'guests': 0,
       ...rsvpDetails,
-      'will_attend' : 1,
-      'guests': 0
     }
     let host = this.baseURL.protocol + '//' + this.baseURL.host
     let URL = host + '/page/graph/addrsvp' + '?' + qs.stringify(params)
