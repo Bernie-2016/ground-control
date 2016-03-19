@@ -342,7 +342,7 @@ function startApp() {
     res.redirect('/slack/callforbernie/')
   })
 
-  app.use('/slack/berniebuilders/', proxy('slack-berniebuilders.saikat.svc.tutum.io:3000', {
+  app.use('/slack/berniebuilders/', proxy('aqueous-waters-95883.herokuapp.com', {
     forwardPath: function(req, res) {
       return url.parse(req.url).path
     }
