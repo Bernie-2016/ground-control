@@ -224,8 +224,6 @@ let {nodeInterface, nodeField} = nodeDefinitions(
     return null
   },
   (obj) => {
-    if (obj._type === 'users')
-      return GraphQLUser
     if (obj._type === 'bsd_call_assignments')
       return GraphQLCallAssignment
     if (obj._type === 'bsd_calls')
