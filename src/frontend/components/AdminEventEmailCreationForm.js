@@ -49,7 +49,7 @@ class AdminEventEmailCreationForm extends React.Component {
 
   state = {
     testMode: false,
-    recipientLimit: null
+    recipientLimit: Math.min(this.props.event.nearbyPeople.length, 250)
   }
 
   getRandomSubarray(arr, size) {
@@ -107,7 +107,6 @@ class AdminEventEmailCreationForm extends React.Component {
     }
 
     let recipientLimit = this.state.recipientLimit || recipients.length
-    let defaultRecipientSize = Math.min(this.props.event.nearbyPeople.length, 250);
 
     let disableSubmit = (this.props.event.nearbyPeople.length === 0)
 
@@ -221,7 +220,7 @@ class AdminEventEmailCreationForm extends React.Component {
             <br />
             <h4 style={BernieText.default}>Number of recipients: {recipientLimit} (plus you)</h4>
             <Slider
-              defaultValue={defaultRecipientSize}
+              defaultValue={this.state.recipientLimit}
               disabled={this.state.testMode}
               max={recipients.length}
               min={1}
