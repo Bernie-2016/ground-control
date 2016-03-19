@@ -8,6 +8,7 @@ import path from 'path'
 import fallback from 'express-history-api-fallback'
 import bodyParser from 'body-parser'
 import session from 'express-session'
+import proxy from 'express-http-proxy'
 import BSD from './bsd'
 import MG from './mail'
 import demoData from './data/demo.json'
@@ -331,6 +332,42 @@ function startApp() {
       schema: Schema
     }
   }))
+
+  app.use('/slack/callforbernie/', proxy('slack-callforbernie.saikat.svc.tutum.io:3020', {
+    forwardPath: function(req, res) {
+      return url.parse(req.url).path
+    }
+  }))
+  app.get('/slack/callforbernie', async (req, res) => {
+    res.redirect('/slack/callforbernie/')
+  })
+
+  app.use('/slack/berniebuilders/', proxy('aqueous-waters-95883.herokuapp.com', {
+    forwardPath: function(req, res) {
+      return url.parse(req.url).path
+    }
+  }))
+  app.get('/slack/berniebuilders', async (req, res) => {
+    res.redirect('/slack/berniebuilders/')
+  })
+
+  app.use('/slack/bernie2016states/', proxy('slack-bernie2016states.saikat.svc.tutum.io:3010', {
+    forwardPath: function(req, res) {
+      return url.parse(req.url).path
+    }
+  }))
+  app.get('/slack/bernie2016states', async (req, res) => {
+    res.redirect('/slack/bernie2016states/')
+  })
+
+  app.use('/volunteer-dashboard/', proxy('volunteer-dashboard.saikat.svc.tutum.io:8000', {
+    forwardPath: function(req, res) {
+      return url.parse(req.url).path
+    }
+  }))
+  app.get('/volunteer-dashboard', async (req, res) => {
+    res.redirect('/volunteer-dashboard/')
+  })
 
   app.post('/signup',
     passport.authenticate('signup'),
