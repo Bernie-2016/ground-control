@@ -36,6 +36,12 @@ throng(startApp, {
   lifetime: Infinity
 })
 
+function addWebsocketsHeaders(req) {
+  req.headers['Upgrade'] = 'websocket'
+  req.headers['Connection'] = 'Upgrade'
+  return req
+}
+
 function startApp() {
   log.info('Writing schema...')
   writeSchema()
@@ -345,7 +351,8 @@ function startApp() {
   app.use('/slack/berniebuilders/', proxy('aqueous-waters-95883.herokuapp.com', {
     forwardPath: function(req, res) {
       return url.parse(req.url).path
-    }
+    },
+    decorateRequest: addWebsocketsHeaders
   }))
   app.get('/slack/berniebuilders', async (req, res) => {
     res.redirect('/slack/berniebuilders/')
