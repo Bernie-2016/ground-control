@@ -1041,6 +1041,11 @@
       "from": "datauri@>=0.2.0 <0.3.0",
       "resolved": "https://registry.npmjs.org/datauri/-/datauri-0.2.1.tgz"
     },
+    "date-arithmetic": {
+      "version": "3.0.1",
+      "from": "date-arithmetic@>=3.0.0 <4.0.0",
+      "resolved": "https://registry.npmjs.org/date-arithmetic/-/date-arithmetic-3.0.1.tgz"
+    },
     "date-now": {
       "version": "0.1.4",
       "from": "date-now@>=0.1.4 <0.2.0",
@@ -1055,6 +1060,11 @@
       "version": "1.2.0",
       "from": "decamelize@>=1.0.0 <2.0.0",
       "resolved": "https://registry.npmjs.org/decamelize/-/decamelize-1.2.0.tgz"
+    },
+    "deconstruct-number-format": {
+      "version": "0.0.1",
+      "from": "deconstruct-number-format@0.0.1",
+      "resolved": "https://registry.npmjs.org/deconstruct-number-format/-/deconstruct-number-format-0.0.1.tgz"
     },
     "deep-equal": {
       "version": "1.0.1",
@@ -1156,6 +1166,11 @@
           "resolved": "https://registry.npmjs.org/isarray/-/isarray-1.0.0.tgz"
         }
       }
+    },
+    "dom-helpers": {
+      "version": "2.4.0",
+      "from": "dom-helpers@>=2.2.4 <3.0.0",
+      "resolved": "https://registry.npmjs.org/dom-helpers/-/dom-helpers-2.4.0.tgz"
     },
     "dom-serializer": {
       "version": "0.1.0",
@@ -1701,6 +1716,16 @@
       "version": "1.0.0-rc3",
       "from": "form-data@>=1.0.0-rc3 <1.1.0",
       "resolved": "https://registry.npmjs.org/form-data/-/form-data-1.0.0-rc3.tgz"
+    },
+    "format-number": {
+      "version": "2.0.1",
+      "from": "format-number@>=2.0.0 <3.0.0",
+      "resolved": "https://registry.npmjs.org/format-number/-/format-number-2.0.1.tgz"
+    },
+    "format-number-with-string": {
+      "version": "0.0.1",
+      "from": "format-number-with-string@0.0.1",
+      "resolved": "https://registry.npmjs.org/format-number-with-string/-/format-number-with-string-0.0.1.tgz"
     },
     "formidable": {
       "version": "1.0.17",
@@ -4424,6 +4449,11 @@
         }
       }
     },
+    "react-link": {
+      "version": "1.0.3",
+      "from": "react-link@latest",
+      "resolved": "https://registry.npmjs.org/react-link/-/react-link-1.0.3.tgz"
+    },
     "react-prop-types-element-of-type": {
       "version": "1.0.2",
       "from": "react-prop-types-element-of-type@>=1.0.2 <2.0.0",
@@ -4487,6 +4517,11 @@
           "resolved": "https://registry.npmjs.org/fbjs/-/fbjs-0.2.1.tgz"
         }
       }
+    },
+    "react-widgets": {
+      "version": "3.2.0",
+      "from": "react-widgets@latest",
+      "resolved": "https://registry.npmjs.org/react-widgets/-/react-widgets-3.2.0.tgz"
     },
     "read-all-stream": {
       "version": "3.1.0",
@@ -5420,7 +5455,8 @@
       "dependencies": {
         "esprima": {
           "version": "2.7.2",
-          "from": "esprima@>=2.5.0 <3.0.0"
+          "from": "esprima@2.7.2",
+          "resolved": "https://registry.npmjs.org/esprima/-/esprima-2.7.2.tgz"
         },
         "supports-color": {
           "version": "3.1.2",
