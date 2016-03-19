@@ -95,6 +95,10 @@ class ConstituentLookup extends React.Component {
             ref="form"
             schema={searchFormSchema}
             defaultValue={searchFormSchema.default()}
+            value = {this.model}
+            onChange = {model => {
+               this.setState({model})
+            }}
             onSubmit={(data) => {
               Object.keys(data).forEach((key) => {
                 if (!data[key])

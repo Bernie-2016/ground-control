@@ -85,12 +85,14 @@
     "react-geosuggest": "^1.15.1",
     "react-google-maps": "^4.7.0",
     "react-kronos": "^1.2.0",
+    "react-link": "^1.0.3",
     "react-quill": "^0.3.0",
     "react-relay": "^0.4.0",
     "react-router": "^1.0.2",
     "react-router-relay": "^0.7.0",
     "react-select": "^1.0.0-beta8",
     "react-tap-event-plugin": "^0.2.1",
+    "react-widgets": "^3.2.0",
     "relay": "^0.8.0",
     "request-promise": "^2.0.0",
     "retry": "^0.8.0",
@@ -108,11 +110,11 @@
     "fsevents": "^1.0.8"
   },
   "devDependencies": {
-    "foreman": "latest",
-    "nodemon": "latest",
+    "babel-eslint": "latest",
     "eslint": "latest",
     "eslint-plugin-react": "latest",
-    "babel-eslint": "latest",
+    "foreman": "latest",
+    "nodemon": "latest",
     "webpack-dev-server": "1.10.1"
   }
 }
