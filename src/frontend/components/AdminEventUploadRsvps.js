@@ -133,8 +133,10 @@ export default class AdminEventUploadRsvps extends React.Component {
         currentFiles[file.name] = processObj
         this.setState({filesProcessed: currentFiles})
 
-        for (let i=0; i<data.length; i++){
-          this.createRSVPs(data[i], file.name, eventIdKeys)
+        if (confirm(`You are about to upload ${data.length} RSVPs. Continue?`)) {
+          for (let i=0; i<data.length; i++){
+            this.createRSVPs(data[i], file.name, eventIdKeys)
+          }
         }
       }
       reader.readAsText(file, 'utf8');
