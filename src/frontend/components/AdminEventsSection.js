@@ -418,7 +418,6 @@ class AdminEventsSection extends React.Component {
 
     const renderActionButtons = () => {
       let optionsSet = new Set(approvalFilterOptions[this.props.relay.variables.status].actions)
-      console.log(this.props.currentUser)
       if (!this.props.currentUser.isSuperuser)
         optionsSet.delete('delete')
       const options = [...optionsSet]
