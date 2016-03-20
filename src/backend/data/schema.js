@@ -87,6 +87,16 @@ function adminRequired(session) {
   }
 }
 
+function superuserRequired(session) {
+  authRequired(session)
+  if (!session.user || !session.user.is_superuser) {
+    throw new GraphQLError({
+      status: 403,
+      message: 'You are not authorized to access that resource.'
+    })
+  }
+}
+
 // We should move these into model-helpers or something
 function modelFromBSDResponse(BSDObject, type) {
   let modelKeys = {
@@ -1268,7 +1278,7 @@ const GraphQLDeleteEvents = mutationWithClientMutationId({
     }
   },
   mutateAndGetPayload: async ({ids, hostMessage}, {rootValue}) => {
-    adminRequired(rootValue)
+    superuserRequired(rootValue)
     let localIds = ids.map((id) => fromGlobalId(id).id)
     await BSDClient.deleteEvents(localIds)
 
