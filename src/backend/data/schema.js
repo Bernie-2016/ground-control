@@ -429,6 +429,14 @@ const GraphQLUser = new GraphQLObjectType({
   description: 'User of ground control',
   fields: () => ({
     id: globalIdField('User'),
+    isAdmin: {
+      type: GraphQLBoolean,
+      resolve: (user) => user.is_admin
+    },
+    isSuperuser: {
+      type: GraphQLBoolean,
+      resolve: (user) => user.is_superuser
+    },
     email: { type: GraphQLString },
     relatedPerson: {
       type: GraphQLPerson,
