@@ -477,6 +477,7 @@ function startApp() {
       'get-out-the-vote': { id: 45, staffOnly: false, requirePhone: true },
       'vol2vol': { id: 47, staffOnly: true },
       'rally': { id: 14, staffOnly: true },
+      'voter-registration': { id: 22, staffOnly: false, requirePhone: true }
     }
 
     if (form['event_type_id'] === 'canvass'){
