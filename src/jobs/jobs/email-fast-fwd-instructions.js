@@ -48,7 +48,7 @@ export let job = async () => {
                   "ON " +
                     "bsd_emails.cons_id = bsd_events.creator_cons_id " +
                 "WHERE " +
-                    "bsd_events.event_type_id = 31 " +
+                    "bsd_events.event_type_id IN (31, 41) " +
                   "AND " +
                     "bsd_events.start_dt > \'" + oneDayFromNow.startOf('day').format('YYYY-MM-DD HH:mm:ss') + "\' " +
                   "AND " +
@@ -84,7 +84,7 @@ export let job = async () => {
               "ON " +
                 "bsd_emails.cons_id = bsd_events.creator_cons_id " +
             "WHERE " +
-                "bsd_events.event_type_id = 31 " +
+                "bsd_events.event_type_id IN (31, 41) " +
               "AND " +
                 "bsd_events.capacity = 0 " +
               "AND " +
