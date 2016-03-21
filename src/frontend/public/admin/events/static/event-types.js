@@ -118,7 +118,7 @@ var eventTypes = [
 			cons_email: userEmail,
 			rsvp_email_reminder_hours: '24',
 		},
-		disabled: ['attendee_volunteer_show', 'use_shifts'],
+		disabled: ['use_shifts'],
 		adminOnly: false
 	},
 	{
