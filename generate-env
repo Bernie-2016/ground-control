@@ -5,6 +5,6 @@ try {
   fs.readFileSync('.env', 'utf8');
 }
 catch(e) {
-  const currentEnv = fs.readFileSync('.env.sample', 'utf8');
+  var currentEnv = fs.readFileSync('.env.sample', 'utf8');
   fs.writeFileSync('.env', currentEnv, 'utf8');
 }
