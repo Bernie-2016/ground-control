@@ -33,7 +33,7 @@ The best way to run everything on Windows is probably to try to get Docker worki
 
 ### Logging in as an Admin User
 
-By default, two accounts admin level accounts are created by the seed script:
+By default, two admin level accounts are created by the seed script:
 * username: `admin@localhost.com`, password: `admin` (a normal admin user)
 * username: `superuser@localhost.com`, password: `admin` (an admin user with elevated priveledges)
 
