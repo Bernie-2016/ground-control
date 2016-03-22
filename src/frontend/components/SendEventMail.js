@@ -4,13 +4,16 @@ import {SelectField, MenuItem, Dialog, FlatButton, TextField} from 'material-ui'
 import MutationHandler from './MutationHandler'
 import EmailHostAttendees from '../mutations/EmailHostAttendees'
 import linkedState from 'react-link';
+
+const defaultReplyTo = 'help@berniesanders.com'
+
 class SendEventMail extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
       target: 'HOST',
-      replyTo: 'info@berniesanders.com',
+      replyTo: defaultReplyTo,
       subject: '',
       message: ''
     }
@@ -63,9 +66,10 @@ class SendEventMail extends React.Component {
           floatingLabelText="Send Replies To"
           value={this.state.replyTo}
           floatingLabelStyle={{cursor: 'pointer'}}
+          onChange={(event, index, replyTo) => {this.setState({replyTo})}}
         >
           <MenuItem value={this.props.currentUser.email} primaryText={this.props.currentUser.email}/>
-          <MenuItem value="info@berniesanders.com" primaryText="info@berniesanders.com"/>
+          <MenuItem value={defaultReplyTo} primaryText={defaultReplyTo} />
         </SelectField>
         <TextField
           valueLink={linkedState(this, 'subject')}
