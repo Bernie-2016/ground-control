@@ -37,7 +37,7 @@ The best way to run everything on Windows is probably to try to get Docker worki
 
 Here is a list of Environment Variables and how they are used:
 
-You can find their defaults in `.env.sample`
+You can find their defaults in `.env.sample`. The first time a setup script is run, a `.env` file will be generated with these defaults.
 
 * `BSD_HOST`:
 * `BSD_API_ID`:
