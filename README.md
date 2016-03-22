@@ -35,24 +35,11 @@ The best way to run everything on Windows is probably to try to get Docker worki
 
 ### Enviornment Variables
 
-Here is a list of Environment Variables and how they are used:
+You can find environment defaults in `.env.sample`. The first time a setup script is run, `.env` will be generated with these defaults.
 
-You can find their defaults in `.env.sample`. The first time a setup script is run, a `.env` file will be generated with these defaults.
+If you ever need to generate a missing `.env`, run
 
-* `BSD_HOST`:
-* `BSD_API_ID`:
-* `BSD_API_SECRET`:
-* `MAILGUN_DOMAIN`:
-* `MAILGUN_KEY`:
-* `MAILGUN_DOMAIN`:
-* `PORT`:
-* `SESSION_SECRET`:
-* `NODE_ENV`:
-* `DATABASE_URL`:
-* `config.use_env_variable`:
-* `process.env.WEBPACK_PORT`:
-* `APP_HOST`:
-* `WEBPACK_PROXY_PORT`:
+`npm run generate-dotenv`
 
 ## What does this do and how do I get started?
 
