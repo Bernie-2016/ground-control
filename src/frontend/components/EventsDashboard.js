@@ -80,7 +80,7 @@ class EventsDashboard extends React.Component {
     return (
       <div style={{height: this.state.windowHeight - 56, width: '100%', top: 56, position: 'absolute', overflow: 'scroll'}}>
         {this.renderEvents()}
-        <FloatingActionButton style={{marginRight: 20, position: 'absolute', bottom: 20, right: 10}} linkButton={true} href='/events/create' >
+        <FloatingActionButton style={{marginRight: 20, position: 'fixed', bottom: 20, right: 10}} linkButton={true} href='/events/create' >
           <FontIcon className="material-icons">add</FontIcon>
         </FloatingActionButton>
       </div>
