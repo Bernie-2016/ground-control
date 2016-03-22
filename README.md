@@ -52,7 +52,7 @@ If you ever need to generate a missing `.env`, run
 Currently, Ground Control is two things:
 
 * A tool for calling other volunteers of the campaign and integrating that data back into BSD, which is a CRM the campaign uses.  In the near future, it is going to also be used to call voters.
-* A tool to create and manage events.  These include both volunteer-run events and official events.  The goal here is to replace (https://go.berniesanders.com/page/event/create)[https://go.berniesanders.com/page/event/create] and start replacing some of the functionality of the event administration backed.
+* A tool to create and manage events.  These include both volunteer-run events and official events.  The goal here is to replace [go.berniesanders.com/page/event/create](https://go.berniesanders.com/page/event/create) and start replacing some of the functionality of the event administration backed.
 
 To get started with Ground Control, once it's running, go to `http://localhost:3000/admin`. From there, you can see the events administration section and the call assignment creation section.  To create a call assignment, do the following:
 
