@@ -87,6 +87,16 @@ function adminRequired(session) {
   }
 }
 
+function superuserRequired(session) {
+  authRequired(session)
+  if (!session.user || !session.user.is_superuser) {
+    throw new GraphQLError({
+      status: 403,
+      message: 'You are not authorized to access that resource.'
+    })
+  }
+}
+
 // We should move these into model-helpers or something
 function modelFromBSDResponse(BSDObject, type) {
   let modelKeys = {
@@ -224,8 +234,6 @@ let {nodeInterface, nodeField} = nodeDefinitions(
     return null
   },
   (obj) => {
-    if (obj._type === 'users')
-      return GraphQLUser
     if (obj._type === 'bsd_call_assignments')
       return GraphQLCallAssignment
     if (obj._type === 'bsd_calls')
@@ -431,6 +439,14 @@ const GraphQLUser = new GraphQLObjectType({
   description: 'User of ground control',
   fields: () => ({
     id: globalIdField('User'),
+    isAdmin: {
+      type: GraphQLBoolean,
+      resolve: (user) => user.is_admin
+    },
+    isSuperuser: {
+      type: GraphQLBoolean,
+      resolve: (user) => user.is_superuser
+    },
     email: { type: GraphQLString },
     relatedPerson: {
       type: GraphQLPerson,
@@ -987,7 +1003,7 @@ const GraphQLEvent = new GraphQLObjectType({
         let backoff = 1000;
         let foundPeople = [];
 
-        while (foundPeople.length < 250 && radius <= maxRadius) {
+        while (foundPeople.length < 500 && radius <= maxRadius) {
           let foundConsIds = foundPeople.map((person) => person.cons_id)
           let query = knex('bsd_addresses')
             .distinct('bsd_emails.email')
@@ -1001,7 +1017,7 @@ const GraphQLEvent = new GraphQLObjectType({
             .whereNotIn('bsd_people.cons_id', foundConsIds)
             .whereRaw(`st_dwithin(bsd_addresses.geom, '${event.geom}', ${radius})`)
             .whereNull('communications.id')
-            .limit(250)
+            .limit(500)
           log.info(`Running query: ${query.toString()}`)
           let people = await query
           foundPeople = foundPeople.concat(people)
@@ -1009,7 +1025,7 @@ const GraphQLEvent = new GraphQLObjectType({
           if (radius === 15000)
             backoff = 5000;
         }
-        return foundPeople.slice(0, 250)
+        return foundPeople.slice(0, 500)
       }
     },
     fastFwdRequest: {
@@ -1200,7 +1216,7 @@ const GraphQLEditEvents = mutationWithClientMutationId({
       })
 
       // Require phone number for RSVPs
-      const eventIdsRequiringPhone = new Set([31, 32, 39, 45])
+      const eventIdsRequiringPhone = new Set([22, 31, 32, 39, 45])
       if (eventIdsRequiringPhone.has(Number(event['event_type_id']))) {
         event['attendee_require_phone'] = 1
       }
@@ -1262,7 +1278,7 @@ const GraphQLDeleteEvents = mutationWithClientMutationId({
     }
   },
   mutateAndGetPayload: async ({ids, hostMessage}, {rootValue}) => {
-    adminRequired(rootValue)
+    superuserRequired(rootValue)
     let localIds = ids.map((id) => fromGlobalId(id).id)
     await BSDClient.deleteEvents(localIds)
 

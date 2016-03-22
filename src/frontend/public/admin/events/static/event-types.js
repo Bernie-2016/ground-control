@@ -118,7 +118,7 @@ var eventTypes = [
 			cons_email: userEmail,
 			rsvp_email_reminder_hours: '24',
 		},
-		disabled: ['attendee_volunteer_show', 'use_shifts'],
+		disabled: ['use_shifts'],
 		adminOnly: false
 	},
 	{
@@ -164,6 +164,15 @@ var eventTypes = [
 		},
 		disabled: ['contact_phone', 'public_phone'],
 		adminOnly: true
+	},
+	{
+		id: 'voter-registration',
+		name: 'Voter Registration',
+		defaultValues: {
+			duration_num: 3,
+			duration_unit: 60
+		},
+		adminOnly: false
 	}
 	// { // Keep this event type in as an example for providing extra default values
 	// 	id: 44,

@@ -417,7 +417,11 @@ class AdminEventsSection extends React.Component {
     }
 
     const renderActionButtons = () => {
-      return approvalFilterOptions[this.props.relay.variables.status].actions.map((type) => {
+      let optionsSet = new Set(approvalFilterOptions[this.props.relay.variables.status].actions)
+      if (!this.props.currentUser.isSuperuser)
+        optionsSet.delete('delete')
+      const options = [...optionsSet]
+      return options.map((type) => {
           return (
             <IconButton
               title={actions[type].title}
@@ -1488,6 +1492,7 @@ export default Relay.createContainer(AdminEventsSection, {
     currentUser: () => Relay.QL`
       fragment on User {
         ${SendEventMail.getFragment('currentUser')}
+        isSuperuser
       }
     `,
     listContainer: () => Relay.QL`

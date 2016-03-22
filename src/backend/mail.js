@@ -251,7 +251,6 @@ export default class MG {
       'h:Reply-To': 'info@berniesanders.com',
       to: data.recipientAddress,
       subject: 'Fwd: ' + data.hostEmailSubject,
-      html: content.html,
       text: content.text
     }
 

@@ -8,6 +8,7 @@ import path from 'path'
 import fallback from 'express-history-api-fallback'
 import bodyParser from 'body-parser'
 import session from 'express-session'
+import proxy from 'express-http-proxy'
 import BSD from './bsd'
 import MG from './mail'
 import demoData from './data/demo.json'
@@ -332,6 +333,51 @@ function startApp() {
     }
   }))
 
+  // app.use('/slack/callforbernie/', proxy('slack-callforbernie.saikat.svc.tutum.io:3020', {
+  //   forwardPath: function(req, res) {
+  //     return url.parse(req.url).path
+  //   }
+  // }))
+  app.get('/slack/callforbernie/', async (req, res) => {
+    res.redirect('http://slack-callforbernie.saikat.svc.tutum.io:3020')
+  })
+  app.get('/slack/callforbernie', async (req, res) => {
+    res.redirect('/slack/callforbernie/')
+  })
+
+  // app.use('/slack/berniebuilders/', proxy('aqueous-waters-95883.herokuapp.com', {
+  //   forwardPath: function(req, res) {
+  //     return url.parse(req.url).path
+  //   }
+  // }))
+  app.get('/slack/berniebuilders/', async (req, res) => {
+    res.redirect('http://slack-berniebuilders.saikat.svc.tutum.io:3000')
+  })
+  app.get('/slack/berniebuilders', async (req, res) => {
+    res.redirect('/slack/berniebuilders/')
+  })
+
+  // app.use('/slack/bernie2016states/', proxy('slack-bernie2016states.saikat.svc.tutum.io:3010', {
+  //   forwardPath: function(req, res) {
+  //     return url.parse(req.url).path
+  //   }
+  // }))
+  app.get('/slack/bernie2016states/', async (req, res) => {
+    res.redirect('http://slack-bernie2016states.saikat.svc.tutum.io:3010')
+  })
+  app.get('/slack/bernie2016states', async (req, res) => {
+    res.redirect('/slack/bernie2016states/')
+  })
+
+  app.use('/volunteer-dashboard/', proxy('volunteer-dashboard.saikat.svc.tutum.io:8000', {
+    forwardPath: function(req, res) {
+      return url.parse(req.url).path
+    }
+  }))
+  app.get('/volunteer-dashboard', async (req, res) => {
+    res.redirect('/volunteer-dashboard/')
+  })
+
   app.post('/signup',
     passport.authenticate('signup'),
     wrap(async (req, res) => {
@@ -431,6 +477,7 @@ function startApp() {
       'get-out-the-vote': { id: 45, staffOnly: false, requirePhone: true },
       'vol2vol': { id: 47, staffOnly: true },
       'rally': { id: 14, staffOnly: true },
+      'voter-registration': { id: 22, staffOnly: false, requirePhone: true }
     }
 
     if (form['event_type_id'] === 'canvass'){
