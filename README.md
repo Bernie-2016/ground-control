@@ -19,8 +19,6 @@ If you ever want to re-seed the database, run
 
 `npm run seed`
 
-The seed script will create an admin user with e-mail address `admin@localhost.com` and password `admin`.  Login with those credentials when you first go to `localhost:3000` and then check out `localhost:3000/admin`.
-
 If you ever add a new Node.js package, be sure to run `npm shrinkwrap` after you do or things will break for everyone else.
 
 ### Linux (PROBABLY DEPRECATED)
@@ -32,6 +30,14 @@ You will also need to have [Docker](https://docs.docker.com/engine/installation)
 ### Windows
 
 The best way to run everything on Windows is probably to try to get Docker working on Windows and use the Linux installation instructions.
+
+### Logging in as an Admin User
+
+By default, two admin level accounts are created by the seed script:
+* username: `admin@localhost.com`, password: `admin` (a normal admin user)
+* username: `superuser@localhost.com`, password: `admin` (an admin user with elevated priveledges)
+
+Log in with either of those credentials when you first go to `localhost:3000` and then check out `localhost:3000/admin`.
 
 ### Enviornment Variables
 

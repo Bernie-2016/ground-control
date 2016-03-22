@@ -80,15 +80,25 @@ exports.seed = async function(knex, Promise) {
     modified_dt: timestamp
   }
 
-  log.info('Creating admin user...')
+  log.info('Creating admin users...')
   let password = await hash('admin')
 
-  data.users = [{
-    email: 'admin@localhost.com',
-    password: password,
-    is_admin: true,
-    ...timestamps
-  }]
+  data.users = [
+    {
+      email: 'admin@localhost.com',
+      password: password,
+      is_admin: true,
+      is_superuser: false,
+      ...timestamps
+    },
+    {
+      email: 'superuser@localhost.com',
+      password: password,
+      is_admin: true,
+      is_superuser: true,
+      ...timestamps
+    }
+  ]
 
   log.info('Generating zips...')
   data.zip_codes = loadZips('./seeds/shared/zip-codes.csv')
