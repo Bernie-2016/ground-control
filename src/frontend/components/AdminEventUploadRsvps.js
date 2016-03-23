@@ -85,7 +85,6 @@ export default class AdminEventUploadRsvps extends React.Component {
       if (!this.allowedKeys.has(key))
         delete row[key]
     })
-    let url = `/events/add-rsvp?${qs.stringify(row)}`
 
     superagent.post('/events/add-rsvp')
       .set('Accept', 'application/json')
