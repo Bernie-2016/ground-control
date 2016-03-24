@@ -11,6 +11,8 @@ import moment from 'moment'
 import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider'
 import {BernieTheme} from './styles/bernie-theme'
 import stripScripts from '../helpers/stripScripts'
+import qs from 'querystring'
+import superagent from 'superagent'
 
 const momentWithTimezone = (startDate, timeZone) => {
   return moment(startDate).tz(timeZone)
@@ -22,7 +24,8 @@ class EventDataUpload extends React.Component {
     super(props)
 
     this.state = {
-      fileType: null
+      fileType: null,
+      filesProcessed: {}
     }
   }
 
@@ -84,6 +87,49 @@ class EventDataUpload extends React.Component {
     fileType: yup.string().required()
   })
 
+  onDrop = (files) => {
+    files.forEach((file) => {
+      const processObj = {
+        errors: []
+      }
+      let currentFiles = this.state.filesProcessed
+      currentFiles[file.name] = processObj
+      this.setState({filesProcessed: currentFiles})
+
+      this.getSignedRequest(file)
+    })
+  }
+
+  getSignedRequest = (file) => {
+    const {name, type} = file
+    superagent.get(`/get-signed-s3-request?${qs.stringify({name, type})}`)
+      .end((err, res) => {
+        if (err)
+          return processObj.errors.push(res.body)
+        this.uploadFile(file, res.body)
+      })
+  }
+
+  uploadFile(file, signedRequest) {
+    const {signedRequestEndpoint, fileUrl} = signedRequest
+    console.log(signedRequestEndpoint)
+    superagent.post(signedRequestEndpoint)
+      .set('x-amz-acl', 'public-read')
+      .send(file)
+      .end((err, res) => {
+        let filesProcessed = this.state.filesProcessed
+        let processObj = filesProcessed[file.name]
+
+        if (err){
+          processObj.errors = []
+          processObj.errors.push(res.text)
+        }
+
+        filesProcessed[file.name] = processObj
+        this.setState(filesProcessed)
+      })
+  }
+
   renderDropZone() {
     if (this.state.fileType !== null){
       return (
@@ -110,17 +156,12 @@ class EventDataUpload extends React.Component {
               />
             </div>
           </div>
+          {this.renderFileProgress()}
         </Dropzone>
       )
     }
     else
       return <div></div>
-  }
-
-  onDrop = (files) => {
-    files.forEach((file) => {
-      // Upload files
-    })
   }
 
   renderFileProgress() {
@@ -139,9 +180,9 @@ class EventDataUpload extends React.Component {
           {fileObj.errors.map((error) => {
             return (
               <div>
-                {`${error.email}, Zip: ${error.zip}, Phone: ${error.phone}`}
+                {`Here's some info`}
                 <br />
-                <span style={{color: BernieColors.red}}>{error.error}</span>
+                <span style={{color: BernieColors.red}}>{error}</span>
                 <hr />
               </div>
             )
@@ -152,7 +193,7 @@ class EventDataUpload extends React.Component {
     let fileNodes = Object.keys(this.state.filesProcessed).map((fileName) => {
       count = count + 1
       let fileObj = this.state.filesProcessed[fileName]
-      let color = (fileObj.errors.length === 0 ? (fileObj.totalRows === fileObj.processedRows ? BernieColors.green : BernieColors.gray) : BernieColors.red)
+      let color = (fileObj.errors.length === 0 ? (false ? BernieColors.green : BernieColors.gray) : BernieColors.red)
 
       return (
         <div style={{
@@ -160,7 +201,7 @@ class EventDataUpload extends React.Component {
           color: color,
           backgroundColor: count % 2 ? BernieColors.lightGray : BernieColors.white
         }}>
-          {fileName}: {fileObj.processedRows}/{fileObj.totalRows}
+          {fileName}
           {renderErrors(fileObj)}
         </div>
       )
