@@ -3,7 +3,6 @@ import Dropzone from 'react-dropzone';
 import {BernieText, BernieColors} from './styles/bernie-css'
 import {RaisedButton} from 'material-ui'
 import Papa from 'papaparse'
-import qs from 'querystring'
 import superagent from 'superagent'
 import downloadCSV from '../helpers/downloadCSV'
 
