@@ -9,6 +9,7 @@ import fallback from 'express-history-api-fallback'
 import bodyParser from 'body-parser'
 import session from 'express-session'
 import proxy from 'express-http-proxy'
+import AWS from 'aws-sdk'
 import BSD from './bsd'
 import MG from './mail'
 import demoData from './data/demo.json'
@@ -52,6 +53,7 @@ function startApp() {
   }
 
   const KnexSessionStore = KnexSessionStoreFactory(session)
+  const s3 = new AWS.S3()
   const Mailgun = new MG(process.env.MAILGUN_KEY, process.env.MAILGUN_DOMAIN)
   const BSDClient = new BSD(process.env.BSD_HOST, process.env.BSD_API_ID, process.env.BSD_API_SECRET)
   const port = process.env.PORT
@@ -411,6 +413,35 @@ function startApp() {
 
   app.get('/nda', wrap(async (req, res) => {
     res.redirect('https://docs.google.com/forms/d/1cyoAcumEd4Co5Fqj9pOUnQtIUo_rfRzQ7oVqACFe5Rs/viewform')
+  }))
+
+  app.get('/get-signed-s3-request', isAuthenticated, wrap(async (req, res) => {
+    log.info(req.query)
+    log.info(encodeURIComponent(req.query.name))
+    const {name, type} = req.query
+    const encodedName = encodeURIComponent(name)
+    const s3Params = {
+        Bucket: process.env.S3_BUCKET,
+        Key: encodedName,
+        Expires: 60,
+        ContentType: type,
+        ACL: 'public-read'
+    }
+
+    s3.getSignedUrl('putObject', s3Params, (err, data) => {
+      if(err) {
+        log.error(err)
+      }
+      else {
+        log.info(data)
+        const returnData = {
+          signedRequestEndpoint: data,
+          fileUrl: `https://'${process.env.S3_BUCKET}'.s3.amazonaws.com/${encodedName}`
+        }
+        res.json(returnData)
+        res.end()
+      }
+    })
   }))
 
   app.post('/events/add-rsvp', async (req, res) => {
