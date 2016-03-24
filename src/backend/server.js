@@ -417,15 +417,14 @@ function startApp() {
 
   app.get('/get-signed-s3-request', isAuthenticated, wrap(async (req, res) => {
     log.info(req.query)
-    log.info(encodeURIComponent(req.query.name))
     const {name, type} = req.query
     const encodedName = encodeURIComponent(name)
     const s3Params = {
-        Bucket: process.env.S3_BUCKET,
-        Key: encodedName,
-        Expires: 60,
-        ContentType: type,
-        ACL: 'public-read'
+      Bucket: process.env.S3_BUCKET,
+      Key: name,
+      Expires: 60,
+      ContentType: type,
+      ACL: 'public-read'
     }
 
     s3.getSignedUrl('putObject', s3Params, (err, data) => {
