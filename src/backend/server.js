@@ -371,6 +371,13 @@ function startApp() {
     res.redirect('/slack/bernie2016states/')
   })
 
+  app.get('/slack/codersforsanders/', async (req, res) => {
+    res.redirect('https://cfs-slack.forsanders.com')
+  })
+  app.get('/slack/codersforsanders', async (req, res) => {
+    res.redirect('/slack/codersforsanders/')
+  })
+
   app.use('/volunteer-dashboard/', proxy('volunteer-dashboard.saikat.svc.tutum.io:8000', {
     forwardPath: function(req, res) {
       return url.parse(req.url).path
