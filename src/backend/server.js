@@ -333,13 +333,13 @@ function startApp() {
     }
   }))
 
-  // app.use('/slack/callforbernie/', proxy('slack-callforbernie.saikat.svc.tutum.io:3020', {
+  // app.use('/slack/callforbernie/', proxy('join-bernie-call-team.herokuapp.com', {
   //   forwardPath: function(req, res) {
   //     return url.parse(req.url).path
   //   }
   // }))
   app.get('/slack/callforbernie/', async (req, res) => {
-    res.redirect('http://slack-callforbernie.saikat.svc.tutum.io:3020')
+    res.redirect('https://join-bernie-call-team.herokuapp.com')
   })
   app.get('/slack/callforbernie', async (req, res) => {
     res.redirect('/slack/callforbernie/')
@@ -351,7 +351,7 @@ function startApp() {
   //   }
   // }))
   app.get('/slack/berniebuilders/', async (req, res) => {
-    res.redirect('http://slack-berniebuilders.saikat.svc.tutum.io:3000')
+    res.redirect('https://join-bernie-builders.herokuapp.com')
   })
   app.get('/slack/berniebuilders', async (req, res) => {
     res.redirect('/slack/berniebuilders/')
