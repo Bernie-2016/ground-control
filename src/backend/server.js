@@ -415,13 +415,16 @@ function startApp() {
     res.redirect('https://docs.google.com/forms/d/1cyoAcumEd4Co5Fqj9pOUnQtIUo_rfRzQ7oVqACFe5Rs/viewform')
   }))
 
-  app.get('/get-signed-s3-request', isAuthenticated, wrap(async (req, res) => {
+  app.get('/events/:eventId/upload/get-signed-request', isAuthenticated, wrap(async (req, res) => {
     log.info(req.query)
     const {name, type} = req.query
-    const encodedName = encodeURIComponent(name)
+    const event = await knex('bsd_events')
+      .where('event_id_obfuscated', req.params.eventId)
+      .first()
+    const key = `event-files/${event.event_id_obfuscated}/${req.user.email}/${name}`
     const s3Params = {
       Bucket: process.env.S3_BUCKET,
-      Key: name,
+      Key: key,
       Expires: 60,
       ContentType: type,
       ACL: 'public-read'
@@ -435,7 +438,7 @@ function startApp() {
         log.info(data)
         const returnData = {
           signedRequestEndpoint: data,
-          fileUrl: `https://'${process.env.S3_BUCKET}'.s3.amazonaws.com/${encodedName}`
+          fileUrl: `https://${process.env.S3_BUCKET}.s3.amazonaws.com/${encodeURIComponent(key)}`
         }
         res.json(returnData)
         res.end()
