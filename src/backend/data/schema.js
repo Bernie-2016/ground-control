@@ -1410,6 +1410,16 @@ const GraphQLReviewEvents = mutationWithClientMutationId({
   }
 })
 
+const GraphQLSaveEventFile = mutationWithClientMutationId({
+  name: 'SaveEventFile',
+  inputFields: {
+  },
+  outputFields: {
+  },
+  mutateAndGetPayload: async () => {
+  }
+})
+
 const GraphQLSubmitCallSurvey = mutationWithClientMutationId({
   name: 'SubmitCallSurvey',
   inputFields: {
@@ -1867,6 +1877,7 @@ let RootMutation = new GraphQLObjectType({
   fields: () => ({
     editEvents: GraphQLEditEvents,
     reviewEvents: GraphQLReviewEvents,
+    saveEventFile: GraphQLSaveEventFile,
     submitCallSurvey: GraphQLSubmitCallSurvey,
     createCallAssignment: GraphQLCreateCallAssignment,
     deleteEvents: GraphQLDeleteEvents,
