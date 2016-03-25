@@ -339,7 +339,7 @@ function startApp() {
     }
   }))
 
-  app.use('/slack/callforbernie/', proxy('slack-callforbernie.saikat.svc.tutum.io:3020', {
+  app.use('/slack/callforbernie/', proxy('join-bernie-call-team.herokuapp.com/', {
     forwardPath: function(req, res) {
       return url.parse(req.url).path
     }
