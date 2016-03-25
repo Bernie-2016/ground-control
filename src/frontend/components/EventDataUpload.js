@@ -102,7 +102,8 @@ class EventDataUpload extends React.Component {
 
   getSignedRequest = (file) => {
     const {name, type} = file
-    superagent.get(`/get-signed-s3-request?${qs.stringify({name, type})}`)
+    const eventId = this.props.event.eventIdObfuscated
+    superagent.get(`/events/${eventId}/upload/get-signed-request?${qs.stringify({name, type, eventId})}`)
       .end((err, res) => {
         if (err)
           return processObj.errors.push(res.body)
@@ -112,8 +113,7 @@ class EventDataUpload extends React.Component {
 
   uploadFile(file, signedRequest) {
     const {signedRequestEndpoint, fileUrl} = signedRequest
-    console.log(signedRequestEndpoint)
-    superagent.post(signedRequestEndpoint)
+    superagent.put(signedRequestEndpoint)
       .set('x-amz-acl', 'public-read')
       .send(file)
       .end((err, res) => {
@@ -125,6 +125,7 @@ class EventDataUpload extends React.Component {
           processObj.errors.push(res.text)
         }
 
+        processObj.url = fileUrl
         filesProcessed[file.name] = processObj
         this.setState(filesProcessed)
       })
@@ -166,7 +167,8 @@ class EventDataUpload extends React.Component {
 
   renderFileProgress() {
     let count = 0
-    let renderErrors = (fileObj) => {
+    const renderFileLink = (fileObj, fileName) => fileObj.url ? <a href={fileObj.url} target='_blank'>{fileName}</a> : fileName
+    const renderErrors = (fileObj) => {
       if (fileObj.errors.length === 0)
         return <div></div>
       return (
@@ -177,9 +179,9 @@ class EventDataUpload extends React.Component {
           paddingLeft: 10,
           width: 470,
         }}>
-          {fileObj.errors.map((error) => {
+          {fileObj.errors.map((error, index) => {
             return (
-              <div>
+              <div key={index}>
                 {`Here's some info`}
                 <br />
                 <span style={{color: BernieColors.red}}>{error}</span>
@@ -190,18 +192,21 @@ class EventDataUpload extends React.Component {
         </div>
       )
     }
-    let fileNodes = Object.keys(this.state.filesProcessed).map((fileName) => {
+    let fileNodes = Object.keys(this.state.filesProcessed).map((fileName, index) => {
       count = count + 1
       let fileObj = this.state.filesProcessed[fileName]
       let color = (fileObj.errors.length === 0 ? (false ? BernieColors.green : BernieColors.gray) : BernieColors.red)
 
       return (
-        <div style={{
-          ...this.styles.fileStatus,
-          color: color,
-          backgroundColor: count % 2 ? BernieColors.lightGray : BernieColors.white
-        }}>
-          {fileName}
+        <div
+          style={{
+            ...this.styles.fileStatus,
+            color: color,
+            backgroundColor: count % 2 ? BernieColors.lightGray : BernieColors.white
+          }}
+          key={index}
+        >
+          {renderFileLink(fileObj, fileName)}
           {renderErrors(fileObj)}
         </div>
       )
