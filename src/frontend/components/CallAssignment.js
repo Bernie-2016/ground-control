@@ -402,6 +402,17 @@ ${userFirstName}`
                 <Form.Button type='submit' label='Submit and on to the next person!' fullWidth={true} style={this.styles.submitButton}/>
               </div>
             </GCForm>
+            <div style={{marginBottom: '1em', textAlign: 'center'}}>
+              <a
+                target='_blank'
+                href={'mailto:help@berniesanders.com?' +
+                  `Subject=${encodeURIComponent('User Report: Issue with Ground Control Call Tool')}&` +
+                  `Body=${encodeURIComponent(`Source: ${location.href}\n\nNotes: `)}`
+                }
+              >
+                Report an Issue
+              </a>
+            </div>
           </div>
         </div>
       </div>

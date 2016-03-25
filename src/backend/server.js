@@ -335,37 +335,22 @@ function startApp() {
     }
   }))
 
-  // app.use('/slack/callforbernie/', proxy('slack-callforbernie.saikat.svc.tutum.io:3020', {
-  //   forwardPath: function(req, res) {
-  //     return url.parse(req.url).path
-  //   }
-  // }))
   app.get('/slack/callforbernie/', async (req, res) => {
-    res.redirect('http://slack-callforbernie.saikat.svc.tutum.io:3020')
+    res.redirect('https://join-bernie-call-team.herokuapp.com')
   })
   app.get('/slack/callforbernie', async (req, res) => {
     res.redirect('/slack/callforbernie/')
   })
 
-  // app.use('/slack/berniebuilders/', proxy('aqueous-waters-95883.herokuapp.com', {
-  //   forwardPath: function(req, res) {
-  //     return url.parse(req.url).path
-  //   }
-  // }))
   app.get('/slack/berniebuilders/', async (req, res) => {
-    res.redirect('http://slack-berniebuilders.saikat.svc.tutum.io:3000')
+    res.redirect('https://join-bernie-builders.herokuapp.com')
   })
   app.get('/slack/berniebuilders', async (req, res) => {
     res.redirect('/slack/berniebuilders/')
   })
 
-  // app.use('/slack/bernie2016states/', proxy('slack-bernie2016states.saikat.svc.tutum.io:3010', {
-  //   forwardPath: function(req, res) {
-  //     return url.parse(req.url).path
-  //   }
-  // }))
   app.get('/slack/bernie2016states/', async (req, res) => {
-    res.redirect('http://slack-bernie2016states.saikat.svc.tutum.io:3010')
+    res.redirect('https://join-bernie-2016-states.herokuapp.com')
   })
   app.get('/slack/bernie2016states', async (req, res) => {
     res.redirect('/slack/bernie2016states/')
