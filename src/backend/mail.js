@@ -206,8 +206,7 @@ export default class MG {
       },
       'default' : {
         template: 'generic-event-instructions',
-        senderAddress: 'Saikat Chakrabarti<saikat@berniesanders.com>',
-        sender: 'Saikat Chakrabarti',
+        senderAddress,
         subject: 'Invite nearby Bernie volunteers to your event'
       },
     }
