@@ -363,7 +363,7 @@ function startApp() {
   //   }
   // }))
   app.get('/slack/bernie2016states/', async (req, res) => {
-    res.redirect('http://slack-bernie2016states.saikat.svc.tutum.io:3010')
+    res.redirect('https://join-bernie-2016-states.herokuapp.com')
   })
   app.get('/slack/bernie2016states', async (req, res) => {
     res.redirect('/slack/bernie2016states/')
