@@ -333,11 +333,6 @@ function startApp() {
     }
   }))
 
-  // app.use('/slack/callforbernie/', proxy('join-bernie-call-team.herokuapp.com', {
-  //   forwardPath: function(req, res) {
-  //     return url.parse(req.url).path
-  //   }
-  // }))
   app.get('/slack/callforbernie/', async (req, res) => {
     res.redirect('https://join-bernie-call-team.herokuapp.com')
   })
@@ -345,11 +340,6 @@ function startApp() {
     res.redirect('/slack/callforbernie/')
   })
 
-  // app.use('/slack/berniebuilders/', proxy('aqueous-waters-95883.herokuapp.com', {
-  //   forwardPath: function(req, res) {
-  //     return url.parse(req.url).path
-  //   }
-  // }))
   app.get('/slack/berniebuilders/', async (req, res) => {
     res.redirect('https://join-bernie-builders.herokuapp.com')
   })
@@ -357,11 +347,6 @@ function startApp() {
     res.redirect('/slack/berniebuilders/')
   })
 
-  // app.use('/slack/bernie2016states/', proxy('slack-bernie2016states.saikat.svc.tutum.io:3010', {
-  //   forwardPath: function(req, res) {
-  //     return url.parse(req.url).path
-  //   }
-  // }))
   app.get('/slack/bernie2016states/', async (req, res) => {
     res.redirect('https://join-bernie-2016-states.herokuapp.com')
   })
