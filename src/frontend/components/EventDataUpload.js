@@ -1,7 +1,7 @@
 import React from 'react'
 import Relay from 'react-relay'
 import {BernieColors, BernieText} from './styles/bernie-css'
-import {Paper, Styles, FlatButton} from 'material-ui'
+import {Paper, Styles, FlatButton, LinearProgress} from 'material-ui'
 import GCForm from './forms/GCForm'
 import Form from 'react-formal'
 import EventPreview from './EventPreview'
@@ -79,7 +79,6 @@ class EventDataUpload extends React.Component {
       ...BernieText.secondaryTitle,
       fontSize: '0.75em',
       textAlign: 'left',
-      paddingLeft: 20
     }
   }
 
@@ -167,7 +166,17 @@ class EventDataUpload extends React.Component {
 
   renderFileProgress() {
     let count = 0
-    const renderFileLink = (fileObj, fileName) => fileObj.url ? <a href={fileObj.url} target='_blank'>{fileName}</a> : fileName
+    const renderFileLink = (fileObj, fileName) => {
+      if (fileObj.url)
+        return <a href={fileObj.url} target='_blank'>{fileName}</a>
+      else 
+        return (
+          <div>
+            {fileName}
+            <LinearProgress mode="indeterminate"/>
+          </div>
+        )
+    }
     const renderErrors = (fileObj) => {
       if (fileObj.errors.length === 0)
         return <div></div>
@@ -176,8 +185,7 @@ class EventDataUpload extends React.Component {
           ...BernieText.default,
           borderTop: '1px solid ' + BernieColors.red,
           fontSize: '0.5em',
-          paddingLeft: 10,
-          width: 470,
+          width: '100%'
         }}>
           {fileObj.errors.map((error, index) => {
             return (
@@ -206,8 +214,10 @@ class EventDataUpload extends React.Component {
           }}
           key={index}
         >
-          {renderFileLink(fileObj, fileName)}
-          {renderErrors(fileObj)}
+          <div style={{padding: 20}}>
+            {renderFileLink(fileObj, fileName)}
+            {renderErrors(fileObj)}
+          </div>
         </div>
       )
     })
