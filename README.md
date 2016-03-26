@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/Bernie-2016/ground-control.png?label=ready&title=Ready)](https://waffle.io/Bernie-2016/ground-control)
 # Ground Control
 
 ## Getting started
