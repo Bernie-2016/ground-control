@@ -1278,7 +1278,12 @@ const GraphQLDeleteEvents = mutationWithClientMutationId({
     }
   },
   mutateAndGetPayload: async ({ids, hostMessage}, {rootValue}) => {
-    superuserRequired(rootValue)
+    adminRequired(rootValue)
+    if (!rootValue.user.is_superuser && ids.length !== 1)
+      throw new GraphQLError({
+        status: 403,
+        message: 'Your account is only authorized to delete one event at a time.'
+      })
     let localIds = ids.map((id) => fromGlobalId(id).id)
     await BSDClient.deleteEvents(localIds)
 
