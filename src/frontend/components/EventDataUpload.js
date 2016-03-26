@@ -89,7 +89,8 @@ class EventDataUpload extends React.Component {
   onDrop = (files) => {
     files.forEach((file) => {
       const processObj = {
-        errors: []
+        errors: [],
+        preview: file.preview
       }
       let currentFiles = this.state.filesProcessed
       currentFiles[file.name] = processObj
