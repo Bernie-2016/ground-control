@@ -74,6 +74,8 @@ function startApp() {
 
     //Set the new BSD User's password
     await BSDClient.setConstituentPassword(email, password);
+
+    log.info(`BSD user ${email} created.`)
   }
 
   function isAuthenticated(req, res, next) {
@@ -136,6 +138,7 @@ function startApp() {
       if (user && !bsdUser) {
         if (user.password === null || user.password === undefined) {
           // Create new BSD User and log in
+          log.info(`Ground control user ${email} has null password; setting new password and creating new BSD user...`)
           await createNewBSDUser(email, password)
 
           // Set user's new password
@@ -147,6 +150,7 @@ function startApp() {
         }
         else if (await compare(password, user.password)) {
           // Create new BSD User and log in
+          log.info(`Ground control user ${email} exists; creating new BSD user...`)
           await createNewBSDUser(email, password)
 
           return done(null, user)
@@ -167,7 +171,8 @@ function startApp() {
         });
       }
       //If BSD constituent does not exist, create a new BSD constituent AND ground-control user with those credentials
-      else if (!bsdUser &&(!user || user.password === null)) {
+      else if (!bsdUser && !user) {
+        log.info(`User ${email} does not exist; creating new BSD user...`)
 
         // Create new BSD User
         await createNewBSDUser(email, password)
