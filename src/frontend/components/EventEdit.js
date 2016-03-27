@@ -160,8 +160,12 @@ class EventEdit extends React.Component {
     });
 
     const form = (
-      <GCForm
+      <Form
         ref="form"
+        value = {this.model}
+        onChange = {model => {
+               this.setState({model})
+            }}
         schema={eventSchema}
         defaultValue={eventSchema.default()}
         onSubmit={ (data) => {
@@ -363,7 +367,7 @@ class EventEdit extends React.Component {
 
       <Form.Button  style={ { display: "none" } } ref="submit" type='submit' label='Submit Changes' fullWidth={true} />
 
-    </GCForm>)
+    </Form>)
 
     return form
   }
