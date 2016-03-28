@@ -1,7 +1,14 @@
-[![Stories in Ready](https://badge.waffle.io/Bernie-2016/ground-control.png?label=status-ready&title=Ready)](https://waffle.io/Bernie-2016/ground-control)
-# Ground Control
+# Ground Control [![Stories in Ready](https://badge.waffle.io/Bernie-2016/ground-control.png?label=status-ready&title=Ready)](https://waffle.io/Bernie-2016/ground-control)
 
-## Getting started
+Ground Control is the campaign's central platform for creating, managing, and increasing turnout to events. It contains several key tools used every day by campaign volunteers and staff:
+
+* An administrative interface for editing and approving events
+* An event creation tool
+* Call and email tools for event hosts to increase turnout
+* A constituent lookup tool for administrative use
+* A constituent event dashboard to allow uploading of data files for review by our data team
+
+## Getting Started
 
 ### OS X
 
@@ -16,98 +23,25 @@ Then you should be able to start Ground Control on `http://localhost:3000` with
 
 `npm run dev`
 
-If you ever want to re-seed the database, run
+### Windows & Linux
 
-`npm run seed`
-
-If you ever add a new Node.js package, be sure to run `npm shrinkwrap` after you do or things will break for everyone else.
-
-### Linux (PROBABLY DEPRECATED)
-
-On Linux, follow the same directions as OS X above, but substitue `./setup-linux` for the equivalent OSx script.
+On Linux, follow the same directions as OS X above, but substitute `./setup-linux` for the equivalent OS X script.
 
 You will also need to have [Docker](https://docs.docker.com/engine/installation) and [docker-compose](https://docs.docker.com/compose/install) installed to provide your database.
 
-### Windows
+## Contributing
 
-The best way to run everything on Windows is probably to try to get Docker working on Windows and use the Linux installation instructions.
+Want to help out? You can jump right in to see issues that are ready to be tackled by looking at the [status-ready](https://github.com/Bernie-2016/ground-control/issues?q=is%3Aissue+is%3Aopen+label%3Astatus-ready) issue label. If you are just getting started with the project, also check out the [newbie-friendly](https://github.com/Bernie-2016/ground-control/issues?q=is%3Aissue+is%3Aopen+label%3Anewbie-friendly) label.
 
-### Logging in as an Admin User
+You can also see an overview of where all of our issues stand at https://waffle.io/Bernie-2016/ground-control
 
-By default, two admin level accounts are created by the seed script:
-* username: `admin@localhost.com`, password: `admin` (a normal admin user)
-* username: `superuser@localhost.com`, password: `admin` (an admin user with elevated priveledges)
+### More Info
 
-Log in with either of those credentials when you first go to `localhost:3000` and then check out `localhost:3000/admin`.
+[Read our wiki for more guidance on development and other FAQs.](https://github.com/Bernie-2016/ground-control/wiki)
 
-### Enviornment Variables
+### Contribution Activity
 
-Here is a list of Environment Variables and how they are used:
-
-You can find their defaults in `.env`
-
-* `BSD_HOST`:
-* `BSD_API_ID`:
-* `BSD_API_SECRET`:
-* `MAILGUN_DOMAIN`:
-* `MAILGUN_KEY`:
-* `MAILGUN_DOMAIN`:
-* `PORT`:
-* `SESSION_SECRET`:
-* `NODE_ENV`:
-* `DATABASE_URL`:
-* `config.use_env_variable`:
-* `process.env.WEBPACK_PORT`:
-* `APP_HOST`:
-* `WEBPACK_PROXY_PORT`:
-
-## What does this do and how do I get started?
-
-Currently, Ground Control is two things:
-
-* A tool for calling other volunteers of the campaign and integrating that data back into BSD, which is a CRM the campaign uses.  In the near future, it is going to also be used to call voters.
-* A tool to create and manage events.  These include both volunteer-run events and official events.  The goal here is to replace [go.berniesanders.com/page/event/create](https://go.berniesanders.com/page/event/create) and start replacing some of the functionality of the event administration backed.
-
-To get started with Ground Control, once it's running, go to `http://localhost:3000/admin`. From there, you can see the events administration section and the call assignment creation section.  To create a call assignment, do the following:
-
-1. Make a survey in Blue State Digital.  If you are developing on Ground Control, ask Saikat for access to the BSD testbed. Make sure to use the "GROUND CONTROL - Survey" wrapper.
-2. If you wish Ground Control to be able to do dynamic stuff with the Blue State Digital fields, tag the fields with something within square brackets at the beginning.  E.g. [event_id]Here's a field label.
-3. Make a constituent group that you wish to be the target of your phonebanking assignment in BSD (or figure out a SQL query to use).
-4. Go to `http://localhost:3000/admin/call-assignments`, click Create, and enter the BSD IDs of your survey and target interviewee group in the form.
-5. Click create
-
-Now, if you go to `http://localhost:3000` and signup/login, you shoul see your assignment on the left side.  Click it to test it out and start making calls!
-
-## What's the end game?
-
-The grand purpose of Ground Control is to be:
-
-1. A central portal for volunteers who want to get involved with the campaign and an admin interface to manage volunteers. We want this to be the landing page on the homepage as soon as someone wants to volunteer for Bernie.
-
-2. The central routing point/API for applications to integrate with the CRMs the campaign uses (BSD and VAN)
-
-3. Be a repository for data that does not fit neatly into BSD and VAN and give people outside of our system access to this data as well
-
-4. An effort to build out more organizing tools on top of what we already have (which leads to the data in #2).
-
-## What are these "CRMs the campaign uses?"
-
-BSD is Blue State Digital and VAN is Voter Activation Network.  BSD is basically a CRM including a mailer, way to create surveys, and way to look at signup data.  VAN is a giant database of voter information that is used for canvassing/voter outreach efforts.  Here is a rough diagram of how it fits together. Rectangles are things that exist, circles are things we are building: [https://gomockingbird.com/projects/0govthz/sXMAyD](https://gomockingbird.com/projects/0govthz/sXMAyD).
-
-VAN and BSD have their own APIs, and currently Ground Control makes use of the BSD API heavily for its syncing purposes.
-
-* [Blue State Digital (BSD) API Reference](https://www.bluestatedigital.com/page/api/doc)
-* [Voter Activation Network (VAN) API Reference](http://developers.ngpvan.com/van-api)
-
-## What stack is this project using?
-
-We are using PostgreSQL for our database. On top of that, we are creating a [GraphQL](http://graphql.org/) API.  GraphQL is designed to make it easy to build APIs for objects that have many relationships.  On the frontend, we are using [React](https://facebook.github.io/react/) for the view layer, and React talks to GraphQL via [Relay](https://facebook.github.io/relay/).
-
-If you are feeling stuck/aren't familiar with any of this and want some help, please don't bang your head against a wall!  Talk to me (saikat@berniesanders.com, @saikat in the BernieBuilders Slack).
-
-## More info?
-
-See the [docs](docs).
+[![Throughput Graph](https://graphs.waffle.io/Bernie-2016/ground-control/throughput.svg)](https://waffle.io/Bernie-2016/ground-control/metrics)
 
 ## License
 
