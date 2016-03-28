@@ -1,9 +1,13 @@
 # Ground Control [![Stories in Ready](https://badge.waffle.io/Bernie-2016/ground-control.png?label=status-ready&title=Ready)](https://waffle.io/Bernie-2016/ground-control)
 
-Currently, Ground Control is two things:
+Ground Control is the campaign's central platform for creating, managing, and increasing turnout to events. It contains several key tools used every day by campaign volunteers and staff:
 
-* A tool for calling other volunteers of the campaign and integrating that data back into BSD, which is a CRM the campaign uses.  In the near future, it is going to also be used to call voters.
-* A tool to create and manage events.  These include both volunteer-run events and official events.  The goal here is to replace [go.berniesanders.com/page/event/create](https://go.berniesanders.com/page/event/create) and start replacing some of the functionality of the event administration backed.
+* An administrative interface for editing and approving campaign events
+* Public and administrative versions of an event creation form
+* A call tool which allows event hosts to call nearby constituents and invite them to attend their events
+* An email tool which allows event hosts to promote events to other nearby constituents
+* A constituent lookup tool for administrative use
+* A constituent event dashboard to allow uploading of data files for review by our data team
 
 ## Getting Started
 
