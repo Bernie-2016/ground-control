@@ -1,4 +1,4 @@
-# Ground Control [![Stories in Ready](https://badge.waffle.io/Bernie-2016/ground-control.png?label=status-ready&title=Ready)](https://waffle.io/Bernie-2016/ground-control)
+# Ground Control
 
 Ground Control is the campaign's central platform for creating, managing, and increasing turnout to events. It contains several key tools used every day by campaign volunteers and staff:
 
@@ -29,7 +29,7 @@ On Linux, follow the same directions as OS X above, but substitute `./setup-linu
 
 You will also need to have [Docker](https://docs.docker.com/engine/installation) and [docker-compose](https://docs.docker.com/compose/install) installed to provide your database.
 
-## Contributing
+## Contributing [![Stories in Ready](https://badge.waffle.io/Bernie-2016/ground-control.png?label=status-ready&title=Ready)](https://waffle.io/Bernie-2016/ground-control) [![Stories in Ready](https://badge.waffle.io/Bernie-2016/ground-control.png?label=newbie-friendly&title=Newbie%20Friendly)](https://github.com/Bernie-2016/ground-control/issues?q=is%3Aissue+is%3Aopen+label%3Anewbie-friendly)
 
 Want to help out? You can jump right in to see issues that are ready to be tackled by looking at the [status-ready](https://github.com/Bernie-2016/ground-control/issues?q=is%3Aissue+is%3Aopen+label%3Astatus-ready) issue label. If you are just getting started with the project, also check out the [newbie-friendly](https://github.com/Bernie-2016/ground-control/issues?q=is%3Aissue+is%3Aopen+label%3Anewbie-friendly) label.
 
@@ -41,7 +41,7 @@ You can also see an overview of where all of our issues stand at https://waffle.
 
 ### Contribution Activity
 
-[![Throughput Graph](https://graphs.waffle.io/Bernie-2016/ground-control/throughput.svg)](https://waffle.io/Bernie-2016/ground-control/metrics)
+[![Throughput Graph](https://graphs.waffle.io/Bernie-2016/ground-control/throughput.svg)](https://waffle.io/Bernie-2016/ground-control)
 
 ## License
 
