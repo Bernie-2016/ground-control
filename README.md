@@ -2,10 +2,9 @@
 
 Ground Control is the campaign's central platform for creating, managing, and increasing turnout to events. It contains several key tools used every day by campaign volunteers and staff:
 
-* An administrative interface for editing and approving campaign events
-* Public and administrative versions of an event creation form
-* A call tool which allows event hosts to call nearby constituents and invite them to attend their events
-* An email tool which allows event hosts to promote events to other nearby constituents
+* An administrative interface for editing and approving events
+* An event creation tool
+* Call and email tools for event hosts to increase turnout
 * A constituent lookup tool for administrative use
 * A constituent event dashboard to allow uploading of data files for review by our data team
 
