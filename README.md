@@ -105,6 +105,10 @@ We are using PostgreSQL for our database. On top of that, we are creating a [Gra
 
 If you are feeling stuck/aren't familiar with any of this and want some help, please don't bang your head against a wall!  Talk to me (jacoblegrone@berniesanders.com, @jlegrone in the [BernieBuilders Slack](https://organize.berniesanders.com/slack/berniebuilders)).
 
+## Contributing
+
+Want to help out? You can jump right in to see issues that are ready to be tackled by looking at the [status-ready](https://github.com/Bernie-2016/ground-control/issues?q=is%3Aissue+is%3Aopen+label%3Astatus-ready) issue label. If you are just getting started with the project, also check out the [newbie-friendly](https://github.com/Bernie-2016/ground-control/issues?q=is%3Aissue+is%3Aopen+label%3Anewbie-friendly) label.
+
 ## More info?
 
 See the [docs](docs).
