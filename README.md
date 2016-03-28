@@ -103,7 +103,7 @@ VAN and BSD have their own APIs, and currently Ground Control makes use of the B
 
 We are using PostgreSQL for our database. On top of that, we are creating a [GraphQL](http://graphql.org/) API.  GraphQL is designed to make it easy to build APIs for objects that have many relationships.  On the frontend, we are using [React](https://facebook.github.io/react/) for the view layer, and React talks to GraphQL via [Relay](https://facebook.github.io/relay/).
 
-If you are feeling stuck/aren't familiar with any of this and want some help, please don't bang your head against a wall!  Talk to me (saikat@berniesanders.com, @saikat in the BernieBuilders Slack).
+If you are feeling stuck/aren't familiar with any of this and want some help, please don't bang your head against a wall!  Talk to me (jacoblegrone@berniesanders.com, @jlegrone in the [BernieBuilders Slack](https://organize.berniesanders.com/slack/berniebuilders)).
 
 ## More info?
 
