@@ -49,7 +49,9 @@ class AdminEventEmailCreationForm extends React.Component {
 
   state = {
     testMode: false,
-    recipientLimit: Math.min(this.props.event.nearbyPeople.length, 250)
+    recipientLimit: Math.min(this.props.event.nearbyPeople.length, 250),
+    submitted: false,
+    disableSubmit: false
   }
 
   getRandomSubarray(arr, size) {
@@ -108,7 +110,7 @@ class AdminEventEmailCreationForm extends React.Component {
 
     let recipientLimit = this.state.recipientLimit || recipients.length
 
-    let disableSubmit = (this.props.event.nearbyPeople.length === 0)
+    this.state.disableSubmit = (this.props.event.nearbyPeople.length === 0 || this.state.submitted)
 
     let adminAlias = this.props.currentUser.email.split('@')[0]
     let adminName = adminAlias.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();})
@@ -178,6 +180,7 @@ class AdminEventEmailCreationForm extends React.Component {
                 eventId: this.props.event.id,
                 ...formValues
               })
+              this.setState({submitted: !this.state.testMode})
             }}
           >
             <Form.Field
@@ -240,7 +243,7 @@ class AdminEventEmailCreationForm extends React.Component {
             />
             <br />
             <br />
-            <Form.Button type='submit' label='Send!' fullWidth={true} disabled={disableSubmit} />
+            <Form.Button type='submit' label='Send!' fullWidth={true} disabled={this.state.disableSubmit} />
           </GCForm>
         </Paper>
 
