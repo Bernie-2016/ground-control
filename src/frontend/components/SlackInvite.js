@@ -1,11 +1,6 @@
 import React from 'react';
-import Relay from 'react-relay';
 import {Paper, TextField} from 'material-ui';
 import {BernieText, BernieColors} from './styles/bernie-css';
-import GCForm from './forms/GCForm';
-import Form from 'react-formal';
-import yup from 'yup';
-import superagent from 'superagent';
 import {Styles} from 'material-ui';
 import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider'
 import {BernieTheme} from './styles/bernie-theme';
@@ -88,7 +83,7 @@ export default class SlackInvite extends React.Component {
       flex: 1,
       marginRight: 40
     },
-    signupFormContainer: {
+    formContainer: {
       flex: 'auto',
       width: '12em'
     },

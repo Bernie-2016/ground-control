@@ -40,6 +40,7 @@ import {createHistory} from 'history';
 import GCNetworkLayer from './relay-extensions/GCNetworkLayer'
 import log from './log'
 import Loading from './components/Loading'
+import SlackInviteIndex from './components/SlackInviteIndex';
 import SlackInvite from './components/SlackInvite';
 
 window.jQuery = jQuery;
@@ -210,6 +211,7 @@ ReactDOM.render(
         renderLoading={() => <Loading />}
     />
     <Route path='/unauthorized' component={Unauthorized} />
+    <Route path='/slack' component={SlackInviteIndex} />
     <Route path='/slack/:team' component={SlackInvite} />
     <Route path="*" component={NotFound} />
   </Router>,
