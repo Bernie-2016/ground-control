@@ -28,6 +28,8 @@ import handlebars from 'handlebars'
 import throng from 'throng'
 import compression from 'compression'
 import rp from 'request-promise'
+import Slack from './slack'
+import SlackError from './slack'
 
 const WORKERS = process.env.WEB_CONCURRENCY || 1
 
@@ -67,6 +69,8 @@ function startApp() {
     knex: knex,
     tablename: 'sessions'
   })
+
+  const SlackClient = new Slack();
 
   async function createNewBSDUser(email, password) {
     //Create a new BSD User
@@ -338,33 +342,13 @@ function startApp() {
     }
   }))
 
-  app.get('/slack/callforbernie/', async (req, res) => {
-    res.redirect('https://join-bernie-call-team.herokuapp.com')
-  })
-  app.get('/slack/callforbernie', async (req, res) => {
-    res.redirect('/slack/callforbernie/')
-  })
-
-  app.get('/slack/berniebuilders/', async (req, res) => {
-    res.redirect('https://join-bernie-builders.herokuapp.com')
-  })
-  app.get('/slack/berniebuilders', async (req, res) => {
-    res.redirect('/slack/berniebuilders/')
-  })
-
-  app.get('/slack/bernie2016states/', async (req, res) => {
-    res.redirect('https://join-bernie-2016-states.herokuapp.com')
-  })
-  app.get('/slack/bernie2016states', async (req, res) => {
-    res.redirect('/slack/bernie2016states/')
-  })
-
-  app.get('/slack/codersforsanders/', async (req, res) => {
-    res.redirect('https://cfs-slack.forsanders.com')
-  })
-  app.get('/slack/codersforsanders', async (req, res) => {
-    res.redirect('/slack/codersforsanders/')
-  })
+  // Slack Organization Invites:
+  app.post('/slack_invites',
+    wrap(async (req, res) => {
+      await SlackClient.createInvite(req.body.slackTeam, req.body.email)
+      return res.status(200)
+    })
+  )
 
   app.use('/volunteer-dashboard/', proxy('volunteer-dashboard.saikat.svc.tutum.io:8000', {
     forwardPath: function(req, res) {
