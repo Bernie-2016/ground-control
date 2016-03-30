@@ -1203,6 +1203,10 @@ const GraphQLEditEvents = mutationWithClientMutationId({
       if (event.flag_approval === true && newEventData.flag_approval === false)
         reviewedEvents.push(Number(event.event_id))
 
+      log.info(`Event ${event.event_id_obfuscated} updated by ${rootValue.user.email}`)
+      log.info('New Event Data:', newEventData)
+      log.info('Old Event Data:', event)
+
       event = {
         ...event,
         ...newEventData
@@ -1220,8 +1224,6 @@ const GraphQLEditEvents = mutationWithClientMutationId({
       if (eventIdsRequiringPhone.has(Number(event['event_type_id']))) {
         event['attendee_require_phone'] = 1
       }
-
-      log.debug('Updated event:', event)
 
       try {
         await BSDClient.updateEvent(event)
@@ -1278,9 +1280,16 @@ const GraphQLDeleteEvents = mutationWithClientMutationId({
     }
   },
   mutateAndGetPayload: async ({ids, hostMessage}, {rootValue}) => {
-    superuserRequired(rootValue)
+    adminRequired(rootValue)
+    if (!rootValue.user.is_superuser && ids.length !== 1)
+      throw new GraphQLError({
+        status: 403,
+        message: 'Your account is only authorized to delete one event at a time.'
+      })
     let localIds = ids.map((id) => fromGlobalId(id).id)
     await BSDClient.deleteEvents(localIds)
+
+    log.info(`${localIds.length} event(s) deleted by ${rootValue.user.email}: ${localIds.join(', ')}`)
 
     try {
       if (hostMessage.length > 0){
@@ -1350,6 +1359,8 @@ const GraphQLEmailHostAttendees = mutationWithClientMutationId({
     let localIds = ids.map((id) => fromGlobalId(id).id)
     let recipients = []
 
+    log.info(`${localIds.length} event email(s) sent by ${rootValue.user.email}: ${localIds.join(', ')}`)
+
     if (target === 'host' || target === 'hostAndAttendees'){
       const hostIds = await knex('bsd_events').select('creator_cons_id').whereIn('event_id', localIds);
 
@@ -1406,6 +1417,7 @@ const GraphQLReviewEvents = mutationWithClientMutationId({
   mutateAndGetPayload: async ({ids, pendingReview}, {rootValue}) => {
     adminRequired(rootValue)
     const localIds = ids.map((id) => fromGlobalId(id).id)
+    log.info(`${localIds.length} event(s) marked reviewed by ${rootValue.user.email}: ${localIds.join(', ')}`)
     return await markEventsReviewed(localIds, pendingReview)
   }
 })
@@ -1672,6 +1684,8 @@ const GraphQLCreateAdminEventEmail = mutationWithClientMutationId({
                 'email_sent_dt': moment().format('YYYY-MM-DD HH:mm:ss')
               })
     }
+
+    log.info(`FastForward request for event ${eventId} fulfilled by ${rootValue.user.email}`)
 
     return []
   }

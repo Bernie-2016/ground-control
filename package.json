@@ -64,7 +64,7 @@
     "json2csv": "^3.0.2",
     "knex": "^0.9.0",
     "mailgun-js": "0.7.6",
-    "material-ui": "^0.15.0-alpha.1",
+    "material-ui": "^0.15.0-alpha.2",
     "minilog": "^3.0.0",
     "moment": "^2.10.6",
     "moment-timezone": "https://registry.npmjs.org/moment-timezone/-/moment-timezone-0.4.1.tgz",
