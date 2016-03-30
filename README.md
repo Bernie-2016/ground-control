@@ -34,7 +34,7 @@ You can find environment defaults in `.env.sample`. The first time a setup scrip
 
 If you ever need to generate a missing `.env`, run
 
-`npm run generate-dotenv`
+`npm run gen-env`
 
 ## Contributing [![Stories in Ready](https://badge.waffle.io/Bernie-2016/ground-control.png?label=status-ready&title=Ready)](https://waffle.io/Bernie-2016/ground-control) [![Stories in Ready](https://badge.waffle.io/Bernie-2016/ground-control.png?label=newbie-friendly&title=Newbie%20Friendly)](https://github.com/Bernie-2016/ground-control/issues?q=is%3Aissue+is%3Aopen+label%3Anewbie-friendly)
 
