@@ -1,6 +1,6 @@
 import React from 'react'
 import Relay from 'react-relay'
-import {Styles, Divider, FloatingActionButton, RaisedButton, FlatButton, Card, CardTitle, CardText, CardActions, FontIcon} from 'material-ui'
+import {Styles, Divider, FloatingActionButton, RaisedButton, FlatButton, Card, CardTitle, CardText, CardActions, FontIcon, List, ListItem, Checkbox} from 'material-ui'
 import GCForm from './forms/GCForm'
 import Form from 'react-formal'
 import yup from 'yup'
@@ -8,10 +8,7 @@ import moment from 'moment'
 import {BernieTheme} from './styles/bernie-theme'
 import {BernieText, BernieColors} from './styles/bernie-css'
 import stripScripts from '../helpers/stripScripts'
-
-const style = {
-  marginLeft: 20,
-}
+import SideBarLayout from './SideBarLayout'
 
 class EventsDashboard extends React.Component {
   constructor(props) {
@@ -32,6 +29,27 @@ class EventsDashboard extends React.Component {
     })
   }
 
+  styles = () => {
+    return {
+      sideBar: {
+        width: '25%',
+        border: 'none'
+      },
+      container: {
+        borderBottom: 'none',
+        border: 'none'
+      },
+      content: {
+        height: this.state.windowHeight - 56,
+        width: '75%',
+        padding: 5, top: 56,
+        position: 'absolute',
+        overflow: 'scroll',
+        boxSizing: 'border-box'
+      }
+    }
+  }
+
   renderEvents() {
     const events = this.props.currentUser.relatedPerson ? this.props.currentUser.relatedPerson.hostedEvents : []
     if (events.length === 0)
@@ -45,45 +63,86 @@ class EventsDashboard extends React.Component {
       const offsetDate = moment(event.startDate).utcOffset(utcOffset)
       const formattedDate = offsetDate.format('l LT')
       return (
-        <Card key={event.id} style={{margin: 5, width: this.state.windowWidth - 10}}>
-          <CardTitle
-            title={event.name}
-            subtitle={formattedDate}
-            actAsExpander={true}
-            showExpandableButton={true}
-          />
-          <CardText expandable={true}>
-            <div dangerouslySetInnerHTML={stripScripts(event.description)}></div>
-          </CardText>
-          <CardActions expandable={true}>
-            <FlatButton
-              label='View'
-              onTouchTap={() => this.props.history.push('/events/' + event.eventIdObfuscated)}
+        <div key={event.id} style={{padding: 5, width: '100%', boxSizing: 'border-box'}}>
+          <Card>
+            <CardTitle
+              title={event.name}
+              subtitle={formattedDate}
+              actAsExpander={true}
+              showExpandableButton={true}
             />
-            <FlatButton label="Edit"/>
-            <FlatButton label="Delete"/>
-            <FlatButton
-              label="Send Turnout Email"
-              onTouchTap={() => this.props.history.push('/events/' + event.eventIdObfuscated + '/request-email')}
-            />
-            <FlatButton
-              label="Upload Sign In Sheets"
-              onTouchTap={() => this.props.history.push('/events/' + event.eventIdObfuscated + '/upload')}
-            />
-          </CardActions>
-        </Card>
+            <CardText expandable={true}>
+              <div dangerouslySetInnerHTML={stripScripts(event.description)}></div>
+            </CardText>
+            <CardActions expandable={true}>
+              <FlatButton
+                label='View'
+                onTouchTap={() => this.props.history.push('/events/' + event.eventIdObfuscated)}
+              />
+              <FlatButton label="Edit"/>
+              <FlatButton label="Delete"/>
+              <FlatButton
+                label="Send Turnout Email"
+                onTouchTap={() => this.props.history.push('/events/' + event.eventIdObfuscated + '/request-email')}
+              />
+              <FlatButton
+                label="Upload Sign In Sheets"
+                onTouchTap={() => this.props.history.push('/events/' + event.eventIdObfuscated + '/upload')}
+              />
+            </CardActions>
+          </Card>
+        </div>
       )
     })
   }
 
-  render() {
+  renderContent() {
     return (
-      <div style={{height: this.state.windowHeight - 56, width: '100%', top: 56, position: 'absolute', overflow: 'scroll'}}>
+      <div style={this.styles().content}>
         {this.renderEvents()}
         <FloatingActionButton style={{marginRight: 20, position: 'fixed', bottom: 20, right: 10}} linkButton={true} href='/events/create' >
           <FontIcon className="material-icons">add</FontIcon>
         </FloatingActionButton>
       </div>
+    )
+  }
+
+  render() {
+    const sideBar = (
+      <div>
+          <List subheader="General">
+            <ListItem
+              primaryText="Hosting"
+              secondaryText="Events you are hosting"
+            />
+            <ListItem
+              primaryText="Attending"
+              secondaryText="Events you are attending"
+            />
+          </List>
+          <Divider />
+          <List subheader="View Settings">
+            <ListItem
+              leftCheckbox={<Checkbox />}
+              primaryText="Show All Events"
+              secondaryText="View all past and upcoming events"
+            />
+            <ListItem
+              leftCheckbox={<Checkbox />}
+              primaryText="Use Calendar View"
+              secondaryText="View as a calendar instead of list"
+            />
+          </List>
+      </div>
+    )
+
+    return (
+      <SideBarLayout
+        sideBar={sideBar}
+        sideBarStyle={this.styles().sideBar}
+        content={this.renderContent()}
+        contentViewStyle={this.styles().container}
+      />
     )
   }
 }
