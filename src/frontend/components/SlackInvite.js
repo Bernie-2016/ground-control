@@ -14,6 +14,7 @@ export default class SlackInvite extends React.Component {
 
   titleize = {
     'bernie2016states': 'Bernie 2016 States',
+    'berniebarnstorms': 'Bernie Barnstorms',
     'berniebuilders': 'Bernie Builders',
     'callforbernie': 'Call for Bernie',
     'codersforsanders': 'Coders for Sanders'
@@ -121,6 +122,10 @@ export default class SlackInvite extends React.Component {
               <ul>
                 <li>
                   <a href="/slack/bernie2016states">Bernie 2016 States</a> - interfacing with volunteers and staff in each state
+                </li>
+
+                <li>
+                  <a href="/slack/berniebarnstorms">Bernie Barnstorms</a> - interfacing with barnstorm organizers and planners
                 </li>
 
                 <li>

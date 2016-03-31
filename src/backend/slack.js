@@ -7,6 +7,7 @@ const success_message = { success: true };
 
 // Current Slack Teams:
 //   - bernie2016states (BERNIE2016STATES_SLACK_API_KEY)
+//   - berniebarnstorms (BERNIEBARNSTORMS_SLACK_API_KEY)
 //   - berniebuilders (BERNIEBUILDERS_SLACK_API_KEY)
 //   - callforbernie (CALLFORBERNIE_SLACK_API_KEY)
 //   - codersforsanders (CODERSFORSANDERS_SLACK_API_KEY)
