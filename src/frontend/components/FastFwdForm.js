@@ -83,9 +83,14 @@ class FastFwdForm extends React.Component {
       <MuiThemeProvider muiTheme={Styles.getMuiTheme(BernieTheme)}>
         <div style={this.styles.pageContainer}>
           <MutationHandler ref='mutationHandler'
-                           successMessage='Your message has been saved.'
+                           successMessage='Your request has been saved. We will review it and send it out to volunteers in your area ASAP!'
                            mutationClass={CreateFastFwdRequest}
-                           mutationName='createFastFwdRequest' />
+                           mutationName='createFastFwdRequest'
+                           onSuccess={() => {
+                              setTimeout(() => {
+                                location.href = 'https://go.berniesanders.com/page/content/volunteer-hub/';
+                              }, 9000)
+                         }} />
           <div style={BernieText.title}>
             Fast Fwd: Send a message to bring volunteers to your event
           </div>
