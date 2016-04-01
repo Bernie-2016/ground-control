@@ -125,19 +125,23 @@ function startApp() {
       passReqToCallback: true
     },
     wrap(async (req, email, password, done) => {
-      let bsdUser = await BSDClient.getConstituentByEmail(email);
+      let bsdUser = await BSDClient.getConstituentByEmail(email)
+      log.debug(bsdUser)
+
       let user = await knex('users')
         .where('email', email.toLowerCase())
-        .first();
+        .first()
 
       //Create password
       let hashedPassword = await hash(password)
+
       //Check bsdCredentials
       let bsdCredentialsResponse = await BSDClient.checkCredentials(email, password)
       let bsdCredentialsValid = (typeof bsdCredentialsResponse === 'object' && bsdCredentialsResponse.api.cons)
 
       //If user exists and credentials are valid but no BSD user, create new BSD constituent and log in
-      if (user && !bsdUser) {
+      if (user && (!bsdUser || bsdUser.has_account === '0')) {
+        log.debug('no account!!!')
         if (user.password === null || user.password === undefined) {
           // Create new BSD User and log in
           log.info(`Ground control user ${email} has null password; setting new password and creating new BSD user...`)
@@ -166,14 +170,14 @@ function startApp() {
         }
       }
       //If BSD credentials are incorrect, give error message with a link to reset password via BSD
-      else if (bsdUser && !bsdCredentialsValid) {
+      else if (bsdUser && bsdUser.has_account === '1' && !bsdCredentialsValid) {
         return done(null, false, {
           message: 'Incorrect password.',
           "url": "https://www.bluestatedigital.com/ctl/Core/AdminResetPass"
         });
       }
       //If BSD constituent does not exist, create a new BSD constituent AND ground-control user with those credentials
-      else if (!bsdUser && !user) {
+      else if (!user && (!bsdUser || bsdUser.has_account === '0')) {
         log.info(`User ${email} does not exist; creating new BSD user...`)
 
         // Create new BSD User

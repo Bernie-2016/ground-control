@@ -1311,6 +1311,8 @@ const GraphQLDeleteEvents = mutationWithClientMutationId({
           if (recipient)
             await Mailgun.sendEventDeletionNotification({recipient, message: hostMessage, events})
         }
+
+        await Mailgun.sendEventDeletionNotification({recipient: rootValue.user.email, message: hostMessage, events})
       }
     }
     catch(ex){

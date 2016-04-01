@@ -656,6 +656,20 @@ Thank you so much for helping to spread Bernie's message!
 ${signature}`
       },
       {
+        reason: 'Lobby Superdelegate',
+        message: `The event you posted does not follow guidelines for event creation on Bernie events central. We’ve removed the event from the system.
+
+Please know, it’s not important to worry about superdelegate count when it can change from day-to-day. We interact with superdelegates on a daily basis, sharing Bernie's position on issues and updating them on campaign activities. As such, we ask our volunteers and supporters not to lobby superdelegates directly.
+
+The most important thing you can do right now it to help us increase our pledged delegates, and you can do that by hosting and attending events like phone banks, volunteer meetings, and canvasses, among others.
+
+You can find events in your area by visiting map.berniesanders.com or you can create another event that follows more closely to the important events we mention above. For those events, we give you all the tools you need to run a successful event and to help bring Bernie's message to your area.
+
+Thank you so much for all that you do!
+
+${signature}`
+      },
+      {
         reason: 'General Deletion Message',
         message: `Your event does not meet parameters at berniesanders.com/plan.
 
