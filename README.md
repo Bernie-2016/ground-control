@@ -42,6 +42,16 @@ Want to help out? You can jump right in to see issues that are ready to be tackl
 
 You can also see an overview of where all of our issues stand at https://waffle.io/Bernie-2016/ground-control
 
+We use Gitflow to accept pull requests. To submit a change:
+
+1. Fork the project to your own GitHub account (click "Fork" on the project page in GitHub)
+2. Create your feature branch (git checkout -b my-new-feature)
+3. Commit your changes (git commit -am 'Add some feature')
+4. Push to the branch (git push origin my-new-feature)
+5. Create a new Pull Request
+
+For code review and discussion, ping @jlegrone on the [berniebuilders slack](https://organize.berniesanders.com/slack/berniebuilders).
+
 ### More Info
 
 [Read our wiki for more guidance on development and other FAQs.](https://github.com/Bernie-2016/ground-control/wiki)
