@@ -57,8 +57,8 @@ var eventTypes = [
 		id: 'ballot-access',
 		name: 'Gather Ballot Access Signatures',
 		defaultValues: {
-			name: 'Bernie Ballot Blast - PA Support Bernie and his Delegates and Collect Petition Signatures',
-			description: 'We only have 3 weeks to get all the needed signatures to get Bernie on the Ballot and get his Delegates nominated for the Democratic Convention.  Sign up for your local events scheduled between January 26th and February 10th.  We can\'t do this without you and you can make the difference in Pennsylvania, one of the most important swing states.  Come join the movement!',
+			name: 'Bernie Ballot Blast - NJ Support Bernie and his Delegates and Collect Petition Signatures',
+			description: 'Please stop by and sign petitions to put Bernie and his delegates on the New Jersey Democratic Primary Ballot. All petitions are due in on Monday, so we need you to act now. It takes just a few minutes to sign the petition and spread the Bern!',
 		},
 		adminOnly: false,
 		disabled: ['use_shifts']
