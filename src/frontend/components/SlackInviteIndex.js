@@ -1,22 +1,11 @@
 import React from 'react';
-import {Paper, TextField} from 'material-ui';
 import {BernieText, BernieColors} from './styles/bernie-css';
-import GCForm from './forms/GCForm';
-import Form from 'react-formal';
-import yup from 'yup';
-import superagent from 'superagent';
 import {Styles} from 'material-ui';
 import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider'
 import {BernieTheme} from './styles/bernie-theme';
 
 export default class SlackInviteIndex extends React.Component {
   styles = {
-    signupForm: {
-      width: '100%',
-      backgroundColor: BernieColors.blue,
-      color: BernieColors.white,
-      padding: '15px 15px 15px 15px'
-    },
     paragraph: {
       padding: '0.5em'
     },
@@ -28,19 +17,8 @@ export default class SlackInviteIndex extends React.Component {
       flex: 1,
       marginRight: 40
     },
-    formContainer: {
-      flex: 'auto',
-      width: '12em'
-    },
     container: {
       padding: '40px'
-    },
-    errorMessage: {
-      ...BernieText.default,
-      color: BernieColors.lightRed,
-      fontSize: '0.8em',
-      marginTop: 15,
-      textAlign: 'center'
     }
   }
 
@@ -64,6 +42,10 @@ export default class SlackInviteIndex extends React.Component {
               </p>
 
               <ul>
+                <li>
+                  <a href="/slack/afam4bernie">African Americans For Bernie</a> - community of African American activists and allies
+                </li>
+
                 <li>
                   <a href="/slack/bernie2016states">Bernie 2016 States</a> - interfacing with volunteers and staff in each state
                 </li>

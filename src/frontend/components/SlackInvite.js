@@ -1,6 +1,10 @@
 import React from 'react';
 import {Paper, TextField} from 'material-ui';
 import {BernieText, BernieColors} from './styles/bernie-css';
+import GCForm from './forms/GCForm';
+import Form from 'react-formal';
+import yup from 'yup';
+import superagent from 'superagent';
 import {Styles} from 'material-ui';
 import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider'
 import {BernieTheme} from './styles/bernie-theme';
@@ -13,6 +17,7 @@ export default class SlackInvite extends React.Component {
   }
 
   titleize = {
+    'afam4bernie': 'African Americans for Bernie',
     'bernie2016states': 'Bernie 2016 States',
     'berniebarnstorms': 'Bernie Barnstorms',
     'berniebuilders': 'Bernie Builders',
@@ -69,6 +74,7 @@ export default class SlackInvite extends React.Component {
   styles = {
     signupForm: {
       width: '100%',
+      maxWidth: '400px',
       backgroundColor: BernieColors.blue,
       color: BernieColors.white,
       padding: '15px 15px 15px 15px'
@@ -86,7 +92,7 @@ export default class SlackInvite extends React.Component {
     },
     formContainer: {
       flex: 'auto',
-      width: '12em'
+      width: '12em',
     },
     container: {
       padding: '40px'
@@ -114,36 +120,10 @@ export default class SlackInvite extends React.Component {
             <div style={BernieText.title}>
               Chat with "{this.titleize[this.state.slackTeam]}"
             </div>
-            <div style={BernieText.default}>
-              <p style={this.styles.paragraph}>
-                In order for us to achieve our political revolution, there are many different chat rooms that volunteers use, primarily hosted on the Slack platform.
-              </p>
 
-              <ul>
-                <li>
-                  <a href="/slack/bernie2016states">Bernie 2016 States</a> - interfacing with volunteers and staff in each state
-                </li>
-
-                <li>
-                  <a href="/slack/berniebarnstorms">Bernie Barnstorms</a> - interfacing with barnstorm organizers and planners
-                </li>
-
-                <li>
-                  <a href="/slack/berniebuilders">Bernie Builders</a> - general volunteer chatter
-                </li>
-
-                <li>
-                  <a href="/slack/callforbernie">Call For Bernie</a> - phonebanking assistance and chatter
-                </li>
-
-                <li>
-                  <a href="/slack/codersforsanders">Coders for Sanders</a> - site development and design chatter
-                </li>
-              </ul>
+            <div styles={this.styles.formContainer}>
+              {this.renderForm()}
             </div>
-          </div>
-          <div styles={this.styles.formContainer}>
-            {this.renderForm()}
           </div>
         </div>
       </div>
