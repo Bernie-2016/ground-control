@@ -13,6 +13,8 @@ import {BernieTheme} from './styles/bernie-theme'
 import stripScripts from '../helpers/stripScripts'
 import qs from 'querystring'
 import superagent from 'superagent'
+import MutationHandler from './MutationHandler'
+import SaveEventFile from '../mutations/SaveEventFile'
 
 const momentWithTimezone = (startDate, timeZone) => {
   return moment(startDate).tz(timeZone)
@@ -122,7 +124,15 @@ class EventDataUpload extends React.Component {
 
         if (err){
           processObj.errors = []
+          console.log(res)
           processObj.errors.push(res.text)
+        }
+        else {
+          this.refs.saveEventFileHandler.send({
+            event: this.props.event,
+            fileName: file.name,
+            url: fileUrl
+          })
         }
 
         processObj.url = fileUrl
@@ -256,12 +266,6 @@ class EventDataUpload extends React.Component {
             <div style={{padding: 15}}>
               <GCForm
                 schema={this.formSchema}
-                onSubmit={(formValues) => {
-                  this.refs.mutationHandler.send({
-                    eventId: this.props.event.id,
-                    ...formValues
-                  })
-                }}
               >
                 <h3 style={BernieText.secondaryTitle}>Upload Event Data</h3>
                 <Form.Field
@@ -285,8 +289,14 @@ class EventDataUpload extends React.Component {
               </GCForm>
             </div>
           </div>
-
+          <MutationHandler
+            ref='saveEventFileHandler'
+            mutationClass={SaveEventFile}
+            mutationName='saveEventFile'
+            successMessage='File upload complete'
+          />
         </div>
+
       </MuiThemeProvider>
     )
   }
@@ -302,6 +312,7 @@ export default Relay.createContainer(EventDataUpload, {
     `,
     event: () => Relay.QL`
       fragment on Event {
+        ${SaveEventFile.getFragment('event')}
         attendeesCount
         attendeeVolunteerMessage
         attendeeVolunteerShow

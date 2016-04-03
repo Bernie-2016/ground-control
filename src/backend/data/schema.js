@@ -1427,10 +1427,23 @@ const GraphQLReviewEvents = mutationWithClientMutationId({
 const GraphQLSaveEventFile = mutationWithClientMutationId({
   name: 'SaveEventFile',
   inputFields: {
+    fileName: { type: new GraphQLNonNull(GraphQLString) },
+    url: { type: new GraphQLNonNull(GraphQLString) },
+    notes: { type: GraphQLString },
+    sourceEventId: { type: new GraphQLNonNull(GraphQLString) },
   },
   outputFields: {
+    event: { type: GraphQLEvent }
   },
-  mutateAndGetPayload: async () => {
+  mutateAndGetPayload: async ({fileName, url, notes, sourceEventId}, {rootValue}) => {
+    log.debug('success!')
+
+    let userId = rootValue.user.id
+    log.debug(sourceEventId, userId)
+
+    const event = await rootValue.loaders.bsdEvents.load(sourceEventId)
+    log.debug(event)
+    return event
   }
 })
 
