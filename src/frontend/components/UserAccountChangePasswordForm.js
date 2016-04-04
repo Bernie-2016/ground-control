@@ -56,22 +56,29 @@ export default class UserAccountChangePasswordForm extends React.Component {
               type='password'
               name='currentPassword'
               label='Current password'
+              fullWidth={true}
             />
             <br />
             <Form.Field
               type='password'
               name='newPassword'
               label='New password'
+              fullWidth={true}
             />
             <br />
             <Form.Field
               type='password'
               name='confirmNewPassword'
               label='Confirm password'
+              fullWidth={true}
             />
             <br /> <br />
 
-            <Form.Button type='submit' label='Change password' fullWidth={true}/>
+            <Form.Button
+              type='submit'
+              label='Change password'
+              fullWidth={true}
+            />
           </GCForm>
         </Paper>
       </div>
