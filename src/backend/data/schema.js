@@ -1915,10 +1915,10 @@ const GraphQLChangeUserPassword = mutationWithClientMutationId({
     mutateAndGetPayload: async({currentPassword, newPassword}, {rootValue}) => {
       authRequired(rootValue)
 
-      let user = rootValue.user;
+      const user = rootValue.user
 
-      let bsdCredentialsResponse = await BSDClient.checkCredentials(user.email, currentPassword)
-      let bsdCredentialsValid    = (typeof bsdCredentialsResponse === 'object' && bsdCredentialsResponse.api.cons)
+      const bsdCredentialsResponse = await BSDClient.checkCredentials(user.email, currentPassword)
+      const bsdCredentialsValid    = (typeof bsdCredentialsResponse === 'object' && bsdCredentialsResponse.api.cons)
 
       if (!bsdCredentialsValid) {
         throw new GraphQLError({
