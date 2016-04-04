@@ -37,9 +37,9 @@ export default class UserAccountChangePasswordForm extends React.Component {
 
   render() {
     return (
-      <div>
+      <div style={BernieText.default}>
         <MutationHandler ref='mutationHandler' successMessage='Password changed!'
-                         mutationClass={ChangeUserPassword}/>
+                         mutationClass={ChangeUserPassword} mutationName='changeUserPassword' />
         <div style={BernieText.secondaryTitle}>
           Change Password
         </div>
