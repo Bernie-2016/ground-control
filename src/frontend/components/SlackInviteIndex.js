@@ -1,8 +1,11 @@
-import React from 'react';
-import {BernieText, BernieColors} from './styles/bernie-css';
-import {Styles} from 'material-ui';
+import React from 'react'
+import {BernieText, BernieColors} from './styles/bernie-css'
+import {Styles} from 'material-ui'
 import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider'
-import {BernieTheme} from './styles/bernie-theme';
+import {BernieTheme} from './styles/bernie-theme'
+import {slacks} from './data/slacks'
+
+console.log(slacks)
 
 export default class SlackInviteIndex extends React.Component {
   styles = {

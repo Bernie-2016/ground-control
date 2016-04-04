@@ -343,9 +343,11 @@ function startApp() {
   }))
 
   // Slack Organization Invites:
-  app.post('/slack_invites',
+  app.post('/slack-invites',
     wrap(async (req, res) => {
-      await SlackClient.createInvite(req.body.slackTeam, req.body.email)
+      log.debug(req.body)
+      const response = await SlackClient.createInvite(req.body.slackTeam, req.body.email)
+      log.debug(response)
       return res.status(200)
     })
   )

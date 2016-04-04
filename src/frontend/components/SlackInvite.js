@@ -1,28 +1,21 @@
-import React from 'react';
-import {Paper, TextField} from 'material-ui';
+import React from 'react'
+import {Paper, TextField} from 'material-ui'
 import {BernieText, BernieColors} from './styles/bernie-css';
-import GCForm from './forms/GCForm';
-import Form from 'react-formal';
-import yup from 'yup';
-import superagent from 'superagent';
-import {Styles} from 'material-ui';
+import GCForm from './forms/GCForm'
+import Form from 'react-formal'
+import yup from 'yup'
+import superagent from 'superagent'
+import {Styles} from 'material-ui'
 import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider'
-import {BernieTheme} from './styles/bernie-theme';
+import {BernieTheme} from './styles/bernie-theme'
+import {slacks} from './data/slacks'
+
+console.log(slacks)
 
 export default class SlackInvite extends React.Component {
   state = {
-    slackTeam: this.props.routeParams.team,
     formState: 'signup',
     errorMessage: null,
-  }
-
-  titleize = {
-    'afam4bernie': 'African Americans for Bernie',
-    'bernie2016states': 'Bernie 2016 States',
-    'berniebarnstorms': 'Bernie Barnstorms',
-    'berniebuilders': 'Bernie Builders',
-    'callforbernie': 'Call for Bernie',
-    'codersforsanders': 'Coders for Sanders'
   }
 
   clearError() {
@@ -47,26 +40,27 @@ export default class SlackInvite extends React.Component {
             hintText='Email'
             type='email'
             floatingLabelText={false}
+            fullWidth={true}
           />
-          <br />
           <br />
         </div>
       ),
       onSubmit: (formState) => {
-        this.clearError();
+        this.clearError()
         superagent
-          .post('/slack_invites')
+          .post('/slack-invites')
           .send({
-            email: formState.email,
-            slackTeam: this.state.slackTeam
-          })
+              email: formState.email,
+              slackTeam: this.props.routeParams.team
+            })
           .end((err, res) => {
-            if (!err) {
-              this.redirectToNext();
-            } else {
-              this.setState({errorMessage: 'Whoops! An error occurred. Please try again!'});
-            }
-          })
+              console.log('woo')
+              if (!err) {
+                this.redirectToNext()
+              } else {
+                this.setState({errorMessage: 'Whoops! An error occurred. Please try again!'})
+              }
+            })
       }
     }
   }
@@ -75,27 +69,14 @@ export default class SlackInvite extends React.Component {
     signupForm: {
       width: '100%',
       maxWidth: '400px',
+      margin: '0 auto',
       backgroundColor: BernieColors.blue,
       color: BernieColors.white,
-      padding: '15px 15px 15px 15px'
-    },
-    paragraph: {
-      padding: '0.5em'
-    },
-    introContainer: {
-      display: 'flex',
-      flexDirection: 'row'
-    },
-    introTextContainer: {
-      flex: 1,
-      marginRight: 40
-    },
-    formContainer: {
-      flex: 'auto',
-      width: '12em',
+      padding: 15
     },
     container: {
-      padding: '40px'
+      padding: '40px',
+      textAlign: 'center'
     },
     errorMessage: {
       ...BernieText.default,
@@ -104,30 +85,6 @@ export default class SlackInvite extends React.Component {
       marginTop: 15,
       textAlign: 'center'
     }
-  }
-
-  renderSplash() {
-    return (
-      <div style={this.styles.container} >
-        <div style={this.styles.introContainer}>
-          <div style={this.styles.introTextContainer}>
-            <div style={{
-              ...BernieText.secondaryTitle,
-              display: 'block'
-            }}>
-              Organize
-            </div>
-            <div style={BernieText.title}>
-              Chat with "{this.titleize[this.state.slackTeam]}"
-            </div>
-
-            <div styles={this.styles.formContainer}>
-              {this.renderForm()}
-            </div>
-          </div>
-        </div>
-      </div>
-    )
   }
 
   renderForm() {
@@ -139,7 +96,7 @@ export default class SlackInvite extends React.Component {
     let errorElement = <div></div>;
 
     if (this.state.errorMessage) {
-      errorElement = <div style={this.styles.errorMessage}>{this.state.errorMessage}</div>;
+      errorElement = <div style={this.styles.errorMessage}>{this.state.errorMessage}</div>
     }
 
     return (
@@ -159,7 +116,7 @@ export default class SlackInvite extends React.Component {
             {formTitle}
             {errorElement}
             <Paper zDepth={0} style={{
-              padding: '15px 15px 15px 15px',
+              padding: 15,
               marginTop: 15,
               marginBottom: 15
             }}>
@@ -167,7 +124,7 @@ export default class SlackInvite extends React.Component {
             </Paper>
               <Form.Button
                 type='submit'
-                label='Go!'
+                label='Submit'
                 fullWidth={true}
               />
               <div style={{
@@ -184,9 +141,32 @@ export default class SlackInvite extends React.Component {
   }
 
   render() {
+    const team = slacks[this.props.params.team]
     return (
       <MuiThemeProvider muiTheme={Styles.getMuiTheme(BernieTheme)}>
-        {this.renderSplash()}
+        <div style={this.styles.container} >
+          <h2 style={{
+            ...BernieText.secondaryTitle,
+            display: 'block'
+          }}>
+            Organize on Slack
+          </h2>
+          <h1 style={{
+            ...BernieText.title,
+            marginBottom: 0
+          }}>
+            Join "{team.title}"
+          </h1>
+          <p style={{
+            ...BernieText.default,
+            marginBottom: '1em'
+          }}>
+            {team.description}
+          </p>
+          <div styles={this.styles.formContainer}>
+            {this.renderForm()}
+          </div>
+        </div>
       </MuiThemeProvider>
     )
   }
