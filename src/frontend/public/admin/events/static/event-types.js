@@ -83,23 +83,23 @@ var eventTypes = [
 		adminOnly: false,
 		disabled: ['attendee_volunteer_show']
 	},
-	{
-		id: 'get-out-the-vote',
-		name: 'Get Out the Vote',
-		useShifts: true,
-		adminOnly: true,
-		disabled: ['contact_phone', 'public_phone'],
-		defaultValues: {
-			name: 'Get Out the Vote For Bernie!',
-			description: 'Join other volunteers in the area to help get out the vote for Bernie. You’ll get training, materials, and anything else you might need to put Bernie over the top in the upcoming election. This is the final push, so let’s give it all we’ve got!',
-			is_official: true,
-			is_searchable: true,
-			host_receive_rsvp_emails: false,
-			attendee_volunteer_show: false,
-			duration_allday: true,
-			capacity: 0
-		}
-	},
+	// {
+	// 	id: 'get-out-the-vote',
+	// 	name: 'Get Out the Vote',
+	// 	useShifts: true,
+	// 	adminOnly: true,
+	// 	disabled: ['contact_phone', 'public_phone'],
+	// 	defaultValues: {
+	// 		name: 'Get Out the Vote For Bernie!',
+	// 		description: 'Join other volunteers in the area to help get out the vote for Bernie. You’ll get training, materials, and anything else you might need to put Bernie over the top in the upcoming election. This is the final push, so let’s give it all we’ve got!',
+	// 		is_official: true,
+	// 		is_searchable: true,
+	// 		host_receive_rsvp_emails: false,
+	// 		attendee_volunteer_show: false,
+	// 		duration_allday: true,
+	// 		capacity: 0
+	// 	}
+	// },
 	{
 		id: 'barnstorm',
 		name: 'Barnstorm',

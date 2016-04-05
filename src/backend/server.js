@@ -467,7 +467,7 @@ function startApp() {
     let user = req.user ? req.user.email : 'Anonymous'
     const eventTypeIdString = form['event_type_id']
 
-    // log.info(`Event Create Form Submission to ${src} by ${user}`, JSON.stringify(form))
+    log.info(`Event Create Form Submission to ${src} by ${user}`, JSON.stringify(form))
 
     const eventIdMap = {
       'volunteer-meeting': { id: 24, staffOnly: false },
@@ -479,7 +479,7 @@ function startApp() {
       'carpool-to-nevada': { id: 39, staffOnly: false, requirePhone: true },
       'carpool': { id: 39, staffOnly: false, requirePhone: true },
       'official-barnstorm': { id: 41, staffOnly: true },
-      'get-out-the-vote': { id: 45, staffOnly: false, requirePhone: true },
+      // 'get-out-the-vote': { id: 45, staffOnly: false, requirePhone: true },
       'primary-day': { id: 45, staffOnly: false, requirePhone: true },
       'vol2vol': { id: 47, staffOnly: true },
       'rally': { id: 14, staffOnly: true },
