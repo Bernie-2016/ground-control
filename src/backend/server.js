@@ -28,6 +28,7 @@ import handlebars from 'handlebars'
 import throng from 'throng'
 import compression from 'compression'
 import rp from 'request-promise'
+import moment from 'moment'
 
 const WORKERS = process.env.WEB_CONCURRENCY || 1
 
@@ -417,7 +418,7 @@ function startApp() {
   app.post('/events/add-rsvp', async (req, res) => {
     res.header("Access-Control-Allow-Origin", "*")
     res.header("Access-Control-Allow-Headers", "*")
-    res.header('Access-Control-Allow-Methods', '*')
+    res.header('Access-Control-Allow-Methods', "*")
     
   	const makeRequest = async (body) => {
   		log.debug(body)
@@ -464,21 +465,126 @@ function startApp() {
 
     let form = req.body
     let user = req.user ? req.user.email : 'Anonymous'
-    log.info(`Event Create Form Submission to ${src} by ${user}`, JSON.stringify(form));
+    const eventTypeIdString = form['event_type_id']
+
+    // log.info(`Event Create Form Submission to ${src} by ${user}`, JSON.stringify(form))
 
     const eventIdMap = {
       'volunteer-meeting': { id: 24, staffOnly: false },
       'ballot-access': { id: 30, staffOnly: false },
       'phonebank': { id: 31, staffOnly: false, requirePhone: true },
-      'canvass': { id: 32, staffOnly: false, requirePhone: true },
+      'canvass': { id: 32, staffOnly: true, requirePhone: true },
+      'volunteer-canvass': { id: 32, staffOnly: false, requirePhone: true },
       'barnstorm': { id: 41, staffOnly: false },
       'carpool-to-nevada': { id: 39, staffOnly: false, requirePhone: true },
       'carpool': { id: 39, staffOnly: false, requirePhone: true },
       'official-barnstorm': { id: 41, staffOnly: true },
       'get-out-the-vote': { id: 45, staffOnly: false, requirePhone: true },
+      'primary-day': { id: 45, staffOnly: false, requirePhone: true },
       'vol2vol': { id: 47, staffOnly: true },
       'rally': { id: 14, staffOnly: true },
       'voter-registration': { id: 22, staffOnly: false, requirePhone: true }
+    }
+
+    const shiftSchemaMap = {
+      'canvass': [
+        {
+          id: 1,
+          start: '9:00 am',
+          end: '12:00 pm'
+        },
+        {
+          id: 2,
+          start: '12:00 pm',
+          end: '3:00 pm'
+        },
+        {
+          id: 3,
+          start: '3:00 pm',
+          end: '6:00 pm'
+        }
+      ],
+      'volunteer-canvass': [
+        {
+          id: 1,
+          start: '9:00 am',
+          end: '12:00 pm'
+        },
+        {
+          id: 2,
+          start: '12:00 pm',
+          end: '3:00 pm'
+        },
+        {
+          id: 3,
+          start: '3:00 pm',
+          end: '6:00 pm'
+        }
+      ],
+      'get-out-the-vote': [
+        {
+          id: 1,
+          start: '9:00 am',
+          end: '12:00 pm'
+        },
+        {
+          id: 2,
+          start: '12:00 pm',
+          end: '3:00 pm'
+        },
+        {
+          id: 3,
+          start: '3:00 pm',
+          end: '6:00 pm'
+        },
+        {
+          id: 4,
+          start: '6:00 pm',
+          end: '9:00 pm'
+        }
+      ],
+      'primary-day': [
+        {
+          id: 1,
+          start: '8:00 am',
+          end: '12:00 pm'
+        },
+        {
+          id: 2,
+          start: '12:00 pm',
+          end: '4:00 pm'
+        },
+        {
+          id: 3,
+          start: '4:00 pm',
+          end: '8:00 pm'
+        }
+      ]
+    }
+
+    function getDayWithDefaultShifts(shiftSchemaMap, eventType, shiftIDs, capacity, day) {
+      const convertTime = (time) => moment(time, 'hh:mm a').format('HH:mm:ss')
+      function filterShiftsById() {
+        const shiftIdSet = new Set(shiftIDs)
+        return shiftSchemaMap[eventType].filter((shift) => shiftIdSet.has(shift.id))
+      }
+      function convertToBSDShifts(shifts, capacity) {
+        return shifts.map((shift) => {
+          return {
+            'start_time': convertTime(shift.start),
+            'end_time': convertTime(shift.end),
+            capacity
+          }
+        })
+      }
+      
+      const shifts = filterShiftsById()
+      const bsdShifts = convertToBSDShifts(shifts, capacity)
+
+      return {
+          start_datetime_system: `${day} ${bsdShifts[0].start_time}`,
+          shifts: bsdShifts
+        }
     }
 
     if (form['event_type_id'] === 'canvass'){
@@ -584,7 +690,6 @@ function startApp() {
       startHour = (form['start_time']['a'] == 'pm') ? Number(form['start_time']['h']) + 12 : form['start_time']['h']
 
     let createdEventIds = []
-
     for (let index = 0; index < dateCount; index++) {
       let result = null
       if (form.hasOwnProperty('days')){
@@ -592,6 +697,14 @@ function startApp() {
           form.days[0].start_datetime_system = `${form['event_dates'][index]['date']} ${startHour}:${form['start_time']['i'][0]}:00`
         else
           form.days[0].start_datetime_system = `${form['event_dates'][index]['date']} ${startHour}:${form['start_time']['i']}:00`
+      }
+
+      // Enforce standard event shifts
+      if (eventTypeIdString in shiftSchemaMap && form.shift_ids){
+        const dayWithDefaultShifts = getDayWithDefaultShifts(shiftSchemaMap, eventTypeIdString, form.shift_ids, form.capacity, form['event_dates'][index]['date'])        
+        form['use_shifts'] = '1'
+        form.days = []
+        form.days.push(dayWithDefaultShifts)
       }
       log.info(form)
       try {
