@@ -375,6 +375,7 @@ function setDefaults(eventTypeId){
 		}
 	};
 
+	// show default shifts
 	if (shiftSchema[eventTypeId] !== undefined) {
 		var shifts = shiftSchema[eventTypeId];
 		var shiftPreviews = shifts.map(function(shift, index) {
@@ -382,12 +383,21 @@ function setDefaults(eventTypeId){
 			return '<div class="shift-preview">Shift ' + shiftNumber + ': ' + shift.start + ' to ' + shift.end + ' </div>'
 		});
 		
-		$('#date-inputs').hide();
+		$('#date-inputs').hide()
+			.find("input, select")
+			.attr("disabled", true);
 		$('#shift-previews').html('<br/>' + shiftPreviews.join('<br/>')).show();
 	}
 	else {
-		$('#date-inputs').show();
+		$('#date-inputs').show()
+			.find("input, select")
+			.removeAttr("disabled");
 		$('#shift-previews').hide();
+
+		$("#shift-wrapper")
+			.hide()
+			.find("input, select")
+			.attr("disabled", true);
 	}
 }
 
