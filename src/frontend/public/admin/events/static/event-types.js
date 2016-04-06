@@ -83,6 +83,30 @@ var eventTypes = [
 		adminOnly: false,
 		disabled: ['attendee_volunteer_show']
 	},
+	{
+		id: 'canvass-with-shifts-1',
+		name: 'Shifted Canvass 1',
+		useShifts: true,
+		defaultValues: {
+			name: 'Door knocking for Bernie',
+			description: 'You\'re invited to join your neighbors and supporters to knock on the doors of supporters and undecided voters. We\'ll provide you with a script, a list of voters that you\'ll be talking to, and a map of where to go. We\'ll also train you to use your time effectively out in the field. You\'ll be able to talk to real people about how this country belongs to all of us, not just the billionaire class. Our victory starts with us knocking on doors together.',
+			is_official: true
+		},
+		adminOnly: true,
+		disabled: ['attendee_volunteer_show', 'use_shifts']
+	},
+	{
+		id: 'canvass-with-shifts-2',
+		name: 'Shifted Canvass 2',
+		useShifts: true,
+		defaultValues: {
+			name: 'Door knocking for Bernie',
+			description: 'You\'re invited to join your neighbors and supporters to knock on the doors of supporters and undecided voters. We\'ll provide you with a script, a list of voters that you\'ll be talking to, and a map of where to go. We\'ll also train you to use your time effectively out in the field. You\'ll be able to talk to real people about how this country belongs to all of us, not just the billionaire class. Our victory starts with us knocking on doors together.',
+			is_official: true
+		},
+		adminOnly: true,
+		disabled: ['attendee_volunteer_show', 'use_shifts']
+	},
 	// {
 	// 	id: 'get-out-the-vote',
 	// 	name: 'Get Out the Vote',
@@ -192,8 +216,21 @@ var eventTypes = [
 	// }
 ].sort(dynamicSort("name"));
 
-(function(){
+var shiftSchema = null;
+
+jQuery(document).ready(function() {
 	var form = document.getElementById('secondform');
+
+	var jqxhr = $.ajax("/events/shift-schema.json")
+	  .done(function(result) {
+	  	shiftSchema = result;
+	  })
+	  .fail(function() {
+	    console.log( "error fetching data" );
+	  })
+	  .always(function() {
+	    generateShiftInputs();
+	  });
 
 	form.event_type_id.options[0] = new Option();
 	eventTypes.forEach(function(type){
@@ -249,8 +286,7 @@ var eventTypes = [
 			$(this).hide();
 	});
 
-	function generateShiftInputs(){
-
+	function generateShiftInputs(shiftSchema){
 		var start = $(".time-inputs")
 			.first()
 			.clone();
@@ -275,10 +311,7 @@ var eventTypes = [
 			.find("input, select")
 			.attr("disabled", true);
 	}
-
-	generateShiftInputs();
-
-})();
+})
 
 var disabledInputs = [];
 function resetForm(){
@@ -304,7 +337,6 @@ function resetForm(){
 
 function setDefaults(eventTypeId){
 	var form = resetForm();
-
 	var eventType = null;
 	for (var i = 0; i < eventTypes.length; i++) {
 		if (eventTypes[i].id == eventTypeId) {
@@ -342,6 +374,21 @@ function setDefaults(eventTypeId){
 			$(input).removeProp('required').attr('disabled','disabled');
 		}
 	};
+
+	if (shiftSchema[eventTypeId] !== undefined) {
+		var shifts = shiftSchema[eventTypeId];
+		var shiftPreviews = shifts.map(function(shift, index) {
+			var shiftNumber = index + 1;
+			return '<div class="shift-preview">Shift ' + shiftNumber + ': ' + shift.start + ' to ' + shift.end + ' </div>'
+		});
+		
+		$('#date-inputs').hide();
+		$('#shift-previews').html('<br/>' + shiftPreviews.join('<br/>')).show();
+	}
+	else {
+		$('#date-inputs').show();
+		$('#shift-previews').hide();
+	}
 }
 
 function updateFormValue(property, value) {

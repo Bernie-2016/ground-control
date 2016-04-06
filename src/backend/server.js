@@ -37,6 +37,65 @@ throng(startApp, {
   lifetime: Infinity
 })
 
+const shiftSchemaMap = {
+  'canvass-with-shifts-1': [
+    {
+      id: 1,
+      start: '9:00 am',
+      end: '12:00 pm'
+    },
+    {
+      id: 2,
+      start: '12:00 pm',
+      end: '3:00 pm'
+    },
+    {
+      id: 3,
+      start: '3:00 pm',
+      end: '6:00 pm'
+    }
+  ],
+  'canvass-with-shifts-2': [
+    {
+      id: 1,
+      start: '9:00 am',
+      end: '12:00 pm'
+    },
+    {
+      id: 2,
+      start: '12:00 pm',
+      end: '3:00 pm'
+    },
+    {
+      id: 3,
+      start: '3:00 pm',
+      end: '6:00 pm'
+    },
+    {
+      id: 4,
+      start: '5:30 pm',
+      end: '8:30 pm'
+    }
+  ],
+  'primary-day': [
+    {
+      id: 1,
+      start: '8:00 am',
+      end: '12:00 pm'
+    },
+    {
+      id: 2,
+      start: '12:00 pm',
+      end: '4:00 pm'
+    },
+    {
+      id: 3,
+      start: '4:00 pm',
+      end: '8:00 pm'
+    }
+  ]
+}
+
 function startApp() {
   log.info('Writing schema...')
   writeSchema()
@@ -394,19 +453,6 @@ function startApp() {
     })
   )
 
-  app.get('/events/create', wrap(async (req, res) => {
-    let userIsAdmin = false
-    if (req.user && req.user.id) {
-      userIsAdmin = await isStaff(req.user.id)
-    }
-
-    res.send(createEventPage({ is_public: !userIsAdmin, events_root_url: publicEventsRootUrl, gcUser: req.user }));
-  }))
-
-  app.get('/admin/events/create', isAuthenticated, wrap(async (req, res) => {
-    res.redirect('/events/create')
-  }))
-
   app.get('/events/data/upload', wrap(async (req, res) => {
     res.redirect('https://script.google.com/macros/s/AKfycbwVZHnRZ5CJkzFID91QYcsLNFLkPgstd7XjS9o1QSEAh3tC2vY/exec')
   }))
@@ -461,6 +507,23 @@ function startApp() {
     	makeRequest(req.body)
   })
 
+  app.get('/events/shift-schema.json', wrap(async (req, res) => {
+    res.json(shiftSchemaMap)
+  }))
+
+  app.get('/admin/events/create', isAuthenticated, wrap(async (req, res) => {
+    res.redirect('/events/create')
+  }))
+
+  app.get('/events/create', wrap(async (req, res) => {
+    let userIsAdmin = false
+    if (req.user && req.user.id) {
+      userIsAdmin = await isStaff(req.user.id)
+    }
+
+    res.send(createEventPage({ is_public: !userIsAdmin, events_root_url: publicEventsRootUrl, gcUser: req.user }));
+  }))
+
   app.post('/events/create', wrap(async (req, res) => {
 
     let form = req.body
@@ -484,82 +547,6 @@ function startApp() {
       'vol2vol': { id: 47, staffOnly: true },
       'rally': { id: 14, staffOnly: true },
       'voter-registration': { id: 22, staffOnly: false, requirePhone: true }
-    }
-
-    const shiftSchemaMap = {
-      'canvass': [
-        {
-          id: 1,
-          start: '9:00 am',
-          end: '12:00 pm'
-        },
-        {
-          id: 2,
-          start: '12:00 pm',
-          end: '3:00 pm'
-        },
-        {
-          id: 3,
-          start: '3:00 pm',
-          end: '6:00 pm'
-        }
-      ],
-      'volunteer-canvass': [
-        {
-          id: 1,
-          start: '9:00 am',
-          end: '12:00 pm'
-        },
-        {
-          id: 2,
-          start: '12:00 pm',
-          end: '3:00 pm'
-        },
-        {
-          id: 3,
-          start: '3:00 pm',
-          end: '6:00 pm'
-        }
-      ],
-      'get-out-the-vote': [
-        {
-          id: 1,
-          start: '9:00 am',
-          end: '12:00 pm'
-        },
-        {
-          id: 2,
-          start: '12:00 pm',
-          end: '3:00 pm'
-        },
-        {
-          id: 3,
-          start: '3:00 pm',
-          end: '6:00 pm'
-        },
-        {
-          id: 4,
-          start: '6:00 pm',
-          end: '9:00 pm'
-        }
-      ],
-      'primary-day': [
-        {
-          id: 1,
-          start: '8:00 am',
-          end: '12:00 pm'
-        },
-        {
-          id: 2,
-          start: '12:00 pm',
-          end: '4:00 pm'
-        },
-        {
-          id: 3,
-          start: '4:00 pm',
-          end: '8:00 pm'
-        }
-      ]
     }
 
     function getDayWithDefaultShifts(shiftSchemaMap, eventType, shiftIDs, capacity, day) {
