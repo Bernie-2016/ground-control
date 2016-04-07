@@ -84,9 +84,8 @@ var eventTypes = [
 		disabled: ['attendee_volunteer_show']
 	},
 	{
-		id: 'canvass-with-shifts-1',
-		name: 'Shifted Canvass 1',
-		useShifts: true,
+		id: 'canvass-3-shifts',
+		name: 'Canvass - 3 Standard Shifts',
 		defaultValues: {
 			name: 'Door knocking for Bernie',
 			description: 'You\'re invited to join your neighbors and supporters to knock on the doors of supporters and undecided voters. We\'ll provide you with a script, a list of voters that you\'ll be talking to, and a map of where to go. We\'ll also train you to use your time effectively out in the field. You\'ll be able to talk to real people about how this country belongs to all of us, not just the billionaire class. Our victory starts with us knocking on doors together.',
@@ -96,9 +95,8 @@ var eventTypes = [
 		disabled: ['attendee_volunteer_show', 'use_shifts']
 	},
 	{
-		id: 'canvass-with-shifts-2',
-		name: 'Shifted Canvass 2',
-		useShifts: true,
+		id: 'canvass-4-shifts',
+		name: 'Canvass - 4 Standard Shifts',
 		defaultValues: {
 			name: 'Door knocking for Bernie',
 			description: 'You\'re invited to join your neighbors and supporters to knock on the doors of supporters and undecided voters. We\'ll provide you with a script, a list of voters that you\'ll be talking to, and a map of where to go. We\'ll also train you to use your time effectively out in the field. You\'ll be able to talk to real people about how this country belongs to all of us, not just the billionaire class. Our victory starts with us knocking on doors together.',
@@ -106,6 +104,22 @@ var eventTypes = [
 		},
 		adminOnly: true,
 		disabled: ['attendee_volunteer_show', 'use_shifts']
+	},
+	{
+		id: 'primary-day',
+		name: 'Primary Day GOTV',
+		adminOnly: true,
+		disabled: ['contact_phone', 'public_phone'],
+		defaultValues: {
+			name: 'Get Out the Vote For Bernie!',
+			description: 'Join other volunteers in the area to help get out the vote for Bernie. You’ll get training, materials, and anything else you might need to put Bernie over the top in the upcoming election. This is the final push, so let’s give it all we’ve got!',
+			is_official: true,
+			is_searchable: true,
+			host_receive_rsvp_emails: false,
+			attendee_volunteer_show: false,
+			duration_allday: true,
+			capacity: 0
+		}
 	},
 	// {
 	// 	id: 'get-out-the-vote',

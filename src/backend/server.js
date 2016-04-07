@@ -38,7 +38,7 @@ throng(startApp, {
 })
 
 const shiftSchemaMap = {
-  'canvass-with-shifts-1': [
+  'canvass-3-shifts': [
     {
       id: 1,
       start: '9:00 am',
@@ -55,7 +55,7 @@ const shiftSchemaMap = {
       end: '6:00 pm'
     }
   ],
-  'canvass-with-shifts-2': [
+  'canvass-4-shifts': [
     {
       id: 1,
       start: '9:00 am',
@@ -537,7 +537,8 @@ function startApp() {
       'ballot-access': { id: 30, staffOnly: false },
       'phonebank': { id: 31, staffOnly: false, requirePhone: true },
       'canvass': { id: 32, staffOnly: true, requirePhone: true },
-      'volunteer-canvass': { id: 32, staffOnly: false, requirePhone: true },
+      'canvass-3-shifts': { id: 32, staffOnly: true, requirePhone: true },
+      'canvass-4-shifts': { id: 32, staffOnly: true, requirePhone: true },
       'barnstorm': { id: 41, staffOnly: false },
       'carpool-to-nevada': { id: 39, staffOnly: false, requirePhone: true },
       'carpool': { id: 39, staffOnly: false, requirePhone: true },
@@ -552,8 +553,9 @@ function startApp() {
     function getDayWithDefaultShifts(shiftSchemaMap, eventType, shiftIDs, capacity, day) {
       const convertTime = (time) => moment(time, 'hh:mm a').format('HH:mm:ss')
       function filterShiftsById() {
-        const shiftIdSet = new Set(shiftIDs)
-        return shiftSchemaMap[eventType].filter((shift) => shiftIdSet.has(shift.id))
+        // const shiftIdSet = new Set(shiftIDs)
+        // return shiftSchemaMap[eventType].filter((shift) => shiftIdSet.has(shift.id))
+        return shiftSchemaMap[eventType] // don't support choosing custom shifts for now
       }
       function convertToBSDShifts(shifts, capacity) {
         return shifts.map((shift) => {
@@ -673,34 +675,34 @@ function startApp() {
         })
       })
     }
-    else
+    else if (form['start_time'] !== undefined) {
+      form['days'] = [];
+      form['days'].push({});
       startHour = (form['start_time']['a'] == 'pm') ? Number(form['start_time']['h']) + 12 : form['start_time']['h']
+    }
 
     let createdEventIds = []
     for (let index = 0; index < dateCount; index++) {
       let result = null
-      if (form.hasOwnProperty('days')){
-        if (form['use_shifts'])
-          form.days[0].start_datetime_system = `${form['event_dates'][index]['date']} ${startHour}:${form['start_time']['i'][0]}:00`
-        else
-          form.days[0].start_datetime_system = `${form['event_dates'][index]['date']} ${startHour}:${form['start_time']['i']}:00`
-      }
 
       // Enforce standard event shifts
-      if (eventTypeIdString in shiftSchemaMap && form.shift_ids){
+      if (eventTypeIdString in shiftSchemaMap){
         const dayWithDefaultShifts = getDayWithDefaultShifts(shiftSchemaMap, eventTypeIdString, form.shift_ids, form.capacity, form['event_dates'][index]['date'])        
         form['use_shifts'] = '1'
         form.days = []
         form.days.push(dayWithDefaultShifts)
       }
+      else if (form.hasOwnProperty('days') && form['use_shifts']){
+        form.days[0].start_datetime_system = `${form['event_dates'][index]['date']} ${startHour}:${form['start_time']['i'][0]}:00`
+      }
+      else {
+        form.days[0].start_datetime_system = `${form['event_dates'][index]['date']} ${startHour}:${form['start_time']['i']}:00`;
+        form.days[0].duration = form['duration_num'] * form['duration_unit'];
+      }
+
       log.info(form)
       try {
-        result = await BSDClient.createEvent({
-          ...form,
-          'duration' : form['duration_num'] * form['duration_unit'],
-          'capacity' : form['capacity'],
-          'start_datetime_system' : `${form['event_dates'][index]['date']} ${startHour}:${form['start_time']['i']}:00`
-        })
+        result = await BSDClient.createEvent(form)
 
         createdEventIds.push(result.event_id_obfuscated)
       } catch(ex) {
