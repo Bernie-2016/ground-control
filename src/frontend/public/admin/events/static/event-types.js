@@ -110,7 +110,6 @@ var eventTypes = [
 	// {
 	// 	id: 'get-out-the-vote',
 	// 	name: 'Get Out the Vote',
-	// 	useShifts: true,
 	// 	adminOnly: true,
 	// 	disabled: ['contact_phone', 'public_phone'],
 	// 	defaultValues: {
@@ -221,7 +220,7 @@ var shiftSchema = null;
 jQuery(document).ready(function() {
 	var form = document.getElementById('secondform');
 
-	var jqxhr = $.ajax("/events/shift-schema.json")
+	$.ajax("/events/shift-schema.json")
 	  .done(function(result) {
 	  	shiftSchema = result;
 	  })
@@ -321,6 +320,8 @@ function resetForm(){
 	clearEvents();
 	updateFormValue('is_official', false);
 	updateFormValue('attendee_volunteer_show', false);
+	$("label, select, input").show();
+	$("#event_repeat_type").change();
 
 	for (var i = 0; i < disabledInputs.length; i++){
 		var input = form[disabledInputs[i].name];
@@ -367,11 +368,15 @@ function setDefaults(eventTypeId){
 				name: disabled[i],
 				required: $(input).prop('required')
 			});
-			if (input.checked)
+			if ($(input).is(':checkbox')) {
 				$(input).attr('checked', false).change()
-			else
+			}
+			else {
 				$(input).val('').change()
-			$(input).removeProp('required').attr('disabled','disabled');
+			}
+			$(input).removeProp('required').attr('disabled','disabled').hide();
+			$("label[for='" + input.name + "']").hide();
+			$("#" + input.name).hide();
 		}
 	};
 
