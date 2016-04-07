@@ -2,6 +2,7 @@ import React from 'react';
 import Relay from 'react-relay';
 import {BernieText, BernieColors} from './styles/bernie-css';
 import {Paper, List, ListItem, RaisedButton} from 'material-ui';
+import PlivoDialer from './PlivoDialer';
 import SideBarLayout from './SideBarLayout';
 import moment from 'moment';
 import yup from 'yup'
@@ -168,10 +169,6 @@ ${userFirstName}`
     return phoneUtil.format(phoneUtil.parse(number, country), PNF.INTERNATIONAL);
   }
 
-  formatPhoneNumber(number, country='US') {
-    return phoneUtil.format(phoneUtil.parse(number, country), country === 'US' ? PNF.NATIONAL : PNF.INTERNATIONAL);
-  }
-
   renderIntervieweeInfo() {
     let interviewee = this.props.currentUser.intervieweeForCallAssignment
     let name = this.intervieweeName()
@@ -196,9 +193,10 @@ ${userFirstName}`
         }}>
           {name}
           <br />
-          <a style={{color: BernieColors.darkBlue}} href={`tel:${this.phoneTelLink(phone, country)}`}>
-            {this.formatPhoneNumber(phone, country)}
-          </a>
+          <PlivoDialer number={`${interviewee.phone}`}
+            endpointUsername='bernie2016151225174042'
+            endpointPassword='gUi3BAcj8MOtku1TOeGsjPBNuH21GL'
+          />
         </div>
       </div>
     )
