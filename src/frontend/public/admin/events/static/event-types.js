@@ -30,6 +30,12 @@ var eventTypes = [
 		disabled: ['use_shifts']
 	},
 	{
+		id: 'debate-watch',
+		name: 'Debate Watch Party',
+		adminOnly: false,
+		disabled: ['use_shifts']
+	},
+	{
 		id: 'carpool',
 		name: 'Carpool',
 		adminOnly: false,

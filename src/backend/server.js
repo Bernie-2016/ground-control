@@ -474,6 +474,7 @@ function startApp() {
       'barnstorm': { id: 41, staffOnly: false },
       'carpool-to-nevada': { id: 39, staffOnly: false, requirePhone: true },
       'carpool': { id: 39, staffOnly: false, requirePhone: true },
+      'debate-watch': { id: 36, staffOnly: false },
       'official-barnstorm': { id: 41, staffOnly: true },
       'get-out-the-vote': { id: 45, staffOnly: false, requirePhone: true },
       'vol2vol': { id: 47, staffOnly: true },
