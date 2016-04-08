@@ -73,8 +73,30 @@ const shiftSchemaMap = {
     },
     {
       id: 4,
-      start: '5:30 pm',
-      end: '8:30 pm'
+      start: '6:00 pm',
+      end: '9:00 pm'
+    }
+  ],
+  'get-out-the-vote': [
+    {
+      id: 1,
+      start: '9:00 am',
+      end: '12:00 pm'
+    },
+    {
+      id: 2,
+      start: '12:00 pm',
+      end: '3:00 pm'
+    },
+    {
+      id: 3,
+      start: '3:00 pm',
+      end: '6:00 pm'
+    },
+    {
+      id: 4,
+      start: '6:00 pm',
+      end: '9:00 pm'
     }
   ],
   'primary-day': [
@@ -536,15 +558,15 @@ function startApp() {
       'volunteer-meeting': { id: 24, staffOnly: false },
       'ballot-access': { id: 30, staffOnly: false },
       'phonebank': { id: 31, staffOnly: false, requirePhone: true },
-      'canvass': { id: 32, staffOnly: true, requirePhone: true },
+      'canvass': { id: 32, staffOnly: false, requirePhone: true },
       'canvass-3-shifts': { id: 32, staffOnly: true, requirePhone: true },
       'canvass-4-shifts': { id: 32, staffOnly: true, requirePhone: true },
       'barnstorm': { id: 41, staffOnly: false },
       'carpool-to-nevada': { id: 39, staffOnly: false, requirePhone: true },
       'carpool': { id: 39, staffOnly: false, requirePhone: true },
       'official-barnstorm': { id: 41, staffOnly: true },
-      // 'get-out-the-vote': { id: 45, staffOnly: false, requirePhone: true },
-      'primary-day': { id: 45, staffOnly: false, requirePhone: true },
+      'get-out-the-vote': { id: 45, staffOnly: true, requirePhone: true },
+      'primary-day': { id: 45, staffOnly: true, requirePhone: true },
       'vol2vol': { id: 47, staffOnly: true },
       'rally': { id: 14, staffOnly: true },
       'voter-registration': { id: 22, staffOnly: false, requirePhone: true }
