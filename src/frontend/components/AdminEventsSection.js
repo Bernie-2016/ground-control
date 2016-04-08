@@ -1130,8 +1130,8 @@ ${signature}`
   }
 
   _handleFastForwardRequest = (eventIndex) => {
-    let eventId = events[eventIndex].node.eventIdObfuscated
-    this.props.history.push(`/admin/events/${eventId}/emails/create`)
+    const eventId = events[eventIndex].node.eventIdObfuscated
+    window.open(`/admin/events/${eventId}/emails/create`)
   }
 
   _handleRSVPDownload = (eventIndex) => {
