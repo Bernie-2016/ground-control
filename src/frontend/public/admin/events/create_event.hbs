@@ -124,6 +124,13 @@
       opacity: 0.7;
     }
 
+    .shift-preview {
+      padding: 20px;
+      background-color: white;
+      border-radius: 3px;
+      font-weight: bold;
+    }
+
     </style>
     <script src="/admin/events/static/ckeditor/ckeditor.js"></script>
     <script src="/admin/events/static/less.js"></script>
@@ -1162,72 +1169,74 @@
                   </div>
                   <br>
                 </div>
-                <div class="checkboxgroup">
-                  <label class="form_label" for="use_shifts">Use Shifts for this Event</label>
-                  <input name="use_shifts" id="use_shifts" type="checkbox" value="1">
-                </div>
-                <div class="inputgroup" id="shift-wrapper" style="display:none">
-                  <div id="shift-inputs">
-                    <div class="shift-input-group"></div>
+                <div id="shift-previews" class="hidden"></div>
+                <div id="date-inputs">
+                  <div class="checkboxgroup">
+                    <label class="form_label" for="use_shifts">Use Shifts for this Event</label>
+                    <input name="use_shifts" id="use_shifts" type="checkbox" value="1">
                   </div>
-                  <input type="button" id="add-shift" value="Add Shift"/>
-                  <input type="button" id="remove-shift" value="Remove Shift" style="display:none"/>
-                </div>
-                <div id="date-input-group">
-                  <div class="inputgroup time-inputs">
-                    <div class="label">
-                      <label class="form_label"><span class="time-type">Start</span> Time:</label><span style="color: red;">*</span>
+                  <div class="inputgroup" id="shift-wrapper" style="display:none">
+                    <div id="shift-inputs">
+                      <div class="shift-input-group"></div>
                     </div>
-                    <div class="field">
-                      <div class="select-wrapper col-3">
-                        <select name="start_time[h]" required>
-                          <option selected="selected"></option>
-                          <option value="1">01</option>
-                          <option value="2">02</option>
-                          <option value="3">03</option>
-                          <option value="4">04</option>
-                          <option value="5">05</option>
-                          <option value="6">06</option>
-                          <option value="7">07</option>
-                          <option value="8">08</option>
-                          <option value="9">09</option>
-                          <option value="10">10</option>
-                          <option value="11">11</option>
-                          <option value="00">12</option>
-                        </select>
-                      </div>
-                      <div class="select-wrapper col-3">
-                        <select name="start_time[i]" required>
-                          <option selected="selected"></option>
-                          <option value="00">00</option>
-                          <option value="15">15</option>
-                          <option value="30">30</option>
-                          <option value="45">45</option>
-                        </select>
-                      </div>
-                      &nbsp;
-                      <div class="select-wrapper col-3 col-3-3">
-                        <select name="start_time[a]">
-                          <option value="am">am</option>
-                          <option value="pm" selected="selected">pm</option>
-                        </select>
-                      </div>
-                    </div>
+                    <input type="button" id="add-shift" value="Add Shift"/>
+                    <input type="button" id="remove-shift" value="Remove Shift" style="display:none"/>
                   </div>
-                  <div class="inputgroup event-length">
-                    <div class="label">
-                      <label class="form_label">Event Length:</label><span style="color: red;">*</span>
-                    </div>
-                    <div class="field">
-                      <input size="4" onclick="//document.secondform.duration_allday.checked = false;" name="duration_num" id="duration_num" type="number" value="3" step="0.5" min="0.5">&nbsp;
-                      <div class="select-wrapper">
-                        <select onclick="//document.secondform.duration_allday.checked = false;" name="duration_unit">
-                          <option value="1">minutes</option>
-                          <option value="60" selected="selected">hours</option>
-                          <option value="1440">days</option>
-                        </select>
+                  <div id="date-input-group">
+                    <div class="inputgroup time-inputs">
+                      <div class="label">
+                        <label class="form_label"><span class="time-type">Start</span> Time:</label><span style="color: red;">*</span>
                       </div>
-                      <!-- &nbsp; or &nbsp;<input name="duration_allday" value="-1" type="radio" id="qf_c37f82"><label for="qf_c37f82">all day event</label> -->
+                      <div class="field">
+                        <div class="select-wrapper col-3">
+                          <select name="start_time[h]" required>
+                            <option selected="selected"></option>
+                            <option value="1">01</option>
+                            <option value="2">02</option>
+                            <option value="3">03</option>
+                            <option value="4">04</option>
+                            <option value="5">05</option>
+                            <option value="6">06</option>
+                            <option value="7">07</option>
+                            <option value="8">08</option>
+                            <option value="9">09</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="00">12</option>
+                          </select>
+                        </div>
+                        <div class="select-wrapper col-3">
+                          <select name="start_time[i]" required>
+                            <option selected="selected"></option>
+                            <option value="00">00</option>
+                            <option value="15">15</option>
+                            <option value="30">30</option>
+                            <option value="45">45</option>
+                          </select>
+                        </div>
+                        &nbsp;
+                        <div class="select-wrapper col-3 col-3-3">
+                          <select name="start_time[a]">
+                            <option value="am">am</option>
+                            <option value="pm" selected="selected">pm</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="inputgroup event-length">
+                      <div class="label">
+                        <label class="form_label">Event Length:</label><span style="color: red;">*</span>
+                      </div>
+                      <div class="field">
+                        <input size="4" name="duration_num" id="duration_num" type="number" value="3" step="0.5" min="0.5">&nbsp;
+                        <div class="select-wrapper">
+                          <select name="duration_unit">
+                            <option value="1">minutes</option>
+                            <option value="60" selected="selected">hours</option>
+                            <option value="1440">days</option>
+                          </select>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1244,7 +1253,7 @@
                     <input size="30" name="contact_phone" id="contact_phone" type="tel" required>
                   </div>
                 </div>
-                <div class="inputgroup">
+                <div class="inputgroup" id="public_phone">
                   <div class="label">
                     <label class="form_label">Allow people who view my event to see this phone number:</label>
                   </div>
