@@ -153,7 +153,8 @@ var eventTypes = [
 			is_official: true,
 			is_searchable: true,
 			capacity: 0
-		}
+		},
+		disabled: ['use_shifts']
 	},
 	{
 		id: 'barnstorm',
