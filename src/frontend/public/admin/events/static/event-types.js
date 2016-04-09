@@ -144,6 +144,18 @@ var eventTypes = [
 		}
 	},
 	{
+		id: 'get-out-the-vote-training',
+		name: 'Election Day GOTV Training',
+		adminOnly: true,
+		defaultValues: {
+			name: 'Official Get Out the Vote and Election Day Training',
+			description: '<p>As we get closer to election day, we need to make sure that we get everyone out to vote for Bernie at the polls!</p><p>This will be one of the most important Bernie organizing meetings of the election. To bring home a victory in New York, we need as many supporters as possible trained to join the “Get Out the Vote” effort and signed up for volunteer shifts to help in the final push.</p><p>This is how we win!</p><p>This event is being organized by the Bernie Sanders Official Campaign in conjunction with the Working Families Party and local grassroots Bernie organizers.</p><p>Email questions to <a href="mailto:wfp4bernie@workingfamilies.org">wfp4bernie@workingfamilies.org</a><p>',
+			is_official: true,
+			is_searchable: true,
+			capacity: 0
+		}
+	},
+	{
 		id: 'barnstorm',
 		name: 'Barnstorm',
 		defaultValues: {

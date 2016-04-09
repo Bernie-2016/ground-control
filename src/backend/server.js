@@ -566,6 +566,7 @@ function startApp() {
       'carpool': { id: 39, staffOnly: false, requirePhone: true },
       'debate-watch': { id: 36, staffOnly: false },
       'official-barnstorm': { id: 41, staffOnly: true },
+      'get-out-the-vote-training': { id: 34, staffOnly: true },
       'get-out-the-vote': { id: 45, staffOnly: true, requirePhone: true },
       'primary-day': { id: 45, staffOnly: true, requirePhone: true },
       'vol2vol': { id: 47, staffOnly: true },
