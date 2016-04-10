@@ -650,12 +650,14 @@ function startApp() {
       form['attendee_require_phone'] = 1;
     }
 
-    form['event_dates'] = JSON.parse(form[ 'event_dates' ])
-    let dateCount = form['event_dates'].length
+    let eventDates = JSON.parse(form[ 'event_dates' ])
+    eventDates = eventDates.map((eventDate) => eventDate.date)
+    const eventDatesSet = new Set(eventDates)
+    eventDates = [...eventDatesSet]
 
-    if (dateCount > batchEventMax) {
+    if (eventDates.length > batchEventMax) {
       res.status(400).send({errors: {
-        'Number of Events' : [`You can only create up to ${batchEventMax} events at a time. ${form['event_dates'].length} events were received.`]
+        'Number of Events' : [`You can only create up to ${batchEventMax} events at a time. ${eventDates.length} events were received.`]
       }})
       return
     }
@@ -706,25 +708,24 @@ function startApp() {
     }
 
     let createdEventIds = []
-    for (let index = 0; index < dateCount; index++) {
+    for (let index = 0; index < eventDates.length; index++) {
       let result = null
 
       // Enforce standard event shifts
       if (eventTypeIdString in shiftSchemaMap){
-        const dayWithDefaultShifts = getDayWithDefaultShifts(shiftSchemaMap, eventTypeIdString, form.shift_ids, form.capacity, form['event_dates'][index]['date'])        
+        const dayWithDefaultShifts = getDayWithDefaultShifts(shiftSchemaMap, eventTypeIdString, form.shift_ids, form.capacity, eventDates[index])        
         form['use_shifts'] = '1'
         form.days = []
         form.days.push(dayWithDefaultShifts)
       }
       else if (form.hasOwnProperty('days') && form['use_shifts']){
-        form.days[0].start_datetime_system = `${form['event_dates'][index]['date']} ${startHour}:${form['start_time']['i'][0]}:00`
+        form.days[0].start_datetime_system = `${eventDates[index]} ${startHour}:${form['start_time']['i'][0]}:00`
       }
       else {
-        form.days[0].start_datetime_system = `${form['event_dates'][index]['date']} ${startHour}:${form['start_time']['i']}:00`;
+        form.days[0].start_datetime_system = `${eventDates[index]} ${startHour}:${form['start_time']['i']}:00`;
         form.days[0].duration = form['duration_num'] * form['duration_unit'];
       }
 
-      log.info(form)
       try {
         result = await BSDClient.createEvent(form)
 
