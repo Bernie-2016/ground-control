@@ -39,8 +39,8 @@ export default class Signup extends React.Component {
         <div>
           <Form.Field
             name='email'
-            label='E-mail Address'
-            hintText='Email'
+            label='Email address'
+            hintText='Email Address'
             type='email'
             fullWidth={true}
             floatingLabelText={false}
@@ -79,7 +79,7 @@ export default class Signup extends React.Component {
   styles = {
     signupForm: {
       width: '100%',
-      minWidth: 400,
+      minWidth: 330,
       backgroundColor: BernieColors.blue,
       color: BernieColors.white,
       padding: '15px 15px 15px 15px'
