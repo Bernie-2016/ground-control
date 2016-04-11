@@ -42,6 +42,7 @@ export default class Signup extends React.Component {
             label='E-mail Address'
             hintText='Email'
             type='email'
+            fullWidth={true}
             floatingLabelText={false}
           />
           <br />
@@ -50,6 +51,7 @@ export default class Signup extends React.Component {
             type='password'
             label='Password'
             hintText='Password'
+            fullWidth={true}
             floatingLabelText={false}
           />
           <br />
@@ -77,6 +79,7 @@ export default class Signup extends React.Component {
   styles = {
     signupForm: {
       width: '100%',
+      minWidth: 400,
       backgroundColor: BernieColors.blue,
       color: BernieColors.white,
       padding: '15px 15px 15px 15px'
@@ -103,7 +106,6 @@ export default class Signup extends React.Component {
       ...BernieText.default,
       color: BernieColors.lightRed,
       fontSize: '0.8em',
-      marginTop: 15,
       textAlign: 'center'
     }
   }
