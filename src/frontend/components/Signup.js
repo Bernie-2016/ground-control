@@ -1,14 +1,14 @@
-import React from 'react';
-import Relay from 'react-relay';
-import {Paper, TextField} from 'material-ui';
-import {BernieText, BernieColors} from './styles/bernie-css';
-import GCForm from './forms/GCForm';
-import Form from 'react-formal';
-import yup from 'yup';
-import superagent from 'superagent';
-import {Styles} from 'material-ui';
+import React from 'react'
+import Relay from 'react-relay'
+import {Paper, TextField} from 'material-ui'
+import {BernieText, BernieColors} from './styles/bernie-css'
+import GCForm from './forms/GCForm'
+import Form from 'react-formal'
+import yup from 'yup'
+import superagent from 'superagent'
+import {Styles, Tabs, Tab} from 'material-ui'
 import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider'
-import {BernieTheme} from './styles/bernie-theme';
+import {BernieTheme} from './styles/bernie-theme'
 
 export default class Signup extends React.Component {
   state = {
@@ -133,7 +133,18 @@ export default class Signup extends React.Component {
             </div>
           </div>
           <div styles={this.styles.signupFormContainer}>
-            {this.renderSignupForm()}
+            <Tabs>
+              <Tab label="Log In" >
+                <div>
+                  {this.renderSignupForm()}
+                </div>
+              </Tab>
+              <Tab label="Create Account" >
+                <div>
+                  {this.renderSignupForm()}
+                </div>
+              </Tab>
+            </Tabs>
           </div>
         </div>
       </div>
@@ -168,7 +179,6 @@ export default class Signup extends React.Component {
               submitHandler(formData)
             }}
           >
-            {formTitle}
             {errorElement}
             {passwordResetElement}
             <Paper zDepth={0} style={{
