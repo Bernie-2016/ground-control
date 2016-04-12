@@ -27,6 +27,7 @@ var eventTypes = [
 		id: 'volunteer-meeting',
 		name: 'Volunteer Activity or Meeting',
 		adminOnly: false,
+		nonAdminOnly: true,
 		disabled: ['use_shifts']
 	},
 	{
@@ -59,16 +60,16 @@ var eventTypes = [
 			description: '<a href="http://bernie.to/distance-faq">Click here to view Carpool FAQs</a><p>Join me and other Bernie supporters for a road trip!</p><p>I’ll be leaving on [WRITE YOUR DEPARTURE DATE/TIME HERE] and returning on [WRITE YOUR RETURN DATE/TIME HERE].</p><p>We’re going to hit the road for Bernie to the help out in the crucial final days before the election. Bernie staff on the ground will train us and plug us into the campaign so that we can be as effective as possible.</p><p>Victory will require all of us pitching in, so sign up and let’s go on a Bernie Journey!</p>'
 		}
 	},
-	{
-		id: 'ballot-access',
-		name: 'Gather Ballot Access Signatures',
-		defaultValues: {
-			name: 'Bernie Ballot Blast - NJ Support Bernie and his Delegates and Collect Petition Signatures',
-			description: 'Please stop by and sign petitions to put Bernie and his delegates on the New Jersey Democratic Primary Ballot. All petitions are due in on Monday, so we need you to act now. It takes just a few minutes to sign the petition and spread the Bern!',
-		},
-		adminOnly: false,
-		disabled: ['use_shifts']
-	},
+	// {
+	// 	id: 'ballot-access',
+	// 	name: 'Gather Ballot Access Signatures',
+	// 	defaultValues: {
+	// 		name: 'Bernie Ballot Blast - NJ Support Bernie and his Delegates and Collect Petition Signatures',
+	// 		description: 'Please stop by and sign petitions to put Bernie and his delegates on the New Jersey Democratic Primary Ballot. All petitions are due in on Monday, so we need you to act now. It takes just a few minutes to sign the petition and spread the Bern!',
+	// 	},
+	// 	adminOnly: false,
+	// 	disabled: ['use_shifts']
+	// },
 	{
 		id: 'phonebank',
 		name: 'Phonebank',
