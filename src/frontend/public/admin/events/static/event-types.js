@@ -227,6 +227,8 @@ var eventTypes = [
 		id: 'voter-registration',
 		name: 'Voter Registration',
 		defaultValues: {
+			name: 'Register Voters in [CITY/NEIGHBORHOOD]',
+			description: 'Join us to register (and properly re-register!) our neighbors to vote. If we work together, we can register the necessary voters to bring us closer to a huge voter turnout –– and when voters turn out, we win.',
 			duration_num: 3,
 			duration_unit: 60
 		},
