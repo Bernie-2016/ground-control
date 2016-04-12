@@ -484,7 +484,7 @@ function startApp() {
   }))
 
   app.post('/events/add-rsvp', async (req, res) => {
-    res.header("Access-Control-Allow-Origin", "*")
+    res.header("Access-Control-Allow-Origin", "map.berniesanders.com")
     res.header("Access-Control-Allow-Headers", "*")
     res.header('Access-Control-Allow-Methods', "*")
     
