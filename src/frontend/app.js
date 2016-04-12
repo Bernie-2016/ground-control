@@ -221,6 +221,18 @@ ReactDOM.render(
         }}
       renderLoading={() => <Loading />}
     />
+    <Route
+      path='slack'
+    >
+      <IndexRoute
+        component={SlackInviteIndex}
+      />
+      <Route
+        path=':team'
+        component={SlackInvite}
+        renderLoading={() => <Loading />}
+      />
+    </Route>
     <Route path='/unauthorized' component={Unauthorized}/>
     <Route path="*" component={NotFound}/>
   </Router>,
