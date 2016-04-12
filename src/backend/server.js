@@ -507,13 +507,15 @@ function startApp() {
       eventIds.forEach(async (eventId) => {
         if (!eventId)
           return
-        const shift = await knex('bsd_event_shifts')
-          .join('bsd_events', 'bsd_event_shifts.event_id', 'bsd_events.event_id')
-          .where(`bsd_events.${idType}`, eventId)
-          .orderBy('bsd_event_shifts.start_dt', 'asc')
-          .first()
-        if (shift)
-          req.body.shift_ids = shift.event_shift_id
+        else if (req.body.shift_ids === undefined){
+          const shift = await knex('bsd_event_shifts')
+            .join('bsd_events', 'bsd_event_shifts.event_id', 'bsd_events.event_id')
+            .where(`bsd_events.${idType}`, eventId)
+            .orderBy('bsd_event_shifts.start_dt', 'asc')
+            .first()
+          if (shift)
+            req.body.shift_ids = shift.event_shift_id
+        }
         req.body[idType] = eventId
         makeRequest(req.body)
       })
