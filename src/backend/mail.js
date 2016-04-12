@@ -160,8 +160,7 @@ export default class MG {
     let content = await notificationEmail.render({event, eventIds, host: user, organizerName})
 
     const message = {
-      from: 'Jacob LeGrone<jacoblegrone@berniesanders.com>',
-      'h:Reply-To': 'info@berniesanders.com',
+      from: 'Lynn Hua<lynnhua@berniesanders.com>',
       to: organizers.map((organizer) => organizer.Email),
       subject: 'ACTION NEEDED: New canvass event created',
       html: content.html

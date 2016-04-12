@@ -17,7 +17,7 @@ export default class GCSelectField extends GCFormField {
       <SelectField
         children={this.createMenuItems()}
         errorStyle={BernieText.inputError}
-        hintText={this.props.label}
+        floatingLabelText={this.props.label}
         {...this.props}
         onChange={(event, index, value) => {
           this.props.onChange(value)

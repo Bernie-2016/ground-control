@@ -1,7 +1,7 @@
 import React from 'react'
 import Relay from 'react-relay'
 import {Snackbar} from 'material-ui'
-import {BernieColors} from './styles/bernie-css'
+import {BernieColors, BernieText} from './styles/bernie-css'
 
 export default class MutationHandler extends React.Component {
     static propTypes = {
@@ -110,6 +110,7 @@ export default class MutationHandler extends React.Component {
             open={this.state.open}
             message={this.state.message}
             bodyStyle={{
+              fontFamily: BernieText.default.fontFamily,
               maxWidth: '100%',
               backgroundColor: (this.state.status === 'SUCCESS') ? BernieColors.blue : BernieColors.red
             }}

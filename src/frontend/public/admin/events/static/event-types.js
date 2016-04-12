@@ -30,6 +30,12 @@ var eventTypes = [
 		disabled: ['use_shifts']
 	},
 	{
+		id: 'debate-watch',
+		name: 'Debate Watch Party',
+		adminOnly: false,
+		disabled: ['use_shifts']
+	},
+	{
 		id: 'carpool',
 		name: 'Carpool',
 		adminOnly: false,
@@ -81,12 +87,33 @@ var eventTypes = [
 			is_official: true
 		},
 		adminOnly: false,
-		disabled: ['attendee_volunteer_show']
+		disabled: ['attendee_volunteer_show', 'use_shifts']
 	},
 	{
-		id: 'get-out-the-vote',
-		name: 'Get Out the Vote',
-		useShifts: true,
+		id: 'canvass-3-shifts',
+		name: 'Canvass - 3 Standard Shifts',
+		defaultValues: {
+			name: 'Door knocking for Bernie',
+			description: 'You\'re invited to join your neighbors and supporters to knock on the doors of supporters and undecided voters. We\'ll provide you with a script, a list of voters that you\'ll be talking to, and a map of where to go. We\'ll also train you to use your time effectively out in the field. You\'ll be able to talk to real people about how this country belongs to all of us, not just the billionaire class. Our victory starts with us knocking on doors together.',
+			is_official: true
+		},
+		adminOnly: true,
+		disabled: ['attendee_volunteer_show', 'use_shifts']
+	},
+	{
+		id: 'canvass-4-shifts',
+		name: 'Canvass - 4 Standard Shifts',
+		defaultValues: {
+			name: 'Door knocking for Bernie',
+			description: 'You\'re invited to join your neighbors and supporters to knock on the doors of supporters and undecided voters. We\'ll provide you with a script, a list of voters that you\'ll be talking to, and a map of where to go. We\'ll also train you to use your time effectively out in the field. You\'ll be able to talk to real people about how this country belongs to all of us, not just the billionaire class. Our victory starts with us knocking on doors together.',
+			is_official: true
+		},
+		adminOnly: true,
+		disabled: ['attendee_volunteer_show', 'use_shifts']
+	},
+	{
+		id: 'primary-day',
+		name: 'GOTV - Primary Day',
 		adminOnly: true,
 		disabled: ['contact_phone', 'public_phone'],
 		defaultValues: {
@@ -99,6 +126,35 @@ var eventTypes = [
 			duration_allday: true,
 			capacity: 0
 		}
+	},
+	{
+		id: 'get-out-the-vote',
+		name: 'GOTV - 4 Standard Shifts',
+		adminOnly: true,
+		disabled: ['contact_phone', 'public_phone'],
+		defaultValues: {
+			name: 'Get Out the Vote For Bernie!',
+			description: 'Join other volunteers in the area to help get out the vote for Bernie. You’ll get training, materials, and anything else you might need to put Bernie over the top in the upcoming election. This is the final push, so let’s give it all we’ve got!',
+			is_official: true,
+			is_searchable: true,
+			host_receive_rsvp_emails: false,
+			attendee_volunteer_show: false,
+			duration_allday: true,
+			capacity: 0
+		}
+	},
+	{
+		id: 'get-out-the-vote-training',
+		name: 'Election Day GOTV Training',
+		adminOnly: true,
+		defaultValues: {
+			name: 'Official Get Out the Vote and Election Day Training',
+			description: '<p>As we get closer to election day, we need to make sure that we get everyone out to vote for Bernie at the polls!</p><p>This will be one of the most important Bernie organizing meetings of the election. To bring home a victory in New York, we need as many supporters as possible trained to join the “Get Out the Vote” effort and signed up for volunteer shifts to help in the final push.</p><p>This is how we win!</p><p>This event is being organized by the Bernie Sanders Official Campaign in conjunction with the Working Families Party and local grassroots Bernie organizers.</p><p>Email questions to <a href="mailto:wfp4bernie@workingfamilies.org">wfp4bernie@workingfamilies.org</a><p>',
+			is_official: true,
+			is_searchable: true,
+			capacity: 0
+		},
+		disabled: ['use_shifts']
 	},
 	{
 		id: 'barnstorm',
@@ -192,8 +248,21 @@ var eventTypes = [
 	// }
 ].sort(dynamicSort("name"));
 
-(function(){
+var shiftSchema = null;
+
+jQuery(document).ready(function() {
 	var form = document.getElementById('secondform');
+
+	$.ajax("/events/shift-schema.json")
+	  .done(function(result) {
+	  	shiftSchema = result;
+	  })
+	  .fail(function() {
+	    console.log( "error fetching data" );
+	  })
+	  .always(function() {
+	    generateShiftInputs();
+	  });
 
 	form.event_type_id.options[0] = new Option();
 	eventTypes.forEach(function(type){
@@ -249,8 +318,7 @@ var eventTypes = [
 			$(this).hide();
 	});
 
-	function generateShiftInputs(){
-
+	function generateShiftInputs(shiftSchema){
 		var start = $(".time-inputs")
 			.first()
 			.clone();
@@ -275,10 +343,7 @@ var eventTypes = [
 			.find("input, select")
 			.attr("disabled", true);
 	}
-
-	generateShiftInputs();
-
-})();
+})
 
 var disabledInputs = [];
 function resetForm(){
@@ -288,6 +353,8 @@ function resetForm(){
 	clearEvents();
 	updateFormValue('is_official', false);
 	updateFormValue('attendee_volunteer_show', false);
+	$("label, select, input").show();
+	$("#event_repeat_type").change();
 
 	for (var i = 0; i < disabledInputs.length; i++){
 		var input = form[disabledInputs[i].name];
@@ -304,7 +371,6 @@ function resetForm(){
 
 function setDefaults(eventTypeId){
 	var form = resetForm();
-
 	var eventType = null;
 	for (var i = 0; i < eventTypes.length; i++) {
 		if (eventTypes[i].id == eventTypeId) {
@@ -335,13 +401,42 @@ function setDefaults(eventTypeId){
 				name: disabled[i],
 				required: $(input).prop('required')
 			});
-			if (input.checked)
+			if ($(input).is(':checkbox')) {
 				$(input).attr('checked', false).change()
-			else
+			}
+			else {
 				$(input).val('').change()
-			$(input).removeProp('required').attr('disabled','disabled');
+			}
+			$(input).removeProp('required').attr('disabled','disabled').hide();
+			$("label[for='" + input.name + "']").hide();
+			$("#" + input.name).hide();
 		}
 	};
+
+	// show default shifts
+	if (shiftSchema[eventTypeId] !== undefined) {
+		var shifts = shiftSchema[eventTypeId];
+		var shiftPreviews = shifts.map(function(shift, index) {
+			var shiftNumber = index + 1;
+			return '<div class="shift-preview">Shift ' + shiftNumber + ': ' + shift.start + ' to ' + shift.end + ' </div>'
+		});
+		
+		$('#date-inputs').hide()
+			.find("input, select")
+			.attr("disabled", true);
+		$('#shift-previews').html('<br/>' + shiftPreviews.join('<br/>')).show();
+	}
+	else {
+		$('#date-inputs').show()
+			.find("input, select")
+			.removeAttr("disabled");
+		$('#shift-previews').hide();
+
+		$("#shift-wrapper")
+			.hide()
+			.find("input, select")
+			.attr("disabled", true);
+	}
 }
 
 function updateFormValue(property, value) {

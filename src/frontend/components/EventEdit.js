@@ -180,7 +180,6 @@ class EventEdit extends React.Component {
           name='eventTypeId'
           type='select'
           label='Event Type'
-          fullWidth={true}
           choices={this.eventTypes()}
         />
         <br />
@@ -299,7 +298,7 @@ class EventEdit extends React.Component {
           onChange={(value) => {
             this.props.relay.setVariables({personFilters: {email: value}})
           }}
-        /><br />
+        /><br/>
 
         <Form.Field
           name="contactPhone"
@@ -335,7 +334,6 @@ class EventEdit extends React.Component {
           name="attendeeVolunteerShow"
           type='select'
           label="Ask Attendees to Volunteer"
-          fullWidth={true}
           choices={this.volunteerShowOptions()}
         />
 
@@ -352,9 +350,8 @@ class EventEdit extends React.Component {
           name='isSearchable'
           type='select'
           label='Make Event Public?'
-          fullWidth={true}
           choices={this.eventSearchableOptions()}
-        />
+        /><br/><br/>
 
         <Form.Field
           name="isOfficial"
