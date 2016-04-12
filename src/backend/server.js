@@ -516,6 +516,9 @@ function startApp() {
           if (shift)
             req.body.shift_ids = shift.event_shift_id
         }
+        else {
+          req.body.guests = req.body.shift_ids.split(',').map(() => 0).join(',')
+        }
         req.body[idType] = eventId
         makeRequest(req.body)
       })
