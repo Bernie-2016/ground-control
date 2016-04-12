@@ -176,11 +176,12 @@ var eventTypes = [
 			rsvp_email_reminder_hours: '24',
 		},
 		disabled: ['use_shifts'],
-		adminOnly: false
+		adminOnly: false,
+		nonAdminOnly: true
 	},
 	{
 		id: 'official-barnstorm',
-		name: 'Official Barnstorm',
+		name: 'Barnstorm',
 		defaultValues: {
 			name: 'Bernstorm - Organizing Rally with National Bernie Staff',
 			description: '<p>Join other local volunteers and grassroots organizers on [DOW, Month DD] as a representative from the national organizing staff, [STAFF] comes to [STATE] for a series of special organizing events.</p><p>We will discuss how we can rapidly grow our movement in the next several months as we enter the primary season. We will also be discussing local volunteer activities to help the early primary states.</p><p>This will be a great opportunity to hear what\'s going on nationally and locally with the campaign, as well as a chance to meet other Bernie supporters from your community. Thank you for all that you\'ve contributed and all the hard work that you\'re about to do!</p>',
@@ -266,7 +267,12 @@ jQuery(document).ready(function() {
 
 	form.event_type_id.options[0] = new Option();
 	eventTypes.forEach(function(type){
+		// Don't show admin only event types on public form
 		if (isPublic && type.adminOnly) {
+			return
+		};
+		// Don't show public only event types on admin form
+		if (!isPublic && type.nonAdminOnly) {
 			return
 		};
 		form.event_type_id.options[form.event_type_id.options.length] = new Option(type.name, type.id);
@@ -351,7 +357,8 @@ function resetForm(){
 
 	$(form.start_tz).off("change");
 	clearEvents();
-	updateFormValue('is_official', false);
+	updateFormValue('is_official', true);
+	updateFormValue('cons_email', userEmail);
 	updateFormValue('attendee_volunteer_show', false);
 	$("label, select, input").show();
 	$("#event_repeat_type").change();
