@@ -293,8 +293,8 @@ export default class MG {
       fastFwdURL: 'https://organize.berniesanders.com/event/' +
                       event.event_id_obfuscated
                       + '/request_email',
-      eventDate: moment(event.event_start_dt).format('dddd, MMMM Do'),
-      eventDay: moment(event.event_start_dt).format('dddd'),
+      eventDate: moment(event.start_dt).tz(event.start_tz).format('dddd, MMMM Do'),
+      eventDay: moment(event.start_dt).tz(event.start_tz).format('dddd'),
       recipientAddress: event.email
     }
 
