@@ -210,7 +210,7 @@ export default class MG {
       },
     }
 
-    let name = event.firstname ? event.firstname : "Bernie Volunteer"
+    let name = event.firstname || "Bernie Volunteer"
     let eventTypeData = eventTypeDetails['default']
     Object.keys(eventTypeDetails).forEach((key) => {
       if (eventType.name.toLowerCase().indexOf(key) !== -1)
