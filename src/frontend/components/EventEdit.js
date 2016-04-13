@@ -1,17 +1,13 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import Relay from 'react-relay';
-import GCForm from './forms/GCForm';
-import Form from 'react-formal';
-import yup from 'yup';
-import moment from 'moment';
-import ReactQuill from 'react-quill';
-import {Card, CardActions, CardExpandable, CardTitle, CardHeader, CardText, FlatButton, TextField, DropDownMenu, SelectField, DatePicker, TimePicker, Checkbox} from 'material-ui';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import Relay from 'react-relay'
+import GCForm from './forms/GCForm'
+import Form from 'react-formal'
+import yup from 'yup'
+import moment from 'moment'
+import {Card, CardActions, CardExpandable, CardTitle, CardHeader, CardText, FlatButton, TextField, DropDownMenu, SelectField, DatePicker, TimePicker, Checkbox} from 'material-ui'
 import InfoHeader from './InfoHeader'
-import {USTimeZones} from './data/USTimeZones';
-
-require('quill/dist/quill.base.css');
-require('quill/dist/quill.snow.css');
+import {USTimeZones} from './data/USTimeZones'
 
 class EventEdit extends React.Component {
 
@@ -165,9 +161,8 @@ class EventEdit extends React.Component {
         schema={eventSchema}
         defaultValue={eventSchema.default()}
         onSubmit={ (data) => {
-          data.description = this.refs.quill.getEditorContents();
-          data.duration = data.duration.h * 60 + data.duration.m;
-          data.isSearchable = Number(data.isSearchable);
+          data.duration = data.duration.h * 60 + data.duration.m
+          data.isSearchable = Number(data.isSearchable)
           if (host)
             data.hostId = host.id
           delete data.hostEmail
@@ -191,7 +186,11 @@ class EventEdit extends React.Component {
         <br /><br />
 
         <label>Event Description</label>
-        <ReactQuill defaultValue={event.description} theme="snow" ref="quill" />
+        <Form.Field
+          name='description'
+          type='richtext'
+          label='Description'
+        />
 
         <InfoHeader content='Event Date & Time' />
 
