@@ -6,7 +6,9 @@ import RichTextEditor from 'jlegrone-react-rte'
 export default class GCRichTextField extends GCFormField {
   static propTypes = {
     onChange: React.PropTypes.func,
-    value: React.PropTypes.string
+    value: React.PropTypes.string,
+    label: React.PropTypes.string,
+    placeholder: React.PropTypes.string
   }
 
   constructor(props) {
@@ -38,10 +40,14 @@ export default class GCRichTextField extends GCFormField {
 
   render () {
     return (
-      <RichTextEditor
-        value={this.state.value}
-        onChange={this.onChange}
-      />
+      <div>
+        <label>{this.props.label}</label>
+        <RichTextEditor
+          placeholder={this.props.placeholder || this.props.label}
+          value={this.state.value}
+          onChange={this.onChange}
+        />
+      </div>
     )
   }
 }

@@ -191,11 +191,10 @@ class EventEdit extends React.Component {
         />
         <br /><br />
 
-        <label>Event Description</label>
         <Form.Field
           name='description'
           type='richtext'
-          label='Description'
+          placeholder='Event Description'
         />
 
         <InfoHeader content='Event Date & Time' />
