@@ -992,8 +992,8 @@ ${signature}`
       >
         <Tabs
           value={String(this.state.previewTabIndex)}
-          tabItemContainerStyle={{position: 'absolute', top: '0', left: '0', zIndex: '2'}}
-          inkBarStyle={{position: 'absolute', top: '48px', zIndex: '2'}}
+          tabItemContainerStyle={{position: 'absolute', top: '0', left: '0', zIndex: 20}}
+          inkBarStyle={{position: 'absolute', top: '48px', zIndex: 21}}
           contentContainerStyle={{paddingTop: '24px'}}
           onChange={(tabValue, touchEvent, tab) => {
               if (!tab.props)
