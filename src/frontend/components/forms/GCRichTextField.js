@@ -46,6 +46,7 @@ export default class GCRichTextField extends GCFormField {
           placeholder={this.props.placeholder || this.props.label}
           value={this.state.value}
           onChange={this.onChange}
+          spellCheck={true}
         />
       </div>
     )
