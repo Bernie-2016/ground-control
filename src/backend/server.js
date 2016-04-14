@@ -426,13 +426,11 @@ function startApp() {
 
   app.get('/clean-undefined-constituents', async (req, res) => {
     const data = {
-      firstname: '',
-      lastname: '',
+      firstname: ''
     }
 
     const constituents = await knex('bsd_people')
       .whereRaw(`LOWER(firstname) LIKE ?`, `%${'undefined'.toLowerCase()}%`)
-      .whereRaw(`LOWER(lastname) LIKE ?`, `%${'undefined'.toLowerCase()}%`)
 
     const updateConstituentCalls = constituents.map((cons) => {
       data.cons_id = cons.cons_id
