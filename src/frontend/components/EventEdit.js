@@ -5,9 +5,13 @@ import GCForm from './forms/GCForm'
 import Form from 'react-formal'
 import yup from 'yup'
 import moment from 'moment'
+import {AllHtmlEntities, XmlEntities} from 'html-entities'
 import {Card, CardActions, CardExpandable, CardTitle, CardHeader, CardText, FlatButton, TextField, DropDownMenu, SelectField, DatePicker, TimePicker, Checkbox} from 'material-ui'
 import InfoHeader from './InfoHeader'
 import {USTimeZones} from './data/USTimeZones'
+
+const entities = new AllHtmlEntities()
+const xmlEntities = new XmlEntities()
 
 class EventEdit extends React.Component {
 
@@ -163,6 +167,8 @@ class EventEdit extends React.Component {
         onSubmit={ (data) => {
           data.duration = data.duration.h * 60 + data.duration.m
           data.isSearchable = Number(data.isSearchable)
+          // Encode special characters to HTML entities, but avoid encoding <>"'& + &#...;
+          data.description = xmlEntities.decode(entities.encode(data.description))
           if (host)
             data.hostId = host.id
           delete data.hostEmail

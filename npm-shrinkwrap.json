@@ -2615,6 +2615,11 @@
       "from": "home-or-tmp@>=1.0.0 <2.0.0",
       "resolved": "https://registry.npmjs.org/home-or-tmp/-/home-or-tmp-1.0.0.tgz"
     },
+    "html-entities": {
+      "version": "1.2.0",
+      "from": "html-entities@latest",
+      "resolved": "https://registry.npmjs.org/html-entities/-/html-entities-1.2.0.tgz"
+    },
     "html-to-text": {
       "version": "1.6.2",
       "from": "html-to-text@>=1.5.1 <2.0.0",
