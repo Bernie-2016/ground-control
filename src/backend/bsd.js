@@ -325,34 +325,37 @@ export default class BSD {
   }
 
   async createConstituent(email, firstName, lastName) {
-    const params = `<?xml version="1.0" encoding="utf-8"?><api><cons><firstname>${firstName}</firstname><lastname>${lastName}</lastname><cons_email><email>${email}</email></cons_email></cons></api>`;
-    let response = await this.request('/cons/set_constituent_data', params, 'POST');
-    response = await parseStringPromise(response);
+    let consNameXML = ''
+    if (firstName && lastName)
+      consNameXML = `<firstname>${firstName}</firstname><lastname>${lastName}</lastname>`
+    const params = `<?xml version="1.0" encoding="utf-8"?><api><cons>${consNameXML}<cons_email><email>${email}</email></cons_email></cons></api>`
+    let response = await this.request('/cons/set_constituent_data', params, 'POST')
+    response = await parseStringPromise(response)
 
-    let constituent = await this.getConstituentByEmail(email);
+    let constituent = await this.getConstituentByEmail(email)
 
     // generate a 'random' 9-14 character alphanumeric password
-    let password = randString(Math.floor(Math.random() * 6) + 9);
-    constituent['password'] = password;
+    let password = randString(Math.floor(Math.random() * 6) + 9)
+    constituent['password'] = password
 
     // set the constituent password asynchronously
-    await this.setConstituentPassword(email, password);
-    return constituent;
+    await this.setConstituentPassword(email, password)
+    return constituent
 
     function randString(x){
-        let s = '';
+        let s = ''
         while(s.length<x&&x>0){
             let r = Math.random();
-            s+= (r<0.1?Math.floor(r*100):String.fromCharCode(Math.floor(r*26) + (r>0.5?97:65)));
+            s+= (r<0.1?Math.floor(r*100):String.fromCharCode(Math.floor(r*26) + (r>0.5?97:65)))
         }
-        return s;
+        return s
     }
   }
 
   async setConstituentPassword(email, password) {
     // response will be empty if successful
-    let response = await this.request('/account/set_password', {userid: email, password: password}, 'POST');
-    return 'password set';
+    let response = await this.request('/account/set_password', {userid: email, password: password}, 'POST')
+    return 'password set'
   }
 
   async checkCredentials(email, password) {
