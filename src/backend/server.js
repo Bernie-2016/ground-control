@@ -424,6 +424,26 @@ function startApp() {
     }
   }))
 
+  app.get('/clean-undefined-constituents', async (req, res) => {
+    const data = {
+      firstname: '',
+      lastname: '',
+    }
+
+    const constituents = await knex('bsd_people')
+      .where('firstname', 'undefined')
+      .where('lastname', 'undefined')
+
+    const updateConstituentCalls = constituents.map((cons) => {
+      data.cons_id = cons.cons_id
+      BSDClient.setConstituentData(data)
+    })
+    Promise.all(updateConstituentCalls)
+
+    log.info(`${constituents.length} records updated.`)
+    res.json('success')
+  })
+
   app.get('/slack/callforbernie/', async (req, res) => {
     res.redirect('https://join-bernie-call-team.herokuapp.com')
   })
@@ -522,6 +542,15 @@ function startApp() {
         req.body[idType] = eventId
         makeRequest(req.body)
       })
+    }
+
+    if (req.body.firstname && req.body.lastname){
+      const constituent = await knex('bsd_people')
+        .join('bsd_emails', 'bsd_people.cons_id', 'bsd_emails.cons_id')
+        .where('bsd_emails.email', req.body.email)
+        .first()
+
+      log.debug(constituent)
     }
 
     if (req.body.event_id_obfuscated){
