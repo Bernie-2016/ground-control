@@ -313,25 +313,55 @@ export default class BSD {
     return response
   }
 
-  async setConstituentData(cons_id, bundleName, data) {
-    let xmlData = ''
-    Object.keys(data).forEach((key) => {
-      if (data[key])
-        xmlData = xmlData + `<${key}>${data[key]}</${key}>`
-    })
-    let params = `<?xml version="1.0" encoding="utf-8"?><api><cons id="${cons_id}"><${bundleName}>${xmlData}</${bundleName}></cons></api>`
-    let response = await this.request('/cons/set_constituent_data', params, 'POST');
+  async setConstituentData(data) {
+    /*
+    Accepts data that looks like
+    {
+      cons_id: 342 // required
+      firstname: 'John',
+      lastname: 'Smith',
+      cons_addr: {
+        id: 2494 // optional -- only necessary if updating an existing bundle record
+        city: 'Los Angeles',
+        zip: '90007'
+      }
+    }
+
+    Any key containing an object will be treated as a 'bundle'.
+    See https://www.bluestatedigital.com/page/api/doc#-----------------Core--cons-------------
+
+    Every field shown above is optional, with the exception of `cons_id`.
+    */
+    function generateXML(data) {
+      let xmlData = ''
+      Object.keys(data).forEach((key) => {
+        if (typeof data[key] === 'object'){
+          const bundleIdString = data[key].id ? ` id="${data[key].id}"` : ''
+          xmlData = xmlData + `<${key}${bundleIdString}>${generateXML(data[key])}</${key}>`
+        }
+        else if (data.hasOwnProperty(key) && key !== 'cons_id' && key !== 'id' && data[key] !== null && data[key] !== undefined)
+          xmlData = xmlData + `<${key}>${data[key]}</${key}>`
+      })
+      return xmlData
+    }
+
+    const consIdString = data.cons_id ? ` id="${data.cons_id}"` : ''
+    let params = `<?xml version="1.0" encoding="utf-8"?><api><cons${consIdString}>${generateXML(data)}</cons></api>`
+
+    log.debug(params)
+    let response = await this.request('/cons/set_constituent_data', params, 'POST')
     return response
   }
 
-  async createConstituent(email, firstName, lastName) {
-    let consNameXML = ''
-    if (firstName && lastName)
-      consNameXML = `<firstname>${firstName}</firstname><lastname>${lastName}</lastname>`
-    const params = `<?xml version="1.0" encoding="utf-8"?><api><cons>${consNameXML}<cons_email><email>${email}</email></cons_email></cons></api>`
-    let response = await this.request('/cons/set_constituent_data', params, 'POST')
+  async createConstituent(email, firstname, lastname) {    
+    let response = await this.setConstituentData({
+      firstname,
+      lastname,
+      cons_email: {
+        email
+      }
+    })
     response = await parseStringPromise(response)
-
     let constituent = await this.getConstituentByEmail(email)
 
     // generate a 'random' 9-14 character alphanumeric password
