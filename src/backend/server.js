@@ -431,8 +431,8 @@ function startApp() {
     }
 
     const constituents = await knex('bsd_people')
-      .where('firstname', 'undefined')
-      .where('lastname', 'undefined')
+      .whereRaw(`LOWER(firstname) LIKE ?`, `%${'undefined'.toLowerCase()}%`)
+      .whereRaw(`LOWER(lastname) LIKE ?`, `%${'undefined'.toLowerCase()}%`)
 
     const updateConstituentCalls = constituents.map((cons) => {
       data.cons_id = cons.cons_id
