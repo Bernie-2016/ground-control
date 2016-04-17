@@ -541,7 +541,7 @@ function startApp() {
   app.get('/events/:id/get-rsvps.json', requireAdmin, wrap(async (req, res) => {
     const attendees = await knex('bsd_event_attendees')
       .join('bsd_events', 'bsd_event_attendees.event_id', 'bsd_events.event_id')
-      .join('bsd_people', 'bsd_event_attendees.attendee_cons_id', 'bsd_people.cons_id')
+      .leftJoin('bsd_people', 'bsd_event_attendees.attendee_cons_id', 'bsd_people.cons_id')
       .leftJoin('bsd_phones', 'bsd_event_attendees.attendee_cons_id', 'bsd_phones.cons_id')
       .leftJoin('bsd_emails', 'bsd_event_attendees.attendee_cons_id', 'bsd_emails.cons_id')
       .leftJoin('bsd_addresses', 'bsd_event_attendees.attendee_cons_id', 'bsd_addresses.cons_id')
@@ -552,7 +552,7 @@ function startApp() {
       .select('bsd_people.cons_id', 'bsd_people.firstname', 'bsd_people.lastname')
       .select('bsd_phones.phone')
       .select('bsd_emails.email')
-      .select('bsd_addresses.*')
+      .select('bsd_addresses.addr1', 'bsd_addresses.addr2', 'bsd_addresses.city', 'bsd_addresses.state_cd', 'bsd_addresses.zip', 'bsd_addresses.zip_4', 'bsd_addresses.country')
 
     res.json(attendees)
   }))
