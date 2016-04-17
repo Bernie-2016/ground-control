@@ -1143,7 +1143,7 @@ ${signature}`
       .set('Accept', 'application/json')
       .end((err, res) => {
         const attendees = JSON.parse(res.text)
-        const data = attendees.map((attendee) => JSON.flatten(attendee, {ignoreProps: ['create_dt', 'geom', 'is_primary', 'cons_addr_id']}))
+        const data = attendees.map((attendee) => JSON.flatten(attendee, {ignoreProps: ['create_dt', 'modified_dt', 'geom', 'is_primary', 'cons_addr_id']}))
         downloadCSV(Papa.unparse(data), `${event.eventIdObfuscated}.rsvps.csv`)
       })
   }
