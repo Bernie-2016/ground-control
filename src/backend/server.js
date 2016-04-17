@@ -180,7 +180,7 @@ function startApp() {
 
   let isAdmin = async (userId) => {
     const user = await knex('users').where('id', userId).first()
-    if (req.user)
+    if (user)
       return user.is_admin
     return false
   }
