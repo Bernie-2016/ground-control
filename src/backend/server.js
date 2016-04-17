@@ -546,9 +546,9 @@ function startApp() {
       .join('bsd_emails', 'bsd_event_attendees.attendee_cons_id', 'bsd_emails.cons_id')
       .join('bsd_addresses', 'bsd_event_attendees.attendee_cons_id', 'bsd_addresses.cons_id')
       .where('bsd_events.event_id_obfuscated', req.params.id)
-      .select('bsd_people.*')
-      .select('bsd_phones.*')
-      .select('bsd_emails.*')
+      .select('bsd_people.cons_id', 'bsd_people.firstname', 'bsd_people.lastname')
+      .select('bsd_phones.phone')
+      .select('bsd_emails.email')
       .select('bsd_addresses.*')
 
     res.json(attendees)
