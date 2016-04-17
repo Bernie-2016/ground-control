@@ -538,6 +538,22 @@ function startApp() {
     res.json(shiftSchemaMap)
   }))
 
+  app.get('/events/:id/get-rsvps.json', requireAdmin, wrap(async (req, res) => {
+    const attendees = await knex('bsd_event_attendees')
+      .join('bsd_events', 'bsd_event_attendees.event_id', 'bsd_events.event_id')
+      .join('bsd_people', 'bsd_event_attendees.attendee_cons_id', 'bsd_people.cons_id')
+      .join('bsd_phones', 'bsd_event_attendees.attendee_cons_id', 'bsd_phones.cons_id')
+      .join('bsd_emails', 'bsd_event_attendees.attendee_cons_id', 'bsd_emails.cons_id')
+      .join('bsd_addresses', 'bsd_event_attendees.attendee_cons_id', 'bsd_addresses.cons_id')
+      .where('bsd_events.event_id_obfuscated', req.params.id)
+      .select('bsd_people.*')
+      .select('bsd_phones.*')
+      .select('bsd_emails.*')
+      .select('bsd_addresses.*')
+
+    res.json(attendees)
+  }))
+
   app.get('/admin/events/create', isAuthenticated, wrap(async (req, res) => {
     res.redirect('/events/create')
   }))

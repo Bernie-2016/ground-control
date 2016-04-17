@@ -10,6 +10,9 @@ import {BernieText, BernieColors} from './styles/bernie-css'
 import moment from 'moment'
 import json2csv from 'json2csv'
 import qs from 'qs'
+import superagent from 'superagent'
+import Papa from 'papaparse'
+import downloadCSV from '../helpers/downloadCSV'
 import {states} from './data/states'
 import {USTimeZones} from './data/USTimeZones'
 
@@ -1136,39 +1139,13 @@ ${signature}`
 
   _handleRSVPDownload = (eventIndex) => {
     const event = events[eventIndex].node
-    const data = event.attendees.map(
-      (attendee) => JSON.flatten(attendee, {ignoreProps: ['__dataID__']})
-    )
-
-    let options = {
-      data,
-      fields: Object.keys(data[0])
-    }
-
-    json2csv(options, (err, csv) => {
-      if (err) console.log(err);
-
-      let byteNumbers = new Uint8Array(csv.length);
-
-      for (let i = 0; i < csv.length; i++){
-        byteNumbers[i] = csv.charCodeAt(i);
-      }
-      let blob = new Blob([byteNumbers], {type: "text/csv"});
-
-          // Construct the uri
-      let uri = URL.createObjectURL(blob);
-
-      // Construct the <a> element
-      let link = document.createElement("a");
-      link.download = `Event RSVPs (${event.eventIdObfuscated}).csv`;
-      link.href = uri;
-
-      document.body.appendChild(link);
-      link.click();
-
-      // Cleanup the DOM
-      document.body.removeChild(link);
-    })
+    superagent.get(`/events/${event.eventIdObfuscated}/get-rsvps.json`)
+      .set('Accept', 'application/json')
+      .end((err, res) => {
+        const attendees = JSON.parse(res.text)
+        const data = attendees.map((attendee) => JSON.flatten(attendee, {ignoreProps: ['create_dt', 'geom']}))
+        downloadCSV(Papa.unparse(data), `${event.eventIdObfuscated}.rsvps.csv`)
+      })
   }
 
   _handleEventEdit = (event, newData) => {
