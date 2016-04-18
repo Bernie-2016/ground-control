@@ -7,7 +7,8 @@ import {BernieColors} from '../styles/bernie-css';
 export default class GCForm extends React.Component {
   state = {
     formErrors: null,
-    isSubmitting: false
+    isSubmitting: false,
+    model: null
   }
 
   renderChildren(children) {
@@ -44,6 +45,12 @@ export default class GCForm extends React.Component {
   render() {
     return (
         <Form
+          value = {this.props.value || this.state.model || this.props.defaultValue}
+          onChange = {model => {
+            this.setState({model})
+            if (this.props.onChange)
+              this.props.onChange(model)
+          }}
           onError={(errors) => {
             this.setState({formErrors: errors})
           }}
