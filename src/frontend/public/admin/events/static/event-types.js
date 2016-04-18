@@ -27,6 +27,13 @@ var eventTypes = [
 		id: 'volunteer-meeting',
 		name: 'Volunteer Activity or Meeting',
 		adminOnly: false,
+		nonAdminOnly: true,
+		disabled: ['use_shifts']
+	},
+	{
+		id: 'organizing-meeting',
+		name: 'Organizing Meeting',
+		adminOnly: true,
 		disabled: ['use_shifts']
 	},
 	{
@@ -59,16 +66,16 @@ var eventTypes = [
 			description: '<a href="http://bernie.to/distance-faq">Click here to view Carpool FAQs</a><p>Join me and other Bernie supporters for a road trip!</p><p>I’ll be leaving on [WRITE YOUR DEPARTURE DATE/TIME HERE] and returning on [WRITE YOUR RETURN DATE/TIME HERE].</p><p>We’re going to hit the road for Bernie to the help out in the crucial final days before the election. Bernie staff on the ground will train us and plug us into the campaign so that we can be as effective as possible.</p><p>Victory will require all of us pitching in, so sign up and let’s go on a Bernie Journey!</p>'
 		}
 	},
-	{
-		id: 'ballot-access',
-		name: 'Gather Ballot Access Signatures',
-		defaultValues: {
-			name: 'Bernie Ballot Blast - NJ Support Bernie and his Delegates and Collect Petition Signatures',
-			description: 'Please stop by and sign petitions to put Bernie and his delegates on the New Jersey Democratic Primary Ballot. All petitions are due in on Monday, so we need you to act now. It takes just a few minutes to sign the petition and spread the Bern!',
-		},
-		adminOnly: false,
-		disabled: ['use_shifts']
-	},
+	// {
+	// 	id: 'ballot-access',
+	// 	name: 'Gather Ballot Access Signatures',
+	// 	defaultValues: {
+	// 		name: 'Bernie Ballot Blast - NJ Support Bernie and his Delegates and Collect Petition Signatures',
+	// 		description: 'Please stop by and sign petitions to put Bernie and his delegates on the New Jersey Democratic Primary Ballot. All petitions are due in on Monday, so we need you to act now. It takes just a few minutes to sign the petition and spread the Bern!',
+	// 	},
+	// 	adminOnly: false,
+	// 	disabled: ['use_shifts']
+	// },
 	{
 		id: 'phonebank',
 		name: 'Phonebank',
@@ -176,11 +183,12 @@ var eventTypes = [
 			rsvp_email_reminder_hours: '24',
 		},
 		disabled: ['use_shifts'],
-		adminOnly: false
+		adminOnly: false,
+		nonAdminOnly: true
 	},
 	{
 		id: 'official-barnstorm',
-		name: 'Official Barnstorm',
+		name: 'Barnstorm',
 		defaultValues: {
 			name: 'Bernstorm - Organizing Rally with National Bernie Staff',
 			description: '<p>Join other local volunteers and grassroots organizers on [DOW, Month DD] as a representative from the national organizing staff, [STAFF] comes to [STATE] for a series of special organizing events.</p><p>We will discuss how we can rapidly grow our movement in the next several months as we enter the primary season. We will also be discussing local volunteer activities to help the early primary states.</p><p>This will be a great opportunity to hear what\'s going on nationally and locally with the campaign, as well as a chance to meet other Bernie supporters from your community. Thank you for all that you\'ve contributed and all the hard work that you\'re about to do!</p>',
@@ -226,6 +234,8 @@ var eventTypes = [
 		id: 'voter-registration',
 		name: 'Voter Registration',
 		defaultValues: {
+			name: 'Register Voters in [CITY/NEIGHBORHOOD]',
+			description: 'Join us to register (and properly re-register!) our neighbors to vote. If we work together, we can register the necessary voters to bring us closer to a huge voter turnout –– and when voters turn out, we win.',
 			duration_num: 3,
 			duration_unit: 60
 		},
@@ -266,7 +276,12 @@ jQuery(document).ready(function() {
 
 	form.event_type_id.options[0] = new Option();
 	eventTypes.forEach(function(type){
+		// Don't show admin only event types on public form
 		if (isPublic && type.adminOnly) {
+			return
+		};
+		// Don't show public only event types on admin form
+		if (!isPublic && type.nonAdminOnly) {
 			return
 		};
 		form.event_type_id.options[form.event_type_id.options.length] = new Option(type.name, type.id);
@@ -351,7 +366,8 @@ function resetForm(){
 
 	$(form.start_tz).off("change");
 	clearEvents();
-	updateFormValue('is_official', false);
+	updateFormValue('is_official', true);
+	updateFormValue('cons_email', userEmail);
 	updateFormValue('attendee_volunteer_show', false);
 	$("label, select, input").show();
 	$("#event_repeat_type").change();

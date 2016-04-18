@@ -1,6 +1,6 @@
 import React from 'react'
 import Relay from 'react-relay'
-import {Styles, Divider, RaisedButton, Card, CardHeader, CardText, FontIcon} from 'material-ui'
+import {Styles, Divider, RaisedButton, Card, CardHeader, CardText, FontIcon, RefreshIndicator} from 'material-ui'
 import GCForm from './forms/GCForm'
 import Form from 'react-formal'
 import yup from 'yup'
@@ -18,7 +18,8 @@ class ConstituentLookup extends React.Component {
 
     this.state = {
       windowWidth: window.innerWidth,
-      windowHeight: window.innerHeight
+      windowHeight: window.innerHeight,
+      loading: false
     }
 
     window.addEventListener('resize', this._handleResize)
@@ -33,13 +34,28 @@ class ConstituentLookup extends React.Component {
 
   renderSearchResults() {
     const people = this.props.listContainer.people.edges
+    const positioningStyle = {
+      textAlign: 'center',
+      position: 'relative'
+    }
 
-    if (people.length === 0)
+    if (this.state.loading) {
+      return (
+          <RefreshIndicator
+            size={50}
+            top={200}
+            left={0}
+            loadingColor={BernieColors.blue}
+            status="loading"
+            style={{...positioningStyle, margin: '0 auto'}}
+          />
+      )
+    }
+    else if (people.length === 0)
       return (
         <div style={{
-          textAlign: 'center',
-          position: 'relative',
-          top: '200px',
+          ...positioningStyle,
+          top: 200,
           fontFamily: BernieTheme.fontFamily,
           color: BernieTheme.palette.accent3Color
         }} ><h2>No Results</h2></div>
@@ -100,11 +116,16 @@ class ConstituentLookup extends React.Component {
                this.setState({model})
             }}
             onSubmit={(data) => {
+              this.setState({loading: true})
               Object.keys(data).forEach((key) => {
                 if (!data[key])
                   delete data[key]
               })
-              this.props.relay.setVariables({personFilters: data})
+              this.props.relay.setVariables({personFilters: data}, (readyState) => {
+                if (readyState.ready) {
+                  this.setState({loading: false})
+                }
+              })
             }}
           >
             <h1 style={{

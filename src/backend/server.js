@@ -184,7 +184,7 @@ function startApp() {
 
   let isAdmin = async (userId) => {
     const user = await knex('users').where('id', userId).first()
-    if (req.user)
+    if (user)
       return user.is_admin
     return false
   }
@@ -493,13 +493,18 @@ function startApp() {
       eventIds.forEach(async (eventId) => {
         if (!eventId)
           return
-        const shift = await knex('bsd_event_shifts')
-          .join('bsd_events', 'bsd_event_shifts.event_id', 'bsd_events.event_id')
-          .where(`bsd_events.${idType}`, eventId)
-          .orderBy('bsd_event_shifts.start_dt', 'asc')
-          .first()
-        if (shift)
-          req.body.shift_ids = shift.event_shift_id
+        else if (req.body.shift_ids === undefined){
+          const shift = await knex('bsd_event_shifts')
+            .join('bsd_events', 'bsd_event_shifts.event_id', 'bsd_events.event_id')
+            .where(`bsd_events.${idType}`, eventId)
+            .orderBy('bsd_event_shifts.start_dt', 'asc')
+            .first()
+          if (shift)
+            req.body.shift_ids = shift.event_shift_id
+        }
+        else {
+          req.body.guests = req.body.shift_ids.split(',').map(() => 0).join(',')
+        }
         req.body[idType] = eventId
         makeRequest(req.body)
       })
@@ -517,6 +522,25 @@ function startApp() {
 
   app.get('/events/shift-schema.json', wrap(async (req, res) => {
     res.json(shiftSchemaMap)
+  }))
+
+  app.get('/events/:id/get-rsvps.json', requireAdmin, wrap(async (req, res) => {
+    const attendees = await knex('bsd_event_attendees')
+      .join('bsd_events', 'bsd_event_attendees.event_id', 'bsd_events.event_id')
+      .leftJoin('bsd_people', 'bsd_event_attendees.attendee_cons_id', 'bsd_people.cons_id')
+      .leftJoin('bsd_phones', 'bsd_event_attendees.attendee_cons_id', 'bsd_phones.cons_id')
+      .leftJoin('bsd_emails', 'bsd_event_attendees.attendee_cons_id', 'bsd_emails.cons_id')
+      .leftJoin('bsd_addresses', 'bsd_event_attendees.attendee_cons_id', 'bsd_addresses.cons_id')
+      .where('bsd_events.event_id_obfuscated', req.params.id)
+      .where('bsd_phones.is_primary', true)
+      .where('bsd_emails.is_primary', true)
+      .where('bsd_addresses.is_primary', true)
+      .select('bsd_people.cons_id', 'bsd_people.firstname', 'bsd_people.lastname')
+      .select('bsd_phones.phone')
+      .select('bsd_emails.email')
+      .select('bsd_addresses.addr1', 'bsd_addresses.addr2', 'bsd_addresses.city', 'bsd_addresses.state_cd', 'bsd_addresses.zip', 'bsd_addresses.zip_4', 'bsd_addresses.country')
+
+    res.json(attendees)
   }))
 
   app.get('/admin/events/create', isAuthenticated, wrap(async (req, res) => {
@@ -552,6 +576,7 @@ function startApp() {
       'carpool': { id: 39, staffOnly: false, requirePhone: true },
       'debate-watch': { id: 36, staffOnly: false },
       'official-barnstorm': { id: 41, staffOnly: true },
+      'organizing-meeting': { id: 34, staffOnly: true },
       'get-out-the-vote-training': { id: 34, staffOnly: true },
       'get-out-the-vote': { id: 45, staffOnly: true, requirePhone: true },
       'primary-day': { id: 45, staffOnly: true, requirePhone: true },

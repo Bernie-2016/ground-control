@@ -61,8 +61,6 @@ export let job = async () => {
                     "bsd_events.flag_approval = false " +
                   "AND " +
                     "gc_bsd_events.fast_fwd_instructions_sent = false " +
-                  "AND " +
-                    "bsd_emails.email NOT ILIKE '%@berniesanders.com%' " +
                 "GROUP BY " +
                     "bsd_events.event_id " +
                   "HAVING " +
@@ -96,9 +94,7 @@ export let job = async () => {
               "AND " +
                 "bsd_events.flag_approval = false " +
               "AND " +
-                "gc_bsd_events.fast_fwd_instructions_sent = false " +
-              "AND " +
-                    "bsd_emails.email NOT ILIKE '%@berniesanders.com%'";
+                "gc_bsd_events.fast_fwd_instructions_sent = false";
 
       eventsToEmail = await knex.raw(eventsSql).transacting(trx);
 

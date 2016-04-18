@@ -160,7 +160,7 @@ export default class MG {
     let content = await notificationEmail.render({event, eventIds, host: user, organizerName})
 
     const message = {
-      from: 'Lynn Hua<lynnhua@berniesanders.com>',
+      from: 'Help Desk<help@berniesanders.com>',
       to: organizers.map((organizer) => organizer.Email),
       subject: 'ACTION NEEDED: New canvass event created',
       html: content.html
@@ -210,7 +210,7 @@ export default class MG {
       },
     }
 
-    let name = event.firstname ? event.firstname : "Bernie Volunteer"
+    let name = event.firstname || "Bernie Volunteer"
     let eventTypeData = eventTypeDetails['default']
     Object.keys(eventTypeDetails).forEach((key) => {
       if (eventType.name.toLowerCase().indexOf(key) !== -1)
@@ -293,8 +293,8 @@ export default class MG {
       fastFwdURL: 'https://organize.berniesanders.com/event/' +
                       event.event_id_obfuscated
                       + '/request_email',
-      eventDate: moment(event.event_start_dt).format('dddd, MMMM Do'),
-      eventDay: moment(event.event_start_dt).format('dddd'),
+      eventDate: moment(event.start_dt).tz(event.start_tz).format('dddd, MMMM Do'),
+      eventDay: moment(event.start_dt).tz(event.start_tz).format('dddd'),
       recipientAddress: event.email
     }
 

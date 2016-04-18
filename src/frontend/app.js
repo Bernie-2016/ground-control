@@ -17,6 +17,7 @@ import AdminCallAssignmentsSection from './components/AdminCallAssignmentsSectio
 import AdminCallAssignmentCreationForm from './components/AdminCallAssignmentCreationForm'
 import FastFwdForm from './components/FastFwdForm'
 import GCTextField from './components/forms/GCTextField'
+import GCRichTextField from './components/forms/GCRichTextField'
 import GCPhoneField from './components/forms/GCPhoneField'
 import GCDateField from './components/forms/GCDateField'
 import GCDateTimeField from './components/forms/GCDateTimeField'
@@ -70,6 +71,7 @@ Relay.injectNetworkLayer(new GCNetworkLayer('/graphql'), {
 
 Form.addInputTypes({
   string: GCTextField,
+  richtext: GCRichTextField,
   number: GCTextField,
   email: GCTextField,
   boolean: GCBooleanField,
