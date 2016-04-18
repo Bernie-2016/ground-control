@@ -153,6 +153,7 @@ class AdminEventsSection extends React.Component {
       userMessage: '',
       deletionConfirmationMessage: null,
       deletionReasonIndex: null,
+      loading: false,
       undoAction: function(){console.log('undo')}
     }
 
@@ -1218,16 +1219,16 @@ ${signature}`
   }
 
   _handleQueryChange = (queryParams) => {
-    console.log('loading')
+    this.setState({loading: true})
     this.props.relay.setVariables(queryParams, (readyState) => {
       if (readyState.ready) {
+        this.setState({loading: false})
         setTimeout(() => {
-          const relayProps = this.props.relay.variables;
-          let hash = qs.parse(location.hash.substr(1));
+          const relayProps = this.props.relay.variables
+          let hash = qs.parse(location.hash.substr(1))
           hash.query = relayProps;
-          console.log('finished')
-          location.hash = qs.stringify(hash, { encode: false, skipNulls: true });
-        }, 500);
+          location.hash = qs.stringify(hash, { encode: false, skipNulls: true })
+        }, 500)
       }
     })
   }
@@ -1268,186 +1269,191 @@ ${signature}`
       {this.renderEventPreviewModal()}
       {this.renderFiltersModal()}
       {this.renderToolbar()}
-      <Table
-        rowHeight={83}
-        groupHeaderHeight={35}
-        headerHeight={50}
-        rowsCount={events.length}
-        width={this.state.windowWidth}
-        height={this.state.windowHeight - 112}
-        // rowClassNameGetter={(index) => (events[index].isOfficial) ? 'officialEventRow' : null}
-        onRowDoubleClick={this._handleRowClick}
-        {...this.props}>
-        <ColumnGroup
-          fixed={true}
-          header={<this.HeaderCell content="Actions" />}>
-          <Column
-            header={
-              <Cell>
-                <Checkbox
-                  checked={(this.state.selectedRows.length > 0)}
-                  onCheck={this._masterCheckBoxChecked}
-                  checkedIcon={(this.state.selectedRows.length == events.length) ? <FontIcon className="material-icons">check_box</FontIcon> : <FontIcon className="material-icons">indeterminate_check_box</FontIcon>}
-                  style={{marginLeft: '15px'}}
-                  iconStyle={{color: BernieColors.blue}}
-                />
-              </Cell>
-            }
-            cell={<this.SelectCell data={events} col="select" selectedRows={this.state.selectedRows} />}
+      <div style={{
+        opacity: this.state.loading ? '0.3' : '1',
+        transition: 'opacity .2s ease-in'
+      }}>
+        <Table
+          rowHeight={83}
+          groupHeaderHeight={35}
+          headerHeight={50}
+          rowsCount={events.length}
+          width={this.state.windowWidth}
+          height={this.state.windowHeight - 112}
+          // rowClassNameGetter={(index) => (events[index].isOfficial) ? 'officialEventRow' : null}
+          onRowDoubleClick={this._handleRowClick}
+          {...this.props}>
+          <ColumnGroup
             fixed={true}
-            width={73}
-          />
-          <Column
-            header={<this.HeaderCell content="Manage" />}
-            cell={<this.ActionCell data={events} col="actions" />}
-            fixed={true}
-            width={approvalFilterOptions[this.props.relay.variables.status].actions.length * 48 + 16}
-            align='center'
-          />
-        </ColumnGroup>
-        <ColumnGroup
-          header={<this.HeaderCell content="Event" />}
-        >
-          <Column
-            flexGrow={1}
-            header={<this.HeaderCell content="ID" />}
-            cell={<this.EventIdLinkCell data={events} />}
-            width={100}
-            align='center'
-          />
-          <Column
-            flexGrow={1}
-            header={<this.SortControllerCell content="Type" attribute="eventTypeId" />}
-            cell={
-              <this.EventTypeCell data={events} col="eventType" attr="name" />
-            }
-            width={130}
-          />
-        </ColumnGroup>
-        <ColumnGroup
-          header={<this.HeaderCell content="Time" />}>
-          <Column
-            header={<this.SortControllerCell content="Event Date" attribute="startDate" />}
-            cell={<this.DateCell data={events} col="startDate" />}
-            flexGrow={1}
-            width={170}
-          />
-          <Column
-            header={<this.SortControllerCell content="Create Date" attribute="createDate" />}
-            cell={<this.DateCell data={events} col="createDate" />}
-            flexGrow={1}
-            width={170}
-          />
-        </ColumnGroup>
-        <ColumnGroup
-          header={<this.HeaderCell content="About" />}>
-          <Column
-            flexGrow={1}
-            header={<this.SortControllerCell content="Event Name" attribute="name" />}
-            cell={<this.TextCell data={events} col="name" />}
-            width={250}
-          />
-          <Column
-            flexGrow={1}
-            header={<this.SortControllerCell content="Description" attribute="description" />}
-            cell={<this.NoHTMLCell data={events} col="description" />}
-            width={450}
-          />
-        </ColumnGroup>
-        <ColumnGroup
-          header={<this.HeaderCell content="Event Host" />}>
-          <Column
-            flexGrow={1}
-            header={<this.HeaderCell content="Email" />}
-            cell={<this.HostInfoCell data={events} col="host" info="email" />}
-            width={220}
-          />
-          <Column
-            flexGrow={1}
-            header={<this.HeaderCell content="Name" />}
-            cell={<this.HostInfoCell data={events} col="host" info="name" />}
-            width={150}
-          />
-          <Column
-            flexGrow={1}
-            header={<this.SortControllerCell content="Phone" attribute="contactPhone" />}
-            cell={<this.TextCell data={events} col="contactPhone" />}
-            width={100}
-          />
-        </ColumnGroup>
-        <ColumnGroup
-          header={<this.HeaderCell content="Detailed Info" />}>
-         <Column
-            header={<this.SortControllerCell content="Duration" attribute="duration" />}
-            cell={<this.DurationCell data={events} col="duration" />}
-            flexGrow={1}
-            width={110}
-          />
-          <Column
-            flexGrow={1}
-            header={<this.SortControllerCell content="Capacity" attribute="capacity" />}
-            cell={<this.TextCell data={events} col="capacity" />}
-            width={100}
-            align='center'
-          />
-          <Column
-            flexGrow={1}
-            header={<this.HeaderCell content="RSVPs" />}
-            cell={<this.TextCell data={events} col="attendeesCount" />}
-            width={100}
-            align='center'
-          />
-        </ColumnGroup>
-        <ColumnGroup
-          header={<this.HeaderCell content="Event Location" />}>
-          <Column
-            header={<this.SortControllerCell content="Venue" attribute="venueName" />}
-            cell={<this.TextCell data={events} col="venueName" />}
-            flexGrow={1}
-            width={150}
-          />
-          <Column
-            header={<this.SortControllerCell content="Address" attribute="venueAddr1" />}
-            cell={<this.TextCell data={events} col="venueAddr1" />}
-            flexGrow={1}
-            width={150}
-          />
-          <Column
-            header={<this.SortControllerCell content="City" attribute="venueCity" />}
-            cell={<this.TextCell data={events} col="venueCity" />}
-            flexGrow={1}
-            width={150}
-          />
-          <Column
-            header={<this.SortControllerCell content="State" attribute="venueState" />}
-            cell={<this.TextCell data={events} col="venueState" />}
-            flexGrow={1}
-            width={80}
-            align='center'
-          />
-          <Column
-            header={<this.SortControllerCell content="Zip Code" attribute="venueZip" />}
-            cell={<this.TextCell data={events} col="venueZip" />}
-            flexGrow={1}
-            width={120}
-            align='center'
-          />
-          <Column
-            header={<this.SortControllerCell content="Latitude" attribute="latitude" />}
-            cell={<this.TextCell data={events} col="latitude" />}
-            flexGrow={1}
-            width={150}
-            align='center'
-          />
-          <Column
-            header={<this.SortControllerCell content="Longitude" attribute="longitude" />}
-            cell={<this.TextCell data={events} col="longitude" />}
-            flexGrow={1}
-            width={150}
-            align='center'
-          />
-        </ColumnGroup>
-      </Table>
+            header={<this.HeaderCell content="Actions" />}>
+            <Column
+              header={
+                <Cell>
+                  <Checkbox
+                    checked={(this.state.selectedRows.length > 0)}
+                    onCheck={this._masterCheckBoxChecked}
+                    checkedIcon={(this.state.selectedRows.length == events.length) ? <FontIcon className="material-icons">check_box</FontIcon> : <FontIcon className="material-icons">indeterminate_check_box</FontIcon>}
+                    style={{marginLeft: '15px'}}
+                    iconStyle={{color: BernieColors.blue}}
+                  />
+                </Cell>
+              }
+              cell={<this.SelectCell data={events} col="select" selectedRows={this.state.selectedRows} />}
+              fixed={true}
+              width={73}
+            />
+            <Column
+              header={<this.HeaderCell content="Manage" />}
+              cell={<this.ActionCell data={events} col="actions" />}
+              fixed={true}
+              width={approvalFilterOptions[this.props.relay.variables.status].actions.length * 48 + 16}
+              align='center'
+            />
+          </ColumnGroup>
+          <ColumnGroup
+            header={<this.HeaderCell content="Event" />}
+          >
+            <Column
+              flexGrow={1}
+              header={<this.HeaderCell content="ID" />}
+              cell={<this.EventIdLinkCell data={events} />}
+              width={100}
+              align='center'
+            />
+            <Column
+              flexGrow={1}
+              header={<this.SortControllerCell content="Type" attribute="eventTypeId" />}
+              cell={
+                <this.EventTypeCell data={events} col="eventType" attr="name" />
+              }
+              width={130}
+            />
+          </ColumnGroup>
+          <ColumnGroup
+            header={<this.HeaderCell content="Time" />}>
+            <Column
+              header={<this.SortControllerCell content="Event Date" attribute="startDate" />}
+              cell={<this.DateCell data={events} col="startDate" />}
+              flexGrow={1}
+              width={170}
+            />
+            <Column
+              header={<this.SortControllerCell content="Create Date" attribute="createDate" />}
+              cell={<this.DateCell data={events} col="createDate" />}
+              flexGrow={1}
+              width={170}
+            />
+          </ColumnGroup>
+          <ColumnGroup
+            header={<this.HeaderCell content="About" />}>
+            <Column
+              flexGrow={1}
+              header={<this.SortControllerCell content="Event Name" attribute="name" />}
+              cell={<this.TextCell data={events} col="name" />}
+              width={250}
+            />
+            <Column
+              flexGrow={1}
+              header={<this.SortControllerCell content="Description" attribute="description" />}
+              cell={<this.NoHTMLCell data={events} col="description" />}
+              width={450}
+            />
+          </ColumnGroup>
+          <ColumnGroup
+            header={<this.HeaderCell content="Event Host" />}>
+            <Column
+              flexGrow={1}
+              header={<this.HeaderCell content="Email" />}
+              cell={<this.HostInfoCell data={events} col="host" info="email" />}
+              width={220}
+            />
+            <Column
+              flexGrow={1}
+              header={<this.HeaderCell content="Name" />}
+              cell={<this.HostInfoCell data={events} col="host" info="name" />}
+              width={150}
+            />
+            <Column
+              flexGrow={1}
+              header={<this.SortControllerCell content="Phone" attribute="contactPhone" />}
+              cell={<this.TextCell data={events} col="contactPhone" />}
+              width={100}
+            />
+          </ColumnGroup>
+          <ColumnGroup
+            header={<this.HeaderCell content="Detailed Info" />}>
+           <Column
+              header={<this.SortControllerCell content="Duration" attribute="duration" />}
+              cell={<this.DurationCell data={events} col="duration" />}
+              flexGrow={1}
+              width={110}
+            />
+            <Column
+              flexGrow={1}
+              header={<this.SortControllerCell content="Capacity" attribute="capacity" />}
+              cell={<this.TextCell data={events} col="capacity" />}
+              width={100}
+              align='center'
+            />
+            <Column
+              flexGrow={1}
+              header={<this.HeaderCell content="RSVPs" />}
+              cell={<this.TextCell data={events} col="attendeesCount" />}
+              width={100}
+              align='center'
+            />
+          </ColumnGroup>
+          <ColumnGroup
+            header={<this.HeaderCell content="Event Location" />}>
+            <Column
+              header={<this.SortControllerCell content="Venue" attribute="venueName" />}
+              cell={<this.TextCell data={events} col="venueName" />}
+              flexGrow={1}
+              width={150}
+            />
+            <Column
+              header={<this.SortControllerCell content="Address" attribute="venueAddr1" />}
+              cell={<this.TextCell data={events} col="venueAddr1" />}
+              flexGrow={1}
+              width={150}
+            />
+            <Column
+              header={<this.SortControllerCell content="City" attribute="venueCity" />}
+              cell={<this.TextCell data={events} col="venueCity" />}
+              flexGrow={1}
+              width={150}
+            />
+            <Column
+              header={<this.SortControllerCell content="State" attribute="venueState" />}
+              cell={<this.TextCell data={events} col="venueState" />}
+              flexGrow={1}
+              width={80}
+              align='center'
+            />
+            <Column
+              header={<this.SortControllerCell content="Zip Code" attribute="venueZip" />}
+              cell={<this.TextCell data={events} col="venueZip" />}
+              flexGrow={1}
+              width={120}
+              align='center'
+            />
+            <Column
+              header={<this.SortControllerCell content="Latitude" attribute="latitude" />}
+              cell={<this.TextCell data={events} col="latitude" />}
+              flexGrow={1}
+              width={150}
+              align='center'
+            />
+            <Column
+              header={<this.SortControllerCell content="Longitude" attribute="longitude" />}
+              cell={<this.TextCell data={events} col="longitude" />}
+              flexGrow={1}
+              width={150}
+              align='center'
+            />
+          </ColumnGroup>
+        </Table>
+      </div>
     </div>
     )
   }
