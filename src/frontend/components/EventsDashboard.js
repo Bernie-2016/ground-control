@@ -9,6 +9,10 @@ import {BernieTheme} from './styles/bernie-theme'
 import {BernieText, BernieColors} from './styles/bernie-css'
 import stripScripts from '../helpers/stripScripts'
 import SideBarLayout from './SideBarLayout'
+import humps from 'humps'
+import Papa from 'papaparse'
+import downloadCSV from '../helpers/downloadCSV'
+import flattenJSON from '../helpers/flattenJSON'
 
 class EventsDashboard extends React.Component {
   constructor(props) {
@@ -81,6 +85,15 @@ class EventsDashboard extends React.Component {
               />
               <FlatButton label="Edit"/>
               <FlatButton label="Delete"/>
+              <FlatButton
+                label="Download RSVPs"
+                disabled={(event.attendees.length === 0)}
+                onTouchTap={() => {
+                  const attendees = event.attendees.map((attendee) => flattenJSON(attendee, {ignoreProps: ['__dataID__']}))
+                  const data = Papa.unparse(humps.decamelizeKeys(attendees))
+                  downloadCSV(data, `${event.eventIdObfuscated}.rsvps.csv`)
+                }}
+              />
               <FlatButton
                 label="Send Turnout Email"
                 onTouchTap={() => this.props.history.push('/events/' + event.eventIdObfuscated + '/request-email')}
