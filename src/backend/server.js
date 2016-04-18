@@ -29,6 +29,7 @@ import handlebars from 'handlebars'
 import throng from 'throng'
 import compression from 'compression'
 import rp from 'request-promise'
+import moment from 'moment'
 
 const WORKERS = process.env.WEB_CONCURRENCY || 1
 
@@ -36,6 +37,87 @@ throng(startApp, {
   workers: WORKERS,
   lifetime: Infinity
 })
+
+const shiftSchemaMap = {
+  'canvass-3-shifts': [
+    {
+      id: 1,
+      start: '9:00 am',
+      end: '12:00 pm'
+    },
+    {
+      id: 2,
+      start: '12:00 pm',
+      end: '3:00 pm'
+    },
+    {
+      id: 3,
+      start: '3:00 pm',
+      end: '6:00 pm'
+    }
+  ],
+  'canvass-4-shifts': [
+    {
+      id: 1,
+      start: '9:00 am',
+      end: '12:00 pm'
+    },
+    {
+      id: 2,
+      start: '12:00 pm',
+      end: '3:00 pm'
+    },
+    {
+      id: 3,
+      start: '3:00 pm',
+      end: '6:00 pm'
+    },
+    {
+      id: 4,
+      start: '6:00 pm',
+      end: '9:00 pm'
+    }
+  ],
+  'get-out-the-vote': [
+    {
+      id: 1,
+      start: '9:00 am',
+      end: '12:00 pm'
+    },
+    {
+      id: 2,
+      start: '12:00 pm',
+      end: '3:00 pm'
+    },
+    {
+      id: 3,
+      start: '3:00 pm',
+      end: '6:00 pm'
+    },
+    {
+      id: 4,
+      start: '6:00 pm',
+      end: '9:00 pm'
+    }
+  ],
+  'primary-day': [
+    {
+      id: 1,
+      start: '8:00 am',
+      end: '12:00 pm'
+    },
+    {
+      id: 2,
+      start: '12:00 pm',
+      end: '4:00 pm'
+    },
+    {
+      id: 3,
+      start: '4:00 pm',
+      end: '8:00 pm'
+    }
+  ]
+}
 
 function startApp() {
   log.info('Writing schema...')
@@ -100,7 +182,7 @@ function startApp() {
 
   let isAdmin = async (userId) => {
     const user = await knex('users').where('id', userId).first()
-    if (req.user)
+    if (user)
       return user.is_admin
     return false
   }
@@ -395,19 +477,6 @@ function startApp() {
     })
   )
 
-  app.get('/events/create', wrap(async (req, res) => {
-    let userIsAdmin = false
-    if (req.user && req.user.id) {
-      userIsAdmin = await isStaff(req.user.id)
-    }
-
-    res.send(createEventPage({ is_public: !userIsAdmin, events_root_url: publicEventsRootUrl, gcUser: req.user }));
-  }))
-
-  app.get('/admin/events/create', isAuthenticated, wrap(async (req, res) => {
-    res.redirect('/events/create')
-  }))
-
   app.get('/events/data/upload', wrap(async (req, res) => {
     res.redirect('https://script.google.com/macros/s/AKfycbwVZHnRZ5CJkzFID91QYcsLNFLkPgstd7XjS9o1QSEAh3tC2vY/exec')
   }))
@@ -450,7 +519,7 @@ function startApp() {
   app.post('/events/add-rsvp', async (req, res) => {
     res.header("Access-Control-Allow-Origin", "*")
     res.header("Access-Control-Allow-Headers", "*")
-    res.header('Access-Control-Allow-Methods', '*')
+    res.header('Access-Control-Allow-Methods', "*")
     
   	const makeRequest = async (body) => {
   		log.debug(body)
@@ -471,13 +540,18 @@ function startApp() {
       eventIds.forEach(async (eventId) => {
         if (!eventId)
           return
-        const shift = await knex('bsd_event_shifts')
-          .join('bsd_events', 'bsd_event_shifts.event_id', 'bsd_events.event_id')
-          .where(`bsd_events.${idType}`, eventId)
-          .orderBy('bsd_event_shifts.start_dt', 'asc')
-          .first()
-        if (shift)
-          req.body.shift_ids = shift.event_shift_id
+        else if (req.body.shift_ids === undefined){
+          const shift = await knex('bsd_event_shifts')
+            .join('bsd_events', 'bsd_event_shifts.event_id', 'bsd_events.event_id')
+            .where(`bsd_events.${idType}`, eventId)
+            .orderBy('bsd_event_shifts.start_dt', 'asc')
+            .first()
+          if (shift)
+            req.body.shift_ids = shift.event_shift_id
+        }
+        else {
+          req.body.guests = req.body.shift_ids.split(',').map(() => 0).join(',')
+        }
         req.body[idType] = eventId
         makeRequest(req.body)
       })
@@ -493,25 +567,95 @@ function startApp() {
     	makeRequest(req.body)
   })
 
+  app.get('/events/shift-schema.json', wrap(async (req, res) => {
+    res.json(shiftSchemaMap)
+  }))
+
+  app.get('/events/:id/get-rsvps.json', requireAdmin, wrap(async (req, res) => {
+    const attendees = await knex('bsd_event_attendees')
+      .join('bsd_events', 'bsd_event_attendees.event_id', 'bsd_events.event_id')
+      .leftJoin('bsd_people', 'bsd_event_attendees.attendee_cons_id', 'bsd_people.cons_id')
+      .leftJoin('bsd_phones', 'bsd_event_attendees.attendee_cons_id', 'bsd_phones.cons_id')
+      .leftJoin('bsd_emails', 'bsd_event_attendees.attendee_cons_id', 'bsd_emails.cons_id')
+      .leftJoin('bsd_addresses', 'bsd_event_attendees.attendee_cons_id', 'bsd_addresses.cons_id')
+      .where('bsd_events.event_id_obfuscated', req.params.id)
+      .where('bsd_phones.is_primary', true)
+      .where('bsd_emails.is_primary', true)
+      .where('bsd_addresses.is_primary', true)
+      .select('bsd_people.cons_id', 'bsd_people.firstname', 'bsd_people.lastname')
+      .select('bsd_phones.phone')
+      .select('bsd_emails.email')
+      .select('bsd_addresses.addr1', 'bsd_addresses.addr2', 'bsd_addresses.city', 'bsd_addresses.state_cd', 'bsd_addresses.zip', 'bsd_addresses.zip_4', 'bsd_addresses.country')
+
+    res.json(attendees)
+  }))
+
+  app.get('/admin/events/create', isAuthenticated, wrap(async (req, res) => {
+    res.redirect('/events/create')
+  }))
+
+  app.get('/events/create', wrap(async (req, res) => {
+    let userIsAdmin = false
+    if (req.user && req.user.id) {
+      userIsAdmin = await isStaff(req.user.id)
+    }
+
+    res.send(createEventPage({ is_public: !userIsAdmin, events_root_url: publicEventsRootUrl, gcUser: req.user }));
+  }))
+
   app.post('/events/create', wrap(async (req, res) => {
 
     let form = req.body
     let user = req.user ? req.user.email : 'Anonymous'
-    log.info(`Event Create Form Submission to ${src} by ${user}`, JSON.stringify(form));
+    const eventTypeIdString = form['event_type_id']
+
+    log.info(`Event Create Form Submission to ${src} by ${user}`, JSON.stringify(form))
 
     const eventIdMap = {
       'volunteer-meeting': { id: 24, staffOnly: false },
       'ballot-access': { id: 30, staffOnly: false },
       'phonebank': { id: 31, staffOnly: false, requirePhone: true },
       'canvass': { id: 32, staffOnly: false, requirePhone: true },
+      'canvass-3-shifts': { id: 32, staffOnly: true, requirePhone: true },
+      'canvass-4-shifts': { id: 32, staffOnly: true, requirePhone: true },
       'barnstorm': { id: 41, staffOnly: false },
       'carpool-to-nevada': { id: 39, staffOnly: false, requirePhone: true },
       'carpool': { id: 39, staffOnly: false, requirePhone: true },
+      'debate-watch': { id: 36, staffOnly: false },
       'official-barnstorm': { id: 41, staffOnly: true },
-      'get-out-the-vote': { id: 45, staffOnly: false, requirePhone: true },
+      'organizing-meeting': { id: 34, staffOnly: true },
+      'get-out-the-vote-training': { id: 34, staffOnly: true },
+      'get-out-the-vote': { id: 45, staffOnly: true, requirePhone: true },
+      'primary-day': { id: 45, staffOnly: true, requirePhone: true },
       'vol2vol': { id: 47, staffOnly: true },
       'rally': { id: 14, staffOnly: true },
       'voter-registration': { id: 22, staffOnly: false, requirePhone: true }
+    }
+
+    function getDayWithDefaultShifts(shiftSchemaMap, eventType, shiftIDs, capacity, day) {
+      const convertTime = (time) => moment(time, 'hh:mm a').format('HH:mm:ss')
+      function filterShiftsById() {
+        // const shiftIdSet = new Set(shiftIDs)
+        // return shiftSchemaMap[eventType].filter((shift) => shiftIdSet.has(shift.id))
+        return shiftSchemaMap[eventType] // don't support choosing custom shifts for now
+      }
+      function convertToBSDShifts(shifts, capacity) {
+        return shifts.map((shift) => {
+          return {
+            'start_time': convertTime(shift.start),
+            'end_time': convertTime(shift.end),
+            capacity
+          }
+        })
+      }
+      
+      const shifts = filterShiftsById()
+      const bsdShifts = convertToBSDShifts(shifts, capacity)
+
+      return {
+          start_datetime_system: `${day} ${bsdShifts[0].start_time}`,
+          shifts: bsdShifts
+        }
     }
 
     if (form['event_type_id'] === 'canvass'){
@@ -564,12 +708,14 @@ function startApp() {
       form['attendee_require_phone'] = 1;
     }
 
-    form['event_dates'] = JSON.parse(form[ 'event_dates' ])
-    let dateCount = form['event_dates'].length
+    let eventDates = JSON.parse(form[ 'event_dates' ])
+    eventDates = eventDates.map((eventDate) => eventDate.date)
+    const eventDatesSet = new Set(eventDates)
+    eventDates = [...eventDatesSet]
 
-    if (dateCount > batchEventMax) {
+    if (eventDates.length > batchEventMax) {
       res.status(400).send({errors: {
-        'Number of Events' : [`You can only create up to ${batchEventMax} events at a time. ${form['event_dates'].length} events were received.`]
+        'Number of Events' : [`You can only create up to ${batchEventMax} events at a time. ${eventDates.length} events were received.`]
       }})
       return
     }
@@ -613,27 +759,33 @@ function startApp() {
         })
       })
     }
-    else
+    else if (form['start_time'] !== undefined) {
+      form['days'] = [];
+      form['days'].push({});
       startHour = (form['start_time']['a'] == 'pm') ? Number(form['start_time']['h']) + 12 : form['start_time']['h']
+    }
 
     let createdEventIds = []
-
-    for (let index = 0; index < dateCount; index++) {
+    for (let index = 0; index < eventDates.length; index++) {
       let result = null
-      if (form.hasOwnProperty('days')){
-        if (form['use_shifts'])
-          form.days[0].start_datetime_system = `${form['event_dates'][index]['date']} ${startHour}:${form['start_time']['i'][0]}:00`
-        else
-          form.days[0].start_datetime_system = `${form['event_dates'][index]['date']} ${startHour}:${form['start_time']['i']}:00`
+
+      // Enforce standard event shifts
+      if (eventTypeIdString in shiftSchemaMap){
+        const dayWithDefaultShifts = getDayWithDefaultShifts(shiftSchemaMap, eventTypeIdString, form.shift_ids, form.capacity, eventDates[index])        
+        form['use_shifts'] = '1'
+        form.days = []
+        form.days.push(dayWithDefaultShifts)
       }
-      log.info(form)
+      else if (form.hasOwnProperty('days') && form['use_shifts']){
+        form.days[0].start_datetime_system = `${eventDates[index]} ${startHour}:${form['start_time']['i'][0]}:00`
+      }
+      else {
+        form.days[0].start_datetime_system = `${eventDates[index]} ${startHour}:${form['start_time']['i']}:00`;
+        form.days[0].duration = form['duration_num'] * form['duration_unit'];
+      }
+
       try {
-        result = await BSDClient.createEvent({
-          ...form,
-          'duration' : form['duration_num'] * form['duration_unit'],
-          'capacity' : form['capacity'],
-          'start_datetime_system' : `${form['event_dates'][index]['date']} ${startHour}:${form['start_time']['i']}:00`
-        })
+        result = await BSDClient.createEvent(form)
 
         createdEventIds.push(result.event_id_obfuscated)
       } catch(ex) {

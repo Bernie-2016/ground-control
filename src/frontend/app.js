@@ -1,51 +1,54 @@
-import 'babel/polyfill';
-import jQuery from 'jquery';
-import React from 'react';
-import ReactDOM from 'react-dom';
-import Relay from 'react-relay';
+import 'babel/polyfill'
+import jQuery from 'jquery'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import Relay from 'react-relay'
 import EventCreate from './components/EventCreate.js'
 import DummyEventCreate from './components/DummyEventCreate.js'
-import {Redirect, IndexRoute, IndexRedirect, Route, Router} from 'react-router';
-import ReactRouterRelay from 'react-router-relay';
-import injectTapEventPlugin from 'react-tap-event-plugin';
-import AdminDashboard from './components/AdminDashboard';
+import {Redirect, IndexRoute, IndexRedirect, Route, Router} from 'react-router'
+import ReactRouterRelay from 'react-router-relay'
+import injectTapEventPlugin from 'react-tap-event-plugin'
+import AdminDashboard from './components/AdminDashboard'
 import AdminEventEmailCreationForm from './components/AdminEventEmailCreationForm'
-import AdminEventsSection from './components/AdminEventsSection';
-import AdminEventUploadRsvps from './components/AdminEventUploadRsvps';
-import ConstituentLookup from './components/ConstituentLookup';
-import AdminCallAssignmentsSection from './components/AdminCallAssignmentsSection';
-import AdminCallAssignmentCreationForm from './components/AdminCallAssignmentCreationForm';
-import FastFwdForm from './components/FastFwdForm';
-import EventsDashboard from './components/EventsDashboard';
-import EventView from './components/EventView';
-import EventDataUpload from './components/EventDataUpload';
-import GCTextField from './components/forms/GCTextField';
-import GCPhoneField from './components/forms/GCPhoneField';
-import GCDateField from './components/forms/GCDateField';
-import GCDateTimeField from './components/forms/GCDateTimeField';
-import GCTimeField from './components/forms/GCTimeField';
-import GCPasswordField from './components/forms/GCPasswordField';
-import GCRadioButtonsField from './components/forms/GCRadioButtonsField';
-import GCSelectField from './components/forms/GCSelectField';
-import GCCheckboxesField from './components/forms/GCCheckboxesField';
-import GCBooleanField from './components/forms/GCBooleanField';
-import GCToggleField from './components/forms/GCToggleField';
-import CallAssignmentsDashboard from './components/CallAssignmentsDashboard';
-import AdminCallAssignment from './components/AdminCallAssignment';
-import CallAssignment from './components/CallAssignment';
-import CallAssignmentsSection from './components/CallAssignmentsSection';
-import Dashboard from './components/Dashboard';
-import Signup from './components/Signup';
+import AdminEventsSection from './components/AdminEventsSection'
+import AdminEventUploadRsvps from './components/AdminEventUploadRsvps'
+import ConstituentLookup from './components/ConstituentLookup'
+import AdminCallAssignmentsSection from './components/AdminCallAssignmentsSection'
+import AdminCallAssignmentCreationForm from './components/AdminCallAssignmentCreationForm'
+import FastFwdForm from './components/FastFwdForm'
+import EventsDashboard from './components/EventsDashboard'
+import EventView from './components/EventView'
+import EventDataUpload from './components/EventDataUpload'
+import GCTextField from './components/forms/GCTextField'
+import GCRichTextField from './components/forms/GCRichTextField'
+import GCPhoneField from './components/forms/GCPhoneField'
+import GCDateField from './components/forms/GCDateField'
+import GCDateTimeField from './components/forms/GCDateTimeField'
+import GCTimeField from './components/forms/GCTimeField'
+import GCPasswordField from './components/forms/GCPasswordField'
+import GCRadioButtonsField from './components/forms/GCRadioButtonsField'
+import GCSelectField from './components/forms/GCSelectField'
+import GCCheckboxesField from './components/forms/GCCheckboxesField'
+import GCBooleanField from './components/forms/GCBooleanField'
+import GCToggleField from './components/forms/GCToggleField'
+import CallAssignmentsDashboard from './components/CallAssignmentsDashboard'
+import AdminCallAssignment from './components/AdminCallAssignment'
+import CallAssignment from './components/CallAssignment'
+import CallAssignmentsSection from './components/CallAssignmentsSection'
+import Dashboard from './components/Dashboard'
+import Signup from './components/Signup'
 import NotFound from './components/NotFound'
 import Unauthorized from './components/Unauthorized'
-import Form from 'react-formal';
-import {createHistory} from 'history';
+import Form from 'react-formal'
+import {createHistory} from 'history'
 import GCNetworkLayer from './relay-extensions/GCNetworkLayer'
 import log from './log'
 import Loading from './components/Loading'
+import UserAccountDashboard from './components/UserAccountDashboard'
+import UserAccountChangePasswordForm from './components/UserAccountChangePasswordForm'
 
-window.jQuery = jQuery;
-window.log = log;
+window.jQuery = jQuery
+window.log = log
 
 window.onerror = (msg, file, line, col, error) => {
   if (!error) {
@@ -60,15 +63,16 @@ window.onerror = (msg, file, line, col, error) => {
       alert('Whoops! Something went wrong. We\'re looking into it, but in the meantime please refresh your browser.')
       document.location.reload(true)
     }, 2000)
-};
+}
 
-injectTapEventPlugin();
+injectTapEventPlugin()
 Relay.injectNetworkLayer(new GCNetworkLayer('/graphql'), {
-    fetchTimeout: 30000,   // Timeout after 30s.
-  });
+  fetchTimeout: 30000,   // Timeout after 30s.
+})
 
 Form.addInputTypes({
   string: GCTextField,
+  richtext: GCRichTextField,
   number: GCTextField,
   email: GCTextField,
   boolean: GCBooleanField,
@@ -80,29 +84,29 @@ Form.addInputTypes({
   time: GCTimeField,
   datetime: GCDateTimeField,
   phone: GCPhoneField
-});
+})
 
 const ListContainerQueries = {
   listContainer: () => Relay.QL`query { listContainer }`
-};
+}
 
 const CallAssignmentQueries = {
   callAssignment: () => Relay.QL`query { callAssignment(id: $id) }`
-};
+}
 
 const CurrentUserQueries = {
   currentUser: () => Relay.QL`query { currentUser }`
-};
+}
 
 const EventQueries = {
   event: () => Relay.QL`query { event(id: $id) }`
-};
+}
 
 const FastFwdRequest = {
   fastFwdRequest: () => Relay.QL`query{ fastFwdRequest(id: $id) }`
-};
+}
 
-let history = createHistory();
+let history = createHistory()
 
 ReactDOM.render(
   <Router
@@ -169,7 +173,7 @@ ReactDOM.render(
       path='/'
       component={Dashboard}
       queries={CurrentUserQueries}
-     >
+    >
       <IndexRedirect to='/call' />
       <Route
         path='events/create/v2'
@@ -247,18 +251,27 @@ ReactDOM.render(
             renderLoading={() => <Loading />}
         />
       </Route>
+      <Route
+        path='account'
+        component={UserAccountDashboard}
+        queries={CurrentUserQueries}
+      >
+        <IndexRoute
+          component={UserAccountChangePasswordForm}
+        />
+      </Route>
     </Route>
     <Route
       path='/event/:id/request_email'
       component={FastFwdForm}
-        queries={{
+      queries={{
           ...EventQueries,
           ...CurrentUserQueries
         }}
-        renderLoading={() => <Loading />}
+      renderLoading={() => <Loading />}
     />
-    <Route path='/unauthorized' component={Unauthorized} />
-    <Route path="*" component={NotFound} />
+    <Route path='/unauthorized' component={Unauthorized}/>
+    <Route path="*" component={NotFound}/>
   </Router>,
   document.getElementById('root')
-);
+)
