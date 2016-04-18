@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import Relay from 'react-relay'
+import linkedState from 'react-link';
 import EventPreview from './EventPreview'
 import EventEdit from './EventEdit'
 import SendEventMail from './SendEventMail'
@@ -151,7 +152,23 @@ class AdminEventsSection extends React.Component {
       activeEvent: null,
       previewTabIndex: 0,
       userMessage: '',
-      deletionConfirmationMessage: null,
+      /**
+       * @todo find out a better way to expand material-ui TextField by default
+       */
+      blankMessage: `
+      
+      
+      
+      
+      
+      `,
+      deletionConfirmationMessage:`
+      
+      
+      
+      
+      
+      `,
       deletionReasonIndex: null,
       loading: false,
       undoAction: function(){console.log('undo')}
@@ -699,7 +716,7 @@ ${signature}`
     this._handleDeleteModalRequestClose = () => {
       let updatedStateProps = {
           showDeleteEventDialog: false,
-          deletionConfirmationMessage: null,
+          deletionConfirmationMessage: this.state.blankMessage,
           deletionReasonIndex: null
         };
       if (this.state.activeEventIndex) {
@@ -719,7 +736,7 @@ ${signature}`
       <FlatButton
         label={(this.state.deletionConfirmationMessage) ? 'Delete & Send Message' : 'Delete'}
         primary={true}
-        disabled={(this.state.deletionConfirmationMessage === null || this.state.deletionConfirmationMessage === deleteReasons[deleteReasons.length-1]['message'] || this.state.deletionConfirmationMessage === '')}
+        disabled={(this.state.deletionConfirmationMessage === this.state.blankMessage || this.state.deletionConfirmationMessage === deleteReasons[deleteReasons.length-1]['message'] || this.state.deletionConfirmationMessage === '')}
         onTouchTap={this._deleteEvent}
       />
     ];
@@ -727,11 +744,11 @@ ${signature}`
     let deleteMessage = (
       <div>
         <SelectField
-          value={this.state.deletionReasonIndex}
+          valueLink={linkedState(this, 'deletionReasonIndex')}
+          // value={this.state.deletionReasonIndex}
           floatingLabelText="Reason For Deletion"
           onChange={(event, index, value) => {
             this.setState({
-              deletionReasonIndex: value,
               deletionConfirmationMessage: deleteReasons[value].message
             })
           }}
@@ -742,14 +759,12 @@ ${signature}`
         </SelectField><br />
         <TextField
           floatingLabelText="Message for Event Host & Attendees"
-          value={(this.state.deletionConfirmationMessage === 0) ? '' : this.state.deletionConfirmationMessage}
-          disabled={(this.state.deletionConfirmationMessage === 0 || this.state.deletionConfirmationMessage === null)}
-          onChange={(event) => {
-            this.setState({deletionConfirmationMessage: event.target.value});
-          }}
+          valueLink={linkedState(this, 'deletionConfirmationMessage')}
+          disabled={(this.state.deletionConfirmationMessage === 0 || this.state.deletionConfirmationMessage === this.state.blankMessage)}
           multiLine={true}
           rowsMax={6}
           fullWidth={true}
+          underlineShow={false}
           inputStyle={{backgroundColor: 'rgb(250,250,250)'}}
           ref="deleteConfirmationInput"
         />
@@ -781,7 +796,7 @@ ${signature}`
         title='Create an Event'
         open={this.state.showCreateEventDialog}
         onRequestClose={this._handleCreateModalRequestClose}
-        bodyStyle={{paddingBottom: '0'}}
+        bodyStyle={{paddingBottom: '0', height: '100%'}}
       >
         <iframe
           ref="creationForm"
