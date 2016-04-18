@@ -1,6 +1,6 @@
-import requestPromise from 'request-promise';
-import url from 'url';
-import log from './log';
+import requestPromise from 'request-promise'
+import url from 'url'
+import log from './log'
 
 const error_message = { success: false };
 const success_message = { success: true };
@@ -19,9 +19,9 @@ export default class Slack {
 
   async createInvite(team, email) {
     try {
-      let token_keyword = team.toUpperCase() + '_SLACK_API_KEY'
-      let token = process.env[ token_keyword ];
-      let url = `https://${team}.slack.com/api/users.admin.invite?email=${email}&token=${token}&set_active=true`;
+      const token_keyword = team.toUpperCase() + '_SLACK_API_KEY'
+      const token = process.env[token_keyword]
+      const url = `https://${team}.slack.com/api/users.admin.invite?email=${email}&token=${token}&set_active=true`
 
       let options = {
         uri: url,
@@ -34,12 +34,13 @@ export default class Slack {
       if (response.ok) {
         return true
       } else {
+        log.error(JSON.stringify(response))
         log.error('Error in processing Slack invitation')
         return false
       }
     } catch (e) {
-      log.error(e);
-      return false;
+      log.error(e)
+      return false
     }
   }
 }
