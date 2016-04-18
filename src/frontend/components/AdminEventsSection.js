@@ -13,6 +13,7 @@ import qs from 'qs'
 import superagent from 'superagent'
 import Papa from 'papaparse'
 import downloadCSV from '../helpers/downloadCSV'
+import flattenJSON from '../helpers/flattenJSON'
 import {states} from './data/states'
 import {USTimeZones} from './data/USTimeZones'
 
@@ -53,44 +54,6 @@ const convertType = (value) => {
   else {
     return undefined
   }
-}
-
-JSON.flatten = (data, options) => {
-  let result = {}
-  let addProp = (prop, val) => {
-    if (options.ignoreProps && options.ignoreProps.length > 0){
-      const props = prop.split('.')
-      for (const item of props) {
-        if (options.ignoreProps.indexOf(item) > -1)
-          return
-      }
-    }
-    result[prop] = val
-  }
-  let recurse = (cur, prop) => {
-    if (Object(cur) !== cur) {
-      addProp(prop, cur)
-    }
-    else if (Array.isArray(cur)) {
-      let l=cur.length;
-      for(let i=0; i<l; i++)
-        recurse(cur[i], `${prop}[${i}]`)
-
-    if (l == 0)
-      addProp(prop, [])
-    }
-    else {
-      let isEmpty = true
-      for (let p in cur) {
-        isEmpty = false
-        recurse(cur[p], prop ? `${prop}.${p}` : p)
-      }
-      if (isEmpty && prop)
-        addProp(prop, {})
-    }
-  }
-  recurse(data, '')
-  return result
 }
 
 const keyboardActionStyles = {
@@ -1143,7 +1106,7 @@ ${signature}`
       .set('Accept', 'application/json')
       .end((err, res) => {
         const attendees = JSON.parse(res.text)
-        const data = attendees.map((attendee) => JSON.flatten(attendee, {ignoreProps: ['create_dt', 'modified_dt', 'geom', 'is_primary', 'cons_addr_id']}))
+        const data = attendees.map((attendee) => flattenJSON(attendee, {ignoreProps: ['create_dt', 'modified_dt', 'geom', 'is_primary', 'cons_addr_id']}))
         downloadCSV(Papa.unparse(data), `${event.eventIdObfuscated}.rsvps.csv`)
       })
   }
