@@ -29,7 +29,6 @@ import throng from 'throng'
 import compression from 'compression'
 import rp from 'request-promise'
 import Slack from './slack'
-import SlackError from './slack'
 import moment from 'moment'
 
 const WORKERS = process.env.WEB_CONCURRENCY || 1
