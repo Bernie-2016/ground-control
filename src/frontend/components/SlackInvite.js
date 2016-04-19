@@ -121,7 +121,12 @@ export default class SlackInvite extends React.Component {
       )
     else
       return (
-        <div style={{...BernieText.default, color: BernieColors.darkGreen}}>
+        <div style={{
+          ...BernieText.default,
+          color: BernieColors.darkGreen,
+          maxWidth: 600,
+          margin: '0 auto'
+        }}>
           Success! <strong>{this.state.email}</strong> has been invited to join <strong>{this.slackTeam.title}</strong>.
           <br /><br />
           <RaisedButton
