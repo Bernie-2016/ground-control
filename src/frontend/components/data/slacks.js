@@ -11,10 +11,10 @@ export const slacks = {
         title: 'Bernie Builders',
         description: 'General volunteer discussion'
     },
-    // callforbernie: {
-    //     title: 'Call For Bernie',
-    //     description: 'Phonebanking assistance and chatter'
-    // },
+    callforbernie: {
+        title: 'Call For Bernie',
+        description: 'Phonebanking assistance and chatter'
+    },
     // codersforsanders: {
     //     title: 'Coders for Sanders',
     //     description: 'Volunteer development projects discussion'
