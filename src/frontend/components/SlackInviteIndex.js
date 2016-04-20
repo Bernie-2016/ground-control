@@ -5,8 +5,6 @@ import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider'
 import {BernieTheme} from './styles/bernie-theme'
 import {slacks} from './data/slacks'
 
-console.log(slacks)
-
 export default class SlackInviteIndex extends React.Component {
   styles = {
     paragraph: {
@@ -41,29 +39,10 @@ export default class SlackInviteIndex extends React.Component {
             </div>
             <div style={BernieText.default}>
               <p style={this.styles.paragraph}>
-                In order for us to achieve our political revolution, there are many different chat rooms that volunteers use, primarily hosted on the Slack platform.
+                Join a slack team to get involved in the revolution!
               </p>
-
               <ul>
-                <li>
-                  <a href="/slack/afam4bernie">African Americans For Bernie</a> - community of African American activists and allies
-                </li>
-
-                <li>
-                  <a href="/slack/bernie2016states">Bernie 2016 States</a> - interfacing with volunteers and staff in each state
-                </li>
-
-                <li>
-                  <a href="/slack/berniebuilders">Bernie Builders</a> - general volunteer chatter
-                </li>
-
-                <li>
-                  <a href="/slack/callforbernie">Call For Bernie</a> - phonebanking assistance and chatter
-                </li>
-
-                <li>
-                  <a href="/slack/codersforsanders">Coders for Sanders</a> - site development and design chatter
-                </li>
+                {Object.keys(slacks).map((key) => <li><a href={`/slack/${key}`}>{slacks[key].title}</a> - {slacks[key].description}</li>)}
               </ul>
             </div>
           </div>
