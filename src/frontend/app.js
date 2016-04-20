@@ -41,6 +41,8 @@ import {createHistory} from 'history'
 import GCNetworkLayer from './relay-extensions/GCNetworkLayer'
 import log from './log'
 import Loading from './components/Loading'
+import SlackInviteIndex from './components/SlackInviteIndex';
+import SlackInvite from './components/SlackInvite';
 import UserAccountDashboard from './components/UserAccountDashboard'
 import UserAccountChangePasswordForm from './components/UserAccountChangePasswordForm'
 
@@ -221,6 +223,18 @@ ReactDOM.render(
         }}
       renderLoading={() => <Loading />}
     />
+    <Route
+      path='slack'
+    >
+      <IndexRoute
+        component={SlackInviteIndex}
+      />
+      <Route
+        path=':team'
+        component={SlackInvite}
+        renderLoading={() => <Loading />}
+      />
+    </Route>
     <Route path='/unauthorized' component={Unauthorized}/>
     <Route path="*" component={NotFound}/>
   </Router>,
