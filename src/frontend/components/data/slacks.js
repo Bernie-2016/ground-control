@@ -15,8 +15,8 @@ export const slacks = {
         title: 'Call For Bernie',
         description: 'Phonebanking assistance and chatter'
     },
-    // codersforsanders: {
-    //     title: 'Coders for Sanders',
-    //     description: 'Volunteer development projects discussion'
-    // }
+    codersforsanders: {
+        title: 'Coders for Sanders',
+        description: 'Volunteer development projects discussion'
+    }
 }
