@@ -10,10 +10,18 @@ import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider'
 import {slacks} from './data/slacks'
 
 export default class SlackInvite extends React.Component {
-  state = {
-    formState: 'signup',
-    errorMessage: null,
-    email: null
+
+  constructor(props) {
+    super(props)
+
+    if (slacks[this.props.params.team] === undefined)
+      this.props.history.push('/slack')
+
+    this.state = {
+      formState: 'signup',
+      errorMessage: null,
+      email: null
+    }
   }
 
   slackTeam = {
