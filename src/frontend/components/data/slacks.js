@@ -12,7 +12,7 @@ export const slacks = {
         description: 'General volunteer discussion'
     },
     callforbernie: {
-        title: 'Call For Bernie',
+        title: 'Call Team Bernie',
         description: 'Phonebanking assistance and chatter'
     },
     codersforsanders: {
