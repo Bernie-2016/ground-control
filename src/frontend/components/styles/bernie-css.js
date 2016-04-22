@@ -19,7 +19,6 @@ export const BernieText = {
   default: {
     color: BernieColors.darkGray,
     fontFamily: 'freight-sans-pro',
-    fontSize: '1.2em',
     fontWeight: 'normal',
     lineHeight: '1.5'
   },
