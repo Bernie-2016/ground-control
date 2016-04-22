@@ -5,6 +5,7 @@ import {Paper, Slider, Toggle, Styles} from 'material-ui'
 import GCForm from './forms/GCForm'
 import Form from 'react-formal'
 import EventPreview from './EventPreview'
+import {GoogleMapLoader, GoogleMap, Marker} from 'react-google-maps'
 import yup from 'yup'
 import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider'
 import {BernieTheme} from './styles/bernie-theme';
@@ -20,14 +21,12 @@ class EventView extends React.Component {
       width: '60%'
     },
 
-    formContainer: {
-      float: 'left',
-      width: 380,
-      paddingLeft: 15,
-      paddingRight: 15,
-      paddingTop: 15,
-      paddingBottom: 15,
-      marginTop: 15,
+    mapContainer: {
+      position: 'fixed',
+      right: '2rem',
+      width: '35%',
+      height: 300,
+      marginTop: '2rem',
       marginLeft: '2rem',
       border: 'solid 1px ' + BernieColors.lightGray
     },
@@ -40,6 +39,16 @@ class EventView extends React.Component {
   state = {
     testMode: false,
     recipientLimit: null
+  }
+
+  marker = {
+    position: {
+      lat: this.props.event.latitude,
+      lng: this.props.event.longitude
+    },
+    key: 'event',
+    title: this.props.event.name,
+    name: this.props.event.name
   }
 
   render() {
@@ -70,6 +79,32 @@ class EventView extends React.Component {
           <div style={this.styles.detailsContainer}>
             <p style={BernieText.secondaryTitle}>Event Details:</p>
             <EventPreview event={this.props.event} />
+          </div>
+
+          <div style={this.styles.mapContainer}>
+            <GoogleMapLoader
+              containerElement={
+                <div
+                  style={{
+                    height: '100%',
+                    width: '100%'
+                  }}
+                />
+              }
+              googleMapElement={
+                <GoogleMap
+                  ref='map'
+                  options={{
+                    scrollwheel: false
+                  }}
+                  defaultZoom={9}
+                  defaultCenter={this.marker.position}>
+                  <Marker
+                    {...this.marker}
+                  />
+                </GoogleMap>
+              }
+            />
           </div>
 
         </div>
