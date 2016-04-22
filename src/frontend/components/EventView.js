@@ -47,7 +47,7 @@ class EventView extends React.Component {
       lng: this.props.event.longitude
     },
     key: 'event',
-    title: this.props.event.name,
+    title: this.props.event.venueAddr1,
     name: this.props.event.name
   }
 
@@ -97,7 +97,7 @@ class EventView extends React.Component {
                   options={{
                     scrollwheel: false
                   }}
-                  defaultZoom={9}
+                  defaultZoom={14}
                   defaultCenter={this.marker.position}>
                   <Marker
                     {...this.marker}
