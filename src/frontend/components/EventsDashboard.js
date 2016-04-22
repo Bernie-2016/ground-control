@@ -1,6 +1,21 @@
 import React from 'react'
 import Relay from 'react-relay'
-import {Styles, Divider, FloatingActionButton, RaisedButton, FlatButton, Card, CardTitle, CardText, CardActions, FontIcon, List, ListItem, Checkbox} from 'material-ui'
+import {
+  Styles,
+  Divider,
+  FloatingActionButton,
+  RaisedButton,
+  FlatButton,
+  Card,
+  CardTitle,
+  CardText,
+  CardActions,
+  FontIcon,
+  List,
+  ListItem,
+  Checkbox
+} from 'material-ui'
+import Subheader from 'material-ui/lib/Subheader'
 import GCForm from './forms/GCForm'
 import Form from 'react-formal'
 import yup from 'yup'
@@ -123,29 +138,31 @@ class EventsDashboard extends React.Component {
   render() {
     const sideBar = (
       <div>
-          <List subheader="General">
-            <ListItem
-              primaryText="Hosting"
-              secondaryText="Events you are hosting"
-            />
-            <ListItem
-              primaryText="Attending"
-              secondaryText="Events you are attending"
-            />
-          </List>
-          <Divider />
-          <List subheader="View Settings">
-            <ListItem
-              leftCheckbox={<Checkbox />}
-              primaryText="Show All Events"
-              secondaryText="View all past and upcoming events"
-            />
-            <ListItem
-              leftCheckbox={<Checkbox />}
-              primaryText="Use Calendar View"
-              secondaryText="View as a calendar instead of list"
-            />
-          </List>
+        <List>
+          <Subheader>General</Subheader>
+          <ListItem
+            primaryText="Hosting"
+            secondaryText="Events you are hosting"
+          />
+          <ListItem
+            primaryText="Attending"
+            secondaryText="Events you are attending"
+          />
+        </List>
+        <Divider />
+        <List>
+          <Subheader>View Settings</Subheader>
+          <ListItem
+            leftCheckbox={<Checkbox />}
+            primaryText="Show All Events"
+            secondaryText="View all past and upcoming events"
+          />
+          <ListItem
+            leftCheckbox={<Checkbox />}
+            primaryText="Use Calendar View"
+            secondaryText="View as a calendar instead of list"
+          />
+        </List>
       </div>
     )
 
