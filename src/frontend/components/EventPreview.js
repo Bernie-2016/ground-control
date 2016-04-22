@@ -37,7 +37,7 @@ export default class EventPreview extends React.Component {
       isOfficial = <span style={officialStyle}>Official Event</span>
     }
     return (
-      <div>
+      <div style={BernieText.default}>
         <h1 style={BernieText.title}>{event.name}</h1>
         {isOfficial}  
 
