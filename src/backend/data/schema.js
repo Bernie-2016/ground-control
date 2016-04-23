@@ -1022,6 +1022,7 @@ const GraphQLEvent = new GraphQLObjectType({
             .join('bsd_emails', 'bsd_people.cons_id', 'bsd_emails.cons_id')
             .leftJoin('communications', 'bsd_people.cons_id', 'communications.person_id')
             .innerJoin('bsd_subscriptions', 'bsd_people.cons_id', 'bsd_subscriptions.cons_id')
+            .where('bsd_addresses.is_primary', true)
             .where('bsd_emails.is_primary', true)
             .where('bsd_subscriptions.isunsub', false)
             .whereNotIn('bsd_people.cons_id', foundConsIds)
