@@ -244,6 +244,8 @@ let {nodeInterface, nodeField} = nodeDefinitions(
       return GraphQLSurvey
     if (obj._type === 'list_container')
       return GraphQLListContainer
+    if (obj._type === 'event_file_types')
+      return GraphQLEventFileType
     if (obj._type === 'bsd_event_types')
       return GraphQLEventType
     if (obj._type === 'bsd_events')
@@ -305,6 +307,12 @@ const GraphQLListContainer = new GraphQLObjectType({
   name: 'ListContainer',
   fields: () => ({
     id: globalIdField('ListContainer'),
+    eventFileTypes: {
+      type: new GraphQLList(GraphQLEventFileType),
+      resolve: async(eventFileType, {rootValue}) => {
+        return knex('event_file_types')
+      }
+    },
     eventTypes: {
       type: new GraphQLList(GraphQLEventType),
       resolve: async(eventType, {rootValue}) => {
@@ -842,6 +850,21 @@ const GraphQLCall = new GraphQLObjectType({
     interviewee: {type: GraphQLPerson},
     callAssignment: {type: GraphQLCallAssignment}
   })
+})
+
+const GraphQLEventFileType = new GraphQLObjectType({
+  name: 'EventFileType',
+  description: 'An event file type',
+  fields: () => ({
+    id: globalIdField('EventFileType', (obj) => obj.id),
+    name: {type: GraphQLString},
+    description: {type: GraphQLString}
+  })
+})
+
+const { connectionType: GraphQLEventFileTypeConnection } = connectionDefinitions({
+  name: 'EventFileType',
+  nodeType: GraphQLEventFileType
 })
 
 const GraphQLEventType = new GraphQLObjectType({
