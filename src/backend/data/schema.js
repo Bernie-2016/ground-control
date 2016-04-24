@@ -219,6 +219,8 @@ let {nodeInterface, nodeField} = nodeDefinitions(
       return addType(knex('bsd_call_assignments').where('id', id))
     if (type === 'Survey')
       return addType(knex('gc_bsd_surveys').where('id', id))
+    if (type === 'EventFileType')
+      return addType(knex('event_file_types').where('id', id))
     if (type === 'EventType')
       return addType(knex('bsd_event_types').where('event_type_id', id))
     if (type === 'Event')
