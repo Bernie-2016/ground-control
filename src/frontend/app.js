@@ -239,6 +239,7 @@ ReactDOM.render(
           component={EventDataUpload}
           queries={{
             ...EventQueries,
+            ...ListContainerQueries,
             ...CurrentUserQueries
           }}
           renderLoading={() => <Loading />}

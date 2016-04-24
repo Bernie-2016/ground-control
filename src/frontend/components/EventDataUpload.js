@@ -310,6 +310,14 @@ export default Relay.createContainer(EventDataUpload, {
         email
       }
     `,
+    listContainer: () => Relay.QL`
+      fragment on ListContainer {
+        eventFileTypes {
+          id
+          name
+        }
+      }
+    `,
     event: () => Relay.QL`
       fragment on Event {
         ${SaveEventFile.getFragment('event')}
