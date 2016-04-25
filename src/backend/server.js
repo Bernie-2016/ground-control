@@ -471,11 +471,11 @@ function startApp() {
 
   app.get('/events/:eventId/upload/get-signed-request', isAuthenticated, wrap(async (req, res) => {
     log.info(req.query)
-    const {name, type} = req.query
+    const {name, type, typeSlug} = req.query
     const event = await knex('bsd_events')
       .where('event_id_obfuscated', req.params.eventId)
       .first()
-    const key = `event-files/${event.event_id_obfuscated}/${req.user.email}/${name}`
+    const key = `event-files/${event.event_id_obfuscated}/${typeSlug}/${req.user.email}/${name}`
     const matchingFiles = await knex('event_files')
       .where('s3_key', key)
 

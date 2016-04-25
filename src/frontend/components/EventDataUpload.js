@@ -126,11 +126,10 @@ class EventDataUpload extends React.Component {
     const {name, type} = file
     const eventId = this.props.event.eventIdObfuscated
 
-    superagent.get(`/events/${eventId}/upload/get-signed-request?${qs.stringify({name, type, eventId})}`)
+    superagent.get(`/events/${eventId}/upload/get-signed-request?${qs.stringify({name, type, eventId, typeSlug: this.state.fileType})}`)
       .end((err, res) => {
-        if (err){
+        if (err)
           this.setFilesProcessedState(file.name, {errors: [res.text]})
-        }
         else
           this.uploadFile(file, res.body)
       })
