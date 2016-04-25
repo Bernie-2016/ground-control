@@ -1466,6 +1466,7 @@ const GraphQLSaveEventFile = mutationWithClientMutationId({
   inputFields: {
     fileName: { type: new GraphQLNonNull(GraphQLString) },
     fileTypeSlug: { type: new GraphQLNonNull(GraphQLString) },
+    mimeType: { type: new GraphQLNonNull(GraphQLString) },
     url: { type: new GraphQLNonNull(GraphQLString) },
     notes: { type: GraphQLString },
     sourceEventId: { type: new GraphQLNonNull(GraphQLString) },
@@ -1473,12 +1474,23 @@ const GraphQLSaveEventFile = mutationWithClientMutationId({
   outputFields: {
     event: { type: GraphQLEvent }
   },
-  mutateAndGetPayload: async ({fileName, fileTypeSlug, url, notes, sourceEventId}, {rootValue}) => {
-    let userId = rootValue.user.id
-    log.debug(sourceEventId, userId, fileTypeSlug)
+  mutateAndGetPayload: async ({fileName, fileTypeSlug, mimeType, url, notes, sourceEventId}, {rootValue}) => {
+    const userId = rootValue.user.id
+    const fileType = await knex('event_file_types')
+      .where('slug', fileTypeSlug)
+      .first()
 
     const event = await rootValue.loaders.bsdEvents.load(sourceEventId)
-    log.debug(event)
+    const file = await knex.insertAndFetch('event_files', {
+      event_file_type_id: fileType.id,
+      event_id: Number(event.event_id),
+      uploader_id: userId,
+      mime_type: mimeType,
+      name: fileName,
+      notes,
+      s3_key: url
+    })
+
     return event
   }
 })
