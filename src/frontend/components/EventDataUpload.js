@@ -1,7 +1,7 @@
 import React from 'react'
 import Relay from 'react-relay'
 import {BernieColors, BernieText} from './styles/bernie-css'
-import {Paper, Styles, FlatButton, LinearProgress} from 'material-ui'
+import {Paper, Styles, FlatButton, LinearProgress, GridList, GridTile} from 'material-ui'
 import GCForm from './forms/GCForm'
 import Form from 'react-formal'
 import EventPreview from './EventPreview'
@@ -19,6 +19,8 @@ import SaveEventFile from '../mutations/SaveEventFile'
 const momentWithTimezone = (startDate, timeZone) => {
   return moment(startDate).tz(timeZone)
 }
+
+const FileDownloadLink = ({url, name, style}) => <a href={url} style={style} target='_blank'>{name}</a>
 
 class EventDataUpload extends React.Component {
 
@@ -43,6 +45,11 @@ class EventDataUpload extends React.Component {
       marginTop: '1rem',
       padding: 10,
       width: '50%'
+    },
+
+    filesContainer: {
+      width: '100%',
+      marginBottom: '1rem',
     },
 
     formContainer: {
@@ -187,7 +194,7 @@ class EventDataUpload extends React.Component {
     let count = 0
     const renderFileLink = (fileObj, fileName) => {
       if (fileObj.url)
-        return <a href={fileObj.url} target='_blank'>{fileName}</a>
+        return <FileDownloadLink url={fileObj.url} name={fileName} />
       else 
         return (
           <div>
@@ -247,8 +254,30 @@ class EventDataUpload extends React.Component {
     )
   }
 
+  renderFileList(files) {
+    return (
+      <GridList
+        cellHeight={200}
+        style={{
+          ...BernieText.menuItem,
+          lineHeight: '1.6em'
+        }}
+      >
+        {files.map(file => (
+          <GridTile
+            key={file.id}
+            title={<b><FileDownloadLink url={file.url} name={file.name} style={{color: 'white'}} /></b>}
+            subtitle={<span>Uploaded {moment.utc(file.modifiedDate).format("MMM Do, h:mm a")}</span>}
+          >
+            <img src={file.url} />
+          </GridTile>
+        ))}
+      </GridList>
+    )
+  }
+
   render() {
-    const event = this.props.event
+    const { event } = this.props
     let formattedDateTime = momentWithTimezone(event.startDate, event.localTimezone)
     formattedDateTime = formattedDateTime ? formattedDateTime.format('LLLL') : event.startDate
 
@@ -268,6 +297,12 @@ class EventDataUpload extends React.Component {
             <h1 style={BernieText.title}>{event.name}</h1>
             <h3 style={{...BernieText.secondaryTitle, fontSize: '1.2rem'}}>{formattedDateTime}</h3>
             <p dangerouslySetInnerHTML={stripScripts(event.description)}></p>
+
+            <br /><br />
+
+            <div style={this.styles.filesContainer}>
+              {this.renderFileList(event.files)}
+            </div>
           </div>
 
           <div style={this.styles.formContainer}>
@@ -374,6 +409,13 @@ export default Relay.createContainer(EventDataUpload, {
         venueName
         venueState
         venueZip
+        files {
+          id
+          name
+          mimeType
+          url
+          modifiedDate
+        }
       }
     `
   }
