@@ -857,6 +857,7 @@ const GraphQLEventFileType = new GraphQLObjectType({
   description: 'An event file type',
   fields: () => ({
     id: globalIdField('EventFileType', (obj) => obj.id),
+    slug: {type: GraphQLString},
     name: {type: GraphQLString},
     description: {type: GraphQLString}
   })
@@ -1464,6 +1465,7 @@ const GraphQLSaveEventFile = mutationWithClientMutationId({
   name: 'SaveEventFile',
   inputFields: {
     fileName: { type: new GraphQLNonNull(GraphQLString) },
+    fileType: { type: new GraphQLNonNull(GraphQLString) },
     url: { type: new GraphQLNonNull(GraphQLString) },
     notes: { type: GraphQLString },
     sourceEventId: { type: new GraphQLNonNull(GraphQLString) },
@@ -1471,11 +1473,9 @@ const GraphQLSaveEventFile = mutationWithClientMutationId({
   outputFields: {
     event: { type: GraphQLEvent }
   },
-  mutateAndGetPayload: async ({fileName, url, notes, sourceEventId}, {rootValue}) => {
-    log.debug('success!')
-
+  mutateAndGetPayload: async ({fileName, fileType, url, notes, sourceEventId}, {rootValue}) => {
     let userId = rootValue.user.id
-    log.debug(sourceEventId, userId)
+    log.debug(sourceEventId, userId, fileType)
 
     const event = await rootValue.loaders.bsdEvents.load(sourceEventId)
     log.debug(event)

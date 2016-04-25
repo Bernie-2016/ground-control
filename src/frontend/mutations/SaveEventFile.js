@@ -1,4 +1,4 @@
-import Relay from 'react-relay';
+import Relay from 'react-relay'
 
 export default class SaveEventFile extends Relay.Mutation {
   static fragments = {
@@ -40,6 +40,7 @@ export default class SaveEventFile extends Relay.Mutation {
     return {
       sourceEventId: this.props.event.eventIdObfuscated,
       fileName: this.props.fileName,
+      fileType: this.props.fileType,
       url: this.props.url
     }
   }

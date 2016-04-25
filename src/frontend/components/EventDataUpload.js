@@ -29,6 +29,12 @@ class EventDataUpload extends React.Component {
       fileType: null,
       filesProcessed: {}
     }
+
+    let fileTypeChoices = {}
+    this.props.listContainer.eventFileTypes.forEach((type) => {
+      fileTypeChoices[type.slug] = type.name
+    })
+    this.fileTypeChoices = fileTypeChoices
   }
 
   styles = {
@@ -131,6 +137,7 @@ class EventDataUpload extends React.Component {
           this.refs.saveEventFileHandler.send({
             event: this.props.event,
             fileName: file.name,
+            fileType: this.state.fileType,
             url: fileUrl
           })
         }
@@ -273,11 +280,7 @@ class EventDataUpload extends React.Component {
                   type='select'
                   label='What are you uploading?'
                   fullWidth={true}
-                  choices={{
-                    eventPhotos: 'Event Photos',
-                    signInSheets: 'Sign-In Sheets',
-                    phonebankEventForms: 'Phonebank Event Forms'
-                  }}
+                  choices={this.fileTypeChoices}
                   value={this.state.fileType}
                   onChange={(fileType) => {
                     this.setState({fileType})
@@ -313,7 +316,7 @@ export default Relay.createContainer(EventDataUpload, {
     listContainer: () => Relay.QL`
       fragment on ListContainer {
         eventFileTypes {
-          id
+          slug
           name
         }
       }
