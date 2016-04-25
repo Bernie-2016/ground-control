@@ -97,6 +97,15 @@ class EventDataUpload extends React.Component {
     }
   }
 
+  setFilesProcessedState(fileName, updatedFileState) {
+    let filesProcessed = this.state.filesProcessed
+    const currentFileState = filesProcessed[fileName] || {}
+    const futureFileState = { ...currentFileState, ...updatedFileState }
+
+    filesProcessed[fileName] = futureFileState
+    this.setState({filesProcessed})
+  }
+
   formSchema = yup.object({
     fileType: yup.string().required()
   })
@@ -104,13 +113,11 @@ class EventDataUpload extends React.Component {
   onDrop = (files) => {
     files.forEach((file) => {
       const processObj = {
+        success: false,
         errors: [],
         preview: file.preview
       }
-      let currentFiles = this.state.filesProcessed
-      currentFiles[file.name] = processObj
-      this.setState({filesProcessed: currentFiles})
-
+      this.setFilesProcessedState(file.name, processObj)
       this.getSignedRequest(file)
     })
   }
@@ -118,27 +125,25 @@ class EventDataUpload extends React.Component {
   getSignedRequest = (file) => {
     const {name, type} = file
     const eventId = this.props.event.eventIdObfuscated
+
     superagent.get(`/events/${eventId}/upload/get-signed-request?${qs.stringify({name, type, eventId})}`)
       .end((err, res) => {
-        if (err)
-          return processObj.errors.push(res.body)
-        this.uploadFile(file, res.body)
+        if (err){
+          this.setFilesProcessedState(file.name, {errors: [res.text]})
+        }
+        else
+          this.uploadFile(file, res.body)
       })
   }
 
   uploadFile(file, signedRequest) {
-    const {signedRequestEndpoint, fileUrl} = signedRequest
+    const {signedRequestEndpoint, key} = signedRequest
     superagent.put(signedRequestEndpoint)
       .set('x-amz-acl', 'public-read')
       .send(file)
       .end((err, res) => {
-        let filesProcessed = this.state.filesProcessed
-        let processObj = filesProcessed[file.name]
-
         if (err){
-          processObj.errors = []
-          console.log(res)
-          processObj.errors.push(res.text)
+          this.setFilesProcessedState(file.name, {errors: [res.text]})
         }
         else {
           this.refs.saveEventFileHandler.send({
@@ -146,13 +151,10 @@ class EventDataUpload extends React.Component {
             fileName: file.name,
             fileTypeSlug: this.state.fileType,
             mimeType: file.type,
-            url: fileUrl
+            key
           })
+          this.setFilesProcessedState(file.name, {success: true})
         }
-
-        processObj.url = fileUrl
-        filesProcessed[file.name] = processObj
-        this.setState(filesProcessed)
       })
   }
 
@@ -193,8 +195,8 @@ class EventDataUpload extends React.Component {
   renderFileProgress() {
     let count = 0
     const renderFileLink = (fileObj, fileName) => {
-      if (fileObj.url)
-        return <FileDownloadLink url={fileObj.url} name={fileName} />
+      if (fileObj.success || fileObj.errors)
+        return <span>{fileName}</span>
       else 
         return (
           <div>

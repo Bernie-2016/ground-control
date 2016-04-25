@@ -476,6 +476,16 @@ function startApp() {
       .where('event_id_obfuscated', req.params.eventId)
       .first()
     const key = `event-files/${event.event_id_obfuscated}/${req.user.email}/${name}`
+    const matchingFiles = await knex('event_files')
+      .where('s3_key', key)
+
+    log.debug(matchingFiles)
+    if (matchingFiles.length !== 0){
+      res.status(400).send('File already exists')
+      res.end()
+      return
+    }
+
     const s3Params = {
       Bucket: process.env.S3_BUCKET,
       Key: key,
@@ -492,7 +502,7 @@ function startApp() {
         log.info(data)
         const returnData = {
           signedRequestEndpoint: data,
-          fileUrl: `https://${process.env.S3_BUCKET}.s3.amazonaws.com/${encodeURIComponent(key)}`
+          key
         }
         res.json(returnData)
         res.end()

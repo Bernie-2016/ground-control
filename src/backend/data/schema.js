@@ -875,7 +875,7 @@ const GraphQLEventFile = new GraphQLObjectType({
     notes: { type: GraphQLString },
     url: {
       type: GraphQLString,
-      resolve: (file) => file.s3_key
+      resolve: (file) => `https://${process.env.S3_BUCKET}.s3.amazonaws.com/${encodeURIComponent(file.s3_key)}`
     },
     modifiedDate: {
       type: GraphQLDate,
@@ -1511,14 +1511,14 @@ const GraphQLSaveEventFile = mutationWithClientMutationId({
     fileName: { type: new GraphQLNonNull(GraphQLString) },
     fileTypeSlug: { type: new GraphQLNonNull(GraphQLString) },
     mimeType: { type: new GraphQLNonNull(GraphQLString) },
-    url: { type: new GraphQLNonNull(GraphQLString) },
+    key: { type: new GraphQLNonNull(GraphQLString) },
     notes: { type: GraphQLString },
     sourceEventId: { type: new GraphQLNonNull(GraphQLString) },
   },
   outputFields: {
     event: { type: GraphQLEvent }
   },
-  mutateAndGetPayload: async ({fileName, fileTypeSlug, mimeType, url, notes, sourceEventId}, {rootValue}) => {
+  mutateAndGetPayload: async ({fileName, fileTypeSlug, mimeType, key, notes, sourceEventId}, {rootValue}) => {
     const userId = rootValue.user.id
     const fileType = await knex('event_file_types')
       .where('slug', fileTypeSlug)
@@ -1532,7 +1532,7 @@ const GraphQLSaveEventFile = mutationWithClientMutationId({
       mime_type: mimeType,
       name: fileName,
       notes,
-      s3_key: url
+      s3_key: key
     })
 
     return event
