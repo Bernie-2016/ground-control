@@ -877,6 +877,10 @@ const GraphQLEventFile = new GraphQLObjectType({
       type: GraphQLString,
       resolve: (file) => file.s3_key
     },
+    modifiedDate: {
+      type: GraphQLDate,
+      resolve: (file) => interpretDateAsUTC(file.modified_dt)
+    }
   })
 })
 
