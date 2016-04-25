@@ -3,6 +3,7 @@ import log from '../../../log';
 import {hash} from '../../../bcrypt-promise';
 import Promise from 'bluebird'
 import loadZips from '../shared/load-zips'
+import generateEventFileTypes from '../shared/event-file-types'
 import importData from '../../import-data'
 import moment from 'moment'
 
@@ -65,6 +66,7 @@ exports.seed = async function(knex, Promise) {
     'bsd_event_types' : [],
     'bsd_subscriptions': [],
     'zip_codes' : [],
+    'event_file_types' : [],
     'sessions' : [],
   }
 
@@ -102,6 +104,9 @@ exports.seed = async function(knex, Promise) {
 
   log.info('Generating zips...')
   data.zip_codes = loadZips('./seeds/shared/zip-codes.csv')
+
+  log.info('Generating event file types...')
+  data.event_file_types = generateEventFileTypes()
 
   log.info('Generating groups...')
   data.bsd_groups = [
@@ -289,7 +294,7 @@ exports.seed = async function(knex, Promise) {
     }
   }
 
-  let insertOrder = ['users', 'zip_codes', 'bsd_groups', 'bsd_event_types', 'bsd_people', 'bsd_events', 'bsd_event_shifts', 'bsd_event_attendees', 'bsd_addresses', 'bsd_person_bsd_groups', 'bsd_emails', 'bsd_phones', 'bsd_subscriptions']
+  let insertOrder = ['users', 'zip_codes', 'event_file_types', 'bsd_groups', 'bsd_event_types', 'bsd_people', 'bsd_events', 'bsd_event_shifts', 'bsd_event_attendees', 'bsd_addresses', 'bsd_person_bsd_groups', 'bsd_emails', 'bsd_phones', 'bsd_subscriptions']
 
   for (let index = 0; index < insertOrder.length; index++) {
     let key = insertOrder[index]
