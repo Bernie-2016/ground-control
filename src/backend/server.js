@@ -367,6 +367,7 @@ function startApp() {
     return {
       queries: new QueryLoader(),
       users: dataLoaderCreator('users', 'id'),
+      eventFiles: dataLoaderCreator('event_files', 'id'),
       bsdPeople: dataLoaderCreator('bsd_people', 'cons_id'),
       bsdPhones: dataLoaderCreator('bsd_phones', 'cons_phone_id'),
       bsdEmails: dataLoaderCreator('bsd_emails', 'cons_email_id'),

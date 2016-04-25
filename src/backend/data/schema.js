@@ -219,6 +219,8 @@ let {nodeInterface, nodeField} = nodeDefinitions(
       return addType(knex('bsd_call_assignments').where('id', id))
     if (type === 'Survey')
       return addType(knex('gc_bsd_surveys').where('id', id))
+    if (type === 'EventFile')
+      return addType(knex('event_files').where('id', id))
     if (type === 'EventFileType')
       return addType(knex('event_file_types').where('id', id))
     if (type === 'EventType')
@@ -852,6 +854,32 @@ const GraphQLCall = new GraphQLObjectType({
   })
 })
 
+const GraphQLEventFile = new GraphQLObjectType({
+  name: 'EventFile',
+  description: 'An event file',
+  fields: () => ({
+    id: globalIdField('EventFile', (obj) => obj.id),
+    type: {
+      type: GraphQLEventFileType,
+      resolve: async (file, _, {rootValue}) => rootValue.loaders.eventFileTypes.load(file.event_file_type_id)
+    },
+    uploader: {
+      type: GraphQLUser,
+      resolve: async (file) => await knex('users').where('id', file.uploader_id).first()
+    },
+    mimeType: {
+      type: GraphQLString,
+      resolve: (file) => file.mime_type
+    },
+    name: { type: GraphQLString },
+    notes: { type: GraphQLString },
+    url: {
+      type: GraphQLString,
+      resolve: (file) => file.s3_key
+    },
+  })
+})
+
 const GraphQLEventFileType = new GraphQLObjectType({
   name: 'EventFileType',
   description: 'An event file type',
@@ -1012,26 +1040,38 @@ const GraphQLEvent = new GraphQLObjectType({
     },
     attendeesCount: {
       type: GraphQLInt,
-      resolve: async(event) => {
+      resolve: async (event) => {
         const count = await knex('bsd_event_attendees').where('event_id', event.event_id).count('event_attendee_id');
         return count[0].count
       }
     },
     attendees: {
       type: new GraphQLList(GraphQLPerson),
-      resolve: async(event, _, {rootValue}) => {
+      resolve: async (event, _, {rootValue}) => {
         const attendeeIds = await knex('bsd_event_attendees').select('attendee_cons_id', 'event_id').where('event_id', event.event_id)
          let attendees = []
          for (let i = 0; i < attendeeIds.length; i++) {
          let attendee = await rootValue.loaders.bsdPeople.load(attendeeIds[i].attendee_cons_id)
-         attendees.push(attendee);
+         attendees.push(attendee)
          }
          return attendees
       }
     },
+    files: {
+      type: new GraphQLList(GraphQLEventFile),
+      resolve: async (event, _, {rootValue}) => {
+        const fileIds = await knex('event_files').select('id').where('event_id', event.event_id)
+        let files = []
+        for (let i = 0; i < fileIds.length; i++) {
+          const file = await rootValue.loaders.eventFiles.load(fileIds[i].id)
+          files.push(file)
+        }
+        return files
+      }
+    },
     nearbyPeople: {
       type: new GraphQLList(GraphQLPerson),
-      resolve: async(event, _, {rootValue}) => {
+      resolve: async (event, _, {rootValue}) => {
         let maxRadius   = 50000;
         let radius      = 1000;
         let backoff     = 1000;
@@ -1064,7 +1104,7 @@ const GraphQLEvent = new GraphQLObjectType({
     },
     fastFwdRequest: {
       type: GraphQLFastFwdRequest,
-      resolve: async(event) => {
+      resolve: async (event) => {
         let req = await knex.table('fast_fwd_request')
           .where('event_id', event['event_id'])
         return humps.camelizeKeys(req[0])
