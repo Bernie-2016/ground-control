@@ -37,11 +37,12 @@ export default class SaveEventFile extends Relay.Mutation {
   }
 
   getVariables() {
+    const { fileName, fileTypeSlug, url } = this.props
     return {
       sourceEventId: this.props.event.eventIdObfuscated,
-      fileName: this.props.fileName,
-      fileType: this.props.fileType,
-      url: this.props.url
+      fileName,
+      fileTypeSlug,
+      url
     }
   }
 }

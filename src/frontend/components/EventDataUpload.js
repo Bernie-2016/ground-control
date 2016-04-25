@@ -137,7 +137,7 @@ class EventDataUpload extends React.Component {
           this.refs.saveEventFileHandler.send({
             event: this.props.event,
             fileName: file.name,
-            fileType: this.state.fileType,
+            fileTypeSlug: this.state.fileType,
             url: fileUrl
           })
         }
