@@ -608,20 +608,10 @@ function startApp() {
         }
     }
 
-    if (form['event_type_id'] === 'canvass'){
-      const result = await rp('https://sheetsu.com/apis/bd810a50')
-      const organizerArray = JSON.parse(result).result
-      const organizers = organizerArray.filter((organizer) => (organizer.State === form['venue_state_cd']))
-      if (organizers.length <= 0)
-        res.status(400).send({errors: {
-          'Event Type' : [`Canvasses are not yet supported in ${form['venue_state_cd']}. Please feel free to sign up host another event type!`]
-        }})
-    }
-
     // Flag event as needing approval
     let batchEventMax = 20
     let userIsStaff = false
-    let flagForApproval = eventIdMap[form['event_type_id']].staffOnly
+    let flagForApproval = eventIdMap[eventTypeIdString].staffOnly
 
     if (req.user){
       userIsStaff = await isStaff(req.user.id)
@@ -630,12 +620,29 @@ function startApp() {
         batchEventMax = 40
       }
     }
-    if (flagForApproval || eventIdMap[form['event_type_id']] === undefined){
+    if (flagForApproval || eventIdMap[eventTypeIdString] === undefined){
       // form['flag_approval'] = '1'
       res.status(400).send({errors: {
         'Permission Error' : [`You don't have permission to use that event type.`]
       }})
       return
+    }
+
+    if (eventIdMap[eventTypeIdString].id === 32){
+      try {
+        const result = await rp('https://sheetsu.com/apis/bd810a50')
+        const organizerArray = JSON.parse(result).result
+        const organizers = organizerArray.filter((organizer) => (organizer.State === form['venue_state_cd']))
+        if (organizers.length === 0 && (!userIsStaff || form['is_official'] != '1')){
+          res.status(400).send({errors: {
+            'Event Type' : [`Volunteer canvasses are not yet supported in ${form['venue_state_cd']}. Please contact help@berniesanders.com to request support for creating volunteer canvasses in your state.`]
+          }})
+          return
+        }
+      }
+      catch(ex) {
+        log.error(ex)
+      }
     }
 
     let src = 'unknown source'
@@ -654,10 +661,9 @@ function startApp() {
       src = 'unknown source'
 
     // Require phone number for RSVPs to phonebanks
-    if (eventIdMap[form['event_type_id']].requirePhone) {
-      form['attendee_require_phone'] = 1;
-    }
-
+    if (eventIdMap[form['event_type_id']].requirePhone)
+      form['attendee_require_phone'] = 1
+    
     let eventDates = JSON.parse(form[ 'event_dates' ])
     eventDates = eventDates.map((eventDate) => eventDate.date)
     const eventDatesSet = new Set(eventDates)
