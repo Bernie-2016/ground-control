@@ -5,11 +5,11 @@ import {Paper, Slider, Toggle, Styles} from 'material-ui'
 import GCForm from './forms/GCForm'
 import Form from 'react-formal'
 import EventPreview from './EventPreview'
+import EventMapPreview from './EventMapPreview'
 import EventInvalid from './EventInvalid'
-import {GoogleMapLoader, GoogleMap, Marker} from 'react-google-maps'
 import yup from 'yup'
 import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider'
-import {BernieTheme} from './styles/bernie-theme';
+import {BernieTheme} from './styles/bernie-theme'
 
 const publicEventsRootUrl = 'https://secure.berniesanders.com/page/event/detail/'
 
@@ -42,18 +42,6 @@ class EventView extends React.Component {
     recipientLimit: null
   }
 
-  generateMarker() {
-    return {
-      position: {
-        lat: this.props.event.latitude,
-        lng: this.props.event.longitude
-      },
-      key: 'event',
-      title: this.props.event.venueAddr1,
-      name: this.props.event.name
-    }
-  }
-
   render() {
     if (!this.props.event)
       return <EventInvalid />
@@ -66,8 +54,6 @@ class EventView extends React.Component {
       event_type_name = 'Barnstorm event'
     }
 
-    const marker = this.generateMarker()
-
     return (
       <MuiThemeProvider muiTheme={Styles.getMuiTheme(BernieTheme)}>
         <div style={this.styles.pageContainer}>
@@ -78,29 +64,7 @@ class EventView extends React.Component {
           </div>
 
           <div style={this.styles.mapContainer}>
-            <GoogleMapLoader
-              containerElement={
-                <div
-                  style={{
-                    height: '100%',
-                    width: '100%'
-                  }}
-                />
-              }
-              googleMapElement={
-                <GoogleMap
-                  ref='map'
-                  options={{
-                    scrollwheel: false
-                  }}
-                  defaultZoom={14}
-                  defaultCenter={marker.position}>
-                  <Marker
-                    {...marker}
-                  />
-                </GoogleMap>
-              }
-            />
+            <EventMapPreview event={this.props.event} />
           </div>
 
         </div>
