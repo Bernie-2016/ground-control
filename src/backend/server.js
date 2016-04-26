@@ -470,7 +470,6 @@ function startApp() {
   }))
 
   app.get('/events/:eventId/upload/get-signed-request', isAuthenticated, wrap(async (req, res) => {
-    log.info(req.query)
     const {name, type, typeSlug} = req.query
     const event = await knex('bsd_events')
       .where('event_id_obfuscated', req.params.eventId)
@@ -479,7 +478,6 @@ function startApp() {
     const matchingFiles = await knex('event_files')
       .where('s3_key', key)
 
-    log.debug(matchingFiles)
     if (matchingFiles.length !== 0){
       res.status(400).send('File already exists')
       res.end()
