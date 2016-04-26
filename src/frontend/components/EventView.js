@@ -5,6 +5,7 @@ import {Paper, Slider, Toggle, Styles} from 'material-ui'
 import GCForm from './forms/GCForm'
 import Form from 'react-formal'
 import EventPreview from './EventPreview'
+import EventInvalid from './EventInvalid'
 import {GoogleMapLoader, GoogleMap, Marker} from 'react-google-maps'
 import yup from 'yup'
 import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider'
@@ -55,12 +56,7 @@ class EventView extends React.Component {
 
   render() {
     if (!this.props.event)
-      return <div style={{ textAlign: 'center', margin: '4em'}}>
-                <h1 style={BernieText.title}>Invalid Event</h1>
-                <p style={BernieText.default}>This event does not exist. If you've just recently created your event.
-                this error may resolve itself in a short period of time. It's also
-                possible your event was deleted. Please email <a href="mailto:help@berniesanders.com">help@berniesanders.com</a> if you need help.</p>
-              </div>
+      return <EventInvalid />
 
     let event_type_name = 'volunteer event'
     if(this.props.event.eventType.name.toLowerCase().indexOf('phone bank') > -1){
