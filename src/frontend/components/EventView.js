@@ -41,18 +41,19 @@ class EventView extends React.Component {
     recipientLimit: null
   }
 
-  marker = {
-    position: {
-      lat: this.props.event.latitude,
-      lng: this.props.event.longitude
-    },
-    key: 'event',
-    title: this.props.event.venueAddr1,
-    name: this.props.event.name
+  generateMarker() {
+    return {
+      position: {
+        lat: this.props.event.latitude,
+        lng: this.props.event.longitude
+      },
+      key: 'event',
+      title: this.props.event.venueAddr1,
+      name: this.props.event.name
+    }
   }
 
   render() {
-
     if (!this.props.event)
       return <div style={{ textAlign: 'center', margin: '4em'}}>
                 <h1 style={BernieText.title}>Invalid Event</h1>
@@ -61,16 +62,15 @@ class EventView extends React.Component {
                 possible your event was deleted. Please email <a href="mailto:help@berniesanders.com">help@berniesanders.com</a> if you need help.</p>
               </div>
 
-
-    let event_type_name = 'volunteer event';
-
+    let event_type_name = 'volunteer event'
     if(this.props.event.eventType.name.toLowerCase().indexOf('phone bank') > -1){
       event_type_name = 'phone bank party'
     }
-
-    if(this.props.event.eventType.name.toLowerCase().indexOf('barnstorm') > -1){
+    else if(this.props.event.eventType.name.toLowerCase().indexOf('barnstorm') > -1){
       event_type_name = 'Barnstorm event'
     }
+
+    const marker = this.generateMarker()
 
     return (
       <MuiThemeProvider muiTheme={Styles.getMuiTheme(BernieTheme)}>
@@ -98,9 +98,9 @@ class EventView extends React.Component {
                     scrollwheel: false
                   }}
                   defaultZoom={14}
-                  defaultCenter={this.marker.position}>
+                  defaultCenter={marker.position}>
                   <Marker
-                    {...this.marker}
+                    {...marker}
                   />
                 </GoogleMap>
               }
