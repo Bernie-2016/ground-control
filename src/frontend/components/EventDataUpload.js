@@ -217,10 +217,8 @@ class EventDataUpload extends React.Component {
           {fileObj.errors.map((error, index) => {
             return (
               <div key={index}>
-                {`Here's some info`}
-                <br />
-                <span style={{color: BernieColors.red}}>{error}</span>
-                <hr />
+                <br/>
+                {error}
               </div>
             )
           })}
