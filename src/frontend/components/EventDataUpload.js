@@ -277,16 +277,16 @@ class EventDataUpload extends React.Component {
 
   render() {
     const { event } = this.props
+    if (!event)
+      return (
+        <div style={{ textAlign: 'center', margin: '4em'}}>
+          <h1 style={BernieText.title}>Invalid Event</h1>
+          <p style={BernieText.default}>This event does not exist. If you've just recently created your event, this error may resolve itself in a short period of time. It's also possible your event was deleted. Please email <a href="mailto:help@berniesanders.com">help@berniesanders.com</a> if you need assistance.</p>
+        </div>
+      )
+
     let formattedDateTime = momentWithTimezone(event.startDate, event.localTimezone)
     formattedDateTime = formattedDateTime ? formattedDateTime.format('LLLL') : event.startDate
-
-    if (!event)
-      return <div style={{ textAlign: 'center', margin: '4em'}}>
-                <h1 style={BernieText.title}>Invalid Event</h1>
-                <p style={BernieText.default}>This event does not exist. If you've just recently created your event.
-                this error may resolve itself in a short period of time. It's also
-                possible your event was deleted. Please email <a href="mailto:help@berniesanders.com">help@berniesanders.com</a> if you need help.</p>
-              </div>
 
     return (
       <MuiThemeProvider muiTheme={Styles.getMuiTheme(BernieTheme)}>
