@@ -194,9 +194,9 @@ class EventDataUpload extends React.Component {
   renderFileProgress() {
     let count = 0
     const renderFileLink = (fileObj, fileName) => {
-      if (fileObj.success || fileObj.errors)
-        return <span>{fileName}</span>
-      else 
+      if (fileObj.success || fileObj.errors.length > 0)
+        return fileName
+      else
         return (
           <div>
             {fileName}
