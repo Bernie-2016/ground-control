@@ -25,7 +25,7 @@ export const slacks = {
     },
     textforbernie: {
         title: 'Text for Bernie',
-        description: 'Generate large scale turnout for organizing events and contact voters about key election happenings all through the power of text messaging',
+        description: 'Text for Bernie uses Slack, a powerful group messaging program, to coordinate our efforts.  Please enter your email address below to receive an email invitation to the Text for Bernie Slack team.',
         showInIndex: false
     }
 }
