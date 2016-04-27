@@ -42,7 +42,9 @@ export default class SlackInviteIndex extends React.Component {
                 Join a slack team to get involved in the revolution!
               </p>
               <ul>
-                {Object.keys(slacks).map((key) => <li key={key}><a href={`/slack/${key}`}>{slacks[key].title}</a> - {slacks[key].description}</li>)}
+                {Object.keys(slacks)
+                  .filter((key) => slacks[key].showInIndex)
+                  .map((key) => <li key={key}><a href={`/slack/${key}`}>{slacks[key].title}</a> - {slacks[key].description}</li>)}
               </ul>
             </div>
           </div>

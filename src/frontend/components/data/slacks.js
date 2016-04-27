@@ -5,22 +5,27 @@ export const slacks = {
     // },
     bernie2016states: {
         title: 'Bernie 2016 States',
-        description: 'Interface with volunteers and staff in each state'
+        description: 'Interface with volunteers and staff in each state',
+        showInIndex: true
     },
     berniebuilders: {
         title: 'Bernie Builders',
-        description: 'General volunteer discussion'
+        description: 'General volunteer discussion',
+        showInIndex: true
     },
     callforbernie: {
         title: 'Call Team Bernie',
-        description: 'Phonebanking assistance and chatter'
+        description: 'Phonebanking assistance and chatter',
+        showInIndex: true
     },
     codersforsanders: {
         title: 'Coders for Sanders',
-        description: 'Volunteer development projects discussion'
+        description: 'Volunteer development projects discussion',
+        showInIndex: true
     },
     textforbernie: {
         title: 'Text for Bernie',
-        description: 'Generate large scale turnout for organizing events and contact voters about key election happenings all through the power of text messaging'
+        description: 'Generate large scale turnout for organizing events and contact voters about key election happenings all through the power of text messaging',
+        showInIndex: false
     }
 }
