@@ -23,6 +23,10 @@
     {
       "cron": "00 9 * * * *",
       "job": "./jobs/email-fast-fwd-instructions.js"
+    },
+    {
+      "cron": "00 */30 * * * *",
+      "job": "./jobs/moderate-events-from-banned-hosts.js"
     }
   ]
 }
