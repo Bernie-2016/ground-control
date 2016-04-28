@@ -101,6 +101,10 @@ class EventsDashboard extends React.Component {
               <FlatButton label="Edit"/>
               <FlatButton label="Delete"/>
               <FlatButton
+                label="Send Turnout Email"
+                onTouchTap={() => this.props.history.push('/events/' + event.eventIdObfuscated + '/request-email')}
+              />
+              <FlatButton
                 label="Download RSVPs"
                 disabled={(event.attendees.length === 0)}
                 onTouchTap={() => {
@@ -108,14 +112,6 @@ class EventsDashboard extends React.Component {
                   const data = Papa.unparse(humps.decamelizeKeys(attendees))
                   downloadCSV(data, `${event.eventIdObfuscated}.rsvps.csv`)
                 }}
-              />
-              <FlatButton
-                label="Send Turnout Email"
-                onTouchTap={() => this.props.history.push('/events/' + event.eventIdObfuscated + '/request-email')}
-              />
-              <FlatButton
-                label="Upload Sign In Sheets"
-                onTouchTap={() => this.props.history.push('/events/' + event.eventIdObfuscated + '/upload')}
               />
             </CardActions>
           </Card>

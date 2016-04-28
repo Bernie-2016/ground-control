@@ -234,7 +234,7 @@ ReactDOM.render(
           }}
           renderLoading={() => <Loading />}
         />
-        <Route
+        {/*<Route
           path=':id/upload'
           component={EventDataUpload}
           queries={{
@@ -243,7 +243,7 @@ ReactDOM.render(
             ...CurrentUserQueries
           }}
           renderLoading={() => <Loading />}
-        />
+        />*/}
         <Route
           path=':id/request-email'
           component={FastFwdForm}
