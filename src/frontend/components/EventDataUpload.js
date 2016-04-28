@@ -277,6 +277,7 @@ class EventDataUpload extends React.Component {
   }
 
   render() {
+    console.log(this)
     const { event } = this.props
     if (!event)
       return <EventInvalid />
@@ -344,11 +345,20 @@ export default Relay.createContainer(EventDataUpload, {
         email
       }
     `,
-    listContainer: () => Relay.QL`
+    listContainer: ({id}) => Relay.QL`
       fragment on ListContainer {
         eventFileTypes {
           slug
           name
+        }
+        eventFiles(
+          eventIdObfuscated: $id
+        ) {
+          id
+          name
+          mimeType
+          url
+          modifiedDate
         }
       }
     `,

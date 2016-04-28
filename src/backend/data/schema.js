@@ -311,13 +311,40 @@ const GraphQLListContainer = new GraphQLObjectType({
     id: globalIdField('ListContainer'),
     eventFileTypes: {
       type: new GraphQLList(GraphQLEventFileType),
-      resolve: async(eventFileType, {rootValue}) => {
+      resolve: async (eventFileType, {rootValue}) => {
         return knex('event_file_types')
+      }
+    },
+    eventFiles: {
+      type: new GraphQLList(GraphQLEventFile),
+      args: {
+        id: {type: GraphQLInt},
+        eventIdObfuscated: {type: GraphQLString},
+        fileTypeId: {type: GraphQLInt},
+        uploaderId: {type: GraphQLInt},
+        mimeType: {type: GraphQLString},
+      },
+      resolve: async (eventFile, {id, eventIdObfuscated, fileTypeId, uploaderId, mimeType}, {rootValue}) => {
+        let files = knex('event_files')
+        if (id)
+          files = files.where('event_files.id', id)
+        if (eventIdObfuscated) {
+          files = files.join('bsd_events', 'event_files.event_id', 'bsd_events.event_id')
+            .where('bsd_events.event_id_obfuscated', eventIdObfuscated)
+        }
+        if (fileTypeId)
+          files = files.where('event_files.event_file_type_id', fileTypeId)
+        if (uploaderId)
+          files = files.where('event_files.uploader_id', uploaderId)
+        if (mimeType)
+          files = files.where('event_files.mime_type', mimeType)
+
+        return await files
       }
     },
     eventTypes: {
       type: new GraphQLList(GraphQLEventType),
-      resolve: async(eventType, {rootValue}) => {
+      resolve: async (eventType, {rootValue}) => {
         return knex('bsd_event_types')
       }
     },
@@ -1517,7 +1544,10 @@ const GraphQLSaveEventFile = mutationWithClientMutationId({
     sourceEventId: { type: new GraphQLNonNull(GraphQLString) },
   },
   outputFields: {
-    event: { type: GraphQLEvent }
+    event: {
+      type: GraphQLEvent,
+      // resolve: async (event) => await rootValue.loaders.bsdEvents.load(event.id)
+    }
   },
   mutateAndGetPayload: async ({fileName, fileTypeSlug, mimeType, key, notes, sourceEventId}, {rootValue}) => {
     const userId = rootValue.user.id
@@ -1536,6 +1566,7 @@ const GraphQLSaveEventFile = mutationWithClientMutationId({
       s3_key: key
     })
 
+    log.debug(event)
     return event
   }
 })

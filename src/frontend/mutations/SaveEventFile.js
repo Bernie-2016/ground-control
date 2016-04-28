@@ -6,34 +6,36 @@ export default class SaveEventFile extends Relay.Mutation {
       fragment on Event {
         id,
         eventIdObfuscated
+        files
       }
     `
-  };
+  }
 
   getMutation() {
     return Relay.QL`
       mutation{ saveEventFile }
-    `;
+    `
   }
 
   getFatQuery() {
+    console.log(this.props.event)
     return Relay.QL`
       fragment on SaveEventFilePayload {
         event {
           id
+          files
         },
       }
-    `;
+    `
   }
 
   getConfigs() {
-    console.log(this.props)
     return [{
       type: 'FIELDS_CHANGE',
       fieldIDs: {
         event: this.props.event.id
       }
-    }];
+    }]
   }
 
   getVariables() {
