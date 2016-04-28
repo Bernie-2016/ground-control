@@ -1327,7 +1327,7 @@ const GraphQLEditEvents = mutationWithClientMutationId({
       })
 
       // Require phone number for RSVPs
-      const eventIdsRequiringPhone = new Set([22, 31, 32, 39, 45])
+      const eventIdsRequiringPhone = new Set([22, 31, 32, 39, 41, 45])
       if (eventIdsRequiringPhone.has(Number(event['event_type_id']))) {
         event['attendee_require_phone'] = 1
       }
