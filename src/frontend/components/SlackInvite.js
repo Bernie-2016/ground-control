@@ -135,7 +135,7 @@ export default class SlackInvite extends React.Component {
           maxWidth: 600,
           margin: '0 auto'
         }}>
-          Success! <strong>{this.state.email}</strong> has been invited to join <strong>{this.slackTeam.title}</strong>.
+          Success! <strong>{this.state.email}</strong> has been invited to join <strong>{this.slackTeam.title}</strong>.  Check your email for next steps.
           <br /><br />
           <RaisedButton
             label={`Go to ${this.slackTeam.title}`}
@@ -168,7 +168,9 @@ export default class SlackInvite extends React.Component {
           </h1>
           <p style={{
             ...BernieText.default,
-            marginBottom: '1em'
+            margin: '0 auto',
+            marginBottom: '1em',
+            maxWidth: 600
           }}>
             {this.slackTeam.description}
           </p>
