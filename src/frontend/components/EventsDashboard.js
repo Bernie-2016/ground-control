@@ -29,6 +29,22 @@ import Papa from 'papaparse'
 import downloadCSV from '../helpers/downloadCSV'
 import flattenJSON from '../helpers/flattenJSON'
 
+const publicEventsRootUrl = 'https://secure.berniesanders.com/page/event'
+
+class LinkButton extends React.Component {
+  render() {
+    return (
+      <FlatButton
+        label={this.props.label}
+        linkButton={true}
+        href={this.props.href}
+        target='_blank'
+        style={{textAlign: 'center'}}
+      />
+    )
+  }
+}
+
 class EventsDashboard extends React.Component {
   constructor(props) {
     super(props)
@@ -94,15 +110,21 @@ class EventsDashboard extends React.Component {
               <div dangerouslySetInnerHTML={stripScripts(event.description)}></div>
             </CardText>
             <CardActions expandable={true}>
-              <FlatButton
+              <LinkButton
                 label='View'
-                onTouchTap={() => this.props.history.push('/events/' + event.eventIdObfuscated)}
+                href={`${publicEventsRootUrl}/detail/${event.eventIdObfuscated}`}
               />
-              <FlatButton label="Edit"/>
-              <FlatButton label="Delete"/>
+              <LinkButton
+                label='Edit'
+                href={`${publicEventsRootUrl}/edit_details?event_id=${event.eventIdUnObfuscated}`}
+              />
+              <LinkButton
+                label='Delete'
+                href={`${publicEventsRootUrl}/delete/${event.eventIdObfuscated}`}
+              />
               <FlatButton
                 label="Send Turnout Email"
-                onTouchTap={() => this.props.history.push('/events/' + event.eventIdObfuscated + '/request-email')}
+                onTouchTap={() => this.props.history.push(`/events/${event.eventIdObfuscated}/request-email`)}
               />
               <FlatButton
                 label="Download RSVPs"
@@ -193,6 +215,7 @@ export default Relay.createContainer(EventsDashboard, {
               id
               name
             }
+            eventIdUnObfuscated
             eventIdObfuscated
             flagApproval
             isOfficial

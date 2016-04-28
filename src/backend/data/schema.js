@@ -926,6 +926,10 @@ const GraphQLEvent = new GraphQLObjectType({
       type: GraphQLString,
       resolve: (event) => event.event_id_obfuscated
     },
+    eventIdUnObfuscated: {
+      type: GraphQLInt,
+      resolve: (event) => event.event_id
+    },
     isOfficial: {
       type: GraphQLBoolean,
       resolve: (event) => event.is_official
