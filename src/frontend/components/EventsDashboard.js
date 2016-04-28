@@ -32,6 +32,11 @@ import flattenJSON from '../helpers/flattenJSON'
 const publicEventsRootUrl = 'https://secure.berniesanders.com/page/event'
 
 class LinkButton extends React.Component {
+  static propTypes = {
+    label: React.PropTypes.string.isRequired,
+    href: React.PropTypes.string.isRequired
+  }
+
   render() {
     return (
       <FlatButton
