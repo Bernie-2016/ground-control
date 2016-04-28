@@ -42,6 +42,9 @@ class CallAssignment extends React.Component {
       fontSize: '1em',
       marginBottom: 15,
     },
+    container: {
+      margin: '1em'
+    },
     surveyFrame: {
       borderTop: 'solid 1px ' + BernieColors.lightGray,
       paddingTop: 30
