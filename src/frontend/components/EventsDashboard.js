@@ -1,6 +1,7 @@
 import React from 'react'
 import Relay from 'react-relay'
 import {
+  LeftNav,
   Styles,
   Divider,
   FloatingActionButton,
@@ -73,7 +74,8 @@ class EventsDashboard extends React.Component {
     return {
       sideBar: {
         width: '25%',
-        border: 'none'
+        border: 'none',
+        zIndex: 10
       },
       container: {
         borderBottom: 'none',
@@ -93,7 +95,7 @@ class EventsDashboard extends React.Component {
   renderEvents() {
     const events = this.props.currentUser.relatedPerson ? this.props.currentUser.relatedPerson.hostedEvents : []
     if (events.length === 0)
-      return <div style={{ textAlign: 'center', margin: '4em'}}>
+      return <div style={{textAlign: 'center', margin: '4em'}}>
                 <h1 style={BernieText.title}>No Events</h1>
                 <p style={BernieText.default}>You haven't signed up to host any events yet! <a href="/events/create">Click here</a> to create your first event.</p>
               </div>
@@ -160,8 +162,12 @@ class EventsDashboard extends React.Component {
 
   render() {
     const sideBar = (
-      <div>
-        <List>
+      <LeftNav
+        docked={true}
+        open={true}
+        width={'25%'}
+      >
+        <List style={{marginTop: 56}}>
           <Subheader>General</Subheader>
           <ListItem
             primaryText="Hosting"
@@ -186,7 +192,7 @@ class EventsDashboard extends React.Component {
             secondaryText="View as a calendar instead of list"
           />
         </List>
-      </div>
+      </LeftNav>
     )
 
     return (
