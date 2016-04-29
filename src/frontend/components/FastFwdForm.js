@@ -19,16 +19,13 @@ class FastFwdForm extends React.Component {
       float: 'left',
       marginTop: '1rem',
       padding: 10,
-      width: 480
+      width: '50%'
     },
 
     formContainer: {
       float: 'left',
-      width: 380,
-      paddingLeft: 15,
-      paddingRight: 15,
-      paddingTop: 15,
-      paddingBottom: 15,
+      width: '40%',
+      padding: 15,
       marginTop: 15,
       marginLeft: '2rem',
       border: 'solid 1px ' + BernieColors.lightGray
@@ -95,10 +92,10 @@ class FastFwdForm extends React.Component {
             Fast Fwd: Send a message to bring volunteers to your event
           </div>
 
-          <Paper zDepth={1} style={this.styles.detailsContainer}>
+          <div zDepth={1} style={this.styles.detailsContainer}>
             <p style={BernieText.secondaryTitle}>Your Event Details:</p>
             <EventPreview event={this.props.event} />
-          </Paper>
+          </div>
 
           <Paper zDepth={2} style={this.styles.formContainer}>
             <GCForm
