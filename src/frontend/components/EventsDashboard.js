@@ -31,6 +31,7 @@ import downloadCSV from '../helpers/downloadCSV'
 import flattenJSON from '../helpers/flattenJSON'
 
 const publicEventsRootUrl = 'https://secure.berniesanders.com/page/event'
+const topNavHeight = 56
 
 class LinkButton extends React.Component {
   static propTypes = {
@@ -82,9 +83,9 @@ class EventsDashboard extends React.Component {
         border: 'none'
       },
       content: {
-        height: this.state.windowHeight - 56,
+        height: this.state.windowHeight - topNavHeight,
         width: this.state.windowWidth * 0.8,
-        padding: 5, top: 56,
+        padding: 5, top: topNavHeight,
         position: 'absolute',
         overflow: 'scroll',
         boxSizing: 'border-box'
@@ -167,7 +168,7 @@ class EventsDashboard extends React.Component {
         open={true}
         width={this.styles().sideBar.width}
       >
-        <List style={{marginTop: 56}}>
+        <List style={{marginTop: topNavHeight}}>
           <Subheader>General</Subheader>
           <ListItem
             primaryText="Hosting"
