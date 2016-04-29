@@ -73,7 +73,7 @@ class EventsDashboard extends React.Component {
   styles = () => {
     return {
       sideBar: {
-        width: '25%',
+        width: '20%',
         border: 'none',
         zIndex: 10
       },
@@ -83,7 +83,7 @@ class EventsDashboard extends React.Component {
       },
       content: {
         height: this.state.windowHeight - 56,
-        width: '75%',
+        width: '80%',
         padding: 5, top: 56,
         position: 'absolute',
         overflow: 'scroll',
@@ -108,8 +108,8 @@ class EventsDashboard extends React.Component {
         <div key={event.id} style={{padding: 5, width: '100%', boxSizing: 'border-box'}}>
           <Card>
             <CardTitle
-              title={event.name}
-              subtitle={formattedDate}
+              title={<span style={{...BernieText.title, fontSize: '1.2em'}}>{event.name}</span>}
+              subtitle={<span style={{...BernieText.secondaryTitle, fontSize: '1.1em', letterSpacing: '1px'}}>{formattedDate}</span>}
               actAsExpander={true}
               showExpandableButton={true}
             />
@@ -165,7 +165,7 @@ class EventsDashboard extends React.Component {
       <LeftNav
         docked={true}
         open={true}
-        width={'25%'}
+        width={this.styles().sideBar.width}
       >
         <List style={{marginTop: 56}}>
           <Subheader>General</Subheader>
