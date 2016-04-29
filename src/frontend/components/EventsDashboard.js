@@ -73,7 +73,7 @@ class EventsDashboard extends React.Component {
   styles = () => {
     return {
       sideBar: {
-        width: '20%',
+        width: this.state.windowWidth * 0.2,
         border: 'none',
         zIndex: 10
       },
@@ -83,7 +83,7 @@ class EventsDashboard extends React.Component {
       },
       content: {
         height: this.state.windowHeight - 56,
-        width: '80%',
+        width: this.state.windowWidth * 0.8,
         padding: 5, top: 56,
         position: 'absolute',
         overflow: 'scroll',
