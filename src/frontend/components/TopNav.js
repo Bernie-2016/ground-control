@@ -30,7 +30,10 @@ export default class TopNav extends React.Component {
     },
     bar: {
       height: 56,
-      minHeight: 56
+      minHeight: 56,
+      position: 'fixed',
+      top: 0,
+      left: 0
     },
     tab: {
       ...BernieText.secondaryTitle,
@@ -55,7 +58,13 @@ export default class TopNav extends React.Component {
       value: '/account'
     }
 
-    let inputTabs = [...this.props.tabs, accountTab]
+    let logoutTab = {
+      label: 'Logout',
+      value: '/logout',
+      onActive: this.logoutHandler
+    }
+
+    let inputTabs = [...this.props.tabs, accountTab, logoutTab]
 
     let selectedTab = inputTabs.filter((tab) => {
       return this.props.location.pathname.indexOf(tab.value) === 0
@@ -74,21 +83,9 @@ export default class TopNav extends React.Component {
         }}
         value={tab.value}
         key={tab.value}
-        onActive={() => { this.props.history.push(tab.value) }}
+        onActive={(typeof tab.onActive === 'function') ? tab.onActive : () => { this.props.history.push(tab.value) }}
       />)
     })
-
-    tabs.push(<Tab
-      label={'Logout'}
-      onActive={this.logoutHandler}
-      style={{
-          ...this.styles.tab,
-          color: this.props.tabColor,
-          backgroundColor: this.props.barColor
-        }}
-      value='logout'
-      key='logout'
-    />)
 
     return (
       <div>
@@ -120,6 +117,7 @@ export default class TopNav extends React.Component {
             </div>
           }
         />
+        <div style={{height: 56, width: '100%'}}></div>
       </div>
     )
   }

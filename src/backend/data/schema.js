@@ -219,6 +219,10 @@ let {nodeInterface, nodeField} = nodeDefinitions(
       return addType(knex('bsd_call_assignments').where('id', id))
     if (type === 'Survey')
       return addType(knex('gc_bsd_surveys').where('id', id))
+    if (type === 'EventFile')
+      return addType(knex('event_files').where('id', id))
+    if (type === 'EventFileType')
+      return addType(knex('event_file_types').where('id', id))
     if (type === 'EventType')
       return addType(knex('bsd_event_types').where('event_type_id', id))
     if (type === 'Event')
@@ -242,6 +246,8 @@ let {nodeInterface, nodeField} = nodeDefinitions(
       return GraphQLSurvey
     if (obj._type === 'list_container')
       return GraphQLListContainer
+    if (obj._type === 'event_file_types')
+      return GraphQLEventFileType
     if (obj._type === 'bsd_event_types')
       return GraphQLEventType
     if (obj._type === 'bsd_events')
@@ -303,6 +309,12 @@ const GraphQLListContainer = new GraphQLObjectType({
   name: 'ListContainer',
   fields: () => ({
     id: globalIdField('ListContainer'),
+    eventFileTypes: {
+      type: new GraphQLList(GraphQLEventFileType),
+      resolve: async(eventFileType, {rootValue}) => {
+        return knex('event_file_types')
+      }
+    },
     eventTypes: {
       type: new GraphQLList(GraphQLEventType),
       resolve: async(eventType, {rootValue}) => {
@@ -795,7 +807,7 @@ const GraphQLPerson = new GraphQLObjectType({
       resolve: async(person, {rootValue}) => {
 
         let query = knex('bsd_events')
-          .whereNot('creator_cons_id', person.cons_id)
+          .where('creator_cons_id', person.cons_id)
 
         return query
       }
@@ -842,6 +854,52 @@ const GraphQLCall = new GraphQLObjectType({
   })
 })
 
+const GraphQLEventFile = new GraphQLObjectType({
+  name: 'EventFile',
+  description: 'An event file',
+  fields: () => ({
+    id: globalIdField('EventFile', (obj) => obj.id),
+    type: {
+      type: GraphQLEventFileType,
+      resolve: async (file, _, {rootValue}) => rootValue.loaders.eventFileTypes.load(file.event_file_type_id)
+    },
+    uploader: {
+      type: GraphQLUser,
+      resolve: async (file) => await knex('users').where('id', file.uploader_id).first()
+    },
+    mimeType: {
+      type: GraphQLString,
+      resolve: (file) => file.mime_type
+    },
+    name: { type: GraphQLString },
+    notes: { type: GraphQLString },
+    url: {
+      type: GraphQLString,
+      resolve: (file) => `https://${process.env.S3_BUCKET}.s3.amazonaws.com/${encodeURIComponent(file.s3_key)}`
+    },
+    modifiedDate: {
+      type: GraphQLDate,
+      resolve: (file) => interpretDateAsUTC(file.modified_dt)
+    }
+  })
+})
+
+const GraphQLEventFileType = new GraphQLObjectType({
+  name: 'EventFileType',
+  description: 'An event file type',
+  fields: () => ({
+    id: globalIdField('EventFileType', (obj) => obj.id),
+    slug: {type: GraphQLString},
+    name: {type: GraphQLString},
+    description: {type: GraphQLString}
+  })
+})
+
+const { connectionType: GraphQLEventFileTypeConnection } = connectionDefinitions({
+  name: 'EventFileType',
+  nodeType: GraphQLEventFileType
+})
+
 const GraphQLEventType = new GraphQLObjectType({
   name: 'EventType',
   description: 'An event type',
@@ -867,6 +925,10 @@ const GraphQLEvent = new GraphQLObjectType({
     eventIdObfuscated: {
       type: GraphQLString,
       resolve: (event) => event.event_id_obfuscated
+    },
+    eventIdUnObfuscated: {
+      type: GraphQLInt,
+      resolve: (event) => event.event_id
     },
     isOfficial: {
       type: GraphQLBoolean,
@@ -986,28 +1048,38 @@ const GraphQLEvent = new GraphQLObjectType({
     },
     attendeesCount: {
       type: GraphQLInt,
-      resolve: async(event) => {
+      resolve: async (event) => {
         const count = await knex('bsd_event_attendees').where('event_id', event.event_id).count('event_attendee_id');
         return count[0].count
       }
     },
     attendees: {
       type: new GraphQLList(GraphQLPerson),
-      resolve: async(event, _, {rootValue}) => {
-        /*const attendeeIds = await knex('bsd_event_attendees').select('attendee_cons_id', 'event_id').where('event_id', event.event_id);
-         let attendees = [];
+      resolve: async (event, _, {rootValue}) => {
+        const attendeeIds = await knex('bsd_event_attendees').select('attendee_cons_id', 'event_id').where('event_id', event.event_id)
+         let attendees = []
          for (let i = 0; i < attendeeIds.length; i++) {
-         let attendee = await rootValue.loaders.bsdPeople.load(attendeeIds[i].attendee_cons_id);
-         attendees.push(attendee);
+         let attendee = await rootValue.loaders.bsdPeople.load(attendeeIds[i].attendee_cons_id)
+         attendees.push(attendee)
          }
          return attendees
-         */
-        return []
+      }
+    },
+    files: {
+      type: new GraphQLList(GraphQLEventFile),
+      resolve: async (event, _, {rootValue}) => {
+        const fileIds = await knex('event_files').select('id').where('event_id', event.event_id)
+        let files = []
+        for (let i = 0; i < fileIds.length; i++) {
+          const file = await rootValue.loaders.eventFiles.load(fileIds[i].id)
+          files.push(file)
+        }
+        return files
       }
     },
     nearbyPeople: {
       type: new GraphQLList(GraphQLPerson),
-      resolve: async(event, _, {rootValue}) => {
+      resolve: async (event, _, {rootValue}) => {
         let maxRadius   = 50000;
         let radius      = 1000;
         let backoff     = 1000;
@@ -1041,7 +1113,7 @@ const GraphQLEvent = new GraphQLObjectType({
     },
     fastFwdRequest: {
       type: GraphQLFastFwdRequest,
-      resolve: async(event) => {
+      resolve: async (event) => {
         let req = await knex.table('fast_fwd_request')
           .where('event_id', event['event_id'])
         return humps.camelizeKeys(req[0])
@@ -1435,6 +1507,40 @@ const GraphQLReviewEvents = mutationWithClientMutationId({
     const localIds = ids.map((id) => fromGlobalId(id).id)
     log.info(`${localIds.length} event(s) marked reviewed by ${rootValue.user.email}: ${localIds.join(', ')}`)
     return await markEventsReviewed(localIds, pendingReview)
+  }
+})
+
+const GraphQLSaveEventFile = mutationWithClientMutationId({
+  name: 'SaveEventFile',
+  inputFields: {
+    fileName: { type: new GraphQLNonNull(GraphQLString) },
+    fileTypeSlug: { type: new GraphQLNonNull(GraphQLString) },
+    mimeType: { type: new GraphQLNonNull(GraphQLString) },
+    key: { type: new GraphQLNonNull(GraphQLString) },
+    notes: { type: GraphQLString },
+    sourceEventId: { type: new GraphQLNonNull(GraphQLString) },
+  },
+  outputFields: {
+    event: { type: GraphQLEvent }
+  },
+  mutateAndGetPayload: async ({fileName, fileTypeSlug, mimeType, key, notes, sourceEventId}, {rootValue}) => {
+    const userId = rootValue.user.id
+    const fileType = await knex('event_file_types')
+      .where('slug', fileTypeSlug)
+      .first()
+
+    const event = await rootValue.loaders.bsdEvents.load(sourceEventId)
+    const file = await knex.insertAndFetch('event_files', {
+      event_file_type_id: fileType.id,
+      event_id: Number(event.event_id),
+      uploader_id: userId,
+      mime_type: mimeType,
+      name: fileName,
+      notes,
+      s3_key: key
+    })
+
+    return event
   }
 })
 
@@ -1948,6 +2054,7 @@ let RootMutation = new GraphQLObjectType({
   fields: () => ({
     editEvents: GraphQLEditEvents,
     reviewEvents: GraphQLReviewEvents,
+    saveEventFile: GraphQLSaveEventFile,
     submitCallSurvey: GraphQLSubmitCallSurvey,
     createCallAssignment: GraphQLCreateCallAssignment,
     deleteEvents: GraphQLDeleteEvents,

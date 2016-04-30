@@ -44,6 +44,10 @@
       margin: 0px;
       padding: 0px;
     }
+
+    body {
+      font-family: 'freight-sans-pro';
+    }
     /**
      * The geosuggest module
      */
@@ -129,6 +133,24 @@
       // Force `fetch` polyfill to workaround Chrome not displaying request body
       // in developer tools for the native `fetch`.
       self.fetch = null;
+
+      // Show a blurb for potential volunteer developers
+      var consoleStyle = [
+            'color: rgb(100,100,100)',
+            'text-align: center',
+            'font-weight: bold',
+            'font-size: 18px',
+            'font-family: sans-serif'
+        ];  
+
+        var linkStyle = consoleStyle.slice();
+        linkStyle[0] = 'color: rgb(20, 127, 215)';  
+
+        function css(styleArray){
+          return styleArray.join(';');
+        } 
+
+        console.log("%cInterested in contributing to Ground Control? Check out %chttps://github.com/Bernie-2016/ground-control%c.", css(consoleStyle), css(linkStyle), css(consoleStyle));
     </script>
     {{{ extra_head }}}
     <script src="/assets/js/app.js"></script>

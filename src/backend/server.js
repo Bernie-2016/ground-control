@@ -9,6 +9,7 @@ import fallback from 'express-history-api-fallback'
 import bodyParser from 'body-parser'
 import session from 'express-session'
 import proxy from 'express-http-proxy'
+import AWS from 'aws-sdk'
 import BSD from './bsd'
 import MG from './mail'
 import demoData from './data/demo.json'
@@ -135,6 +136,7 @@ function startApp() {
   }
 
   const KnexSessionStore = KnexSessionStoreFactory(session)
+  const s3 = new AWS.S3()
   const Mailgun = new MG(process.env.MAILGUN_KEY, process.env.MAILGUN_DOMAIN)
   const BSDClient = new BSD(process.env.BSD_HOST, process.env.BSD_API_ID, process.env.BSD_API_SECRET)
   const port = process.env.PORT
@@ -365,6 +367,7 @@ function startApp() {
     return {
       queries: new QueryLoader(),
       users: dataLoaderCreator('users', 'id'),
+      eventFiles: dataLoaderCreator('event_files', 'id'),
       bsdPeople: dataLoaderCreator('bsd_people', 'cons_id'),
       bsdPhones: dataLoaderCreator('bsd_phones', 'cons_phone_id'),
       bsdEmails: dataLoaderCreator('bsd_emails', 'cons_email_id'),
@@ -464,6 +467,50 @@ function startApp() {
 
   app.get('/nda', wrap(async (req, res) => {
     res.redirect('https://docs.google.com/forms/d/1cyoAcumEd4Co5Fqj9pOUnQtIUo_rfRzQ7oVqACFe5Rs/viewform')
+  }))
+
+  // Redirect old FastForward ednpoint
+  app.get('/event/:id/request_email', (req, res) => {
+    res.redirect(`/events/${req.params.id}/request-email`)
+  })
+
+  app.get('/events/:eventId/upload/get-signed-request', isAuthenticated, wrap(async (req, res) => {
+    const {name, type, typeSlug} = req.query
+    const event = await knex('bsd_events')
+      .where('event_id_obfuscated', req.params.eventId)
+      .first()
+    const key = `event-files/${event.event_id_obfuscated}/${typeSlug}/${req.user.email}/${name}`
+    const matchingFiles = await knex('event_files')
+      .where('s3_key', key)
+
+    if (matchingFiles.length !== 0){
+      res.status(400).send('File already exists')
+      res.end()
+      return
+    }
+
+    const s3Params = {
+      Bucket: process.env.S3_BUCKET,
+      Key: key,
+      Expires: 60,
+      ContentType: type,
+      ACL: 'public-read'
+    }
+
+    s3.getSignedUrl('putObject', s3Params, (err, data) => {
+      if(err) {
+        log.error(err)
+      }
+      else {
+        log.info(data)
+        const returnData = {
+          signedRequestEndpoint: data,
+          key
+        }
+        res.json(returnData)
+        res.end()
+      }
+    })
   }))
 
   app.post('/events/add-rsvp', async (req, res) => {

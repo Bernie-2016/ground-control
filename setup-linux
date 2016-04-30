@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 
 var childProcess = require('child_process')
+
+childProcess.execSync('npm run generate-dotenv')
+
 var connstring = ' -h 127.0.0.1 -p 5432 -U postgres -w '
 
 console.log("Installing PostgreSQL...")

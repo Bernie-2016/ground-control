@@ -9,7 +9,7 @@ import MutationHandler from './MutationHandler'
 import CreateFastFwdRequest from '../mutations/CreateFastFwdRequest'
 import yup from 'yup'
 import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider'
-import {BernieTheme} from './styles/bernie-theme';
+import {BernieTheme} from './styles/bernie-theme'
 
 const publicEventsRootUrl = 'https://secure.berniesanders.com/page/event/detail/'
 
@@ -17,26 +17,24 @@ class FastFwdForm extends React.Component {
   styles = {
     detailsContainer: {
       float: 'left',
-      marginTop: '1rem',
-      padding: 10,
-      width: 480
+      padding: '1em',
+      paddingLeft: 0,
+      width: '55%',
     },
 
     formContainer: {
       float: 'left',
-      width: 380,
-      paddingLeft: 15,
-      paddingRight: 15,
-      paddingTop: 15,
-      paddingBottom: 15,
+      width: '40%',
+      padding: '1em',
       marginTop: 15,
       marginLeft: '2rem',
       border: 'solid 1px ' + BernieColors.lightGray
     },
 
     pageContainer: {
-      marginLeft: '7rem',
-      marginTop: '1rem'
+      margin: '0 auto',
+      padding: '3em',
+      maxWidth: 1300
     }
   }
 
@@ -91,16 +89,16 @@ class FastFwdForm extends React.Component {
                                 location.href = 'https://go.berniesanders.com/page/content/volunteer-hub/';
                               }, 9000)
                          }} />
-          <div style={BernieText.title}>
+          <h1 style={BernieText.title}>
             Fast Fwd: Send a message to bring volunteers to your event
-          </div>
+          </h1>
 
-          <Paper zDepth={1} style={this.styles.detailsContainer}>
+          <div zDepth={1} style={this.styles.detailsContainer}>
             <p style={BernieText.secondaryTitle}>Your Event Details:</p>
             <EventPreview event={this.props.event} />
-          </Paper>
+          </div>
 
-          <Paper zDepth={2} style={this.styles.formContainer}>
+          <Paper style={this.styles.formContainer}>
             <GCForm
               schema={formSchema}
               defaultValue={formSchema.default()}
@@ -121,6 +119,7 @@ class FastFwdForm extends React.Component {
                 name='hostMessage'
                 multiLine={true}
                 rows={12}
+                fullWidth={true}
                 label="Message From Host"
               />
               <br />

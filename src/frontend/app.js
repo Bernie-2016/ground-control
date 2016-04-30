@@ -16,6 +16,9 @@ import ConstituentLookup from './components/ConstituentLookup'
 import AdminCallAssignmentsSection from './components/AdminCallAssignmentsSection'
 import AdminCallAssignmentCreationForm from './components/AdminCallAssignmentCreationForm'
 import FastFwdForm from './components/FastFwdForm'
+import EventsDashboard from './components/EventsDashboard'
+import EventView from './components/EventView'
+import EventDataUpload from './components/EventDataUpload'
 import GCTextField from './components/forms/GCTextField'
 import GCRichTextField from './components/forms/GCRichTextField'
 import GCPhoneField from './components/forms/GCPhoneField'
@@ -173,7 +176,7 @@ ReactDOM.render(
       component={Dashboard}
       queries={CurrentUserQueries}
     >
-      <IndexRedirect to='/call'/>
+      <IndexRedirect to='/call' />
       <Route
         path='events/create/v2'
         component={EventCreate}
@@ -205,6 +208,46 @@ ReactDOM.render(
         />
       </Route>
       <Route
+        path='events'
+        component={CallAssignmentsDashboard}
+        queries={CurrentUserQueries}
+      >
+        <IndexRoute
+          component={EventsDashboard}
+          queries={{
+        		...CurrentUserQueries,
+        	}}
+        />
+        <Route
+          path=':id'
+          component={EventView}
+          queries={{
+            ...EventQueries,
+            ...CurrentUserQueries
+          }}
+          renderLoading={() => <Loading />}
+        />
+        {/*<Route
+          path=':id/upload'
+          component={EventDataUpload}
+          queries={{
+            ...EventQueries,
+            ...ListContainerQueries,
+            ...CurrentUserQueries
+          }}
+          renderLoading={() => <Loading />}
+        />*/}
+        <Route
+          path=':id/request-email'
+          component={FastFwdForm}
+            queries={{
+              ...EventQueries,
+              ...CurrentUserQueries
+            }}
+            renderLoading={() => <Loading />}
+        />
+      </Route>
+      <Route
         path='account'
         component={UserAccountDashboard}
         queries={CurrentUserQueries}
@@ -214,15 +257,6 @@ ReactDOM.render(
         />
       </Route>
     </Route>
-    <Route
-      path='/event/:id/request_email'
-      component={FastFwdForm}
-      queries={{
-          ...EventQueries,
-          ...CurrentUserQueries
-        }}
-      renderLoading={() => <Loading />}
-    />
     <Route
       path='slack'
     >

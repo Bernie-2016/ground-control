@@ -3,7 +3,6 @@ import Dropzone from 'react-dropzone';
 import {BernieText, BernieColors} from './styles/bernie-css'
 import {RaisedButton} from 'material-ui'
 import Papa from 'papaparse'
-import qs from 'querystring'
 import superagent from 'superagent'
 import downloadCSV from '../helpers/downloadCSV'
 
@@ -85,7 +84,6 @@ export default class AdminEventUploadRsvps extends React.Component {
       if (!this.allowedKeys.has(key))
         delete row[key]
     })
-    let url = `/events/add-rsvp?${qs.stringify(row)}`
 
     superagent.post('/events/add-rsvp')
       .set('Accept', 'application/json')
