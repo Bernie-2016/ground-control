@@ -209,13 +209,6 @@ ReactDOM.render(
       </Route>
       <Route
         path='events'
-        component={EventsDashboard}
-        queries={{
-        	...CurrentUserQueries,
-        }}
-      />
-      <Route
-        path='events'
         component={CallAssignmentsDashboard}
         queries={CurrentUserQueries}
       >
@@ -264,15 +257,6 @@ ReactDOM.render(
         />
       </Route>
     </Route>
-    <Route
-      path='/event/:id/request_email'
-      component={FastFwdForm}
-      queries={{
-          ...EventQueries,
-          ...CurrentUserQueries
-        }}
-      renderLoading={() => <Loading />}
-    />
     <Route
       path='slack'
     >

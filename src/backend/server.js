@@ -469,6 +469,11 @@ function startApp() {
     res.redirect('https://docs.google.com/forms/d/1cyoAcumEd4Co5Fqj9pOUnQtIUo_rfRzQ7oVqACFe5Rs/viewform')
   }))
 
+  // Redirect old FastForward ednpoint
+  app.get('/event/:id/request_email', (req, res) => {
+    res.redirect(`/events/${req.params.id}/request-email`)
+  })
+
   app.get('/events/:eventId/upload/get-signed-request', isAuthenticated, wrap(async (req, res) => {
     const {name, type, typeSlug} = req.query
     const event = await knex('bsd_events')
