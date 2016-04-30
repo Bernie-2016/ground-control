@@ -146,6 +146,11 @@ class EventsDashboard extends React.Component {
                   onTouchTap={() => this.props.history.push(`/events/${event.eventIdObfuscated}/request-email`)}
                 />
                 <FlatButton
+                  label="Open Call Assignment"
+                  disabled={(event.relatedCallAssignment === null)}
+                  onTouchTap={() => this.props.history.push(`/call/${event.relatedCallAssignment.id}`)}
+                />
+                <FlatButton
                   label="Download RSVPs"
                   disabled={(event.attendees.length === 0)}
                   onTouchTap={() => {
@@ -268,6 +273,9 @@ export default Relay.createContainer(EventsDashboard, {
                 state
                 zip
               }
+            }
+            relatedCallAssignment {
+              id
             }
           }
         }
