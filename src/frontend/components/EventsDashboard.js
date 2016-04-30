@@ -58,7 +58,8 @@ class EventsDashboard extends React.Component {
 
     this.state = {
       windowWidth: window.innerWidth,
-      windowHeight: window.innerHeight
+      windowHeight: window.innerHeight,
+      displayPastEvents: true
     }
 
     window.addEventListener('resize', this._handleResize)
@@ -104,53 +105,60 @@ class EventsDashboard extends React.Component {
                 <p style={{fontSize: '0.7em'}}>If you created an event recently, it may take up to 2 hours for it to be synced into Ground Control.</p>
               </div>
 
+    const currentTime = new moment()
     return events.map((event) => {
       const utcOffset = event.localUTCOffset || 0
       const timezone = event.localTimezone || 'UTC'
       const offsetDate = moment(event.startDate).utcOffset(utcOffset)
       const formattedDate = offsetDate.format('l LT')
-      return (
-        <div key={event.id} style={{padding: 5, width: '100%', boxSizing: 'border-box'}}>
-          <Card>
-            <CardTitle
-              title={<span style={{...BernieText.title, fontSize: '1.2em'}}>{event.name}</span>}
-              subtitle={<span style={{...BernieText.secondaryTitle, fontSize: '1.1em', letterSpacing: '1px'}}>{formattedDate}</span>}
-              actAsExpander={true}
-              showExpandableButton={true}
-            />
-            <CardText expandable={true}>
-              <div dangerouslySetInnerHTML={stripScripts(event.description)}></div>
-            </CardText>
-            <CardActions expandable={true}>
-              <LinkButton
-                label='View'
-                href={`${publicEventsRootUrl}/detail/${event.eventIdObfuscated}`}
+
+      // Return empty div if event is in past
+      if (!this.state.displayPastEvents && !offsetDate.isAfter(currentTime))
+        return <div></div>
+      else {
+        return (
+          <div key={event.id} style={{padding: 5, width: '100%', boxSizing: 'border-box'}}>
+            <Card>
+              <CardTitle
+                title={<span style={{...BernieText.title, fontSize: '1.2em'}}>{event.name}</span>}
+                subtitle={<span style={{...BernieText.secondaryTitle, fontSize: '1.1em', letterSpacing: '1px'}}>{formattedDate}</span>}
+                actAsExpander={true}
+                showExpandableButton={true}
               />
-              <LinkButton
-                label='Edit'
-                href={`${publicEventsRootUrl}/edit_details?event_id=${event.eventIdUnObfuscated}`}
-              />
-              <LinkButton
-                label='Delete'
-                href={`${publicEventsRootUrl}/delete/${event.eventIdObfuscated}`}
-              />
-              <FlatButton
-                label="Send Turnout Email"
-                onTouchTap={() => this.props.history.push(`/events/${event.eventIdObfuscated}/request-email`)}
-              />
-              <FlatButton
-                label="Download RSVPs"
-                disabled={(event.attendees.length === 0)}
-                onTouchTap={() => {
-                  const attendees = event.attendees.map((attendee) => flattenJSON(attendee, {ignoreProps: ['__dataID__']}))
-                  const data = Papa.unparse(humps.decamelizeKeys(attendees))
-                  downloadCSV(data, `${event.eventIdObfuscated}.rsvps.csv`)
-                }}
-              />
-            </CardActions>
-          </Card>
-        </div>
-      )
+              <CardText expandable={true}>
+                <div dangerouslySetInnerHTML={stripScripts(event.description)}></div>
+              </CardText>
+              <CardActions expandable={true}>
+                <LinkButton
+                  label='View'
+                  href={`${publicEventsRootUrl}/detail/${event.eventIdObfuscated}`}
+                />
+                <LinkButton
+                  label='Edit'
+                  href={`${publicEventsRootUrl}/edit_details?event_id=${event.eventIdUnObfuscated}`}
+                />
+                <LinkButton
+                  label='Delete'
+                  href={`${publicEventsRootUrl}/delete/${event.eventIdObfuscated}`}
+                />
+                <FlatButton
+                  label="Send Turnout Email"
+                  onTouchTap={() => this.props.history.push(`/events/${event.eventIdObfuscated}/request-email`)}
+                />
+                <FlatButton
+                  label="Download RSVPs"
+                  disabled={(event.attendees.length === 0)}
+                  onTouchTap={() => {
+                    const attendees = event.attendees.map((attendee) => flattenJSON(attendee, {ignoreProps: ['__dataID__']}))
+                    const data = Papa.unparse(humps.decamelizeKeys(attendees))
+                    downloadCSV(data, `${event.eventIdObfuscated}.rsvps.csv`)
+                  }}
+                />
+              </CardActions>
+            </Card>
+          </div>
+        )
+      }
     })
   }
 
@@ -173,30 +181,19 @@ class EventsDashboard extends React.Component {
         width={this.styles().sideBar.width}
       >
         <List style={{marginTop: topNavHeight}}>
-          <Subheader>General</Subheader>
-          <ListItem
-            primaryText="Hosting"
-            secondaryText="Events you are hosting"
-          />
-          <ListItem
-            primaryText="Attending"
-            secondaryText="Events you are attending"
-          />
-        </List>
-        <Divider />
-        <List>
           <Subheader>View Settings</Subheader>
           <ListItem
-            leftCheckbox={<Checkbox />}
+            leftCheckbox={
+              <Checkbox
+                checked={this.state.displayPastEvents}
+                onCheck={(_, displayPastEvents) => this.setState({displayPastEvents})}
+              />
+            }
             primaryText="Show All Events"
             secondaryText="View all past and upcoming events"
           />
-          <ListItem
-            leftCheckbox={<Checkbox />}
-            primaryText="Use Calendar View"
-            secondaryText="View as a calendar instead of list"
-          />
         </List>
+        <Divider />
       </LeftNav>
     )
 
