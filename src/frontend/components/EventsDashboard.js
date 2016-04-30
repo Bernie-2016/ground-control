@@ -142,15 +142,6 @@ class EventsDashboard extends React.Component {
                   href={`${publicEventsRootUrl}/delete/${event.eventIdObfuscated}`}
                 />
                 <FlatButton
-                  label="Send Turnout Email"
-                  onTouchTap={() => this.props.history.push(`/events/${event.eventIdObfuscated}/request-email`)}
-                />
-                <FlatButton
-                  label="Open Call Assignment"
-                  disabled={(event.relatedCallAssignment === null)}
-                  onTouchTap={() => this.props.history.push(`/call/${event.relatedCallAssignment.id}`)}
-                />
-                <FlatButton
                   label="Download RSVPs"
                   disabled={(event.attendees.length === 0)}
                   onTouchTap={() => {
@@ -158,6 +149,15 @@ class EventsDashboard extends React.Component {
                     const data = Papa.unparse(humps.decamelizeKeys(attendees))
                     downloadCSV(data, `${event.eventIdObfuscated}.rsvps.csv`)
                   }}
+                />
+                <FlatButton
+                  label="Send Turnout Email"
+                  onTouchTap={() => this.props.history.push(`/events/${event.eventIdObfuscated}/request-email`)}
+                />
+                <FlatButton
+                  label="Open Call Assignment"
+                  disabled={(event.relatedCallAssignment === null)}
+                  onTouchTap={() => this.props.history.push(`/call/${event.relatedCallAssignment.id}`)}
                 />
               </CardActions>
             </Card>
