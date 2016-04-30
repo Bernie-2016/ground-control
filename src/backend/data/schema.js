@@ -1077,6 +1077,20 @@ const GraphQLEvent = new GraphQLObjectType({
         return files
       }
     },
+    relatedCallAssignment: {
+      type: GraphQLCallAssignment,
+      resolve: async (event, _, {rootValue}) => {
+        const assignment = await knex('bsd_call_assignments')
+          .select('bsd_call_assignments.id')
+          .join('gc_bsd_events', 'bsd_call_assignments.id', 'gc_bsd_events.turn_out_assignment')
+          .where('gc_bsd_events.event_id', event.event_id)
+          .first()
+        if (assignment !== undefined)
+          return rootValue.loaders.bsdCallAssignments.load(assignment.id)
+        else
+          return null
+      }
+    },
     nearbyPeople: {
       type: new GraphQLList(GraphQLPerson),
       resolve: async (event, _, {rootValue}) => {
