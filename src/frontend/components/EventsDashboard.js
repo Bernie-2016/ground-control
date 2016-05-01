@@ -116,7 +116,7 @@ class EventsDashboard extends React.Component {
 
       // Return empty div if event is in past
       if (!this.state.displayPastEvents && !offsetDate.isAfter(currentTime))
-        return <div></div>
+        return <div key={event.id}></div>
       else {
         return (
           <div key={event.id} style={{padding: 5, width: '100%', boxSizing: 'border-box'}}>
