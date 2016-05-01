@@ -120,11 +120,13 @@ class EventsDashboard extends React.Component {
           <div key={event.id} style={{padding: 5, width: '100%', boxSizing: 'border-box'}}>
             <Card>
               <CardTitle
-                title={<span style={{...BernieText.title, fontSize: '1.2em'}}>{event.name}</span>}
-                subtitle={<span style={{...BernieText.secondaryTitle, fontSize: '1.1em', letterSpacing: '1px'}}>{formattedDate}</span>}
                 actAsExpander={true}
                 showExpandableButton={true}
-              />
+              >
+                <span style={{...BernieText.title, fontSize: '1.4em'}}>{event.name}</span>
+                <br />
+                <span style={{...BernieText.secondaryTitle, fontSize: '0.9em', letterSpacing: '1px'}}>{formattedDate}</span>
+              </CardTitle>
               <CardText expandable={true}>
                 <div dangerouslySetInnerHTML={stripScripts(event.description)}></div>
               </CardText>
