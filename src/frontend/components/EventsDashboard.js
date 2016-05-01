@@ -72,10 +72,12 @@ class EventsDashboard extends React.Component {
     })
   }
 
+  isDesktopWidth = () => (this.state.windowWidth > 960)
+
   styles = () => {
     return {
       sideBar: {
-        width: this.state.windowWidth * 0.2,
+        width: this.isDesktopWidth() ? this.state.windowWidth * 0.2 : 0,
         border: 'none',
         zIndex: 10
       },
@@ -85,7 +87,7 @@ class EventsDashboard extends React.Component {
       },
       content: {
         height: this.state.windowHeight - topNavHeight,
-        width: this.state.windowWidth * 0.8,
+        width: this.isDesktopWidth() ? this.state.windowWidth * 0.8 : '100%',
         padding: 5, top: topNavHeight,
         position: 'absolute',
         overflow: 'scroll',
@@ -184,7 +186,7 @@ class EventsDashboard extends React.Component {
     const sideBar = (
       <LeftNav
         docked={true}
-        open={true}
+        open={this.isDesktopWidth()}
         width={this.styles().sideBar.width}
       >
         <List style={{marginTop: topNavHeight}}>
