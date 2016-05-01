@@ -211,7 +211,7 @@ class EventsDashboard extends React.Component {
         sideBar={sideBar}
         sideBarStyle={this.styles().sideBar}
         content={this.renderContent()}
-        contentViewStyle={this.styles().container}
+        containerStyle={this.styles().container}
       />
     )
   }
