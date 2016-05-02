@@ -461,7 +461,7 @@ function startApp() {
     })
   )
 
-  app.get('/contact-assignments', async (req, res) => {
+  app.get('/contact-assignments.json', async (req, res) => {
     res.header("Access-Control-Allow-Origin", "*")
     res.header("Access-Control-Allow-Headers", "*")
     res.header('Access-Control-Allow-Methods', "*")
