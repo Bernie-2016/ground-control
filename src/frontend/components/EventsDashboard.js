@@ -100,7 +100,7 @@ class EventsDashboard extends React.Component {
   renderEvents() {
     const events = this.props.currentUser.relatedPerson ? this.props.currentUser.relatedPerson.hostedEvents : []
     if (events.length === 0)
-      return <div style={{textAlign: 'center', margin: '4em', fontSize: '1.3em'}}>
+      return <div style={{textAlign: 'center', margin: '2em', fontSize: '1.3em'}}>
                 <h1 style={BernieText.title}>No Events</h1>
                 <p style={BernieText.default}>You haven't signed up to host any events yet!</p>
                 <p><a href="/events/create">Click here</a> to create your first event.</p>
