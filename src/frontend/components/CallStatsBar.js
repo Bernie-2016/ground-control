@@ -22,10 +22,12 @@ export default class CallStatsBar extends React.Component {
         style={{
           ...BernieText.secondaryTitle,
           color: BernieColors.darkBlue,
-          fontSize: '1.3rem'
+          fontSize: '1.3rem',
+          width: '100%',
+          textAlign: 'right'
         }}
       >
-        Calls completed: <span style={{color: BernieColors.darkRed}}>{this.props.callsCompleted}</span>
+        Completed: <span style={{color: BernieColors.darkRed}}>{this.props.callsCompleted}</span>
       </div>
     )
     return (
@@ -38,8 +40,9 @@ export default class CallStatsBar extends React.Component {
         <SideBarLayout
           sideBar={callsMade}
           sideBarStyle={{
-            width: 400,
-            border: 'none'
+            width: '50%',
+            border: 'none',
+            // textAlign: 'left'
           }}
           contentViewStyle={{
             border: 'none'
@@ -47,10 +50,12 @@ export default class CallStatsBar extends React.Component {
           content={callsCompleted}
           containerStyle={{
             border: "none",
-            padding: '10px 10px 10px 10px',
+            padding: 15,
             marginRight: 'auto',
             marginLeft: 'auto',
-            width: 720
+            maxWidth: 600,
+            width: '100%',
+            boxSizing: 'border-box'
           }}
         />
       </Paper>

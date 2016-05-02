@@ -33,7 +33,8 @@ export default class TopNav extends React.Component {
       minHeight: 56,
       position: 'fixed',
       top: 0,
-      left: 0
+      left: 0,
+      boxSizing: 'border-box'
     },
     tab: {
       ...BernieText.secondaryTitle,
@@ -94,7 +95,8 @@ export default class TopNav extends React.Component {
           zDepth={1}
           style={{
             ...this.styles.bar,
-            backgroundColor: this.props.barColor
+            backgroundColor: this.props.barColor,
+            boxSizing: 'border-box'
           }}
           iconElementLeft={
             <BernieLogo

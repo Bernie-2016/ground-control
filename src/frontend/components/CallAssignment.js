@@ -25,14 +25,8 @@ class CallAssignment extends React.Component {
   styles = {
     assignmentBar: {
       backgroundColor: BernieColors.lightGray,
-      marginTop: 15,
-      marginLeft: 'auto',
-      marginRight: 'auto',
-      marginBottom: 15,
-      paddingTop: 15,
-      paddingLeft: 15,
-      paddingRight: 15,
-      paddingBottom: 15,
+      margin: '15px auto',
+      padding: 15,
       color: BernieColors.darkGray,
       fontSize: '1em',
       width: 'auto',
@@ -224,7 +218,7 @@ ${userFirstName}`
         content={content}
         sideBar={sideBar}
         sideBarStyle={{
-          width: 300,
+          width: 200,
         }}
         contentViewStyle={{
           marginLeft: 50,
