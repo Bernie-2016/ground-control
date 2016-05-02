@@ -461,6 +461,40 @@ function startApp() {
     })
   )
 
+  app.get('/contact-assignments', async (req, res) => {
+    res.header("Access-Control-Allow-Origin", "*")
+    res.header("Access-Control-Allow-Headers", "*")
+    res.header('Access-Control-Allow-Methods', "*")
+    
+    const assignments = await knex('contact_assignments')
+      .distinct('contact_assignments.id')
+      .select(
+        'id',
+        'name',
+        'expires',
+        'description',
+        'instructions',
+        'require_call_first as requireCallFirst'
+      )
+
+    let results = []
+    for (let i=0; i < assignments.length; i++) {
+      let assignment = assignments[i]
+
+      assignment.callActions = await knex('contact_call_actions')
+        .select('id', 'name', 'call_script as callScript')
+        .where('contact_call_actions.contact_assignment_id', assignment.id)
+
+      assignment.textActions = await knex('contact_text_actions')
+        .select('id', 'name', 'message_content as messageContent')
+        .where('contact_text_actions.contact_assignment_id', assignment.id)
+
+      results.push(assignment)
+    }
+
+    res.json(results)
+  })
+
   app.get('/events/data/upload', wrap(async (req, res) => {
     res.redirect('https://script.google.com/macros/s/AKfycbwVZHnRZ5CJkzFID91QYcsLNFLkPgstd7XjS9o1QSEAh3tC2vY/exec')
   }))
