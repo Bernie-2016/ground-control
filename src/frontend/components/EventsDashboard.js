@@ -91,7 +91,8 @@ class EventsDashboard extends React.Component {
         padding: 5, top: topNavHeight,
         position: 'absolute',
         overflow: 'scroll',
-        boxSizing: 'border-box'
+        boxSizing: 'border-box',
+        backgroundColor: 'rgb(245,245,245)'
       }
     }
   }

@@ -34,12 +34,12 @@ class Dashboard extends React.Component {
   renderTopNav() {
     return (
       <TopNav
-        zDepth={0}
-        barColor={BernieColors.lightGray}
-        tabColor={BernieColors.darkGray}
-        selectedTabColor={BernieColors.gray}
+        barColor={BernieColors.blue}
+        tabColor={BernieColors.lightBlue}
+        selectedTabColor={Styles.Colors.white}
+        title="Ground Control"
         logoColors={{
-          primary: BernieColors.blue,
+          primary: Styles.Colors.white,
           swoosh: BernieColors.red
         }}
         tabs={this.tabs}
