@@ -84,7 +84,7 @@ const approvalFilterOptions = {
   },
   APPROVED: {
     text: 'Public Events',
-    actions: ['delete', 'demote', 'edit', 'email', 'fastForward', 'downloadRSVPs']
+    actions: ['delete', 'demote', 'edit', 'email', 'call', 'fastForward', 'downloadRSVPs']
   },
   FAST_FWD_REQUEST: {
     text: 'FastFwd Requests',
@@ -364,6 +364,14 @@ class AdminEventsSection extends React.Component {
             this._handleSendEmail(rowIndex)
           },
         icon: 'email'
+      },
+      call: {
+        title: 'call for turnout',
+        execute: () => {
+            this._handleOpenCallAssignment(rowIndex)
+          },
+        icon: 'phone',
+        disabled: (data[rowIndex].node.relatedCallAssignment === null)
       },
       fastForward: {
         title: 'make fast forward request',
@@ -1096,6 +1104,11 @@ ${signature}`
     })
   }
 
+  _handleOpenCallAssignment = (eventIndex) => {
+    const event = events[eventIndex].node
+    this.props.history.push(`/call/${event.relatedCallAssignment.id}`)
+  }
+
   _handleFastForwardRequest = (eventIndex) => {
     const eventId = events[eventIndex].node.eventIdObfuscated
     window.open(`/admin/events/${eventId}/emails/create`)
@@ -1517,6 +1530,9 @@ export default Relay.createContainer(AdminEventsSection, {
               rsvpUseReminderEmail
               rsvpEmailReminderHours
               attendeesCount
+              relatedCallAssignment {
+                id
+              }
             }
           }
         }
