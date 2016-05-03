@@ -160,10 +160,11 @@ class EventsDashboard extends React.Component {
                 <FlatButton
                   label="Send Turnout Email"
                   onTouchTap={() => this.props.history.push(`/events/${event.eventIdObfuscated}/request-email`)}
+                  disabled={!eventIsInFuture}
                 />
                 <FlatButton
                   label="Open Call Assignment"
-                  disabled={(event.relatedCallAssignment === null)}
+                  disabled={eventIsInFuture ? (event.relatedCallAssignment === null) : true}
                   onTouchTap={() => this.props.history.push(`/call/${event.relatedCallAssignment.id}`)}
                 />
               </CardActions>
