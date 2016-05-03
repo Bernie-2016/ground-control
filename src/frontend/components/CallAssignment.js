@@ -234,7 +234,6 @@ ${userFirstName}`
       callAssignmentId: this.props.callAssignment.id,
       intervieweeId: this.props.currentUser.intervieweeForCallAssignment.id,
       leftVoicemail: this.state.leftVoicemail,
-      sentText: this.state.sentText,
       reasonNotCompleted: this.state.reasonNotCompleted,
       sentText: this.state.sentText,
       surveyFieldValues: JSON.stringify(surveyFields)
