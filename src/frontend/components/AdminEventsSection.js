@@ -80,11 +80,11 @@ const approvalFilterOptions = {
   },
   PENDING_REVIEW: {
     text: 'Pending Review',
-    actions: ['delete', 'demote', 'approve', 'edit', 'email']
+    actions: ['demote', 'approve', 'edit', 'email']
   },
   APPROVED: {
     text: 'Public Events',
-    actions: ['delete', 'demote', 'edit', 'email', 'call', 'fastForward', 'downloadRSVPs']
+    actions: ['email', 'call', 'fastForward', 'downloadRSVPs']
   },
   FAST_FWD_REQUEST: {
     text: 'FastFwd Requests',
