@@ -804,12 +804,10 @@ const GraphQLPerson = new GraphQLObjectType({
     },
     hostedEvents: {
       type: new GraphQLList(GraphQLEvent),
-      resolve: async(person, {rootValue}) => {
-
-        let query = knex('bsd_events')
+      resolve: async (person, {rootValue}) => {
+        return knex('bsd_events')
           .where('creator_cons_id', person.cons_id)
-
-        return query
+          .orderBy('start_dt', 'asc')
       }
     }
   }),
