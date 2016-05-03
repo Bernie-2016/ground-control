@@ -33,20 +33,35 @@ import flattenJSON from '../helpers/flattenJSON'
 const publicEventsRootUrl = 'https://secure.berniesanders.com/page/event'
 const topNavHeight = 56
 
-class LinkButton extends React.Component {
+class ActionButton extends React.Component {
   static propTypes = {
     label: React.PropTypes.string.isRequired,
-    href: React.PropTypes.string.isRequired
+    title: React.PropTypes.string,
+    iconType: React.PropTypes.string
   }
 
   render() {
     return (
       <FlatButton
-        label={this.props.label}
+        {...this.props}
+        style={{...this.props.style, textAlign: 'center'}}
+        icon={<FontIcon className="material-icons">{this.props.iconType}</FontIcon>}
+      />
+    )
+  }
+}
+
+class LinkButton extends ActionButton {
+  static propTypes = {
+    href: React.PropTypes.string.isRequired
+  }
+
+  render() {
+    return (
+      <ActionButton
+        {...this.props}
         linkButton={true}
-        href={this.props.href}
         target='_blank'
-        style={{textAlign: 'center'}}
       />
     )
   }
@@ -138,18 +153,23 @@ class EventsDashboard extends React.Component {
               <CardActions expandable={true}>
                 <LinkButton
                   label='View'
+                  iconType='open_in_new'
                   href={`${publicEventsRootUrl}/detail/${event.eventIdObfuscated}`}
                 />
                 <LinkButton
                   label='Edit'
+                  iconType='mode_edit'
                   href={`${publicEventsRootUrl}/edit_details?event_id=${event.eventIdUnObfuscated}`}
                 />
                 <LinkButton
                   label='Delete'
+                  iconType='delete'
                   href={`${publicEventsRootUrl}/delete/${event.eventIdObfuscated}`}
                 />
-                <FlatButton
-                  label="Download RSVPs"
+                <ActionButton
+                  label="RSVPs"
+                  title="Download RSVP details"
+                  iconType="file_download"
                   disabled={(event.attendees.length === 0)}
                   onTouchTap={() => {
                     const attendees = event.attendees.map((attendee) => flattenJSON(attendee, {ignoreProps: ['__dataID__']}))
@@ -157,13 +177,17 @@ class EventsDashboard extends React.Component {
                     downloadCSV(data, `${event.eventIdObfuscated}.rsvps.csv`)
                   }}
                 />
-                <FlatButton
-                  label="Send Turnout Email"
+                <ActionButton
+                  label="Invite by Email"
+                  title="Invite nearby supporters to attend your event by email"
+                  iconType="email"
                   onTouchTap={() => this.props.history.push(`/events/${event.eventIdObfuscated}/request-email`)}
                   disabled={!eventIsInFuture}
                 />
-                <FlatButton
-                  label="Open Call Assignment"
+                <ActionButton
+                  label="Invite by Phone"
+                  title="Invite nearby supporters to attend your event by phone"
+                  iconType="phone"
                   disabled={eventIsInFuture ? (event.relatedCallAssignment === null) : true}
                   onTouchTap={() => this.props.history.push(`/call/${event.relatedCallAssignment.id}`)}
                 />
