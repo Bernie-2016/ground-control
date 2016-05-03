@@ -1438,7 +1438,7 @@ ${signature}`
 const getDefaultQuery = () => {
   const hashParams = convertType(qs.parse(location.hash.substr(1), { strictNullHandling: true }))
   let defaultParams = {
-    numEvents: 100,
+    numEvents: 50,
     sortField: 'startDate',
     sortDirection: 'ASC',
     status: 'PENDING_REVIEW',
