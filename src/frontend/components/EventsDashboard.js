@@ -114,9 +114,11 @@ class EventsDashboard extends React.Component {
       const timezone = event.localTimezone || 'UTC'
       const offsetDate = moment(event.startDate).utcOffset(utcOffset)
       const formattedDate = offsetDate.format('l LT')
+      const eventIsInFuture = offsetDate.isAfter(currentTime)
+      const eventTextStyle = eventIsInFuture ? {} : {color: BernieColors.gray}
 
       // Return empty div if event is in past
-      if (!this.state.displayPastEvents && !offsetDate.isAfter(currentTime))
+      if (!this.state.displayPastEvents && !eventIsInFuture)
         return <div key={event.id}></div>
       else {
         return (
@@ -126,9 +128,9 @@ class EventsDashboard extends React.Component {
                 actAsExpander={true}
                 showExpandableButton={true}
               >
-                <span style={{...BernieText.title, fontSize: '1.4em'}}>{event.name}</span>
+                <span style={{...BernieText.title, fontSize: '1.4em', ...eventTextStyle}}>{event.name}</span>
                 <br />
-                <span style={{...BernieText.secondaryTitle, fontSize: '0.9em', letterSpacing: '1px'}}>{formattedDate}</span>
+                <span style={{...BernieText.secondaryTitle, fontSize: '0.9em', letterSpacing: '1px', ...eventTextStyle}}>{formattedDate}</span>
               </CardTitle>
               <CardText expandable={true}>
                 <div dangerouslySetInnerHTML={stripScripts(event.description)}></div>
