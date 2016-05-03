@@ -1441,7 +1441,7 @@ const getDefaultQuery = () => {
     numEvents: 50,
     sortField: 'startDate',
     sortDirection: 'ASC',
-    status: 'PENDING_REVIEW',
+    status: 'APPROVED',
     filters: {},
     hostFilters: {}
   }
