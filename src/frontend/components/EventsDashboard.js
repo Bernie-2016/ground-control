@@ -72,7 +72,7 @@ class EventsDashboard extends React.Component {
     })
   }
 
-  isDesktopWidth = () => (this.state.windowWidth > 960)
+  isDesktopWidth = () => (this.state.windowWidth > 1024)
 
   styles = () => {
     return {
