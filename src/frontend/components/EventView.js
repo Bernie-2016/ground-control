@@ -8,7 +8,7 @@ import EventPreview from './EventPreview'
 import EventMapPreview from './EventMapPreview'
 import EventInvalid from './EventInvalid'
 import yup from 'yup'
-import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider'
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import {BernieTheme} from './styles/bernie-theme'
 
 const publicEventsRootUrl = 'https://secure.berniesanders.com/page/event/detail/'

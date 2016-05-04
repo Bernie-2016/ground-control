@@ -7,7 +7,7 @@ import Form from 'react-formal'
 import yup from 'yup'
 import superagent from 'superagent'
 import {Styles, Tabs, Tab} from 'material-ui'
-import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider'
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import {BernieTheme} from './styles/bernie-theme'
 
 export default class Signup extends React.Component {
@@ -82,7 +82,7 @@ export default class Signup extends React.Component {
       minWidth: 330,
       backgroundColor: BernieColors.blue,
       color: BernieColors.white,
-      padding: '15px 15px 15px 15px'
+      padding: 15
     },
     paragraph: {
       padding: '0.5em'
@@ -100,7 +100,7 @@ export default class Signup extends React.Component {
       width: '12em'
     },
     container: {
-      padding: '40px'
+      padding: 40
     },
     errorMessage: {
       ...BernieText.default,

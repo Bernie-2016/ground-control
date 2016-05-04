@@ -1,10 +1,10 @@
-import React from 'react';
-import Relay from 'react-relay';
-import {Styles} from 'material-ui';
-import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider'
-import TopNav from './TopNav';
-import {BernieTheme} from './styles/bernie-theme';
-import {BernieColors} from './styles/bernie-css';
+import React from 'react'
+import Relay from 'react-relay'
+import {Styles} from 'material-ui'
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
+import TopNav from './TopNav'
+import {BernieTheme} from './styles/bernie-theme'
+import {BernieColors} from './styles/bernie-css'
 import Radium from 'radium'
 
 @Radium

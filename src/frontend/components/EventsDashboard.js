@@ -16,7 +16,7 @@ import {
   ListItem,
   Checkbox
 } from 'material-ui'
-import Subheader from 'material-ui/lib/Subheader'
+import Subheader from 'material-ui/Subheader'
 import GCForm from './forms/GCForm'
 import Form from 'react-formal'
 import yup from 'yup'

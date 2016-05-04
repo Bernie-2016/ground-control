@@ -6,7 +6,7 @@ import GCForm from './forms/GCForm'
 import Form from 'react-formal'
 import yup from 'yup'
 import superagent from 'superagent'
-import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider'
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import {slacks} from './data/slacks'
 
 export default class SlackInvite extends React.Component {
