@@ -1,0 +1,8 @@
+#!/bin/sh
+PG_CONNSTRING="-h 127.0.0.1 -p 5432"
+for count in `seq 0 60`; do
+  sleep 1; pg_isready $PG_CONNSTRING
+  if [ $? -eq 0 ]; then
+    break
+  fi
+done
