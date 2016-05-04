@@ -1,6 +1,6 @@
 #!/bin/bash
 
-npm run generate-dotenv
+npm run gen-env
 
 echo "Installing PostgreSQL..."
 brew install postgres
