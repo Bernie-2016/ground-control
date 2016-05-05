@@ -2,7 +2,7 @@
 
 var childProcess = require('child_process')
 
-childProcess.execSync('npm run generate-dotenv')
+childProcess.execSync('npm run gen-env')
 
 var connstring = ' -h 127.0.0.1 -p 5432 -U postgres -w '
 
@@ -13,10 +13,17 @@ childProcess.execSync('docker-compose up -d db')
 
 setTimeout(function() {
     try {
-        childProcess.execSync('dropdb'+connstring+'ground_control')
+        childProcess.execSync('./wait-for-pg')
     } catch (ex) {
-        console.warn("dropdb did not run. This is probably because the database does not already exist, which is fine.")
+        console.fatal("postgres failed to start")
     }
+    console.log("postgres started")
+    // no need to drop since database is clean on docker-compose up
+    // try {
+    //     childProcess.execSync('dropdb'+connstring+'ground_control')
+    // } catch (ex) {
+    //     console.warn("dropdb did not run. This is probably because the database does not already exist, which is fine.")
+    // }
     try {
         childProcess.execSync('createdb'+connstring+'ground_control')
     } catch(ex) {
@@ -27,8 +34,23 @@ setTimeout(function() {
     } catch (ex) {
         console.warn("ground_control role not created.  This is probably because the role already exists, which is fine.");
     }
+    try {
+        childProcess.execSync('psql'+connstring+' -c "CREATE EXTENSION postgis;" -d ground_control')
+    } catch (ex) {
+        console.fatal("Unable to install postgis extensions to database, aborting.");
+    }
 
-    console.log("Seeding data...")
-    childProcess.execSync('npm run seed');
+    try {
+        console.log("migrating schema...")
+        childProcess.execSync('npm run migrate')
+    } catch(ex) {
+        console.fatal("unable to migrate schema")
+    }
+    try {
+        console.log("seeding data...")
+        childProcess.execSync('npm run seed')
+    } catch(ex) {
+        console.fatal("unable to seed data")
+    }
     console.log("Done!")
 }, 20000)
