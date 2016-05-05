@@ -142,46 +142,23 @@ export default Relay.createContainer(FastFwdForm, {
     `,
     event: () => Relay.QL`
       fragment on Event {
-        attendeesCount
-        attendeeVolunteerMessage
-        attendeeVolunteerShow
         fastFwdRequest{
           hostMessage
         }
+        attendeesCount
         capacity
-        contactPhone
-        createDate
         description
         duration
         eventIdObfuscated
         eventType {
-          id
           name
         }
-        flagApproval
         host {
-          id
           firstName
           lastName
           email
         }
-        hostReceiveRsvpEmails
-        id
-        isSearchable
-        latitude
-        localTimezone
-        localUTCOffset
-        longitude
         name
-        nearbyPeople {
-          id
-          firstName
-          lastName
-          email
-        }
-        publicPhone
-        rsvpEmailReminderHours
-        rsvpUseReminderEmail
         startDate
         venueAddr1
         venueAddr2
