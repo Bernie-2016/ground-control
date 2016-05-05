@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom'
 import Relay from 'react-relay'
 import EventCreate from './components/EventCreate.js'
 import DummyEventCreate from './components/DummyEventCreate.js'
-import {Redirect, IndexRoute, IndexRedirect, Route, Router} from 'react-router'
+import {Redirect, IndexRoute, IndexRedirect, Route, Router, browserHistory} from 'react-router'
 import ReactRouterRelay from 'react-router-relay'
 import injectTapEventPlugin from 'react-tap-event-plugin'
 import AdminDashboard from './components/AdminDashboard'
@@ -40,7 +40,6 @@ import Signup from './components/Signup'
 import NotFound from './components/NotFound'
 import Unauthorized from './components/Unauthorized'
 import Form from 'react-formal'
-import {createHistory} from 'history'
 import GCNetworkLayer from './relay-extensions/GCNetworkLayer'
 import log from './log'
 import Loading from './components/Loading'
@@ -108,11 +107,9 @@ const FastFwdRequest = {
   fastFwdRequest: () => Relay.QL`query{ fastFwdRequest(id: $id) }`
 }
 
-let history = createHistory()
-
 ReactDOM.render(
   <Router
-    history={history}
+    history={browserHistory}
     createElement={ReactRouterRelay.createElement}>
     <Route
       path='/admin'

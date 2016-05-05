@@ -1,11 +1,14 @@
 import React from 'react'
 import Relay from 'react-relay'
-import {Styles} from 'material-ui'
+import getMuiTheme from 'material-ui/styles/getMuiTheme'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
+import {colors as MaterialColors} from 'material-ui/styles'
 import TopNav from './TopNav'
 import {BernieTheme} from './styles/bernie-theme'
 import {BernieColors} from './styles/bernie-css'
 import Radium from 'radium'
+
+const bernieMuiTheme = getMuiTheme(BernieTheme)
 
 @Radium
 class Dashboard extends React.Component {
@@ -36,10 +39,10 @@ class Dashboard extends React.Component {
       <TopNav
         barColor={BernieColors.blue}
         tabColor={BernieColors.lightBlue}
-        selectedTabColor={Styles.Colors.white}
+        selectedTabColor={MaterialColors.white}
         title="Ground Control"
         logoColors={{
-          primary: Styles.Colors.white,
+          primary: MaterialColors.white,
           swoosh: BernieColors.red
         }}
         tabs={this.tabs}
@@ -51,7 +54,7 @@ class Dashboard extends React.Component {
 
   render() {
     return (
-      <MuiThemeProvider muiTheme={Styles.getMuiTheme(BernieTheme)}>
+      <MuiThemeProvider muiTheme={bernieMuiTheme}>
         <div>
           {this.renderTopNav()}
           {this.props.children}

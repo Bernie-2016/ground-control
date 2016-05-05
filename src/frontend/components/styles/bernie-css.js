@@ -1,5 +1,3 @@
-import {Styles} from 'material-ui';
-
 export const BernieColors = {
   blue: 'rgb(20, 127, 215)',
   lightBlue: 'rgb(196, 223, 245)',
@@ -12,7 +10,7 @@ export const BernieColors = {
   darkGray: 'rgb(54, 67, 80)',
   gray: 'rgb(153, 155, 158)',
   lightGray: 'rgb(239, 243, 247)',
-  white: Styles.Colors.white
+  white: 'white'
 }
 
 export const BernieText = {

@@ -1,10 +1,12 @@
-import React from 'react';
-import Relay from 'react-relay';
-import {Styles} from 'material-ui';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import TopNav from './TopNav';
-import {BernieTheme} from './styles/bernie-theme';
-import {BernieColors} from './styles/bernie-css';
+import React from 'react'
+import Relay from 'react-relay'
+import getMuiTheme from 'material-ui/styles/getMuiTheme'
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
+import TopNav from './TopNav'
+import {BernieTheme} from './styles/bernie-theme'
+import {BernieColors} from './styles/bernie-css'
+
+const bernieMuiTheme = getMuiTheme(BernieTheme)
 
 class AdminDashboard extends React.Component {
   tabs = [
@@ -24,15 +26,15 @@ class AdminDashboard extends React.Component {
 
   render() {
     return (
-      <MuiThemeProvider muiTheme={Styles.getMuiTheme(BernieTheme)}>
+      <MuiThemeProvider muiTheme={bernieMuiTheme}>
         <div>
           <TopNav
             barColor={BernieColors.blue}
             tabColor={BernieColors.lightBlue}
-            selectedTabColor={Styles.Colors.white}
+            selectedTabColor={bernieMuiTheme.Colors.white}
             title="Ground Control Admin"
             logoColors={{
-              primary: Styles.Colors.white,
+              primary: bernieMuiTheme.Colors.white,
               swoosh: BernieColors.gray
             }}
             tabs={this.tabs}
