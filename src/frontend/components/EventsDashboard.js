@@ -14,7 +14,8 @@ import {
   FontIcon,
   List,
   ListItem,
-  Checkbox
+  Checkbox,
+  Dialog
 } from 'material-ui'
 import Subheader from 'material-ui/Subheader'
 import GCForm from './forms/GCForm'
@@ -25,6 +26,7 @@ import {BernieTheme} from './styles/bernie-theme'
 import {BernieText, BernieColors} from './styles/bernie-css'
 import stripScripts from '../helpers/stripScripts'
 import SideBarLayout from './SideBarLayout'
+import EventRSVPTable from './EventRSVPTable'
 import humps from 'humps'
 import Papa from 'papaparse'
 import downloadCSV from '../helpers/downloadCSV'
@@ -67,6 +69,46 @@ class LinkButton extends ActionButton {
   }
 }
 
+class RSVPModalView extends React.Component {
+  static propTypes = {
+    open: React.PropTypes.bool,
+    onRequestClose: React.PropTypes.func,
+    event: React.PropTypes.object
+  }
+
+  actions = [
+    <FlatButton
+      label="Close"
+      secondary={true}
+      onTouchTap={this.props.onRequestClose}
+    />,
+    <ActionButton
+      label="Download as CSV"
+      primary={true}
+      iconType='file_download'
+      onTouchTap={() => {
+        const attendees = this.props.event.attendees.map((attendee) => flattenJSON(attendee, {ignoreProps: ['__dataID__']}))
+        const data = Papa.unparse(humps.decamelizeKeys(attendees))
+        downloadCSV(data, `${this.props.event.eventIdObfuscated}.rsvps.csv`)
+      }}
+    />,
+  ]
+
+  render() {
+    const event = this.props.event || {}
+    return (
+      <Dialog
+        title={`RSVPs for ${event.name}`}
+        actions={this.actions}
+        autoScrollBodyContent={true}
+        {...this.props}
+      >
+        <EventRSVPTable attendees={event.attendees} />
+      </Dialog>
+    )
+  }
+}
+
 class EventsDashboard extends React.Component {
   constructor(props) {
     super(props)
@@ -74,7 +116,9 @@ class EventsDashboard extends React.Component {
     this.state = {
       windowWidth: window.innerWidth,
       windowHeight: window.innerHeight,
-      displayPastEvents: true
+      displayPastEvents: true,
+      showRSVPModal: false,
+      activeEvent: null
     }
 
     window.addEventListener('resize', this._handleResize)
@@ -152,7 +196,7 @@ class EventsDashboard extends React.Component {
               </CardText>
               <CardActions expandable={true}>
                 <LinkButton
-                  label='View'
+                  label='Open'
                   iconType='open_in_new'
                   href={`${publicEventsRootUrl}/detail/${event.eventIdObfuscated}`}
                 />
@@ -167,14 +211,15 @@ class EventsDashboard extends React.Component {
                   href={`${publicEventsRootUrl}/delete/${event.eventIdObfuscated}`}
                 />
                 <ActionButton
-                  label="RSVPs"
-                  title="Download RSVP details"
-                  iconType="file_download"
+                  label="View RSVPs"
+                  title="View details about event attendees"
+                  iconType="list"
                   disabled={(event.attendees.length === 0)}
                   onTouchTap={() => {
-                    const attendees = event.attendees.map((attendee) => flattenJSON(attendee, {ignoreProps: ['__dataID__']}))
-                    const data = Papa.unparse(humps.decamelizeKeys(attendees))
-                    downloadCSV(data, `${event.eventIdObfuscated}.rsvps.csv`)
+                    this.setState({
+                      activeEvent: event,
+                      showRSVPModal: true
+                    })
                   }}
                 />
                 <ActionButton
@@ -206,6 +251,14 @@ class EventsDashboard extends React.Component {
         <FloatingActionButton style={{marginRight: 20, position: 'fixed', bottom: 20, right: 10}} linkButton={true} href='/events/create' >
           <FontIcon className="material-icons">add</FontIcon>
         </FloatingActionButton>
+        <RSVPModalView
+          event={this.state.activeEvent}
+          open={this.state.showRSVPModal}
+          onRequestClose={() => {
+            this.setState({showRSVPModal: false})
+          }}
+          contentStyle={{width: '90%', maxWidth: 1100}}
+        />
       </div>
     )
   }
@@ -303,7 +356,6 @@ export default Relay.createContainer(EventsDashboard, {
               address {
                 city
                 state
-                zip
               }
             }
             relatedCallAssignment {

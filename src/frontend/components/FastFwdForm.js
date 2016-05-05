@@ -86,8 +86,8 @@ class FastFwdForm extends React.Component {
                            mutationName='createFastFwdRequest'
                            onSuccess={() => {
                               setTimeout(() => {
-                                location.href = 'https://go.berniesanders.com/page/content/volunteer-hub/';
-                              }, 9000)
+                                this.props.history.push('/events')
+                              }, 5000)
                          }} />
           <h1 style={BernieText.title}>
             Fast Fwd: Send a message to bring volunteers to your event
@@ -118,7 +118,6 @@ class FastFwdForm extends React.Component {
               <Form.Field
                 name='hostMessage'
                 multiLine={true}
-                rows={12}
                 fullWidth={true}
                 label="Message From Host"
               />
@@ -143,46 +142,23 @@ export default Relay.createContainer(FastFwdForm, {
     `,
     event: () => Relay.QL`
       fragment on Event {
-        attendeesCount
-        attendeeVolunteerMessage
-        attendeeVolunteerShow
         fastFwdRequest{
           hostMessage
         }
+        attendeesCount
         capacity
-        contactPhone
-        createDate
         description
         duration
         eventIdObfuscated
         eventType {
-          id
           name
         }
-        flagApproval
         host {
-          id
           firstName
           lastName
           email
         }
-        hostReceiveRsvpEmails
-        id
-        isSearchable
-        latitude
-        localTimezone
-        localUTCOffset
-        longitude
         name
-        nearbyPeople {
-          id
-          firstName
-          lastName
-          email
-        }
-        publicPhone
-        rsvpEmailReminderHours
-        rsvpUseReminderEmail
         startDate
         venueAddr1
         venueAddr2

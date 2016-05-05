@@ -43,7 +43,7 @@
     "csv-load-sync": "^1.0.0",
     "dataloader": "^1.0.0",
     "dotenv": "^1.2.0",
-    "draft-js": "^0.7.0",
+    "draft-js": "^0.5.0",
     "email-templates": "2.0.1",
     "express": "^4.13.1",
     "express-graphql": "^0.3.0",
