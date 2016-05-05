@@ -63,8 +63,6 @@ export default class EventPreview extends React.Component {
         <p>{event.venueAddr1} {event.venueAddr2}</p>
         <p>{event.venueCity} {event.venueState}, {event.venueZip} ({event.venueCountry})</p>
         <br/>
-        <p>Capacity: {(event.capacity == 0) ? 'Unlimited' : event.capacity}</p>
-        <br/>
         <p>Directions: {(event.venueDirections) ? event.venueDirections : 'None'}</p>
       </div>
     )
