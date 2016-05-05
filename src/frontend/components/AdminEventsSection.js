@@ -978,6 +978,7 @@ ${signature}`
             }}
         >
           <Tab label="Preview" value={'0'} >
+            <br />
             <EventPreview
               event={activeEvent}
               onChangeEventIndex={(n) => {
