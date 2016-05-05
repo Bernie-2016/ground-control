@@ -16,6 +16,10 @@ export default class EventRSVPTable extends React.Component {
     attendees: React.PropTypes.array
   }
 
+  static defaultProps = {
+    attendees: []
+  }
+
   renderPhoneLink = (phone) => (phone) ? <a href={`tel:${phone}`}>{phoneFormatter.format(phone, '(NNN) NNN-NNNN')}</a> : ''
 
   render() {
