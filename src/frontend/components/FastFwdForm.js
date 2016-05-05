@@ -86,8 +86,8 @@ class FastFwdForm extends React.Component {
                            mutationName='createFastFwdRequest'
                            onSuccess={() => {
                               setTimeout(() => {
-                                location.href = 'https://go.berniesanders.com/page/content/volunteer-hub/';
-                              }, 9000)
+                                this.props.history.push('/events')
+                              }, 5000)
                          }} />
           <h1 style={BernieText.title}>
             Fast Fwd: Send a message to bring volunteers to your event
