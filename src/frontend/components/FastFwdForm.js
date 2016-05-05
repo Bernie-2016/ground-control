@@ -118,7 +118,6 @@ class FastFwdForm extends React.Component {
               <Form.Field
                 name='hostMessage'
                 multiLine={true}
-                rows={12}
                 fullWidth={true}
                 label="Message From Host"
               />
