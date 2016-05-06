@@ -11,15 +11,14 @@ import CreateAdminEventEmail from '../mutations/CreateAdminEventEmail'
 import yup from 'yup'
 
 const publicEventsRootUrl = 'https://secure.berniesanders.com/page/event/detail/'
+const maxSectionWidth = 380
 
 class AdminEventEmailCreationForm extends React.Component {
   styles = {
     detailsContainer: {
       float: 'left',
-      marginLeft: '2rem',
       marginTop: '1rem',
-      padding: 10,
-      width: 380
+      width: maxSectionWidth
     },
 
     recipientInfoContainer: {
@@ -27,23 +26,23 @@ class AdminEventEmailCreationForm extends React.Component {
       marginLeft: '2rem',
       marginTop: '1rem',
       padding: 30,
-      width: 380
+      width: maxSectionWidth - 30
     },
 
     formContainer: {
       float: 'left',
-      width: 380,
-      paddingLeft: 15,
-      paddingRight: 15,
-      paddingTop: 15,
-      paddingBottom: 15,
+      width: maxSectionWidth + 30,
+      padding: 15,
       marginTop: 15,
+      marginBottom: '2rem',
+      marginLeft: '2rem',
       border: 'solid 1px ' + BernieColors.lightGray
     },
 
     pageContainer: {
-      marginLeft: '7rem',
-      marginTop: '1rem'
+      padding: '1rem',
+      margin: '0 auto',
+      maxWidth: 1230
     }
   }
 
@@ -160,11 +159,17 @@ class AdminEventEmailCreationForm extends React.Component {
                               this.props.history.push('/admin/events#query[numEvents]=100&query[sortField]=startDate&query[sortDirection]=ASC&query[status]=FAST_FWD_REQUEST')
                             }
                          }} />
-        <div style={BernieText.title}>
+        <div style={BernieText.secondaryTitle}>
           Send Event Email
         </div>
 
-        <Paper zDepth={2} style={this.styles.formContainer}>
+        <div style={this.styles.detailsContainer}>
+          <EventPreview event={this.props.event} />
+        </div>
+
+        {this.renderRecipientInfo()}
+
+        <Paper style={this.styles.formContainer}>
           <GCForm
             schema={modelSchema}
             defaultValue = {modelSchema.default()}
@@ -245,12 +250,6 @@ class AdminEventEmailCreationForm extends React.Component {
             <br />
             <Form.Button type='submit' label='Send!' fullWidth={true} disabled={this.state.disableSubmit} />
           </GCForm>
-        </Paper>
-
-        {this.renderRecipientInfo()}
-
-        <Paper zDepth={1} style={this.styles.detailsContainer}>
-          <EventPreview event={this.props.event} />
         </Paper>
       </div>
     )
