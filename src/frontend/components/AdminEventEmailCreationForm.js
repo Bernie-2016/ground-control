@@ -191,42 +191,35 @@ class AdminEventEmailCreationForm extends React.Component {
             <Form.Field
               name='senderEmail'
               label="Sender Email Address"
+              fullWidth={true}
             />
             <Form.Field
               name='senderMessage'
               multiLine={true}
-              rows={5}
               label="Message From Sender"
+              fullWidth={true}
             />
-            <br />
             <Form.Field
               name='hostEmailSubject'
               multiLine={true}
-              rows={2}
               label='Host Email Subject'
+              fullWidth={true}
             />
-            <br />
             <Form.Field
               name='hostEmail'
               label="Host Email Address"
+              fullWidth={true}
             />
-            <br />
             <Form.Field
               name='hostMessage'
               multiLine={true}
-              rows={5}
               label="Message From Host"
+              fullWidth={true}
             />
             <br />
             <br />
             <br />
-            <Form.Field
-              name='toolPassword'
-              label="Password for this tool (ask an admin)"
-            />
-            <br />
-            <br />
-            <h4 style={BernieText.default}>Number of recipients: {recipientLimit} (plus you)</h4>
+            Number of recipients: {recipientLimit} (plus you)
             <Slider
               defaultValue={this.state.recipientLimit}
               disabled={this.state.testMode}
@@ -236,15 +229,19 @@ class AdminEventEmailCreationForm extends React.Component {
               onChange={(_, newSliderValue) => {
                 this.setState({recipientLimit: newSliderValue})
               }}
+              fullWidth={true}
             />
-            <br />
-            <br />
             <Toggle
               label='Test mode (only delivers to you)'
               toggled={this.state.testMode}
               onToggle={() => {
                 this.setState({testMode: !this.state.testMode})
               }}
+            />
+            <Form.Field
+              name='toolPassword'
+              label="Password for this tool (ask an admin)"
+              fullWidth={true}
             />
             <br />
             <br />
