@@ -24,7 +24,7 @@ export default class EventRSVPTable extends React.Component {
 
   render() {
     return (
-      <Table selectable={false} multiSelectable={false}>
+      <Table selectable={false} multiSelectable={false} style={{fontFamily: 'Roboto'}}>
         <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
           <TableRow>
             <TableHeaderColumn>Name</TableHeaderColumn>
