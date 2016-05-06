@@ -1,5 +1,4 @@
 import React from 'react'
-import {BernieColors, BernieText} from './styles/bernie-css'
 import {
   Table,
   TableHeaderColumn,
