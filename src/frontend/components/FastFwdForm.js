@@ -13,28 +13,24 @@ import {BernieTheme} from './styles/bernie-theme'
 
 const publicEventsRootUrl = 'https://secure.berniesanders.com/page/event/detail/'
 
+require('./styles/fastFwdForm.css')
+
 class FastFwdForm extends React.Component {
   styles = {
     detailsContainer: {
       float: 'left',
       padding: '1em',
-      paddingLeft: 0,
-      width: '55%',
     },
 
     formContainer: {
       float: 'left',
-      width: '40%',
       padding: '1em',
-      marginTop: 15,
-      marginLeft: '2rem',
       border: 'solid 1px ' + BernieColors.lightGray
     },
 
     pageContainer: {
       margin: '0 auto',
       padding: '3em',
-      maxWidth: 1300
     }
   }
 
@@ -79,7 +75,7 @@ class FastFwdForm extends React.Component {
 
     return (
       <MuiThemeProvider muiTheme={Styles.getMuiTheme(BernieTheme)}>
-        <div style={this.styles.pageContainer}>
+        <div style={this.styles.pageContainer} className="ffwdPageContainer">
           <MutationHandler ref='mutationHandler'
                            successMessage='Your request has been saved. We will review it and send it out to volunteers in your area ASAP!'
                            mutationClass={CreateFastFwdRequest}
@@ -93,12 +89,12 @@ class FastFwdForm extends React.Component {
             Fast Fwd: Send a message to bring volunteers to your event
           </h1>
 
-          <div zDepth={1} style={this.styles.detailsContainer}>
+          <div zDepth={1} style={this.styles.detailsContainer} className="ffwdDetailsContainer">
             <p style={BernieText.secondaryTitle}>Your Event Details:</p>
             <EventPreview event={this.props.event} />
           </div>
 
-          <Paper style={this.styles.formContainer}>
+          <Paper style={this.styles.formContainer} className="ffwdFormContainer">
             <GCForm
               schema={formSchema}
               defaultValue={formSchema.default()}
