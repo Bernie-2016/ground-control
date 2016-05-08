@@ -255,20 +255,24 @@ exports.seed = async function(knex, Promise) {
 
   log.info('Generating events and attendees...')
   for (let index = 1; index <= NUM_EVENTS; index++) {
-    let rsvp_use_reminder_boolean = faker.random.boolean();
-    let rsvp_use_reminder_email = rsvp_use_reminder_boolean;
-    let rsvp_email_reminder_hours = rsvp_use_reminder_boolean ? null : faker.random.number({min:0, max:30});
-    let capacity = faker.random.arrayElement([0, faker.random.number({min:0, max:100})]);
+    let rsvp_use_reminder_boolean = faker.random.boolean()
+    let rsvp_use_reminder_email = rsvp_use_reminder_boolean
+    let rsvp_email_reminder_hours = rsvp_use_reminder_boolean ? null : faker.random.number({min:0, max:30})
+    let capacity = faker.random.arrayElement([0, faker.random.number({min:0, max:100})])
 
-    let zip = faker.random.arrayElement(data.zip_codes);
-    let startDate = formatDate(faker.date.future());
+    let zip = faker.random.arrayElement(data.zip_codes)
+    let startDate = formatDate(faker.date.future())
+    const personID = faker.random.number({min: 1, max: NUM_PERSONS})
+    const host = data.bsd_people[personID]
+
     data.bsd_events.push({
       event_id: index,
       event_id_obfuscated: faker.internet.password(5),
       flag_approval: faker.random.boolean(),
       is_official: faker.random.boolean(),
       event_type_id: faker.random.arrayElement(data.bsd_event_types.map((type) => type.event_type_id)),
-      creator_cons_id: faker.random.number({min: 1, max: NUM_PERSONS}),
+      creator_name: `${host.firstname} ${host.lastname}`,
+      creator_cons_id: host.cons_id,
       name: titlify(faker.lorem.sentence(3,5)),
       description: faker.lorem.paragraph(),
       venue_name: titlify(faker.lorem.sentence(1,4)),
@@ -297,14 +301,14 @@ exports.seed = async function(knex, Promise) {
     })
 
     if (faker.random.boolean()){
-    	data.bsd_event_shifts.push({
-    		event_id: index,
-    		event_shift_id: data.bsd_event_shifts.length,
-    		start_dt: moment(startDate).format('YYYY-MM-DD HH:mm:ss'),
-    		start_time: moment(startDate).format('HH:mm:ss'),
-    		end_dt: moment(startDate).format('YYYY-MM-DD HH:mm:ss'),
-    		end_time: moment(startDate).format('HH:mm:ss'),
-    		capacity: faker.random.number({min: 0, max: 300})
+      data.bsd_event_shifts.push({
+        event_id: index,
+        event_shift_id: data.bsd_event_shifts.length,
+        start_dt: moment(startDate).format('YYYY-MM-DD HH:mm:ss'),
+        start_time: moment(startDate).format('HH:mm:ss'),
+        end_dt: moment(startDate).format('YYYY-MM-DD HH:mm:ss'),
+        end_time: moment(startDate).format('HH:mm:ss'),
+        capacity: faker.random.number({min: 0, max: 300})
       })
     }
 
