@@ -932,6 +932,10 @@ const GraphQLEvent = new GraphQLObjectType({
       type: GraphQLBoolean,
       resolve: (event) => event.is_official
     },
+    creatorName: {
+      type: GraphQLBoolean,
+      resolve: (event) => event.creator_name
+    },
     host: {
       type: GraphQLPerson,
       resolve: async(event, _, {rootValue}) => rootValue.loaders.bsdPeople.load(event.creator_cons_id)
