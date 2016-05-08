@@ -84,7 +84,7 @@ const approvalFilterOptions = {
   },
   APPROVED: {
     text: 'Public Events',
-    actions: ['email', 'call', 'fastForward', 'downloadRSVPs']
+    actions: ['edit', 'email', 'call', 'fastForward', 'downloadRSVPs']
   },
   FAST_FWD_REQUEST: {
     text: 'FastFwd Requests',
@@ -1492,6 +1492,7 @@ export default Relay.createContainer(AdminEventsSection, {
             node {
               name
               id
+              creatorName
               host {
                 id
                 firstName

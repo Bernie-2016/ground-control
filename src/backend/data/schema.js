@@ -932,6 +932,10 @@ const GraphQLEvent = new GraphQLObjectType({
       type: GraphQLBoolean,
       resolve: (event) => event.is_official
     },
+    creatorName: {
+      type: GraphQLString,
+      resolve: (event) => event.creator_name
+    },
     host: {
       type: GraphQLPerson,
       resolve: async(event, _, {rootValue}) => rootValue.loaders.bsdPeople.load(event.creator_cons_id)
@@ -1232,6 +1236,7 @@ const GraphQLEventInput = new GraphQLInputObjectType({
     eventIdObfuscated: {type: GraphQLString},
     isOfficial: {type: GraphQLBoolean},
     eventTypeId: {type: GraphQLString},
+    creatorName: {type: GraphQLString},
     hostId: {type: GraphQLString},
     flagApproval: {type: GraphQLBoolean},
     name: {type: GraphQLString},
