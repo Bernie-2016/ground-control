@@ -130,6 +130,9 @@ class EventEdit extends React.Component {
         .min(0)
         .required(),
 
+      creatorName: yup.string()
+        .default(event.creatorName),
+
       hostEmail: yup.string().email()
         .default((event.host) ? event.host.email : null),
 
@@ -302,6 +305,11 @@ class EventEdit extends React.Component {
           onChange={(value) => {
             this.props.relay.setVariables({personFilters: {email: value}})
           }}
+        />
+
+        <Form.Field
+          name="creatorName"
+          label="Host Name"
         /><br/>
 
         <Form.Field
