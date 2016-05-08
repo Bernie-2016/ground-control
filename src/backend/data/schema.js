@@ -1236,6 +1236,7 @@ const GraphQLEventInput = new GraphQLInputObjectType({
     eventIdObfuscated: {type: GraphQLString},
     isOfficial: {type: GraphQLBoolean},
     eventTypeId: {type: GraphQLString},
+    creatorName: {type: GraphQLString},
     hostId: {type: GraphQLString},
     flagApproval: {type: GraphQLBoolean},
     name: {type: GraphQLString},
