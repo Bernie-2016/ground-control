@@ -295,7 +295,10 @@ class EventEdit extends React.Component {
         />
 
         <InfoHeader content='Event Host' />
-        {(host) ? `${host.firstName} ${host.lastName}` : 'No host name available'}<br />
+        <Form.Field
+          name="creatorName"
+          label="Host Name"
+        /><br/>
 
         <Form.Field
           name="hostEmail"
@@ -305,12 +308,7 @@ class EventEdit extends React.Component {
           onChange={(value) => {
             this.props.relay.setVariables({personFilters: {email: value}})
           }}
-        />
-
-        <Form.Field
-          name="creatorName"
-          label="Host Name"
-        /><br/>
+        /> {(host) ? <span>({host.firstName} {host.lastName})</span> : ''}<br/>
 
         <Form.Field
           name="contactPhone"
