@@ -1492,6 +1492,7 @@ export default Relay.createContainer(AdminEventsSection, {
             node {
               name
               id
+              creatorName
               host {
                 id
                 firstName
