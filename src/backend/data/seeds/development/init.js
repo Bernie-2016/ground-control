@@ -324,7 +324,7 @@ exports.seed = async function(knex, Promise) {
     }
   }
 
-  let insertOrder = ['users', 'zip_codes', 'event_files', 'event_file_types', 'bsd_groups', 'bsd_event_types', 'bsd_people', 'bsd_events', 'bsd_event_shifts', 'bsd_event_attendees', 'bsd_addresses', 'bsd_person_bsd_groups', 'bsd_emails', 'bsd_phones', 'bsd_subscriptions', 'contact_assignments', 'contact_call_actions', 'contact_text_actions']
+  let insertOrder = ['users', 'zip_codes', 'event_files', 'event_file_types', 'bsd_groups', 'bsd_event_types', 'bsd_people', 'bsd_events', 'bsd_event_shifts', 'bsd_event_attendees', 'bsd_addresses', 'bsd_person_bsd_groups', 'bsd_emails', 'bsd_phones', 'bsd_subscriptions', 'contact_call_actions', 'contact_text_actions', 'contact_assignments']
 
   for (let index = 0; index < insertOrder.length; index++) {
     let key = insertOrder[index]
