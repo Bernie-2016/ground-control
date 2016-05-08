@@ -933,7 +933,7 @@ const GraphQLEvent = new GraphQLObjectType({
       resolve: (event) => event.is_official
     },
     creatorName: {
-      type: GraphQLBoolean,
+      type: GraphQLString,
       resolve: (event) => event.creator_name
     },
     host: {
