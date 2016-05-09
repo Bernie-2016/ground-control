@@ -168,19 +168,18 @@ ${userFirstName}`
   }
 
   renderIntervieweeInfo() {
-    let interviewee = this.props.currentUser.intervieweeForCallAssignment
-    let name = this.intervieweeName()
-    let localTime = moment().utcOffset(interviewee.address.localUTCOffset).format('h:mm a')
+    const interviewee = this.props.currentUser.intervieweeForCallAssignment
+    const name = this.intervieweeName()
+    const localTime = moment().utcOffset(interviewee.address.localUTCOffset).format('h:mm a')
 
-    let lastCalled = () => {
+    const lastCalled = () => {
       if (interviewee.lastCalled) {
         return moment(interviewee.lastCalled).utcOffset(interviewee.address.localUTCOffset).fromNow()
       } else {
         return 'never'
       }
     }
-    let country = interviewee.address.country || 'US'
-    let sideBar = (
+    const sideBar = (
       <div>
         <div style={{
           ...BernieText.default,
@@ -198,13 +197,8 @@ ${userFirstName}`
       </div>
     )
 
-    let location = `${interviewee.address.city}, ${interviewee.address.state}`
-    if (country !== 'US')
-      location = location + `, ${country}`
-    location = location + `, ${interviewee.address.zip}`
-
-    let email =  this.props.currentUser.intervieweeForCallAssignment.email ? <a target='_blank' href={this.generateEventsInfoEmailLink()}>{this.props.currentUser.intervieweeForCallAssignment.email}</a> : 'None'
-    let content = (
+    const email =  interviewee.email ? <a target='_blank' href={this.generateEventsInfoEmailLink()}>{interviewee.email}</a> : 'None'
+    const content = (
       <div style={BernieText.default}>
         Location: {interviewee.address.city}, {interviewee.address.state}<br />
         Local Time: {localTime}<br />
