@@ -263,7 +263,7 @@ exports.seed = async function(knex, Promise) {
 
     let zip = faker.random.arrayElement(data.zip_codes)
     let startDate = formatDate(faker.date.future())
-    const personID = faker.random.number({min: 1, max: NUM_PERSONS})
+    const personID = faker.random.number({min: 0, max: NUM_PERSONS - 1})
     const host = data.bsd_people[personID]
 
     data.bsd_events.push({
