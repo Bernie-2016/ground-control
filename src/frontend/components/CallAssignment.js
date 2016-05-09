@@ -180,7 +180,6 @@ ${userFirstName}`
       }
     }
     let country = interviewee.address.country || 'US'
-    let phone = interviewee.phone
     let sideBar = (
       <div>
         <div style={{
