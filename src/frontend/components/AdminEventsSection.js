@@ -804,7 +804,7 @@ ${signature}`
           this.setState({showFiltersDialog: false});
         }}
       />,
-    ];
+    ]
 
     const containsInput = (inputArray, inputProp, key='name') => {
       let found = false
@@ -828,8 +828,9 @@ ${signature}`
           type={type}
         />
       </div>
-    );
+    )
 
+    const eventTypeOptions = this.props.listContainer.eventTypes.sort((a, b) => a.name > b.name)
     const booleanOptions = [
       {
         name: 'Yes',
@@ -839,12 +840,12 @@ ${signature}`
         name: 'No',
         value: false
       }
-    ];
+    ]
 
     const filterInputs = [
       {name: 'eventIdObfuscated', label: 'Event ID'},
       {name: 'name', label: 'Event Name'},
-      {name: 'eventTypeId', label: 'Event Type', type: 'select', options: this.props.listContainer.eventTypes, optionValue: 'id'},
+      {name: 'eventTypeId', label: 'Event Type', type: 'select', options: eventTypeOptions, optionValue: 'id'},
       {name: 'isOfficial', label: 'Official Campaign Event', type: 'select', options: booleanOptions},
       {name: 'isSearchable', label: 'Public Event', type: 'select', options: booleanOptions},
       {name: 'contactPhone', label: 'Host Contact Phone'},
@@ -857,7 +858,7 @@ ${signature}`
       {name: 'venueZip', label: 'Zip Code'},
       {name: 'latitude', label: 'Latitude', type: 'number'},
       {name: 'longitude', label: 'Longitude', type: 'number'}
-    ];
+    ]
 
     const hostFilterInputs = [
       {name: 'firstname', label: 'First Name'},
@@ -865,7 +866,7 @@ ${signature}`
       {name: 'lastname', label: 'Last Name'},
       {name: 'email', label: 'Email Address'},
       {name: 'phone', label: 'Phone Number'}
-    ];
+    ]
 
     const FilterSelect = ({filterProperty, name, label, options, optionName='name', optionValue='value'}) => (
       <div>
@@ -880,7 +881,7 @@ ${signature}`
           })}
         </select>
       </div>
-    );
+    )
 
     const FilterGroup = ({filterProperty, name, inputs, containerStyle}) => (
         <div style={containerStyle}>
