@@ -308,7 +308,7 @@ class EventEdit extends React.Component {
           onChange={(value) => {
             this.props.relay.setVariables({personFilters: {email: value}})
           }}
-        /> {(host) ? <span>({host.firstName} {host.lastName})</span> : ''}<br/>
+        /> {(host.firstName || host.lastName) ? <span>({host.firstName} {host.lastName})</span> : ''}<br/>
 
         <Form.Field
           name="contactPhone"
