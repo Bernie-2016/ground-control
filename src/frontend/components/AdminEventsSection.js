@@ -320,6 +320,7 @@ class AdminEventsSection extends React.Component {
   }
 
   ActionCell = ({rowIndex, data, col, ...props}) => {
+    const event = data[rowIndex].node
     let cellStyle = {}
     let iconColor = null
 
@@ -367,19 +368,19 @@ class AdminEventsSection extends React.Component {
       },
       call: {
         title: 'call for turnout',
-        onTouchTap: () => {
-            this._handleOpenCallAssignment(rowIndex)
-          },
+        href: (event.relatedCallAssignment) ? `/call/${event.relatedCallAssignment.id}` : '/call',
+        target: '_blank',
+        linkButton: true,
         icon: 'phone',
-        disabled: (data[rowIndex].node.relatedCallAssignment === null)
+        disabled: (event.relatedCallAssignment === null)
       },
       fastForward: {
         title: 'make fast forward request',
-        onTouchTap: () => {
-            this._handleFastForwardRequest([rowIndex])
-          },
+        href: `/admin/events/${event.eventIdObfuscated}/emails/create`,
+        target: '_blank',
+        linkButton: true,
         icon: 'fast_forward',
-        disabled: (data[rowIndex].node.isSearchable === 0)
+        disabled: (event.isSearchable === 0)
       },
       downloadRSVPs: {
         title: 'download RSVPs',
@@ -387,7 +388,7 @@ class AdminEventsSection extends React.Component {
             this._handleRSVPDownload([rowIndex])
           },
         icon: 'file_download',
-        disabled: (data[rowIndex].node.attendeesCount <= 0)
+        disabled: (event.attendeesCount <= 0)
       }
     }
 
@@ -401,6 +402,7 @@ class AdminEventsSection extends React.Component {
             <IconButton
               {...actions[type]}
               key={type}
+              style={{verticalAlign: 'middle'}}
             >
               <FontIcon className="material-icons" color={iconColor} hoverColor={actions[type].hoverColor || BernieColors.blue}>{actions[type].icon}</FontIcon>
             </IconButton>
@@ -1101,16 +1103,6 @@ ${signature}`
       showSendEventEmailDialog: true,
       activeEvent: events[eventIndex].node
     })
-  }
-
-  _handleOpenCallAssignment = (eventIndex) => {
-    const event = events[eventIndex].node
-    this.props.history.push(`/call/${event.relatedCallAssignment.id}`)
-  }
-
-  _handleFastForwardRequest = (eventIndex) => {
-    const eventId = events[eventIndex].node.eventIdObfuscated
-    window.open(`/admin/events/${eventId}/emails/create`)
   }
 
   _handleRSVPDownload = (eventIndex) => {
