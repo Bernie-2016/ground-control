@@ -330,7 +330,7 @@ class AdminEventsSection extends React.Component {
 
     const actions = {
       delete: {
-        execute: () => {
+        onTouchTap: () => {
             this._handleEventDeletion([rowIndex])
           },
         icon: 'delete',
@@ -338,14 +338,14 @@ class AdminEventsSection extends React.Component {
       },
       approve: {
         title: (this.props.relay.variables.status === 'PENDING_REVIEW') ? 'mark reviewed' : 'mark approved',
-        execute: () => {
+        onTouchTap: () => {
             this._handleEventConfirmation([rowIndex])
           },
         icon: 'event_available'
       },
       demote: {
         title: 'move to approval queue',
-        execute: () => {
+        onTouchTap: () => {
             this._handleEventConfirmation([rowIndex], true)
           },
         icon: 'event_busy',
@@ -353,21 +353,21 @@ class AdminEventsSection extends React.Component {
       },
       edit: {
         title: 'edit',
-        execute: () => {
+        onTouchTap: () => {
             this._handleEventPreviewOpen(rowIndex, 1);
           },
         icon: 'edit'
       },
       email: {
         title: 'send email',
-        execute: () => {
+        onTouchTap: () => {
             this._handleSendEmail(rowIndex)
           },
         icon: 'email'
       },
       call: {
         title: 'call for turnout',
-        execute: () => {
+        onTouchTap: () => {
             this._handleOpenCallAssignment(rowIndex)
           },
         icon: 'phone',
@@ -375,7 +375,7 @@ class AdminEventsSection extends React.Component {
       },
       fastForward: {
         title: 'make fast forward request',
-        execute: () => {
+        onTouchTap: () => {
             this._handleFastForwardRequest([rowIndex])
           },
         icon: 'fast_forward',
@@ -383,7 +383,7 @@ class AdminEventsSection extends React.Component {
       },
       downloadRSVPs: {
         title: 'download RSVPs',
-        execute: () => {
+        onTouchTap: () => {
             this._handleRSVPDownload([rowIndex])
           },
         icon: 'file_download',
@@ -399,9 +399,7 @@ class AdminEventsSection extends React.Component {
       return options.map((type) => {
           return (
             <IconButton
-              title={actions[type].title}
-              onTouchTap={actions[type].execute}
-              disabled={(actions[type].disabled !== undefined) ? actions[type].disabled : false}
+              {...actions[type]}
               key={type}
             >
               <FontIcon className="material-icons" color={iconColor} hoverColor={actions[type].hoverColor || BernieColors.blue}>{actions[type].icon}</FontIcon>
