@@ -88,7 +88,7 @@ exports.seed = async function(knex, Promise) {
   }
 
   log.info('Creating admin users...')
-  let password = await hash('admin')
+  let password = await hash('password')
 
   data.users = [
     {
@@ -254,6 +254,7 @@ exports.seed = async function(knex, Promise) {
   let eventAttendeeCount = 0
 
   log.info('Generating events and attendees...')
+  const eventTypeIdsArray = data.bsd_event_types.map((type) => type.event_type_id)
   for (let index = 1; index <= NUM_EVENTS; index++) {
     let rsvp_use_reminder_boolean = faker.random.boolean()
     let rsvp_use_reminder_email = rsvp_use_reminder_boolean
@@ -270,7 +271,7 @@ exports.seed = async function(knex, Promise) {
       event_id_obfuscated: faker.internet.password(5),
       flag_approval: faker.random.boolean(),
       is_official: faker.random.boolean(),
-      event_type_id: faker.random.arrayElement(data.bsd_event_types.map((type) => type.event_type_id)),
+      event_type_id: faker.random.arrayElement(eventTypeIdsArray),
       creator_name: `${host.firstname} ${host.lastname}`,
       creator_cons_id: host.cons_id,
       name: titlify(faker.lorem.sentence(3,5)),
