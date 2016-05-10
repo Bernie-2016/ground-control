@@ -830,7 +830,7 @@ ${signature}`
       </div>
     )
 
-    const eventTypeOptions = this.props.listContainer.eventTypes.sort((a, b) => a.name > b.name)
+    const eventTypeOptions = this.props.listContainer.eventTypes
     const booleanOptions = [
       {
         name: 'Yes',
