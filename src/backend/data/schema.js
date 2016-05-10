@@ -318,7 +318,7 @@ const GraphQLListContainer = new GraphQLObjectType({
     eventTypes: {
       type: new GraphQLList(GraphQLEventType),
       resolve: async(eventType, {rootValue}) => {
-        return knex('bsd_event_types')
+        return knex('bsd_event_types').orderBy('name', 'ASC')
       }
     },
     events: {
