@@ -5,7 +5,7 @@ import {
   Divider,
   RaisedButton,
   Card,
-  CardHeader,
+  CardTitle,
   CardText,
   FontIcon,
   RefreshIndicator,
@@ -85,18 +85,14 @@ class ConstituentLookup extends React.Component {
       const address = person.address || {}
       return (
         <Card key={person.id}>
-          <CardHeader
-            title={<span>{person.firstName} {person.middleName} {person.lastName} {location}</span>}
-            subtitle={person.email}
-            avatar={
-              <FontIcon
-                className="material-icons"
-                style={{fontSize: '2em'}}
-              >account_circle</FontIcon>
-            }
+          <CardTitle
             actAsExpander={true}
             showExpandableButton={true}
-          />
+          >
+            <span style={{...BernieText.default, fontSize: '1.1em', fontWeight: 'bold'}}>{person.firstName} {person.middleName} {person.lastName} {location}</span>
+            <br />
+            <span style={{...BernieText.default, fontSize: '0.9em', letterSpacing: '1px'}}>{person.email}</span>
+          </CardTitle>
           <CardText expandable={true}>
             <Table selectable={false} multiSelectable={false} style={{fontFamily: 'Roboto'}}>
               <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
