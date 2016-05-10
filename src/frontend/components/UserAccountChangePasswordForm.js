@@ -9,10 +9,6 @@ import yup from 'yup'
 import MutationHandler from './MutationHandler'
 
 export default class UserAccountChangePasswordForm extends React.Component {
-  surveyProcessors = {
-    'bsd-event-rsvper': 'Create event RSVPs.'
-  }
-
   styles = {
     formContainer: {
       width: 360,
