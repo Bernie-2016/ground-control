@@ -1,6 +1,6 @@
-import React from 'react';
-import moment from 'moment-timezone';
-import {BernieText, BernieColors} from './styles/bernie-css';
+import React from 'react'
+import moment from 'moment-timezone'
+import {BernieText, BernieColors} from './styles/bernie-css'
 import InfoHeader from './InfoHeader'
 import stripScripts from '../helpers/stripScripts'
 
@@ -38,7 +38,7 @@ export default class EventPreview extends React.Component {
     }
     return (
       <div style={BernieText.default}>
-        <h1 style={BernieText.title}>{event.name}</h1>
+        <h1 style={{...BernieText.title, fontSize: '2rem'}}>{event.name}</h1>
         {isOfficial}  
 
         <InfoHeader content='Event Host' />
