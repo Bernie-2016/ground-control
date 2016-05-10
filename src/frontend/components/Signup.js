@@ -21,7 +21,7 @@ export default class Signup extends React.Component {
   }
 
   redirectToNext() {
-    let queryDict = {};
+    let queryDict = {}
     location.search.substr(1).split("&").forEach((item) => {
       queryDict[item.split("=")[0]] = item.split("=").slice(1).join('=')
     })
@@ -58,7 +58,7 @@ export default class Signup extends React.Component {
         </div>
       ),
       onSubmit: (formState) => {
-        this.clearError();
+        this.clearError()
         superagent
           .post('/signup')
           .send({
@@ -67,9 +67,9 @@ export default class Signup extends React.Component {
           })
           .end((err, res) => {
             if (!err) {
-              this.redirectToNext();
+              this.redirectToNext()
             } else {
-              this.setState({errorMessage: 'Email or password not recognized.'});
+              this.setState({errorMessage: 'Email or password not recognized.'})
             }
           })
       }
@@ -154,17 +154,16 @@ export default class Signup extends React.Component {
   }
 
   renderSignupForm() {
-    let signupState = this.formStates[this.state.formState];
-    let formElement = signupState.formElement;
-    let formTitle = signupState.formTitle;
-    let formSchema = signupState.formSchema;
-    let submitHandler = signupState.onSubmit;
-    let errorElement = <div></div>;
-    let passwordResetElement = <div></div>;
+    let signupState = this.formStates[this.state.formState]
+    let formElement = signupState.formElement
+    let formSchema = signupState.formSchema
+    let submitHandler = signupState.onSubmit
+    let errorElement = <div></div>
+    let passwordResetElement = <div></div>
 
     if (this.state.errorMessage) {
-      errorElement = <div style={this.styles.errorMessage}>{this.state.errorMessage}</div>;
-      passwordResetElement = <div style={{...this.styles.errorMessage, marginTop: 0}}><a style={{color: BernieColors.lightRed}} target="_blank" href="https://secure.berniesanders.com/page/user/forgot">Click here to request a password reset</a></div>;
+      errorElement = <div style={this.styles.errorMessage}>{this.state.errorMessage}</div>
+      passwordResetElement = <div style={{...this.styles.errorMessage, marginTop: 0}}><a style={{color: BernieColors.lightRed}} target="_blank" href="https://secure.berniesanders.com/page/user/forgot">Click here to request a password reset</a></div>
     }
 
     return (
