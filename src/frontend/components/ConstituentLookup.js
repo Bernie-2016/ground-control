@@ -62,12 +62,12 @@ class ConstituentLookup extends React.Component {
       )
     return people.map((person) => {
       person = person.node
-      const location = (person.address) ? `${person.address.city} ${person.address.state}` : ''
+      const location = (person.address) ? <span>({person.address.city} {person.address.state})</span> : ''
       return (
         <Card key={person.id}>
           <CardHeader
-            title={`${person.firstName || ''} ${person.middleName || ''} ${person.lastName || ''}`}
-            subtitle={(location) ? `${location} - ${person.email}` : person.email}
+            title={<span>{person.firstName} {person.middleName} {person.lastName} {location}</span>}
+            subtitle={person.email}
             avatar={
               <FontIcon
                 className="material-icons"
