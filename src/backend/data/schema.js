@@ -1326,6 +1326,18 @@ const GraphQLEditEvents = mutationWithClientMutationId({
         event['attendee_require_phone'] = 1
       }
 
+      // Delete event host address fields (API calls fail if these are incomplete so just remove them all for now)
+      const hostAddressFields = [
+        'host_addr_addressee',
+        'host_addr_addr1',
+        'host_addr_addr2',
+        'host_addr_zip',
+        'host_addr_city',
+        'host_addr_state_cd',
+        'host_addr_country'
+      ]
+      hostAddressFields.forEach((field) => delete event[field])
+
       try {
         await BSDClient.updateEvent(event)
       }
