@@ -138,6 +138,7 @@ export default Relay.createContainer(FastFwdForm, {
     `,
     event: () => Relay.QL`
       fragment on Event {
+        id
         fastFwdRequest{
           hostMessage
         }
