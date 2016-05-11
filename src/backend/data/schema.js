@@ -1339,6 +1339,7 @@ const GraphQLEditEvents = mutationWithClientMutationId({
       hostAddressFields.forEach((field) => delete event[field])
 
       try {
+        log.info('Merged Event Data:', event)
         await BSDClient.updateEvent(event)
       }
       catch (ex) {
