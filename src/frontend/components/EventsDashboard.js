@@ -280,7 +280,7 @@ class EventsDashboard extends React.Component {
               />
             }
             primaryText="Show All Events"
-            secondaryText="View all past and upcoming events"
+            secondaryText={this.state.displayPastEvents ? "Including past events" : "Hiding past events"}
           />
         </List>
         <Divider />
