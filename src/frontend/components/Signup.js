@@ -89,11 +89,13 @@ export default class Signup extends React.Component {
     },
     introContainer: {
       display: 'flex',
-      flexDirection: 'row'
+      flexDirection: 'row',
+      flexWrap: 'wrap'
     },
     introTextContainer: {
       flex: 1,
-      marginRight: 40
+      marginRight: 40,
+      marginBottom: 20
     },
     signupFormContainer: {
       flex: 'auto',
@@ -114,7 +116,7 @@ export default class Signup extends React.Component {
     return (
       <div style={this.styles.container} >
         <div style={this.styles.introContainer}>
-          <div style={this.styles.introTextContainer}>
+          <div style={this.styles.introTextContainer} className="full-width-on-mobile">
             <div style={{
               ...BernieText.secondaryTitle,
               display: 'block'
@@ -134,7 +136,7 @@ export default class Signup extends React.Component {
                 </p>
             </div>
           </div>
-          <div styles={this.styles.signupFormContainer}>
+          <div styles={this.styles.signupFormContainer} className="full-width-on-mobile">
             <Tabs>
               <Tab label="Log In" >
                 <div>
