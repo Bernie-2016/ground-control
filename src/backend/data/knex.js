@@ -1,5 +1,6 @@
 import knexFactory from 'knex';
 import knexfile from './knexfile';
+import log from '../log'
 
 let knex = null;
 if (!process.env.NO_DB) {
@@ -41,15 +42,18 @@ if (!process.env.NO_DB) {
       values = [values]
     values = values.map((val) => {
       return {
-        modified_dt: timestamp,
-        create_dt: timestamp,
+        // modified_dt: timestamp,
+        // create_dt: timestamp,
         ...val
       }
     })
     idField = idField || 'id'
     let query = knex(table).insert(values).returning(idField);
-    if (transaction)
+    log.debug(query.toString())
+    if (transaction) {
       query = query.transacting(transaction)
+      log.debug(query.toString())
+    }
     let ids = await query
 
     query = knex(table).whereIn(idField, ids)
