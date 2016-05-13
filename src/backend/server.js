@@ -495,6 +495,28 @@ function startApp() {
     res.json(results)
   })
 
+  app.get('/create-contact-assignments.json', async (req, res) => {    
+    const assignments = await knex('contact_assignments')
+      .select('*')
+      .where('name', 'Register voters in California')
+
+    // if (assignments.length > 0) {
+    //   log.debug('assignment exists')
+    //   res.json(assignments[0])
+    //   return
+    // }
+
+    const assignment = await knex.insertAndFetch('contact_assignments', {
+      expires: new Date('05/24/2016'),
+      name: 'Register voters in Oregon',
+      description: `We need to register yuuuge numbers of democrats or unaffiliated voters by May 23rd in order to win big in Oregon.`,
+      instructions: 'Call your friend first, then send them the appropriate followup text.',
+      require_call_first: true
+    })
+
+    res.json(assignment)
+  })
+
   app.get('/events/data/upload', wrap(async (req, res) => {
     res.redirect('https://script.google.com/macros/s/AKfycbwVZHnRZ5CJkzFID91QYcsLNFLkPgstd7XjS9o1QSEAh3tC2vY/exec')
   }))
