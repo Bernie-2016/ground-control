@@ -10,6 +10,8 @@ import {Styles, Tabs, Tab} from 'material-ui'
 import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider'
 import {BernieTheme} from './styles/bernie-theme'
 
+require('./styles/signup.css')
+
 export default class Signup extends React.Component {
   state = {
     formState: 'signup',
@@ -82,25 +84,31 @@ export default class Signup extends React.Component {
       minWidth: 330,
       backgroundColor: BernieColors.blue,
       color: BernieColors.white,
-      padding: '15px 15px 15px 15px'
+      padding: 15
     },
     paragraph: {
       padding: '0.5em'
     },
     introContainer: {
       display: 'flex',
-      flexDirection: 'row'
+      flexDirection: 'row',
+      flexWrap: 'wrap'
     },
     introTextContainer: {
       flex: 1,
-      marginRight: 40
+      marginRight: 40,
+      marginBottom: 20
     },
     signupFormContainer: {
       flex: 'auto',
       width: '12em'
     },
     container: {
-      padding: '40px'
+      padding: 20,
+      width: '100%',
+      maxWidth: 1200,
+      margin: '0 auto',
+      boxSizing: 'border-box'
     },
     errorMessage: {
       ...BernieText.default,
@@ -114,7 +122,7 @@ export default class Signup extends React.Component {
     return (
       <div style={this.styles.container} >
         <div style={this.styles.introContainer}>
-          <div style={this.styles.introTextContainer}>
+          <div style={this.styles.introTextContainer} className="full-width-on-mobile">
             <div style={{
               ...BernieText.secondaryTitle,
               display: 'block'
@@ -134,7 +142,7 @@ export default class Signup extends React.Component {
                 </p>
             </div>
           </div>
-          <div styles={this.styles.signupFormContainer}>
+          <div styles={this.styles.signupFormContainer} className="full-width-on-mobile">
             <Tabs>
               <Tab label="Log In" >
                 <div>
