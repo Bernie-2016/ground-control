@@ -632,7 +632,6 @@ const GraphQLUser = new GraphQLObjectType({
           .join('zip_codes', 'zip_codes.zip', 'bsd_addresses.zip')
           .whereNotIn('bsd_people.cons_id', previousCallsSubquery)
           .whereNotIn('bsd_people.cons_id', assignedCallsSubquery)
-          .whereNotIn('bsd_addresses.state_cd', ['IA', 'NH', 'NV', 'SC'])
           .whereIn('zip_codes.timezone_offset', validOffsets)
           .where('bsd_phones.is_primary', true)
           .where('bsd_addresses.is_primary', true)

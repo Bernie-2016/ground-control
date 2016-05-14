@@ -292,7 +292,7 @@ ${userFirstName}`
             All done!
           </div>
           <div style={BernieText.default}>
-            We have no one left for you to call right now, but try again tomorrow.
+            We have no one left for you to call right now, but try again in an hour.
           </div>
         </div>
       )
