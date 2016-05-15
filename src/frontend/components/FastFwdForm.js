@@ -19,18 +19,20 @@ class FastFwdForm extends React.Component {
   styles = {
     detailsContainer: {
       float: 'left',
-      padding: '1em',
+      paddingBottom: '1em',
+      paddingRight: '1em'
     },
 
     formContainer: {
       float: 'left',
       padding: '1em',
+      marginBottom: '2em',
       border: 'solid 1px ' + BernieColors.lightGray
     },
 
     pageContainer: {
       margin: '0 auto',
-      padding: '3em',
+      padding: '2em',
     }
   }
 
@@ -50,7 +52,7 @@ class FastFwdForm extends React.Component {
               </div>
 
 
-    let event_type_name = 'volunteer event';
+    let event_type_name = 'volunteer event'
 
     if(this.props.event.eventType.name.toLowerCase().indexOf('phone bank') > -1){
       event_type_name = 'phone bank party'
@@ -90,7 +92,7 @@ class FastFwdForm extends React.Component {
           </h1>
 
           <div zDepth={1} style={this.styles.detailsContainer} className="ffwdDetailsContainer">
-            <p style={BernieText.secondaryTitle}>Your Event Details:</p>
+            <h3 style={{...BernieText.secondaryTitle, fontSize: '1.2rem'}}>Your Event Details:</h3>
             <EventPreview event={this.props.event} />
           </div>
 

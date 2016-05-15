@@ -1,6 +1,10 @@
+div {
+    box-sizing: border-box;
+}
+
 @media screen and (min-width: 768px) {
     .ffwdDetailsContainer {
-        width: 55%;
+        width: 60%;
     }
 
     .ffwdFormContainer {
