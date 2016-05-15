@@ -1989,11 +1989,15 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
         let query = groupText
         query     = query.toLowerCase().trim().replace(/;*$/, '')
 
-        if (query.indexOf('drop') !== -1)
+        if (query.indexOf('drop') !== -1 ||
+            query.indexOf('truncate') !== -1 ||
+            query.indexOf('delete') !== -1 ||
+            query.indexOf('update') !== -1) {
           throw new GraphQLError({
             status: 400,
             message: 'Cannot use DROP in your SQL'
           })
+        }
 
         if (query !== EVERYONE_GROUP) {
           let limitedQuery = query
