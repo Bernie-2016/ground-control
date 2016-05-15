@@ -157,6 +157,7 @@ export default Relay.createContainer(FastFwdForm, {
         }
         name
         startDate
+        localTimezone
         venueAddr1
         venueAddr2
         venueCity
