@@ -204,6 +204,7 @@ ReactDOM.render(
             ...CallAssignmentQueries,
             ...CurrentUserQueries
           }}
+          queryParams={['ll', 'miles']}
           renderLoading={() => <Loading />}
         />
       </Route>

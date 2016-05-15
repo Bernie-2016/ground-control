@@ -409,7 +409,11 @@ ${userFirstName}`
 }
 
 export default Relay.createContainer(CallAssignment, {
-  initialVariables: { id: '' },
+  initialVariables: {
+    id: '',
+    ll: null,  // URL query parameter: point in lat,lon format
+    miles: null  // URL query parameter: radius in miles
+  },
   fragments: {
     callAssignment: () => Relay.QL`
       fragment on CallAssignment {
@@ -428,9 +432,13 @@ export default Relay.createContainer(CallAssignment, {
       fragment on User {
         id
         firstName
-        allCallsMade:callsMade(forAssignmentId:$id)
-        completedCallsMade:callsMade(forAssignmentId:$id,completed:true)
-        intervieweeForCallAssignment(callAssignmentId:$id) {
+        allCallsMade: callsMade(forAssignmentId: $id)
+        completedCallsMade: callsMade(forAssignmentId: $id, completed: true)
+        intervieweeForCallAssignment(
+          callAssignmentId: $id,
+          centerLatLon: $ll,
+          radiusMiles: $miles
+        ) {
           id
           prefix
           firstName

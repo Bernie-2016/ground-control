@@ -554,10 +554,18 @@ const GraphQLUser = new GraphQLObjectType({
     intervieweeForCallAssignment: {
       type: GraphQLPerson,
       args: {
-        callAssignmentId: {type: GraphQLString}
+        callAssignmentId: {type: GraphQLString},
+        centerLatLon: {type: GraphQLString},
+        // TODO(zestyping): It would be a better API if the radius were a float
+        // in meters, but I couldn't figure out how to convert the "miles"
+        // query param to a float before it got passed to resolve().
+        radiusMiles: {type: GraphQLString}
       },
-      resolve: async(user, {callAssignmentId}, {rootValue}) => {
-
+      resolve: async(
+        user,
+        {callAssignmentId, centerLatLon, radiusMiles},
+        {rootValue}
+      ) => {
         let localCallAssignmentId = fromGlobalId(callAssignmentId)
         if (localCallAssignmentId.type !== 'CallAssignment')
           localCallAssignmentId = callAssignmentId
@@ -646,6 +654,23 @@ const GraphQLUser = new GraphQLObjectType({
           .first()
         if (userAddress)
           query = query.whereNot('bsd_people.cons_id', userAddress.cons_id)
+
+        // Filter by distance from a geographical point.
+        let coords = (centerLatLon || '').split(',')
+        let radiusMeters = (radiusMiles || 0) * 1609.34
+        if (coords.length == 2 && radiusMeters > 0) {
+          let lat = coords[0] - 0
+          let lon = coords[1] - 0
+          query = query.whereRaw(`
+            ST_DWithin(bsd_addresses.geom,
+              ST_Transform(
+                ST_SetSRID(ST_MakePoint(${lon}, ${lat}), 4326),
+                900913
+              ),
+              ${radiusMeters}
+            )
+          `)
+        }
 
         log.info(`Running query: ${query}`)
 
