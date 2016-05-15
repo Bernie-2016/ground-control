@@ -27,6 +27,7 @@ import {BernieText, BernieColors} from './styles/bernie-css'
 import stripScripts from '../helpers/stripScripts'
 import SideBarLayout from './SideBarLayout'
 import EventRSVPTable from './EventRSVPTable'
+import EventOfficialStamp from './EventOfficialStamp'
 import humps from 'humps'
 import Papa from 'papaparse'
 import downloadCSV from '../helpers/downloadCSV'
@@ -188,6 +189,15 @@ class EventsDashboard extends React.Component {
                 showExpandableButton={true}
               >
                 <span style={{...BernieText.title, fontSize: '1.4em', ...eventTextStyle}}>{event.name}</span>
+                <EventOfficialStamp
+                  style={{
+                    marginLeft: '1em',
+                    verticalAlign: 'bottom',
+                  }}
+                  color={eventTextStyle.color}
+                >
+                  Official
+                </EventOfficialStamp>
                 <br />
                 <span style={{...BernieText.secondaryTitle, fontSize: '0.9em', letterSpacing: '1px', ...eventTextStyle}}>{formattedDate}</span>
               </CardTitle>
