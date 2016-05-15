@@ -188,15 +188,18 @@ class EventsDashboard extends React.Component {
                 showExpandableButton={true}
               >
                 <span style={{...BernieText.title, fontSize: '1.4em', ...eventTextStyle}}>{event.name}</span>
-                <EventOfficialStamp
-                  style={{
-                    marginLeft: '1em',
-                    verticalAlign: 'bottom',
-                  }}
-                  color={eventTextStyle.color}
-                >
-                  Official
-                </EventOfficialStamp>
+                {event.isOfficial
+                  ? <EventOfficialStamp
+                    style={{
+                      marginLeft: '1em',
+                      verticalAlign: 'bottom',
+                    }}
+                    color={eventTextStyle.color}
+                  >
+                    Official
+                  </EventOfficialStamp>
+                  : null
+                }
                 <br />
                 <span style={{...BernieText.secondaryTitle, fontSize: '0.9em', letterSpacing: '1px', ...eventTextStyle}}>{formattedDate}</span>
               </CardTitle>
