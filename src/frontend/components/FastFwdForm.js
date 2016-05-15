@@ -143,6 +143,7 @@ export default Relay.createContainer(FastFwdForm, {
           hostMessage
         }
         attendeesCount
+        isOfficial
         capacity
         description
         duration

@@ -2,44 +2,23 @@ import React from 'react'
 import moment from 'moment-timezone'
 import {BernieText, BernieColors} from './styles/bernie-css'
 import InfoHeader from './InfoHeader'
+import EventOfficialStamp from './EventOfficialStamp'
 import stripScripts from '../helpers/stripScripts'
 
 const momentWithTimezone = (startDate, timeZone) => {
   return moment(startDate).tz(timeZone)
-};
+}
 
 export default class EventPreview extends React.Component {
-  constructor(props) {
-    super(props);
-  }
 
-    render() {
-    let event = this.props.event
+  render() {
+    const event = this.props.event
     let formattedDateTime = momentWithTimezone(event.startDate, event.localTimezone)
     formattedDateTime = formattedDateTime ? formattedDateTime.format('LLLL') : event.startDate
 
-    let isOfficial = null;
-    if (event.isOfficial){
-      const officialStyle = {
-        display: 'inline-block',
-        border: '2px solid #F55B5B',
-        fontSize: '0.9rem',
-        color: '#F55B5B',
-        fontFamily: 'freight-sans-pro',
-        textTransform: 'uppercase',
-        letterSpacing: '0.1em',
-        fontWeight: '600',
-        borderRadius: '3px',
-        marginTop: '0.75rem',
-        padding: '0.2rem 0.5rem',
-        transform: 'rotate(-2deg)'
-      };
-      isOfficial = <span style={officialStyle}>Official Event</span>
-    }
     return (
       <div style={BernieText.default}>
-        <h1 style={{...BernieText.title, fontSize: '2rem'}}>{event.name}</h1>
-        {isOfficial}  
+        <h1 style={{...BernieText.title, fontSize: '2rem'}}>{event.name} {event.isOfficial ? <EventOfficialStamp /> : null}</h1>
 
         <InfoHeader content='Event Host' />
         <p>{event.host ? `${event.host.firstName} ${event.host.lastName}` : 'No Host Info'}</p> 
