@@ -47,15 +47,9 @@ class FastFwdForm extends React.Component {
     if (!this.props.event)
       return <EventInvalid />
 
-    let eventTypeName = 'volunteer event'
-
-    if(this.props.event.eventType.name.toLowerCase().indexOf('phone bank') > -1){
+    let eventTypeName = this.props.event.eventType.name.toLowerCase()
+    if (eventTypeName.indexOf('phonebank') > -1)
       eventTypeName = 'phone bank party'
-    }
-
-    if(this.props.event.eventType.name.toLowerCase().indexOf('barnstorm') > -1){
-      eventTypeName = 'Barnstorm event'
-    }
 
     const defaultHostMessage = this.props.event.fastFwdRequest ? this.props.event.fastFwdRequest.hostMessage :
 `Hello, neighbors!
