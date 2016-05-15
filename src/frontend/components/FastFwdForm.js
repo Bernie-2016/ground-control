@@ -47,27 +47,27 @@ class FastFwdForm extends React.Component {
     if (!this.props.event)
       return <EventInvalid />
 
-
-    let event_type_name = 'volunteer event'
+    let eventTypeName = 'volunteer event'
 
     if(this.props.event.eventType.name.toLowerCase().indexOf('phone bank') > -1){
-      event_type_name = 'phone bank party'
+      eventTypeName = 'phone bank party'
     }
 
     if(this.props.event.eventType.name.toLowerCase().indexOf('barnstorm') > -1){
-      event_type_name = 'Barnstorm event'
+      eventTypeName = 'Barnstorm event'
     }
 
-    let defaultHostMessage = this.props.event.fastFwdRequest ? this.props.event.fastFwdRequest.hostMessage :
-                            "Hello, neighbors!\n\nI'm hosting a " + event_type_name +
-                            " and I need a few more Bernie supporters " +
-                            "to attend to make this event a big success. " +
-                            "Will you please attend my event?\n\n" +
-                            publicEventsRootUrl + this.props.event.eventIdObfuscated + "\n\n" +
-                            "Thank you,\n\n" +
-                            (this.props.event.host ? this.props.event.host.firstName: "")
+    const defaultHostMessage = this.props.event.fastFwdRequest ? this.props.event.fastFwdRequest.hostMessage :
+`Hello, neighbors!
 
-    let formSchema = yup.object({
+I'm hosting a ${eventTypeName} and I need a few more Bernie supporters to attend to make this event a big success.  Will you please attend my event?
+
+${publicEventsRootUrl + this.props.event.eventIdObfuscated}
+
+Thank you,
+${this.props.event.host ? this.props.event.host.firstName : ''}`
+
+    const formSchema = yup.object({
       hostMessage: yup.string().default(this.props.event.hostMessage || defaultHostMessage).required(),
     })
 
