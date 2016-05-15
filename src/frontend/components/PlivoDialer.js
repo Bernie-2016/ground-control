@@ -82,7 +82,7 @@ export default class PlivoDialer extends React.Component {
     }
 
     this.registerCallbacks()
-    Plivo.init({debug: true, fallback_to_flash: false})
+    Plivo.init({debug: true, fallback_to_flash: false, perm_on_click: true})
   }
 
   callPhone(number) {
