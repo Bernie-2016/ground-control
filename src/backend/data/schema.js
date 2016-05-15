@@ -568,6 +568,9 @@ const GraphQLUser = new GraphQLObjectType({
           .where('caller_id', user.id)
           .delete()
         let callAssignment = await rootValue.loaders.bsdCallAssignments.load(localCallAssignmentId)
+
+        // Determine the time zone offsets where it's okay to call.  We only
+        // want to call interviewees whose local time is between 9am and 9pm.
         let allOffsets     = [-10, -9, -8, -7, -6, -5, -4]
         let validOffsets   = []
         // So that I can program late at night
@@ -586,6 +589,7 @@ const GraphQLUser = new GraphQLObjectType({
 
         let group = await rootValue.loaders.gcBsdGroups.load(callAssignment.interviewee_group)
 
+        // Determine whom we *shouldn't* call.
         let previousCallsSubquery = knex('bsd_calls')
           .select('interviewee_id')
           // Don't call people we have successfully canvassed
@@ -593,25 +597,27 @@ const GraphQLUser = new GraphQLObjectType({
             this.where('completed', true)
               .where('call_assignment_id', localCallAssignmentId)
           })
+          // Don't call unusable numbers.
           .orWhereIn('reason_not_completed', ['WRONG_NUMBER', 'DISCONNECTED_NUMBER', 'OTHER_LANGUAGE'])
+          // If the person wasn't available, wait 24h before calling again.
           .orWhere(function () {
             this.whereIn('reason_not_completed', ['NO_PICKUP', 'CALL_BACK'])
               .where('attempted_at', '>', new Date(new Date() - 24 * 60 * 60 * 1000))
           })
+          // Don't call people who rejected this specific assignment.
           .orWhere(function () {
             this.where('call_assignment_id', localCallAssignmentId)
               .where('reason_not_completed', 'NOT_INTERESTED')
           })
 
+        // This is the main query for people we want to call.
         let query = knex.select('bsd_people.cons_id')
-
         if (group.cons_group_id) {
           query = query
             .from('bsd_person_bsd_groups as bsd_people')
             .where('bsd_people.cons_group_id', group.cons_group_id)
         } else if (group.query && group.query !== EVERYONE_GROUP) {
-          let shouldOrder = group.query.indexOf('order by') !== -1
-          query           = query
+          query = query
             .from('bsd_person_gc_bsd_groups as bsd_people')
             .where('gc_bsd_group_id', group.id)
         } else {
@@ -620,11 +626,6 @@ const GraphQLUser = new GraphQLObjectType({
 
         let assignedCallsSubquery = knex('bsd_assigned_calls')
           .select('interviewee_id')
-
-        let userAddress = await knex('bsd_emails')
-          .select('bsd_emails.cons_id')
-          .where('bsd_emails.email', user.email)
-          .first()
 
         query = query
           .join('bsd_phones', 'bsd_people.cons_id', 'bsd_phones.cons_id')
@@ -638,6 +639,11 @@ const GraphQLUser = new GraphQLObjectType({
           .limit(1)
           .first()
 
+        // Don't ask the user to call themselves.
+        let userAddress = await knex('bsd_emails')
+          .select('bsd_emails.cons_id')
+          .where('bsd_emails.email', user.email)
+          .first()
         if (userAddress)
           query = query.whereNot('bsd_people.cons_id', userAddress.cons_id)
 
