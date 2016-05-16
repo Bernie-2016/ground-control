@@ -12,6 +12,9 @@ import json2csv from 'json2csv'
 import qs from 'qs'
 import superagent from 'superagent'
 import Papa from 'papaparse'
+import getDefaultQuery from '../helpers/getDefaultQuery'
+import updateURLRelayParams from '../helpers/updateURLRelayParams'
+import convertType from '../helpers/convertType'
 import downloadCSV from '../helpers/downloadCSV'
 import flattenJSON from '../helpers/flattenJSON'
 import {states} from './data/states'
@@ -30,31 +33,6 @@ require('./styles/adminEventsSection.css')
 const publicEventsRootUrl = 'https://secure.berniesanders.com/page/event/detail/'
 
 const plurry = (n) => (Math.abs(n) == 1) ? '' : 's';
-
-const convertType = (value) => {
-  if (typeof value === 'object'){
-    let updatedValue = {}
-    Object.keys(value).forEach((key) => {
-      const currentValue = convertType(value[key])
-      if (currentValue != undefined)
-        value[key] = currentValue
-    })
-    return value
-  }
-  else if (value === 'none')
-    return null
-  else if (value === 'true')
-    return true
-  else if (value === 'false')
-    return false
-  else if (value != '' && !isNaN(value) && String(Number(value)) === value)
-    return Number(value)
-  else if (value)
-    return String(value)
-  else {
-    return undefined
-  }
-}
 
 const keyboardActionStyles = {
   text: {fontSize: '0.9em', top: '-7px', color: BernieColors.gray, cursor: 'default'},
@@ -1192,10 +1170,7 @@ ${signature}`
       if (readyState.ready) {
         this.setState({loading: false})
         setTimeout(() => {
-          const relayProps = this.props.relay.variables
-          let hash = qs.parse(location.hash.substr(1))
-          hash.query = relayProps;
-          location.hash = qs.stringify(hash, { encode: false, skipNulls: true })
+          updateURLRelayParams(this.props.relay)
         }, 500)
       }
     })
@@ -1427,32 +1402,15 @@ ${signature}`
   }
 }
 
-const getDefaultQuery = () => {
-  const hashParams = convertType(qs.parse(location.hash.substr(1), { strictNullHandling: true }))
-  let defaultParams = {
+export default Relay.createContainer(AdminEventsSection, {
+  initialVariables: getDefaultQuery({
     numEvents: 50,
     sortField: 'startDate',
     sortDirection: 'ASC',
     status: 'APPROVED',
     filters: {},
     hostFilters: {}
-  }
-  if (hashParams.query){
-    try {
-      let newQueryParams = Object.assign({}, defaultParams, hashParams.query)
-      newQueryParams.filters = Object.assign({}, defaultParams.filters, hashParams.query.filters)
-      return newQueryParams
-    }
-    catch(ex) {
-      console.error('Invalid query parameters', ex)
-    }
-  }
-
-  return defaultParams
-}
-
-export default Relay.createContainer(AdminEventsSection, {
-  initialVariables: getDefaultQuery(),
+  }),
   fragments: {
     currentUser: () => Relay.QL`
       fragment on User {
