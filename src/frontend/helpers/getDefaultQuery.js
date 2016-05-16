@@ -5,8 +5,8 @@ export default function(defaultParams, queryProp='query') {
   const hashParams = convertType(qs.parse(location.hash.substr(1), { strictNullHandling: true }))
   if (hashParams[queryProp]){
     try {
-      let newQueryParams = {...defaultParams, ...hashParams.query}
-      newQueryParams.filters = {...defaultParams.filters, ...hashParams.query.filters}
+      let newQueryParams = {...defaultParams, ...hashParams[queryProp]}
+      newQueryParams.filters = {...defaultParams.filters, ...hashParams[queryProp].filters}
       return newQueryParams
     }
     catch(ex) {
