@@ -30,7 +30,7 @@ require('./styles/adminEventsSection.css')
 
 const publicEventsRootUrl = 'https://secure.berniesanders.com/page/event/detail/'
 
-const plurry = (n) => (Math.abs(n) == 1) ? '' : 's';
+const plurry = (n) => (Math.abs(n) == 1) ? '' : 's'
 
 const keyboardActionStyles = {
   text: {fontSize: '0.9em', top: '-7px', color: BernieColors.gray, cursor: 'default'},
@@ -159,7 +159,7 @@ class AdminEventsSection extends React.Component {
         checked={selectedRows.indexOf(rowIndex) > -1}
         eventIndex={rowIndex}
         onCheck={() => {
-          this._handleEventSelect(rowIndex);
+          this._handleEventSelect(rowIndex)
         }}
         style={{marginLeft: '15px'}}
       />
@@ -191,7 +191,7 @@ class AdminEventsSection extends React.Component {
   )
 
   NoHTMLCell = ({rowIndex, data, col, ...props}) => {
-    let displayString = data[rowIndex]['node'][col];
+    let displayString = data[rowIndex]['node'][col]
     return (
       <Cell {...props}
       style={{
@@ -278,7 +278,7 @@ class AdminEventsSection extends React.Component {
       fontFamily: 'Roboto',
       fontSize: '13px',
       lineHeight: '18px'
-    };
+    }
     let linkStyle={
       color: BernieColors.darkBlue
     }
@@ -331,7 +331,7 @@ class AdminEventsSection extends React.Component {
       edit: {
         title: 'edit',
         onTouchTap: () => {
-            this._handleEventPreviewOpen(rowIndex, 1);
+            this._handleEventPreviewOpen(rowIndex, 1)
           },
         icon: 'edit'
       },
@@ -429,7 +429,7 @@ class AdminEventsSection extends React.Component {
           <DropDownMenu
             value={this.props.relay.variables.status}
             onChange={(event, index, value) => {
-                this._handleQueryChange({status: value});
+                this._handleQueryChange({status: value})
               }
             }
             autoWidth={true}
@@ -450,7 +450,7 @@ class AdminEventsSection extends React.Component {
             label="Filter"
             labelPosition="after"
             onTouchTap={() => {
-              this.setState({showFiltersDialog: true});
+              this.setState({showFiltersDialog: true})
             }}
           >
             <FontIcon className="material-icons" style={{position: 'relative', top: '6px', left: '6px'}}>filter_list</FontIcon>
@@ -472,7 +472,7 @@ class AdminEventsSection extends React.Component {
             label="Create"
             labelPosition="after"
             onTouchTap={() => {
-              //this._handleEventCreation(this.state.selectedRows);
+              //this._handleEventCreation(this.state.selectedRows)
               window.location = '/admin/events/create'
             }}
           >
@@ -484,7 +484,7 @@ class AdminEventsSection extends React.Component {
             primary={true}
             disabled={(this.state.selectedRows.length == 0)}
             onTouchTap={() => {
-              this._handleEventDeletion(this.state.selectedRows);
+              this._handleEventDeletion(this.state.selectedRows)
             }}
           />
           <RaisedButton
@@ -493,7 +493,7 @@ class AdminEventsSection extends React.Component {
             secondary={false}
             disabled={(this.state.selectedRows.length == 0 || this.props.relay.variables.status === 'PENDING_APPROVAL')}
             onTouchTap={() => {
-              this._handleEventConfirmation(this.state.selectedRows, true);
+              this._handleEventConfirmation(this.state.selectedRows, true)
             }}
           />
           <RaisedButton
@@ -502,7 +502,7 @@ class AdminEventsSection extends React.Component {
             secondary={true}
             disabled={(this.state.selectedRows.length == 0 || this.props.relay.variables.status === 'APPROVED')}
             onTouchTap={() => {
-              this._handleEventConfirmation(this.state.selectedRows);
+              this._handleEventConfirmation(this.state.selectedRows)
             }}
           />
         </ToolbarGroup>
@@ -529,7 +529,7 @@ class AdminEventsSection extends React.Component {
     let eventsToDelete = this.state.indexesMarkedForDeletion.map(index => {
       return events[index].node.id
     })
-    let deleteMsg = this.state.deletionConfirmationMessage;
+    let deleteMsg = this.state.deletionConfirmationMessage
     if (deleteMsg === 0 || deleteMsg === null)
       deleteMsg = ''
 
@@ -547,7 +547,7 @@ class AdminEventsSection extends React.Component {
   renderDeleteModal() {
 
     const signature = `Events Team
-Bernie 2016`;
+Bernie 2016`
     const deleteReasons = [
       {reason: 'Delete Without Message', message: 0},
       {
@@ -640,23 +640,23 @@ ${signature}`
 
 ${signature}`
       }
-    ];
-    const deleteReasonMenuItems = deleteReasons.map((item, index) => <MenuItem key={index} value={index} primaryText={item.reason}/>);
+    ]
+    const deleteReasonMenuItems = deleteReasons.map((item, index) => <MenuItem key={index} value={index} primaryText={item.reason}/>)
 
     this._handleDeleteModalRequestClose = () => {
       let updatedStateProps = {
           showDeleteEventDialog: false,
           deletionConfirmationMessage: null,
           deletionReasonIndex: null
-        };
+        }
       if (this.state.activeEventIndex) {
-        updatedStateProps['showEventPreview'] = true;
+        updatedStateProps['showEventPreview'] = true
       }
       this.setState(updatedStateProps)
     }
 
-    let numEvents = this.state.indexesMarkedForDeletion.length;
-    let dialogTitle = `You are about to delete ${numEvents} event${plurry(numEvents)}.`;
+    let numEvents = this.state.indexesMarkedForDeletion.length
+    let dialogTitle = `You are about to delete ${numEvents} event${plurry(numEvents)}.`
 
     const standardActions = [
       <FlatButton
@@ -669,7 +669,7 @@ ${signature}`
         disabled={(this.state.deletionConfirmationMessage === null || this.state.deletionConfirmationMessage === deleteReasons[deleteReasons.length-1]['message'] || this.state.deletionConfirmationMessage === '')}
         onTouchTap={this._deleteEvent}
       />
-    ];
+    ]
 
     let deleteMessage = (
       <div>
@@ -692,7 +692,7 @@ ${signature}`
           value={(this.state.deletionConfirmationMessage === 0) ? '' : this.state.deletionConfirmationMessage}
           disabled={(this.state.deletionConfirmationMessage === 0 || this.state.deletionConfirmationMessage === null)}
           onChange={(event) => {
-            this.setState({deletionConfirmationMessage: event.target.value});
+            this.setState({deletionConfirmationMessage: event.target.value})
           }}
           multiLine={true}
           rowsMax={6}
@@ -746,22 +746,22 @@ ${signature}`
         label="Cancel"
         secondary={true}
         onTouchTap={() => {
-          this.setState({showFiltersDialog: false});
+          this.setState({showFiltersDialog: false})
         }}
       />,
       <FlatButton
         label="Clear"
         secondary={true}
         onTouchTap={() => {
-          this._handleRequestFiltersChange({newVars: {}, doNotPreserveOldFilters: true});
-          this._handleRequestFiltersChange({filterKey: 'hostFilters', newVars: {}, doNotPreserveOldFilters: true});
+          this._handleRequestFiltersChange({newVars: {}, doNotPreserveOldFilters: true})
+          this._handleRequestFiltersChange({filterKey: 'hostFilters', newVars: {}, doNotPreserveOldFilters: true})
         }}
       />,
       <FlatButton
         label="Update Filters"
         primary={true}
         onTouchTap={() => {
-          let filtersArray = jQuery(this.refs.eventSearchForm).serializeArray();
+          let filtersArray = jQuery(this.refs.eventSearchForm).serializeArray()
           let eventFiltersObject = {}
           let hostFiltersObject = {}
 
@@ -775,9 +775,9 @@ ${signature}`
             }
           })
 
-          this._handleRequestFiltersChange({newVars: eventFiltersObject, doNotPreserveOldFilters: true});
-          this._handleRequestFiltersChange({filterKey: 'hostFilters', newVars: hostFiltersObject, doNotPreserveOldFilters: true});
-          this.setState({showFiltersDialog: false});
+          this._handleRequestFiltersChange({newVars: eventFiltersObject, doNotPreserveOldFilters: true})
+          this._handleRequestFiltersChange({filterKey: 'hostFilters', newVars: hostFiltersObject, doNotPreserveOldFilters: true})
+          this.setState({showFiltersDialog: false})
         }}
       />,
     ]
@@ -878,14 +878,14 @@ ${signature}`
         onRequestClose={() => {
           this.setState({
             showFiltersDialog: false
-          });
+          })
         }}
         bodyStyle={{paddingBottom: '0'}}
       >
       <form
         ref='eventSearchForm'
         onSubmit={(e, data) => {
-          e.preventDefault();
+          e.preventDefault()
         }}
       >
         <FilterGroup name='Event Filters' inputs={filterInputs} filterProperty={this.props.relay.variables.filters} containerStyle={{float: 'left', width: '50%'}} />
@@ -909,7 +909,7 @@ ${signature}`
         key="2"
         primary={true}
         onTouchTap={() => {
-          this._handleEventDeletion([this.state.activeEventIndex]);
+          this._handleEventDeletion([this.state.activeEventIndex])
         }}
       />,
       <FlatButton
@@ -957,16 +957,16 @@ ${signature}`
             <EventPreview
               event={activeEvent}
               onChangeEventIndex={(n) => {
-                this._iterateActiveEvent(n);
+                this._iterateActiveEvent(n)
               }}
               onEventConfirm={(indexArray) => {
-                this._handleEventConfirmation(indexArray);
+                this._handleEventConfirmation(indexArray)
               }}
               onTabRequest={(eventIndex, tabIndex) => {
-                this._handleEventPreviewOpen(eventIndex, tabIndex);
+                this._handleEventPreviewOpen(eventIndex, tabIndex)
               }}
               onEventDelete={(indexArray) => {
-                this._handleEventDeletion(indexArray);
+                this._handleEventDeletion(indexArray)
               }}
             />
           </Tab>

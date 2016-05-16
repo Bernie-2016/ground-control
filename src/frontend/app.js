@@ -45,8 +45,8 @@ import {createHistory} from 'history'
 import GCNetworkLayer from './relay-extensions/GCNetworkLayer'
 import log from './log'
 import Loading from './components/Loading'
-import SlackInviteIndex from './components/SlackInviteIndex';
-import SlackInvite from './components/SlackInvite';
+import SlackInviteIndex from './components/SlackInviteIndex'
+import SlackInvite from './components/SlackInvite'
 import UserAccountDashboard from './components/UserAccountDashboard'
 import UserAccountChangePasswordForm from './components/UserAccountChangePasswordForm'
 
