@@ -1,9 +1,9 @@
 import qs from 'qs'
 import convertType from './convertType'
 
-export default function(defaultParams) {
+export default function(defaultParams, queryProp='query') {
   const hashParams = convertType(qs.parse(location.hash.substr(1), { strictNullHandling: true }))
-  if (hashParams.query){
+  if (hashParams[queryProp]){
     try {
       let newQueryParams = {...defaultParams, ...hashParams.query}
       newQueryParams.filters = {...defaultParams.filters, ...hashParams.query.filters}
