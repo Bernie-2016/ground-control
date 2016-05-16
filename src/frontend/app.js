@@ -3,6 +3,7 @@ import jQuery from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import Relay from 'react-relay'
+import {StyleRoot} from 'radium'
 import EventCreate from './components/EventCreate.js'
 import DummyEventCreate from './components/DummyEventCreate.js'
 import {Redirect, IndexRoute, IndexRedirect, Route, Router} from 'react-router'
@@ -111,166 +112,168 @@ const FastFwdRequest = {
 let history = createHistory()
 
 ReactDOM.render(
-  <Router
-    history={history}
-    createElement={ReactRouterRelay.createElement}>
-    <Route
-      path='/admin'
-      component={AdminDashboard}
-      queries={ListContainerQueries}
-    >
+  <StyleRoot>
+    <Router
+      history={history}
+      createElement={ReactRouterRelay.createElement}>
       <Route
-        path='call-assignments'
-        component={AdminCallAssignmentsSection}
+        path='/admin'
+        component={AdminDashboard}
         queries={ListContainerQueries}
       >
-        <IndexRoute
-          component={AdminCallAssignmentCreationForm}
+        <Route
+          path='call-assignments'
+          component={AdminCallAssignmentsSection}
           queries={ListContainerQueries}
-        />
+        >
+          <IndexRoute
+            component={AdminCallAssignmentCreationForm}
+            queries={ListContainerQueries}
+          />
+          <Route
+            path=':id'
+            component={AdminCallAssignment}
+            queries={CallAssignmentQueries}
+          />
+        </Route>
         <Route
-          path=':id'
-          component={AdminCallAssignment}
-          queries={CallAssignmentQueries}
-        />
-      </Route>
-      <Route
-        path='events/:id/emails/create'
-        component={AdminEventEmailCreationForm}
-        queries={{
-          ...ListContainerQueries,
-          ...EventQueries,
-          ...CurrentUserQueries
-        }}
-        renderLoading={() => <Loading />}
-      />
-      <Route
-        path='events/upload-rsvps'
-        component={AdminEventUploadRsvps}
-      />
-
-      <Route
-        path='events'
-        component={AdminEventsSection}
-        queries={{
-          ...CurrentUserQueries,
-          ...ListContainerQueries
-        }}
-        renderLoading={() => <Loading />}
-      />
-      <Route
-        path='constituent-lookup'
-        component={ConstituentLookup}
-        queries={{
-          ...ListContainerQueries
-        }}
-        renderLoading={() => <Loading />}
-      />
-    </Route>
-    <Route
-      path='/signup'
-      component={Signup}
-    />
-    <Route
-      path='/'
-      component={Dashboard}
-      queries={CurrentUserQueries}
-    >
-      <IndexRedirect to='/events' />
-      <Route
-        path='events/create/v2'
-        component={EventCreate}
-        queries={CurrentUserQueries}
-        renderLoading={() => <Loading />}
-      />
-      <Route
-        path='events/create'
-        component={DummyEventCreate}
-        renderLoading={() => window.location.reload() }
-      />
-      <Route
-        path='call'
-        component={CallAssignmentsDashboard}
-        queries={CurrentUserQueries}
-      >
-        <IndexRoute
-          component={CallAssignmentsSection}
-          queries={CurrentUserQueries}
-        />
-        <Route
-          path=':id'
-          component={CallAssignment}
+          path='events/:id/emails/create'
+          component={AdminEventEmailCreationForm}
           queries={{
-            ...CallAssignmentQueries,
-            ...CurrentUserQueries
-          }}
-          renderLoading={() => <Loading />}
-        />
-      </Route>
-      <Route
-        path='events'
-        component={CallAssignmentsDashboard}
-        queries={CurrentUserQueries}
-      >
-        <IndexRoute
-          component={EventsDashboard}
-          queries={{
-        		...CurrentUserQueries,
-        	}}
-        />
-        <Route
-          path=':id'
-          component={EventView}
-          queries={{
-            ...EventQueries,
-            ...CurrentUserQueries
-          }}
-          renderLoading={() => <Loading />}
-        />
-        {/*<Route
-          path=':id/upload'
-          component={EventDataUpload}
-          queries={{
-            ...EventQueries,
             ...ListContainerQueries,
+            ...EventQueries,
             ...CurrentUserQueries
           }}
           renderLoading={() => <Loading />}
-        />*/}
+        />
         <Route
-          path=':id/request-email'
-          component={FastFwdForm}
+          path='events/upload-rsvps'
+          component={AdminEventUploadRsvps}
+        />  
+
+        <Route
+          path='events'
+          component={AdminEventsSection}
+          queries={{
+            ...CurrentUserQueries,
+            ...ListContainerQueries
+          }}
+          renderLoading={() => <Loading />}
+        />
+        <Route
+          path='constituent-lookup'
+          component={ConstituentLookup}
+          queries={{
+            ...ListContainerQueries
+          }}
+          renderLoading={() => <Loading />}
+        />
+      </Route>
+      <Route
+        path='/signup'
+        component={Signup}
+      />
+      <Route
+        path='/'
+        component={Dashboard}
+        queries={CurrentUserQueries}
+      >
+        <IndexRedirect to='/events' />
+        <Route
+          path='events/create/v2'
+          component={EventCreate}
+          queries={CurrentUserQueries}
+          renderLoading={() => <Loading />}
+        />
+        <Route
+          path='events/create'
+          component={DummyEventCreate}
+          renderLoading={() => window.location.reload() }
+        />
+        <Route
+          path='call'
+          component={CallAssignmentsDashboard}
+          queries={CurrentUserQueries}
+        >
+          <IndexRoute
+            component={CallAssignmentsSection}
+            queries={CurrentUserQueries}
+          />
+          <Route
+            path=':id'
+            component={CallAssignment}
+            queries={{
+              ...CallAssignmentQueries,
+              ...CurrentUserQueries
+            }}
+            renderLoading={() => <Loading />}
+          />
+        </Route>
+        <Route
+          path='events'
+          component={CallAssignmentsDashboard}
+          queries={CurrentUserQueries}
+        >
+          <IndexRoute
+            component={EventsDashboard}
+            queries={{
+          		...CurrentUserQueries,
+          	}}
+          />
+          <Route
+            path=':id'
+            component={EventView}
             queries={{
               ...EventQueries,
               ...CurrentUserQueries
             }}
             renderLoading={() => <Loading />}
-        />
+          />
+          {/*<Route
+            path=':id/upload'
+            component={EventDataUpload}
+            queries={{
+              ...EventQueries,
+              ...ListContainerQueries,
+              ...CurrentUserQueries
+            }}
+            renderLoading={() => <Loading />}
+          />*/}
+          <Route
+            path=':id/request-email'
+            component={FastFwdForm}
+              queries={{
+                ...EventQueries,
+                ...CurrentUserQueries
+              }}
+              renderLoading={() => <Loading />}
+          />
+        </Route>
+        <Route
+          path='account'
+          component={UserAccountDashboard}
+          queries={CurrentUserQueries}
+        >
+          <IndexRoute
+            component={UserAccountChangePasswordForm}
+          />
+        </Route>
       </Route>
       <Route
-        path='account'
-        component={UserAccountDashboard}
-        queries={CurrentUserQueries}
+        path='slack'
       >
         <IndexRoute
-          component={UserAccountChangePasswordForm}
+          component={SlackInviteIndex}
+        />
+        <Route
+          path=':team'
+          component={SlackInvite}
+          renderLoading={() => <Loading />}
         />
       </Route>
-    </Route>
-    <Route
-      path='slack'
-    >
-      <IndexRoute
-        component={SlackInviteIndex}
-      />
-      <Route
-        path=':team'
-        component={SlackInvite}
-        renderLoading={() => <Loading />}
-      />
-    </Route>
-    <Route path='/unauthorized' component={Unauthorized}/>
-    <Route path="*" component={NotFound}/>
-  </Router>,
+      <Route path='/unauthorized' component={Unauthorized}/>
+      <Route path="*" component={NotFound}/>
+    </Router>
+  </StyleRoot>,
   document.getElementById('root')
 )
