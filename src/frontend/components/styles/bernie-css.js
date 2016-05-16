@@ -1,4 +1,6 @@
-import {Styles} from 'material-ui';
+import {Styles} from 'material-ui'
+
+const maxMobileWidth = 720
 
 export const BernieColors = {
   blue: 'rgb(20, 127, 215)',
@@ -79,5 +81,9 @@ export const BernieLayout = {
       paddingBottom: 25
     }
   }
+}
+
+export const MediaQueries = {
+  onMobile: `@media (max-width: ${maxMobileWidth}px)`
 }
 
