@@ -832,8 +832,6 @@ ${signature}`
       {name: 'venueCity', label: 'City'},
       {name: 'venueState', label: 'State', type: 'select', options: states, optionValue: 'abbreviation'},
       {name: 'venueZip', label: 'Zip Code'},
-      {name: 'latitude', label: 'Latitude', type: 'number'},
-      {name: 'longitude', label: 'Longitude', type: 'number'}
     ]
 
     const hostFilterInputs = [
@@ -1226,7 +1224,8 @@ ${signature}`
           {...this.props}>
           <ColumnGroup
             fixed={true}
-            header={<this.HeaderCell content="Actions" />}>
+            header={<this.HeaderCell content="Actions" />}
+          >
             <Column
               header={
                 <Cell>
@@ -1258,7 +1257,7 @@ ${signature}`
               flexGrow={1}
               header={<this.HeaderCell content="ID" />}
               cell={<this.EventIdLinkCell data={events} />}
-              width={100}
+              width={85}
               align='center'
             />
             <Column
@@ -1271,22 +1270,30 @@ ${signature}`
             />
           </ColumnGroup>
           <ColumnGroup
-            header={<this.HeaderCell content="Time" />}>
+            header={<this.HeaderCell content="Time" />}
+          >
             <Column
               header={<this.SortControllerCell content="Event Date" attribute="startDate" />}
               cell={<this.DateCell data={events} col="startDate" />}
               flexGrow={1}
-              width={170}
+              width={130}
+            />
+            <Column
+              header={<this.SortControllerCell content="Duration" attribute="duration" />}
+              cell={<this.DurationCell data={events} col="duration" />}
+              flexGrow={1}
+              width={95}
             />
             <Column
               header={<this.SortControllerCell content="Create Date" attribute="createDate" />}
               cell={<this.DateCell data={events} col="createDate" />}
               flexGrow={1}
-              width={170}
+              width={130}
             />
           </ColumnGroup>
           <ColumnGroup
-            header={<this.HeaderCell content="About" />}>
+            header={<this.HeaderCell content="About" />}
+          >
             <Column
               flexGrow={1}
               header={<this.SortControllerCell content="Event Name" attribute="name" />}
@@ -1301,7 +1308,8 @@ ${signature}`
             />
           </ColumnGroup>
           <ColumnGroup
-            header={<this.HeaderCell content="Event Host" />}>
+            header={<this.HeaderCell content="Event Host" />}
+          >
             <Column
               flexGrow={1}
               header={<this.HeaderCell content="Email" />}
@@ -1322,30 +1330,8 @@ ${signature}`
             />
           </ColumnGroup>
           <ColumnGroup
-            header={<this.HeaderCell content="Detailed Info" />}>
-           <Column
-              header={<this.SortControllerCell content="Duration" attribute="duration" />}
-              cell={<this.DurationCell data={events} col="duration" />}
-              flexGrow={1}
-              width={110}
-            />
-            <Column
-              flexGrow={1}
-              header={<this.SortControllerCell content="Capacity" attribute="capacity" />}
-              cell={<this.TextCell data={events} col="capacity" />}
-              width={100}
-              align='center'
-            />
-            <Column
-              flexGrow={1}
-              header={<this.HeaderCell content="RSVPs" />}
-              cell={<this.TextCell data={events} col="attendeesCount" />}
-              width={100}
-              align='center'
-            />
-          </ColumnGroup>
-          <ColumnGroup
-            header={<this.HeaderCell content="Event Location" />}>
+            header={<this.HeaderCell content="Event Location" />}
+          >
             <Column
               header={<this.SortControllerCell content="Venue" attribute="venueName" />}
               cell={<this.TextCell data={events} col="venueName" />}
@@ -1378,18 +1364,22 @@ ${signature}`
               width={120}
               align='center'
             />
+          </ColumnGroup>
+          <ColumnGroup
+            header={<this.HeaderCell content="Attendance" />}
+          >
             <Column
-              header={<this.SortControllerCell content="Latitude" attribute="latitude" />}
-              cell={<this.TextCell data={events} col="latitude" />}
               flexGrow={1}
-              width={150}
+              header={<this.SortControllerCell content="Capacity" attribute="capacity" />}
+              cell={<this.TextCell data={events} col="capacity" />}
+              width={100}
               align='center'
             />
             <Column
-              header={<this.SortControllerCell content="Longitude" attribute="longitude" />}
-              cell={<this.TextCell data={events} col="longitude" />}
               flexGrow={1}
-              width={150}
+              header={<this.HeaderCell content="RSVPs" />}
+              cell={<this.TextCell data={events} col="attendeesCount" />}
+              width={100}
               align='center'
             />
           </ColumnGroup>
@@ -1455,8 +1445,6 @@ export default Relay.createContainer(AdminEventsSection, {
               isOfficial
               description
               venueName
-              latitude
-              longitude
               venueZip
               venueCity
               venueState
