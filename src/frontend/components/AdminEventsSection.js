@@ -8,8 +8,6 @@ import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle, SelectField, Drop
 import {Table, Column, ColumnGroup, Cell} from 'fixed-data-table'
 import {BernieText, BernieColors} from './styles/bernie-css'
 import moment from 'moment'
-import json2csv from 'json2csv'
-import qs from 'qs'
 import superagent from 'superagent'
 import Papa from 'papaparse'
 import getDefaultQuery from '../helpers/getDefaultQuery'
