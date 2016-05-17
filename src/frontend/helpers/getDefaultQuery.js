@@ -14,5 +14,5 @@ export default function(defaultParams) {
     }
   }
 
-  return defaultParams
+  return {...defaultParams, ...hashParams}
 }
