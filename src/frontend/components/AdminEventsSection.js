@@ -10,8 +10,8 @@ import {BernieText, BernieColors} from './styles/bernie-css'
 import moment from 'moment'
 import superagent from 'superagent'
 import Papa from 'papaparse'
-import getDefaultQuery from '../helpers/getDefaultQuery'
-import updateURLRelayParams from '../helpers/updateURLRelayParams'
+import getDefaultRelayParams from '../helpers/getDefaultRelayParams'
+import setURLRelayParams from '../helpers/setURLRelayParams'
 import convertType from '../helpers/convertType'
 import downloadCSV from '../helpers/downloadCSV'
 import flattenJSON from '../helpers/flattenJSON'
@@ -1166,7 +1166,7 @@ ${signature}`
       if (readyState.ready) {
         this.setState({loading: false})
         setTimeout(() => {
-          updateURLRelayParams(this.props.relay)
+          setURLRelayParams(this.props.relay)
         }, 500)
       }
     })
@@ -1391,7 +1391,7 @@ ${signature}`
 }
 
 export default Relay.createContainer(AdminEventsSection, {
-  initialVariables: getDefaultQuery({
+  initialVariables: getDefaultRelayParams({
     numEvents: 50,
     sortField: 'startDate',
     sortDirection: 'ASC',
