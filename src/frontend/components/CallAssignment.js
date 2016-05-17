@@ -409,22 +409,17 @@ ${userFirstName}`
   }
 }
 
-// Convert the hash parameters 'query[ll]' and 'query[miles]' into the
-// API arguments for the center and radius of the filter region.
-var center = null;
-var radiusMeters = null;
-
-var hashParams = getDefaultRelayParams({
-  ll: null,  // URL hash parameter: point in lat,lon format
-  miles: null  // URL hash parameter: radius in miles
+// Convert the hash parameters 'query[lat]', 'query[lon]', and 'query[miles]'
+// into the API arguments for the center and radius of the filter region.
+const hashParams = getDefaultRelayParams({
+  lat: null,  // latitude in degrees north
+  lon: null,  // longitude in degrees east
+  miles: null  // radius in miles
 })
-var llParts = (hashParams.ll || '').split(',')
-if (llParts.length === 2) {
-  center = {lat: Number(llParts[0]), lon: Number(llParts[1])}
-}
-if (hashParams.miles) {
-  radiusMeters = Number(hashParams.miles) * 1609.34
-}
+const center = (isFinite(hashParams.lat) && isFinite(hashParams.lon)) ?
+  {lat: hashParams.lat, lon: hashParams.lon} : null
+const radiusMeters = isFinite(hashParams.miles) ?
+  hashParams.miles * 1609.34 : null
 
 export default Relay.createContainer(CallAssignment, {
   initialVariables: {
