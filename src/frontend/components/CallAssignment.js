@@ -13,6 +13,7 @@ import CallStatsBar from './CallStatsBar'
 import MutationHandler from './MutationHandler'
 import {PhoneNumberFormat, PhoneNumberUtil} from 'google-libphonenumber'
 import qs from 'qs'
+import convertType from '../helpers/convertType'
 const phoneUtil = PhoneNumberUtil.getInstance()
 
 const SurveyRenderers = {
@@ -409,13 +410,11 @@ ${userFirstName}`
   }
 }
 
-// Convert the query parameters 'll' and 'miles' into the API arguments
+// Convert the query parameters 'lat', 'lon', and 'miles' into API arguments
 // for the center and radius of the filter region.
-var {ll, miles} = qs.parse(location.search.substr(1));
-var llParts = (ll || '').split(',')
-var center = llParts.length === 2 ? {
-  lat: Number(llParts[0]), lon: Number(llParts[1])} : null
-var radiusMeters = miles ? Number(miles) * 1609.34 : null
+const {lat, lon, miles} = convertType(qs.parse(location.search.substr(1)));
+const center = isFinite(lat) && isFinite(lon) ? {lat: lat, lon: lon} : null
+const radiusMeters = isFinite(miles) ? miles * 1609.34 : null
 
 export default Relay.createContainer(CallAssignment, {
   initialVariables: {
