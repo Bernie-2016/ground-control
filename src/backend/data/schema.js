@@ -456,6 +456,14 @@ const GraphQLListContainer = new GraphQLObjectType({
   interfaces: [nodeInterface]
 })
 
+const GeoPoint = new GraphQLInputObjectType({
+  name: 'GeoPoint',
+  fields: {
+    lat: {type: GraphQLFloat},
+    lon: {type: GraphQLFloat},
+  }
+})
+
 const GraphQLUser = new GraphQLObjectType({
   name: 'User',
   description: 'User of ground control',
@@ -555,16 +563,11 @@ const GraphQLUser = new GraphQLObjectType({
       type: GraphQLPerson,
       args: {
         callAssignmentId: {type: GraphQLString},
-        centerLatLon: {type: GraphQLString},
-        // TODO(zestyping): It would be a better API if the radius were a float
-        // in meters, but I couldn't figure out how to convert the "miles"
-        // query param to a float before it got passed to resolve().
-        radiusMiles: {type: GraphQLString}
+        center: {type: GeoPoint},
+        radiusMeters: {type: GraphQLFloat}
       },
       resolve: async(
-        user,
-        {callAssignmentId, centerLatLon, radiusMiles},
-        {rootValue}
+        user, {callAssignmentId, center, radiusMeters}, {rootValue}
       ) => {
         let localCallAssignmentId = fromGlobalId(callAssignmentId)
         if (localCallAssignmentId.type !== 'CallAssignment')
@@ -656,15 +659,13 @@ const GraphQLUser = new GraphQLObjectType({
           query = query.whereNot('bsd_people.cons_id', userAddress.cons_id)
 
         // Filter by distance from a geographical point.
-        let coords = (centerLatLon || '').split(',')
-        let radiusMeters = (radiusMiles || 0) * 1609.34
-        if (coords.length == 2 && radiusMeters > 0) {
-          let lat = coords[0] - 0
-          let lon = coords[1] - 0
+        // Spatial ref 4326 is WGS 84, in degrees
+        // Spatial ref 900913 is Google Web Mercator, in meters
+        if (center && radiusMeters > 0) {
           query = query.whereRaw(`
             ST_DWithin(bsd_addresses.geom,
               ST_Transform(
-                ST_SetSRID(ST_MakePoint(${lon}, ${lat}), 4326),
+                ST_SetSRID(ST_MakePoint(${center.lon}, ${center.lat}), 4326),
                 900913
               ),
               ${radiusMeters}
