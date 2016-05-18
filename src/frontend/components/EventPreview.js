@@ -21,7 +21,7 @@ export default class EventPreview extends React.Component {
         <h1 style={{...BernieText.title, fontSize: '2rem'}}>{event.name} {event.isOfficial ? <EventOfficialStamp /> : null}</h1>
 
         <InfoHeader content='Event Host' />
-        <p>{event.host ? `${event.host.firstName} ${event.host.lastName}` : 'No Host Info'}</p> 
+        <p>{event.host ? `${event.host.firstName || ''} ${event.host.lastName || ''}` : 'No Host Info'}</p> 
 
         <InfoHeader content='Event Type' />
         <p>{event.eventType.name}</p> 
