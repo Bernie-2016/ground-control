@@ -476,7 +476,6 @@ function startApp() {
         'instructions',
         'require_call_first as requireCallFirst'
       )
-      .whereNot('id', 3)
 
     let results = []
     for (let i=0; i < assignments.length; i++) {
