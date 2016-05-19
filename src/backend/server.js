@@ -476,6 +476,8 @@ function startApp() {
         'instructions',
         'require_call_first as requireCallFirst'
       )
+      .where('expires', '>=', new Date())
+      .orderBy('expires', 'asc')
 
     let results = []
     for (let i=0; i < assignments.length; i++) {
