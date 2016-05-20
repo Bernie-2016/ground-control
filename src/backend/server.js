@@ -39,6 +39,38 @@ throng(startApp, {
   lifetime: Infinity
 })
 
+async function generateContactAssignments() {
+  const assignments = await knex('contact_assignments')
+    .distinct('contact_assignments.id')
+    .select(
+      'id',
+      'name',
+      'expires',
+      'description',
+      'instructions',
+      'require_call_first as requireCallFirst'
+    )
+    .where('expires', '>=', new Date())
+    .orderBy('expires', 'asc')
+
+  let results = []
+  for (let i=0; i < assignments.length; i++) {
+    let assignment = assignments[i]
+
+    assignment.callActions = await knex('contact_call_actions')
+      .select('id', 'name', 'call_script as callScript')
+      .where('contact_call_actions.contact_assignment_id', assignment.id)
+
+    assignment.textActions = await knex('contact_text_actions')
+      .select('id', 'name', 'message_content as messageContent')
+      .where('contact_text_actions.contact_assignment_id', assignment.id)
+
+    results.push(assignment)
+  }
+
+  return results
+}
+
 const shiftSchemaMap = {
   'canvass-3-shifts': [
     {
@@ -120,7 +152,7 @@ const shiftSchemaMap = {
   ]
 }
 
-function startApp() {
+async function startApp() {
   log.info('Writing schema...')
   writeSchema()
 
@@ -143,17 +175,18 @@ function startApp() {
   const publicPath = path.resolve(__dirname, '../frontend/public')
   const oneWeekInMillis = 604800000
 
-  const templateDir = path.resolve(publicPath, 'admin/events');
-  const createEventTemplate = fs.readFileSync(templateDir + '/create_event.hbs', {encoding: 'utf-8'});
-  const createEventPage = handlebars.compile(createEventTemplate);
+  const templateDir = path.resolve(publicPath, 'admin/events')
+  const createEventTemplate = fs.readFileSync(templateDir + '/create_event.hbs', {encoding: 'utf-8'})
+  const createEventPage = handlebars.compile(createEventTemplate)
   const publicEventsRootUrl = process.env.PUBLIC_EVENTS_ROOT_URL
+  const contactAssignments = await generateContactAssignments()
 
   const sessionStore = new KnexSessionStore({
     knex: knex,
     tablename: 'sessions'
   })
 
-  const SlackClient = new Slack();
+  const SlackClient = new Slack()
 
   async function createNewBSDUser(email, password) {
     //Create a new BSD User
@@ -318,17 +351,16 @@ function startApp() {
   }))
 
   function eventDataLoader() {
-      return new DataLoader(async (keys) => {
-        let rows = await knex('bsd_events')
-          .whereIn('event_id_obfuscated', keys)
-        return keys.map((key) => {
-          return rows.find((row) =>
-            row['event_id'].toString() === key.toString() || row['event_id_obfuscated'] === key.toString()
-          )
-        })
+    return new DataLoader(async (keys) => {
+      let rows = await knex('bsd_events')
+        .whereIn('event_id_obfuscated', keys)
+      return keys.map((key) => {
+        return rows.find((row) =>
+          row['event_id'].toString() === key.toString() || row['event_id_obfuscated'] === key.toString()
+        )
       })
-    }
-
+    })
+  }
 
   function dataLoaderCreator(tablename, idField) {
     return new DataLoader(async (keys) => {
@@ -465,36 +497,7 @@ function startApp() {
     res.header("Access-Control-Allow-Origin", "*")
     res.header("Access-Control-Allow-Headers", "*")
     res.header('Access-Control-Allow-Methods', "*")
-    
-    const assignments = await knex('contact_assignments')
-      .distinct('contact_assignments.id')
-      .select(
-        'id',
-        'name',
-        'expires',
-        'description',
-        'instructions',
-        'require_call_first as requireCallFirst'
-      )
-      .where('expires', '>=', new Date())
-      .orderBy('expires', 'asc')
-
-    let results = []
-    for (let i=0; i < assignments.length; i++) {
-      let assignment = assignments[i]
-
-      assignment.callActions = await knex('contact_call_actions')
-        .select('id', 'name', 'call_script as callScript')
-        .where('contact_call_actions.contact_assignment_id', assignment.id)
-
-      assignment.textActions = await knex('contact_text_actions')
-        .select('id', 'name', 'message_content as messageContent')
-        .where('contact_text_actions.contact_assignment_id', assignment.id)
-
-      results.push(assignment)
-    }
-
-    res.json(results)
+    res.json(contactAssignments)
   })
 
   app.get('/events/data/upload', wrap(async (req, res) => {
