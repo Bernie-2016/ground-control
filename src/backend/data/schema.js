@@ -809,9 +809,10 @@ const GraphQLPerson = new GraphQLObjectType({
       type: new GraphQLList(GraphQLEvent),
       args: {
         within: {type: GraphQLInt},
-        type: {type: GraphQLString}
+        type: {type: GraphQLString},
+        officialOnly: {type: GraphQLBoolean}
       },
-      resolve: async(person, {within, type}, {rootValue}) => {
+      resolve: async(person, {within, type, officialOnly}, {rootValue}) => {
         let address          = await getPrimaryAddress(person);
         let boundingDistance = within / 69
         let eventTypes       = null
@@ -826,6 +827,10 @@ const GraphQLPerson = new GraphQLObjectType({
           .where('start_dt', '>', new Date())
           .where('flag_approval', false)
           .whereNot('is_searchable', 0)
+
+        if (officialOnly) {
+          query = query.where('is_official', true)
+        }
 
         if (eventTypes)
           query = query.whereIn('event_type_id', eventTypes.map((type) => type.event_type_id))

@@ -412,7 +412,7 @@ ${userFirstName}`
 
 // Convert the query parameters 'lat', 'lon', and 'miles' into API arguments
 // for the center and radius of the filter region.
-const {lat, lon, miles} = convertType(qs.parse(location.search.substr(1)));
+const {lat, lon, miles} = convertType(qs.parse(location.search.substr(1)))
 const center = isFinite(lat) && isFinite(lon) ? {lat: lat, lon: lon} : null
 const radiusMeters = isFinite(miles) ? miles * 1609.34 : null
 
