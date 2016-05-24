@@ -31,6 +31,7 @@ import compression from 'compression'
 import rp from 'request-promise'
 import Slack from './slack'
 import moment from 'moment'
+import shiftSchemaMap from './data/default-shift-schema.json'
 
 const WORKERS = process.env.WEB_CONCURRENCY || 1
 
@@ -69,87 +70,6 @@ async function generateContactAssignments() {
   }
 
   return results
-}
-
-const shiftSchemaMap = {
-  'canvass-3-shifts': [
-    {
-      id: 1,
-      start: '9:00 am',
-      end: '12:00 pm'
-    },
-    {
-      id: 2,
-      start: '12:00 pm',
-      end: '3:00 pm'
-    },
-    {
-      id: 3,
-      start: '3:00 pm',
-      end: '6:00 pm'
-    }
-  ],
-  'canvass-4-shifts': [
-    {
-      id: 1,
-      start: '9:00 am',
-      end: '12:00 pm'
-    },
-    {
-      id: 2,
-      start: '12:00 pm',
-      end: '3:00 pm'
-    },
-    {
-      id: 3,
-      start: '3:00 pm',
-      end: '6:00 pm'
-    },
-    {
-      id: 4,
-      start: '6:00 pm',
-      end: '9:00 pm'
-    }
-  ],
-  'get-out-the-vote': [
-    {
-      id: 1,
-      start: '9:00 am',
-      end: '12:00 pm'
-    },
-    {
-      id: 2,
-      start: '12:00 pm',
-      end: '3:00 pm'
-    },
-    {
-      id: 3,
-      start: '3:00 pm',
-      end: '6:00 pm'
-    },
-    {
-      id: 4,
-      start: '6:00 pm',
-      end: '9:00 pm'
-    }
-  ],
-  'primary-day': [
-    {
-      id: 1,
-      start: '8:00 am',
-      end: '12:00 pm'
-    },
-    {
-      id: 2,
-      start: '12:00 pm',
-      end: '4:00 pm'
-    },
-    {
-      id: 3,
-      start: '4:00 pm',
-      end: '8:00 pm'
-    }
-  ]
 }
 
 async function startApp() {
