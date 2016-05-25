@@ -16,7 +16,7 @@ const phoneUtil = PhoneNumberUtil.getInstance()
 
 const SurveyRenderers = {
   'BSDSurvey': require('./survey-renderers/BSDSurvey'),
-  'PhonebankRSVPSurvey': require('./survey-renderers/PhonebankRSVPSurvey'),
+  'MultipleEventRSVPSurvey': require('./survey-renderers/MultipleEventRSVPSurvey'),
   'SingleEventRSVPSurvey': require('./survey-renderers/SingleEventRSVPSurvey'),
   'Jan23HostRecruitmentSurvey': require('./survey-renderers/Jan23HostRecruitmentSurvey')
 }
@@ -456,10 +456,10 @@ export default Relay.createContainer(CallAssignment, {
           }
           ${SurveyRenderers.Jan23HostRecruitmentSurvey.getFragment('interviewee')}
           ${SurveyRenderers.BSDSurvey.getFragment('interviewee')}
-          ${SurveyRenderers.PhonebankRSVPSurvey.getFragment('interviewee')}
+          ${SurveyRenderers.MultipleEventRSVPSurvey.getFragment('interviewee')}
           ${SurveyRenderers.SingleEventRSVPSurvey.getFragment('interviewee')}
         }
-        ${SurveyRenderers.PhonebankRSVPSurvey.getFragment('currentUser')}
+        ${SurveyRenderers.MultipleEventRSVPSurvey.getFragment('currentUser')}
         ${SurveyRenderers.BSDSurvey.getFragment('currentUser')}
         ${SurveyRenderers.SingleEventRSVPSurvey.getFragment('currentUser')}
         ${SurveyRenderers.Jan23HostRecruitmentSurvey.getFragment('currentUser')}
