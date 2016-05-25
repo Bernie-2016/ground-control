@@ -98,6 +98,8 @@ export default class TopNav extends React.Component {
             backgroundColor: this.props.barColor,
             boxSizing: 'border-box'
           }}
+          titleStyle={{lineHeight: '56px'}}
+          iconStyleRight={{width: '35%', minWidth: 400}}
           iconElementLeft={
             <BernieLogo
               color={this.props.logoColors.primary}
