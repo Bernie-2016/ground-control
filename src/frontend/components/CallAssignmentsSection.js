@@ -12,16 +12,10 @@ import CallStatsBar from './CallStatsBar';
 class CallAssignmentsSection extends React.Component {
   styles = {
     container: {
-      paddingLeft: 0,
-      paddingTop: 0,
-      paddingRight: 0,
-      paddingBottom: 40,
+      padding: '0 0 40px 0'
     },
     paragraph: {
-      paddingTop: '0.5em',
-      paddingBottom: '0.5em',
-      paddingLeft: '0.5em',
-      paddingRight: '0.5em',
+      padding: '0.5em'
     },
   }
 
@@ -46,10 +40,10 @@ class CallAssignmentsSection extends React.Component {
     )
 
     let content = (
-      <div>
+      <div style={{width: '100%'}}>
         {this.renderStats()}
         <div style={{
-          padding: '40px 40px 40px 40px'
+          padding: 40
         }}>
           <div style={BernieText.title}>
             Let them hear you loud and clear
