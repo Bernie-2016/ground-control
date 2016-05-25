@@ -297,7 +297,7 @@ ${userFirstName}`
         </div>
       )
 
-    let Survey = SurveyRenderers['MultipleEventRSVPSurvey']
+    let Survey = SurveyRenderers[this.props.callAssignment.renderer]
 
     let survey = (
       <div style={{
