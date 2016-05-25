@@ -35,6 +35,7 @@ export default class CallStatsBar extends React.Component {
         zDepth={0}
         style = {{
           backgroundColor: BernieColors.lightBlue,
+          borderRadius: 0
         }}
       >
         <SideBarLayout

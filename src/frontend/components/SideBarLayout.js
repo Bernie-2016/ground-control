@@ -7,7 +7,7 @@ export default class SideBarLayout extends React.Component {
   styles = {
     container: {
       display: 'flex',
-      border: 'solid 1px ' + BernieColors.lightGray,
+      borderBottom: 'solid 1px ' + BernieColors.lightGray,
     },
 
     sideBar: {
