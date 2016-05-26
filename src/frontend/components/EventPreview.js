@@ -1,7 +1,10 @@
 import React from 'react'
 import moment from 'moment-timezone'
-import {BernieText, BernieColors} from './styles/bernie-css'
+import Radium from 'radium'
+import {BernieText, BernieColors, MediaQueries} from './styles/bernie-css'
+import {Paper} from 'material-ui'
 import InfoHeader from './InfoHeader'
+import EventMapPreview from './EventMapPreview'
 import EventOfficialStamp from './EventOfficialStamp'
 import stripScripts from '../helpers/stripScripts'
 
@@ -9,7 +12,22 @@ const momentWithTimezone = (startDate, timeZone) => {
   return moment(startDate).tz(timeZone)
 }
 
+@Radium
 export default class EventPreview extends React.Component {
+	styles = {
+		mapContainer: {
+			display: 'inline-block',
+			float: 'right',
+      width: '40%',
+      height: 290,
+      marginLeft: '2em',
+      [MediaQueries.onMobile]: {
+      	float: 'none',
+      	width: '100%',
+      	marginLeft: 0
+      }
+    }
+	}
 
   render() {
     const event = this.props.event
@@ -18,6 +36,11 @@ export default class EventPreview extends React.Component {
 
     return (
       <div style={BernieText.default}>
+      	<div style={this.styles.mapContainer}>
+      		<Paper zDepth={2} style={{width: '100%', height: '100%'}}>
+	          <EventMapPreview event={event} />
+        	</Paper>
+        </div>
         <h1 style={{...BernieText.title, fontSize: '2rem'}}>{event.name} {event.isOfficial ? <EventOfficialStamp /> : null}</h1>
 
         <InfoHeader content='Event Host' />
