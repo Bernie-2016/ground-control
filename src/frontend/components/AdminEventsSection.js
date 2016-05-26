@@ -1452,6 +1452,8 @@ export default Relay.createContainer(AdminEventsSection, {
               venueAddr2
               venueCountry
               venueDirections
+              latitude
+              longitude
               createDate
               startDate
               localTimezone
