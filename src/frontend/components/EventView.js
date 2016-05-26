@@ -68,6 +68,7 @@ export default Relay.createContainer(EventView, {
         hostReceiveRsvpEmails
         id
         isSearchable
+        isOfficial
         latitude
         localTimezone
         localUTCOffset
