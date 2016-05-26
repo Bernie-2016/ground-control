@@ -1,11 +1,8 @@
 import React from 'react'
 import Relay from 'react-relay'
-import {BernieColors, BernieText} from './styles/bernie-css'
-import {Paper, Slider, Toggle, Styles} from 'material-ui'
-import GCForm from './forms/GCForm'
-import Form from 'react-formal'
+import {BernieText} from './styles/bernie-css'
+import {Paper, Styles} from 'material-ui'
 import EventPreview from './EventPreview'
-import EventMapPreview from './EventMapPreview'
 import EventInvalid from './EventInvalid'
 import yup from 'yup'
 import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider'
@@ -15,31 +12,11 @@ const publicEventsRootUrl = 'https://secure.berniesanders.com/page/event/detail/
 
 class EventView extends React.Component {
   styles = {
-    detailsContainer: {
-      float: 'left',
-      marginTop: '1rem',
-      padding: 10,
-      width: '60%'
-    },
-
-    mapContainer: {
-      position: 'fixed',
-      right: '2rem',
-      width: '35%',
-      height: 300,
-      marginTop: '2rem',
-      marginLeft: '2rem',
-      border: 'solid 1px ' + BernieColors.lightGray
-    },
-
     pageContainer: {
-      margin: '1rem'
+      margin: '0 auto',
+      padding: '1rem',
+      maxWidth: 1100
     }
-  }
-
-  state = {
-    testMode: false,
-    recipientLimit: null
   }
 
   render() {
@@ -57,16 +34,8 @@ class EventView extends React.Component {
     return (
       <MuiThemeProvider muiTheme={Styles.getMuiTheme(BernieTheme)}>
         <div style={this.styles.pageContainer}>
-
-          <div style={this.styles.detailsContainer}>
-            <p style={BernieText.secondaryTitle}>Event Details:</p>
-            <EventPreview event={this.props.event} />
-          </div>
-
-          <div style={this.styles.mapContainer}>
-            <EventMapPreview event={this.props.event} />
-          </div>
-
+          <p style={BernieText.secondaryTitle}>Event Details:</p>
+          <EventPreview event={this.props.event} />
         </div>
       </MuiThemeProvider>
     )
@@ -75,20 +44,11 @@ class EventView extends React.Component {
 
 export default Relay.createContainer(EventView, {
   fragments: {
-    currentUser: () => Relay.QL`
-      fragment on User {
-        id
-        email
-      }
-    `,
     event: () => Relay.QL`
       fragment on Event {
         attendeesCount
         attendeeVolunteerMessage
         attendeeVolunteerShow
-        fastFwdRequest{
-          hostMessage
-        }
         capacity
         contactPhone
         createDate
@@ -104,7 +64,6 @@ export default Relay.createContainer(EventView, {
           id
           firstName
           lastName
-          email
         }
         hostReceiveRsvpEmails
         id
@@ -114,12 +73,6 @@ export default Relay.createContainer(EventView, {
         localUTCOffset
         longitude
         name
-        nearbyPeople {
-          id
-          firstName
-          lastName
-          email
-        }
         publicPhone
         rsvpEmailReminderHours
         rsvpUseReminderEmail

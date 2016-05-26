@@ -224,8 +224,7 @@ ReactDOM.render(
             path=':id'
             component={EventView}
             queries={{
-              ...EventQueries,
-              ...CurrentUserQueries
+              ...EventQueries
             }}
             renderLoading={() => <Loading />}
           />
