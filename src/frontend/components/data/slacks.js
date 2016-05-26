@@ -14,8 +14,8 @@ export const slacks = {
         showInIndex: true
     },
     callforbernie: {
-        title: 'Call Team Bernie',
-        description: 'Phonebanking assistance and chatter',
+        title: 'Call Team Slack',
+        description: 'Get phonebanking assistance and talk to other callers for Bernie',
         showInIndex: true
     },
     codersforsanders: {
