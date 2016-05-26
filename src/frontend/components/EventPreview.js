@@ -18,7 +18,7 @@ export default class EventPreview extends React.Component {
 		mapContainer: {
 			display: 'inline-block',
 			float: 'right',
-      width: '40%',
+      width: '45%',
       height: 290,
       marginLeft: '2em',
       [MediaQueries.onMobile]: {
