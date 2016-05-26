@@ -25,10 +25,10 @@ class Dashboard extends React.Component {
     //   value: 'https://go.berniesanders.com/page/share/share-for-bernie?source=homepage_organize',
     //   label: 'Resources'
     // },
-    // {
-    //   value: 'https://organize.berniesanders.com/slack/berniebuilders',
-    //   label: 'Gather Online'
-    // },
+    {
+      value: '/slack',
+      label: 'Slack'
+    },
   ]
 
   renderTopNav() {
