@@ -22,7 +22,7 @@ import GCForm from './forms/GCForm'
 import Form from 'react-formal'
 import yup from 'yup'
 import moment from 'moment'
-import {BernieText, BernieColors} from './styles/bernie-css'
+import {BernieText, BernieColors, NAVBAR_HEIGHT} from './styles/bernie-css'
 import stripScripts from '../helpers/stripScripts'
 import SideBarLayout from './SideBarLayout'
 import EventRSVPTable from './EventRSVPTable'
@@ -33,7 +33,6 @@ import downloadCSV from '../helpers/downloadCSV'
 import flattenJSON from '../helpers/flattenJSON'
 
 const publicEventsRootUrl = 'https://secure.berniesanders.com/page/event'
-const topNavHeight = 56
 
 class ActionButton extends React.Component {
   static propTypes = {
@@ -145,9 +144,9 @@ class EventsDashboard extends React.Component {
         border: 'none'
       },
       content: {
-        height: this.state.windowHeight - topNavHeight,
+        height: this.state.windowHeight - NAVBAR_HEIGHT,
         width: this.isDesktopWidth() ? this.state.windowWidth * 0.8 : '100%',
-        padding: 5, top: topNavHeight,
+        padding: 5, top: NAVBAR_HEIGHT,
         position: 'absolute',
         overflow: 'scroll',
         boxSizing: 'border-box',
@@ -282,7 +281,7 @@ class EventsDashboard extends React.Component {
         open={this.isDesktopWidth()}
         width={this.styles().sideBar.width}
       >
-        <List style={{marginTop: topNavHeight}}>
+        <List style={{marginTop: NAVBAR_HEIGHT}}>
           <Subheader>View Settings</Subheader>
           <ListItem
             leftCheckbox={

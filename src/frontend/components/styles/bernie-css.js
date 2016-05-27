@@ -2,6 +2,8 @@ import {Styles} from 'material-ui'
 
 const maxMobileWidth = 720
 
+export const NAVBAR_HEIGHT = 48
+
 export const BernieColors = {
   blue: 'rgb(20, 127, 215)',
   lightBlue: 'rgb(196, 223, 245)',

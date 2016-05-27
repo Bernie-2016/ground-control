@@ -1,11 +1,9 @@
 import React from 'react'
 import Radium from 'radium'
 import BernieLogo from './BernieLogo'
-import {BernieColors, BernieText, MediaQueries} from './styles/bernie-css'
+import {BernieColors, BernieText, MediaQueries, NAVBAR_HEIGHT} from './styles/bernie-css'
 import {AppBar, Styles, Tabs, Tab, MenuItem, IconButton, IconMenu, FontIcon} from 'material-ui'
 import superagent from 'superagent'
-
-const NAVBAR_HEIGHT = 48
 
 @Radium
 export default class TopNav extends React.Component {

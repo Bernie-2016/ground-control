@@ -22,7 +22,7 @@ import Form from 'react-formal'
 import yup from 'yup'
 import phoneFormatter from 'phone-formatter'
 import {BernieTheme} from './styles/bernie-theme'
-import {BernieText, BernieColors} from './styles/bernie-css'
+import {BernieText, BernieColors, NAVBAR_HEIGHT} from './styles/bernie-css'
 import {states} from './data/states'
 
 const style = {
@@ -131,7 +131,7 @@ class ConstituentLookup extends React.Component {
     })
 
     return (
-      <div style={{height: this.state.windowHeight - 56, top: 56, position: 'absolute', overflow: 'scroll'}}>
+      <div style={{height: this.state.windowHeight - NAVBAR_HEIGHT, top: NAVBAR_HEIGHT, position: 'absolute', overflow: 'scroll'}}>
         <div
           style={{
             width: this.state.windowWidth * 0.3 - 40,
