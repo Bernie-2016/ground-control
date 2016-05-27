@@ -1,9 +1,13 @@
 import React from 'react'
+import Radium from 'radium'
 import BernieLogo from './BernieLogo'
-import {BernieColors, BernieText} from './styles/bernie-css'
-import {AppBar, Styles, Tabs, Tab} from 'material-ui'
+import {BernieColors, BernieText, MediaQueries} from './styles/bernie-css'
+import {AppBar, Styles, Tabs, Tab, MenuItem, IconButton, IconMenu, FontIcon} from 'material-ui'
 import superagent from 'superagent'
 
+const NAVBAR_HEIGHT = 48
+
+@Radium
 export default class TopNav extends React.Component {
   static propTypes = {
     logoColors: React.PropTypes.shape({
@@ -26,11 +30,11 @@ export default class TopNav extends React.Component {
   styles = {
     logo: {
       width: 96,
-      height: 40
+      height: 38
     },
     bar: {
-      height: 56,
-      minHeight: 56,
+      height: NAVBAR_HEIGHT,
+      minHeight: NAVBAR_HEIGHT,
       position: 'fixed',
       top: 0,
       left: 0,
@@ -54,27 +58,14 @@ export default class TopNav extends React.Component {
   render() {
     let tabs = []
 
-    let accountTab = {
-      label: 'Account',
-      value: '/account'
-    }
-
-    let logoutTab = {
-      label: 'Logout',
-      value: '/logout',
-      onActive: this.logoutHandler
-    }
-
-    let inputTabs = [...this.props.tabs, accountTab, logoutTab]
-
-    let selectedTab = inputTabs.filter((tab) => {
+    let selectedTab = this.props.tabs.filter((tab) => {
       return this.props.location.pathname.indexOf(tab.value) === 0
     })[0]
 
     if (selectedTab)
       selectedTab = selectedTab.value
 
-    inputTabs.forEach((tab) => {
+    this.props.tabs.forEach((tab) => {
       tabs.push(<Tab
         label={tab.label}
         style={{
@@ -97,30 +88,64 @@ export default class TopNav extends React.Component {
             backgroundColor: this.props.barColor,
             boxSizing: 'border-box'
           }}
-          titleStyle={{lineHeight: '56px'}}
-          iconStyleRight={{width: '35%', minWidth: 500}}
+          titleStyle={{lineHeight: NAVBAR_HEIGHT + 'px'}}
+          iconStyleRight={{marginTop: -7}}
           iconElementLeft={
-            <BernieLogo
-              color={this.props.logoColors.primary}
-              bottomSwooshColor={this.props.logoColors.swoosh}
-              viewBox="0 0 480 200"
-              style={this.styles.logo}
-          />}
+            <div style={{
+              position: 'relative',
+              top: -4,
+              [MediaQueries.onMobile]: {
+                display: 'none'
+              }
+            }}>
+              <BernieLogo
+                color={this.props.logoColors.primary}
+                bottomSwooshColor={this.props.logoColors.swoosh}
+                viewBox="0 0 480 200"
+                style={this.styles.logo}
+              />
+            </div>
+          }
           iconElementRight={
             <div>
               {this.props.extraTop}
-              <Tabs valueLink={{
-                value: selectedTab ? selectedTab : 'none',
-                requestChange: (value, event, tab) => {
-                  this.props.history.push(value)
-                }}}
+              <div style={{
+                minWidth: 430,
+                display: 'inline-block',
+                lineHeight: NAVBAR_HEIGHT + 'px',
+                [MediaQueries.onMobile]: {minWidth: 328}
+              }}>
+                <Tabs valueLink={{
+                  value: selectedTab ? selectedTab : 'none',
+                  requestChange: (value, event, tab) => {
+                    this.props.history.push(value)
+                  }}}
+                >
+                  {tabs}
+                </Tabs>
+              </div>
+              <IconMenu
+                style={{top: 7}}
+                iconStyle={{
+                  color: this.props.tabColor
+                }}
+                iconButtonElement={
+                  <IconButton>
+                    <FontIcon className="material-icons">
+                      more_vert
+                    </FontIcon>
+                  </IconButton>
+                }
+                targetOrigin={{horizontal: 'right', vertical: 'top'}}
+                anchorOrigin={{horizontal: 'right', vertical: 'top'}}
               >
-                {tabs}
-              </Tabs>
+                <MenuItem primaryText="Account Settings" onTouchTap={() => this.props.history.push('/account')} />
+                <MenuItem primaryText="Sign Out" onTouchTap={this.logoutHandler} />
+              </IconMenu>
             </div>
           }
         />
-        <div style={{height: 56, width: '100%'}}></div>
+        <div style={{height: NAVBAR_HEIGHT, width: '100%'}}></div>
       </div>
     )
   }
