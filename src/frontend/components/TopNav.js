@@ -87,7 +87,7 @@ export default class TopNav extends React.Component {
             boxSizing: 'border-box'
           }}
           titleStyle={{lineHeight: NAVBAR_HEIGHT + 'px'}}
-          iconStyleRight={{marginTop: -7}}
+          iconStyleRight={{marginTop: -8}}
           iconElementLeft={
             <div style={{
               position: 'relative',
@@ -111,7 +111,7 @@ export default class TopNav extends React.Component {
                 minWidth: 430,
                 display: 'inline-block',
                 lineHeight: NAVBAR_HEIGHT + 'px',
-                [MediaQueries.onMobile]: {minWidth: 328}
+                [MediaQueries.onMobile]: {minWidth: 312}
               }}>
                 <Tabs valueLink={{
                   value: selectedTab ? selectedTab : 'none',
