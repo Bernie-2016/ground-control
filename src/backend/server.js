@@ -573,6 +573,7 @@ async function startApp() {
       'canvass': { id: 32, staffOnly: false, requirePhone: true },
       'canvass-3-shifts': { id: 32, staffOnly: true, requirePhone: true },
       'canvass-4-shifts': { id: 32, staffOnly: true, requirePhone: true },
+      'canvass-4-shifts-early': { id: 32, staffOnly: true, requirePhone: true },
       'barnstorm': { id: 41, staffOnly: false, requirePhone: true },
       'carpool-to-nevada': { id: 39, staffOnly: false, requirePhone: true },
       'carpool': { id: 39, staffOnly: false, requirePhone: true },

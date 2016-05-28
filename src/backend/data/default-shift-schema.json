@@ -38,6 +38,28 @@
 			"end": "9:00 pm"
 		}
 	],
+	"canvass-4-shifts-early": [
+		{
+			"id": 1,
+			"start": "8:00 am",
+			"end": "11:00 am"
+		},
+		{
+			"id": 2,
+			"start": "11:00 am",
+			"end": "2:00 pm"
+		},
+		{
+			"id": 3,
+			"start": "2:00 pm",
+			"end": "5:00 pm"
+		},
+		{
+			"id": 4,
+			"start": "5:00 pm",
+			"end": "8:00 pm"
+		}
+	],
 	"get-out-the-vote": [
 		{
 			"id": 1,
