@@ -4,7 +4,7 @@ import request from 'request-promise'
 
 export const job = async () => {
 	if(process.env.NODE_ENV == 'production') {
-		log.info('Running moderate problem events job...')
+		log.info('Running sync moderated hosts job...')
 		try {
 			const options = {
 			  uri: `https://sheetsu.com/apis/${process.env.EVENTS_MODERATION_ADVISORY_SHEET}/column/Email`,
