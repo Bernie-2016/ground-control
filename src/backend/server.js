@@ -613,6 +613,14 @@ async function startApp() {
         }
     }
 
+    // Prevent submitting manifestos and short novels
+    if (form['description'].length > 5000) {
+      res.status(400).send({errors: {
+        'Character Limit' : [`Your event description cannot exceed 5000 characters.`]
+      }})
+      return
+    }
+
     // Flag event as needing approval
     let batchEventMax = 20
     let userIsStaff = false
