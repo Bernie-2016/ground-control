@@ -29,7 +29,7 @@
       "job": "./jobs/moderate-events-from-banned-hosts.js"
     },
     {
-      "cron": "* * 4 * * *",
+      "cron": "* * */4 * * *",
       "job": "./jobs/add-hosts-to-moderation-advisory.js"
     }
   ]
