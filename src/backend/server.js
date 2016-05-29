@@ -642,7 +642,7 @@ async function startApp() {
       return
     }
 
-    if (eventIdMap[eventTypeIdString].id === 32){
+    if (eventIdMap[eventTypeIdString].id === 32 && form['venue_state_cd'] !== 'DC'){
       try {
         const result = await rp('https://sheetsu.com/apis/bd810a50')
         const organizerArray = JSON.parse(result).result
