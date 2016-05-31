@@ -1276,7 +1276,7 @@ ${signature}`
               header={<this.SortControllerCell content="Event Date" attribute="startDate" />}
               cell={<this.DateCell data={events} col="startDate" />}
               flexGrow={1}
-              width={130}
+              width={160}
             />
             <Column
               header={<this.SortControllerCell content="Duration" attribute="duration" />}
@@ -1288,7 +1288,7 @@ ${signature}`
               header={<this.SortControllerCell content="Create Date" attribute="createDate" />}
               cell={<this.DateCell data={events} col="createDate" />}
               flexGrow={1}
-              width={130}
+              width={160}
             />
           </ColumnGroup>
           <ColumnGroup
