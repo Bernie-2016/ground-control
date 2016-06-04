@@ -1,6 +1,6 @@
 import React from 'react'
 import Relay from 'react-relay'
-import {BernieText, BernieColors} from './styles/bernie-css'
+import {BernieText, BernieColors, MediaQueries} from './styles/bernie-css'
 import Radium from 'radium'
 
 @Radium
@@ -15,11 +15,17 @@ class UserAccountDashboard extends React.Component {
     paragraph: {
       padding: '0.5em'
     },
+    wrapper: {
+      padding: 40,
+      [MediaQueries.onMobile]: {
+        padding: '1em'
+      }
+    }
   }
 
   render() {
     return (
-      <div style={{padding: 40}}>
+      <div style={this.styles.wrapper}>
         <div style={BernieText.title}>
           Account Settings
         </div>
