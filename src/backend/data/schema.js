@@ -331,6 +331,7 @@ const GraphQLListContainer = new GraphQLObjectType({
           type: new GraphQLEnumType({
             name: 'GraphQLEventStatus',
             values: {
+              PAST_EVENTS: {value: 'pastEvents'},
               PENDING_APPROVAL: {value: 'pendingApproval'},
               PENDING_REVIEW: {value: 'pendingReview'},
               APPROVED: {value: 'approved'},
@@ -346,9 +347,13 @@ const GraphQLListContainer = new GraphQLObjectType({
         let convertedSortField = `bsd_events.${eventFieldFromAPIField(sortField)}`
 
         let events = knex('bsd_events')
-          .where('start_dt', '>=', new Date())
           .where(eventFilters)
           .limit(first)
+
+        if (status === 'pastEvents')
+          events = events.where('start_dt', '<', new Date())
+        else
+          events = events.where('start_dt', '>=', new Date())
 
         if (status === 'pendingReview')
           events = events

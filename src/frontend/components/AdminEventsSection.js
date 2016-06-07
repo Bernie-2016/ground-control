@@ -50,6 +50,10 @@ const KeyboardActionsInfo = () => (
 )
 
 const approvalFilterOptions = {
+  PAST_EVENTS: {
+    text: 'Past Events',
+    actions: ['email', 'downloadRSVPs']
+  },
   PENDING_APPROVAL: {
     text: 'Pending Approval',
     actions: ['delete', 'approve', 'edit', 'email']
