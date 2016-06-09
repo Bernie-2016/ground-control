@@ -739,6 +739,11 @@
         }
       }
     },
+    "class-autobind": {
+      "version": "0.1.3",
+      "from": "class-autobind@>=0.1.2 <0.2.0",
+      "resolved": "https://registry.npmjs.org/class-autobind/-/class-autobind-0.1.3.tgz"
+    },
     "classnames": {
       "version": "2.2.5",
       "from": "classnames@>=2.2.3 <3.0.0",
@@ -1226,18 +1231,6 @@
       "from": "detective@>=4.3.1 <5.0.0",
       "resolved": "https://registry.npmjs.org/detective/-/detective-4.3.1.tgz"
     },
-    "doctrine": {
-      "version": "1.2.1",
-      "from": "doctrine@>=1.2.1 <2.0.0",
-      "resolved": "https://registry.npmjs.org/doctrine/-/doctrine-1.2.1.tgz",
-      "dependencies": {
-        "esutils": {
-          "version": "1.1.6",
-          "from": "esutils@>=1.1.6 <2.0.0",
-          "resolved": "https://registry.npmjs.org/esutils/-/esutils-1.1.6.tgz"
-        }
-      }
-    },
     "dom-helpers": {
       "version": "2.4.0",
       "from": "dom-helpers@>=2.2.4 <3.0.0",
@@ -1289,41 +1282,6 @@
       "version": "0.5.0",
       "from": "draft-js@>=0.5.0 <0.6.0",
       "resolved": "https://registry.npmjs.org/draft-js/-/draft-js-0.5.0.tgz"
-    },
-    "draft-js-export-html": {
-      "version": "0.1.13",
-      "from": "draft-js-export-html@>=0.1.9 <0.2.0",
-      "resolved": "https://registry.npmjs.org/draft-js-export-html/-/draft-js-export-html-0.1.13.tgz"
-    },
-    "draft-js-export-markdown": {
-      "version": "0.1.5",
-      "from": "draft-js-export-markdown@>=0.1.3 <0.2.0",
-      "resolved": "https://registry.npmjs.org/draft-js-export-markdown/-/draft-js-export-markdown-0.1.5.tgz"
-    },
-    "draft-js-import-element": {
-      "version": "0.1.11",
-      "from": "draft-js-import-element@>=0.1.11 <0.2.0",
-      "resolved": "https://registry.npmjs.org/draft-js-import-element/-/draft-js-import-element-0.1.11.tgz"
-    },
-    "draft-js-import-html": {
-      "version": "0.1.8",
-      "from": "draft-js-import-html@>=0.1.5 <0.2.0",
-      "resolved": "https://registry.npmjs.org/draft-js-import-html/-/draft-js-import-html-0.1.8.tgz"
-    },
-    "draft-js-import-markdown": {
-      "version": "0.1.4",
-      "from": "draft-js-import-markdown@>=0.1.2 <0.2.0",
-      "resolved": "https://registry.npmjs.org/draft-js-import-markdown/-/draft-js-import-markdown-0.1.4.tgz"
-    },
-    "draft-js-tools": {
-      "version": "0.1.2",
-      "from": "draft-js-tools@>=0.1.2 <0.2.0",
-      "resolved": "https://registry.npmjs.org/draft-js-tools/-/draft-js-tools-0.1.2.tgz"
-    },
-    "draft-js-utils": {
-      "version": "0.1.4",
-      "from": "draft-js-utils@>=0.1.4 <0.2.0",
-      "resolved": "https://registry.npmjs.org/draft-js-utils/-/draft-js-utils-0.1.4.tgz"
     },
     "duplexer": {
       "version": "0.1.1",
@@ -3117,18 +3075,6 @@
       "from": "isstream@>=0.1.2 <0.2.0",
       "resolved": "https://registry.npmjs.org/isstream/-/isstream-0.1.2.tgz"
     },
-    "jlegrone-react-rte": {
-      "version": "0.1.13",
-      "from": "jlegrone-react-rte@>=0.1.13 <0.2.0",
-      "resolved": "https://registry.npmjs.org/jlegrone-react-rte/-/jlegrone-react-rte-0.1.13.tgz",
-      "dependencies": {
-        "draft-js": {
-          "version": "0.4.0",
-          "from": "draft-js@>=0.4.0 <0.5.0",
-          "resolved": "https://registry.npmjs.org/draft-js/-/draft-js-0.4.0.tgz"
-        }
-      }
-    },
     "jmespath": {
       "version": "0.15.0",
       "from": "jmespath@0.15.0",
@@ -3161,7 +3107,8 @@
       "dependencies": {
         "esprima": {
           "version": "2.7.2",
-          "from": "esprima@>=2.6.0 <3.0.0"
+          "from": "esprima@2.7.2",
+          "resolved": "https://registry.npmjs.org/esprima/-/esprima-2.7.2.tgz"
         }
       }
     },
@@ -4740,6 +4687,48 @@
           "version": "5.8.38",
           "from": "babel-runtime@>=5.8.25 <6.0.0",
           "resolved": "https://registry.npmjs.org/babel-runtime/-/babel-runtime-5.8.38.tgz"
+        }
+      }
+    },
+    "react-rte": {
+      "version": "0.3.0",
+      "from": "react-rte@>=0.3.0 <0.4.0",
+      "resolved": "https://registry.npmjs.org/react-rte/-/react-rte-0.3.0.tgz",
+      "dependencies": {
+        "draft-js": {
+          "version": "0.7.0",
+          "from": "draft-js@>=0.7.0 <0.8.0",
+          "resolved": "https://registry.npmjs.org/draft-js/-/draft-js-0.7.0.tgz"
+        },
+        "draft-js-export-html": {
+          "version": "0.2.2",
+          "from": "draft-js-export-html@>=0.2.2 <0.3.0",
+          "resolved": "https://registry.npmjs.org/draft-js-export-html/-/draft-js-export-html-0.2.2.tgz"
+        },
+        "draft-js-export-markdown": {
+          "version": "0.2.0",
+          "from": "draft-js-export-markdown@>=0.2.0 <0.3.0",
+          "resolved": "https://registry.npmjs.org/draft-js-export-markdown/-/draft-js-export-markdown-0.2.0.tgz"
+        },
+        "draft-js-import-element": {
+          "version": "0.2.0",
+          "from": "draft-js-import-element@>=0.2.0 <0.3.0",
+          "resolved": "https://registry.npmjs.org/draft-js-import-element/-/draft-js-import-element-0.2.0.tgz"
+        },
+        "draft-js-import-html": {
+          "version": "0.1.10",
+          "from": "draft-js-import-html@>=0.1.10 <0.2.0",
+          "resolved": "https://registry.npmjs.org/draft-js-import-html/-/draft-js-import-html-0.1.10.tgz"
+        },
+        "draft-js-import-markdown": {
+          "version": "0.1.6",
+          "from": "draft-js-import-markdown@>=0.1.6 <0.2.0",
+          "resolved": "https://registry.npmjs.org/draft-js-import-markdown/-/draft-js-import-markdown-0.1.6.tgz"
+        },
+        "draft-js-utils": {
+          "version": "0.1.5",
+          "from": "draft-js-utils@>=0.1.5 <0.2.0",
+          "resolved": "https://registry.npmjs.org/draft-js-utils/-/draft-js-utils-0.1.5.tgz"
         }
       }
     },

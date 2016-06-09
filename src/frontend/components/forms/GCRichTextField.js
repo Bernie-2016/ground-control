@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import GCFormField from './GCFormField'
-import RichTextEditor from 'jlegrone-react-rte'
+import RichTextEditor from 'react-rte'
 
 export default class GCRichTextField extends GCFormField {
   static propTypes = {

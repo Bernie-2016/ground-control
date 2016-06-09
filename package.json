@@ -61,7 +61,7 @@
     "html-entities": "^1.2.0",
     "html-to-text": "^1.5.1",
     "humps": "^1.0.0",
-    "jlegrone-react-rte": "^0.1.13",
+    "react-rte": "^0.3.0",
     "jquery": "^2.1.4",
     "json-loader": "^0.5.4",
     "json2csv": "^3.0.2",
