@@ -36,12 +36,12 @@ var eventTypes = [
 		adminOnly: true,
 		disabled: ['use_shifts']
 	},
-	{
-		id: 'debate-watch',
-		name: 'Debate Watch Party',
-		adminOnly: false,
-		disabled: ['use_shifts']
-	},
+	// {
+	// 	id: 'debate-watch',
+	// 	name: 'Debate Watch Party',
+	// 	adminOnly: false,
+	// 	disabled: ['use_shifts']
+	// },
 	{
 		id: 'carpool',
 		name: 'Carpool',
@@ -85,95 +85,95 @@ var eventTypes = [
 		},
 		adminOnly: false
 	},
-	{
-		id: 'canvass',
-		name: 'Canvass',
-		defaultValues: {
-			name: 'Door knocking for Bernie',
-			description: 'You\'re invited to join your neighbors and supporters to knock on the doors of supporters and undecided voters. We\'ll provide you with a script, a list of voters that you\'ll be talking to, and a map of where to go. We\'ll also train you to use your time effectively out in the field. You\'ll be able to talk to real people about how this country belongs to all of us, not just the billionaire class. Our victory starts with us knocking on doors together.',
-			is_official: true
-		},
-		adminOnly: false,
-		disabled: ['attendee_volunteer_show', 'use_shifts']
-	},
-	{
-		id: 'canvass-3-shifts',
-		name: 'Canvass - 3 Standard Shifts',
-		defaultValues: {
-			name: 'Door knocking for Bernie',
-			description: 'You\'re invited to join your neighbors and supporters to knock on the doors of supporters and undecided voters. We\'ll provide you with a script, a list of voters that you\'ll be talking to, and a map of where to go. We\'ll also train you to use your time effectively out in the field. You\'ll be able to talk to real people about how this country belongs to all of us, not just the billionaire class. Our victory starts with us knocking on doors together.',
-			is_official: true
-		},
-		adminOnly: true,
-		disabled: ['attendee_volunteer_show', 'use_shifts']
-	},
-	{
-		id: 'canvass-4-shifts',
-		name: 'Canvass - 4 Standard Shifts',
-		defaultValues: {
-			name: 'Door knocking for Bernie',
-			description: 'You\'re invited to join your neighbors and supporters to knock on the doors of supporters and undecided voters. We\'ll provide you with a script, a list of voters that you\'ll be talking to, and a map of where to go. We\'ll also train you to use your time effectively out in the field. You\'ll be able to talk to real people about how this country belongs to all of us, not just the billionaire class. Our victory starts with us knocking on doors together.',
-			is_official: true
-		},
-		adminOnly: true,
-		disabled: ['attendee_volunteer_show', 'use_shifts']
-	},
-	{
-		id: 'canvass-4-shifts-early',
-		name: 'Canvass - 4 Standard Shifts (earlier)',
-		defaultValues: {
-			name: 'Door knocking for Bernie',
-			description: 'You\'re invited to join your neighbors and supporters to knock on the doors of supporters and undecided voters. We\'ll provide you with a script, a list of voters that you\'ll be talking to, and a map of where to go. We\'ll also train you to use your time effectively out in the field. You\'ll be able to talk to real people about how this country belongs to all of us, not just the billionaire class. Our victory starts with us knocking on doors together.',
-			is_official: true
-		},
-		adminOnly: true,
-		disabled: ['attendee_volunteer_show', 'use_shifts']
-	},
-	{
-		id: 'primary-day',
-		name: 'GOTV - Primary Day',
-		adminOnly: true,
-		disabled: ['contact_phone', 'public_phone'],
-		defaultValues: {
-			name: 'Get Out the Vote For Bernie!',
-			description: 'Join other volunteers in the area to help get out the vote for Bernie. You’ll get training, materials, and anything else you might need to put Bernie over the top in the upcoming election. This is the final push, so let’s give it all we’ve got!',
-			is_official: true,
-			is_searchable: true,
-			host_receive_rsvp_emails: false,
-			attendee_volunteer_show: false,
-			duration_allday: true,
-			capacity: 0
-		}
-	},
-	{
-		id: 'get-out-the-vote',
-		name: 'GOTV - 4 Standard Shifts',
-		adminOnly: true,
-		disabled: ['contact_phone', 'public_phone'],
-		defaultValues: {
-			name: 'Get Out the Vote For Bernie!',
-			description: 'Join other volunteers in the area to help get out the vote for Bernie. You’ll get training, materials, and anything else you might need to put Bernie over the top in the upcoming election. This is the final push, so let’s give it all we’ve got!',
-			is_official: true,
-			is_searchable: true,
-			host_receive_rsvp_emails: false,
-			attendee_volunteer_show: false,
-			duration_allday: true,
-			capacity: 0
-		}
-	},
-	{
-		id: 'get-out-the-vote-training',
-		name: 'Election Day GOTV Training',
-		adminOnly: true,
-		defaultValues: {
-			name: 'Official Get Out the Vote and Election Day Training',
-			description: '<p>As we get closer to election day, we need to make sure that we get everyone out to vote for Bernie at the polls!</p><p>This will be one of the most important Bernie organizing meetings of the election. To bring home a victory in New York, we need as many supporters as possible trained to join the “Get Out the Vote” effort and signed up for volunteer shifts to help in the final push.</p><p>This is how we win!</p><p>This event is being organized by the Bernie Sanders Official Campaign in conjunction with the Working Families Party and local grassroots Bernie organizers.</p><p>Email questions to <a href="mailto:wfp4bernie@workingfamilies.org">wfp4bernie@workingfamilies.org</a><p>',
-			is_official: true,
-			is_searchable: true,
-			capacity: 0
-		},
-		disabled: ['use_shifts']
-	},
+	// {
+	// 	id: 'canvass',
+	// 	name: 'Canvass',
+	// 	defaultValues: {
+	// 		name: 'Door knocking for Bernie',
+	// 		description: 'You\'re invited to join your neighbors and supporters to knock on the doors of supporters and undecided voters. We\'ll provide you with a script, a list of voters that you\'ll be talking to, and a map of where to go. We\'ll also train you to use your time effectively out in the field. You\'ll be able to talk to real people about how this country belongs to all of us, not just the billionaire class. Our victory starts with us knocking on doors together.',
+	// 		is_official: true
+	// 	},
+	// 	adminOnly: false,
+	// 	disabled: ['attendee_volunteer_show', 'use_shifts']
+	// },
+	// {
+	// 	id: 'canvass-3-shifts',
+	// 	name: 'Canvass - 3 Standard Shifts',
+	// 	defaultValues: {
+	// 		name: 'Door knocking for Bernie',
+	// 		description: 'You\'re invited to join your neighbors and supporters to knock on the doors of supporters and undecided voters. We\'ll provide you with a script, a list of voters that you\'ll be talking to, and a map of where to go. We\'ll also train you to use your time effectively out in the field. You\'ll be able to talk to real people about how this country belongs to all of us, not just the billionaire class. Our victory starts with us knocking on doors together.',
+	// 		is_official: true
+	// 	},
+	// 	adminOnly: true,
+	// 	disabled: ['attendee_volunteer_show', 'use_shifts']
+	// },
+	// {
+	// 	id: 'canvass-4-shifts',
+	// 	name: 'Canvass - 4 Standard Shifts',
+	// 	defaultValues: {
+	// 		name: 'Door knocking for Bernie',
+	// 		description: 'You\'re invited to join your neighbors and supporters to knock on the doors of supporters and undecided voters. We\'ll provide you with a script, a list of voters that you\'ll be talking to, and a map of where to go. We\'ll also train you to use your time effectively out in the field. You\'ll be able to talk to real people about how this country belongs to all of us, not just the billionaire class. Our victory starts with us knocking on doors together.',
+	// 		is_official: true
+	// 	},
+	// 	adminOnly: true,
+	// 	disabled: ['attendee_volunteer_show', 'use_shifts']
+	// },
+	// {
+	// 	id: 'canvass-4-shifts-early',
+	// 	name: 'Canvass - 4 Standard Shifts (earlier)',
+	// 	defaultValues: {
+	// 		name: 'Door knocking for Bernie',
+	// 		description: 'You\'re invited to join your neighbors and supporters to knock on the doors of supporters and undecided voters. We\'ll provide you with a script, a list of voters that you\'ll be talking to, and a map of where to go. We\'ll also train you to use your time effectively out in the field. You\'ll be able to talk to real people about how this country belongs to all of us, not just the billionaire class. Our victory starts with us knocking on doors together.',
+	// 		is_official: true
+	// 	},
+	// 	adminOnly: true,
+	// 	disabled: ['attendee_volunteer_show', 'use_shifts']
+	// },
+	// {
+	// 	id: 'primary-day',
+	// 	name: 'GOTV - Primary Day',
+	// 	adminOnly: true,
+	// 	disabled: ['contact_phone', 'public_phone'],
+	// 	defaultValues: {
+	// 		name: 'Get Out the Vote For Bernie!',
+	// 		description: 'Join other volunteers in the area to help get out the vote for Bernie. You’ll get training, materials, and anything else you might need to put Bernie over the top in the upcoming election. This is the final push, so let’s give it all we’ve got!',
+	// 		is_official: true,
+	// 		is_searchable: true,
+	// 		host_receive_rsvp_emails: false,
+	// 		attendee_volunteer_show: false,
+	// 		duration_allday: true,
+	// 		capacity: 0
+	// 	}
+	// },
+	// {
+	// 	id: 'get-out-the-vote',
+	// 	name: 'GOTV - 4 Standard Shifts',
+	// 	adminOnly: true,
+	// 	disabled: ['contact_phone', 'public_phone'],
+	// 	defaultValues: {
+	// 		name: 'Get Out the Vote For Bernie!',
+	// 		description: 'Join other volunteers in the area to help get out the vote for Bernie. You’ll get training, materials, and anything else you might need to put Bernie over the top in the upcoming election. This is the final push, so let’s give it all we’ve got!',
+	// 		is_official: true,
+	// 		is_searchable: true,
+	// 		host_receive_rsvp_emails: false,
+	// 		attendee_volunteer_show: false,
+	// 		duration_allday: true,
+	// 		capacity: 0
+	// 	}
+	// },
+	// {
+	// 	id: 'get-out-the-vote-training',
+	// 	name: 'Election Day GOTV Training',
+	// 	adminOnly: true,
+	// 	defaultValues: {
+	// 		name: 'Official Get Out the Vote and Election Day Training',
+	// 		description: '<p>As we get closer to election day, we need to make sure that we get everyone out to vote for Bernie at the polls!</p><p>This will be one of the most important Bernie organizing meetings of the election. To bring home a victory in New York, we need as many supporters as possible trained to join the “Get Out the Vote” effort and signed up for volunteer shifts to help in the final push.</p><p>This is how we win!</p><p>This event is being organized by the Bernie Sanders Official Campaign in conjunction with the Working Families Party and local grassroots Bernie organizers.</p><p>Email questions to <a href="mailto:wfp4bernie@workingfamilies.org">wfp4bernie@workingfamilies.org</a><p>',
+	// 		is_official: true,
+	// 		is_searchable: true,
+	// 		capacity: 0
+	// 	},
+	// 	disabled: ['use_shifts']
+	// },
 	{
 		id: 'barnstorm',
 		name: 'Barnstorm',
@@ -217,30 +217,30 @@ var eventTypes = [
 		disabled: ['contact_phone', 'public_phone', 'use_shifts'],
 		adminOnly: true
 	},
-	{
-		id: 'vol2vol',
-		name: 'Vol 2 Vol Turnout Shift',
-		defaultValues: {
-			name: 'Vol2Vol Turnout Shift',
-			description: '<div class="description"><p>Five minutes before your calling time, navigate to <a href="http://hubdialer.com/agent">hubdialer.com/agent</a>.</p><p>You can find the login codes and various tips in the FAQ: <a href="http://bernie.to/vol2volFAQ">http://bernie.to/vol2volFAQ</a></p><p>If it&#39;s your first time calling, read through the instructions and familiarize yourself with the script.</p><p>We encourage you to hop onto Slack and ask questions, raise concerns, and revel in your successes with us in real time! Here&#39;s a short video to get you set up: <a href="https://www.youtube.com/watch?v=2_BaZ4_9M6M"><u>https://www.youtube.com/watch?v=2_BaZ4_9M6M</u></a></p><p>Please keep in mind we\'re relying on you to fulfill your commitment. If you\'re not able to call for the full two hours, come online when you can and call for the time that you\'re able.</p><p>It&#39;s an honor to have you on the team!</p></div>',
-			is_searchable: 0,
-			is_official: true,
-			rsvp_email_reminder_hours: 4,
-			date: {
-				time: '17:00:00',
-			},
-			duration_num: 2,
-			duration_unit: 60,
-			venue_name: 'HubDialer (online event)',
-			venue_zip: '05401',
-			venue_city: 'Burlington',
-			venue_state_cd: 'VT',
-			start_tz: 'US/Eastern',
-			cons_name: 'Robert Reeves'
-		},
-		disabled: ['contact_phone', 'public_phone'],
-		adminOnly: true
-	},
+	// {
+	// 	id: 'vol2vol',
+	// 	name: 'Vol 2 Vol Turnout Shift',
+	// 	defaultValues: {
+	// 		name: 'Vol2Vol Turnout Shift',
+	// 		description: '<div class="description"><p>Five minutes before your calling time, navigate to <a href="http://hubdialer.com/agent">hubdialer.com/agent</a>.</p><p>You can find the login codes and various tips in the FAQ: <a href="http://bernie.to/vol2volFAQ">http://bernie.to/vol2volFAQ</a></p><p>If it&#39;s your first time calling, read through the instructions and familiarize yourself with the script.</p><p>We encourage you to hop onto Slack and ask questions, raise concerns, and revel in your successes with us in real time! Here&#39;s a short video to get you set up: <a href="https://www.youtube.com/watch?v=2_BaZ4_9M6M"><u>https://www.youtube.com/watch?v=2_BaZ4_9M6M</u></a></p><p>Please keep in mind we\'re relying on you to fulfill your commitment. If you\'re not able to call for the full two hours, come online when you can and call for the time that you\'re able.</p><p>It&#39;s an honor to have you on the team!</p></div>',
+	// 		is_searchable: 0,
+	// 		is_official: true,
+	// 		rsvp_email_reminder_hours: 4,
+	// 		date: {
+	// 			time: '17:00:00',
+	// 		},
+	// 		duration_num: 2,
+	// 		duration_unit: 60,
+	// 		venue_name: 'HubDialer (online event)',
+	// 		venue_zip: '05401',
+	// 		venue_city: 'Burlington',
+	// 		venue_state_cd: 'VT',
+	// 		start_tz: 'US/Eastern',
+	// 		cons_name: 'Robert Reeves'
+	// 	},
+	// 	disabled: ['contact_phone', 'public_phone'],
+	// 	adminOnly: true
+	// },
 	{
 		id: 'voter-registration',
 		name: 'Voter Registration',
