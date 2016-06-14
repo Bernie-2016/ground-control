@@ -143,16 +143,17 @@ async function startApp() {
   }
 
   let isStaff = async (userId) => {
-    if (!userId) {
-      return false
-    }
-    const user = await knex('users').where('id', userId).first()
-    if (user && user.email){
-      let domain = user.email.split('@')
-      if (domain.length > 0)
-        return (domain[1] === 'berniesanders.com' || user.is_admin)
-    }
-    return false
+    return await isAdmin(userId) // require admin privileges for staff
+    // if (!userId) {
+    //   return false
+    // }
+    // const user = await knex('users').where('id', userId).first()
+    // if (user && user.email){
+    //   let domain = user.email.split('@')
+    //   if (domain.length > 0)
+    //     return (domain[1] === 'berniesanders.com' || user.is_admin)
+    // }
+    // return false
   }
 
   passport.use('signup', new LocalStrategy(
