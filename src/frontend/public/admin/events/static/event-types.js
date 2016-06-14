@@ -27,12 +27,12 @@ var eventTypes = [
 		id: 'volunteer-meeting',
 		name: 'Volunteer Activity or Meeting',
 		adminOnly: false,
-		nonAdminOnly: true,
+		nonAdminOnly: false,
 		disabled: ['use_shifts']
 	},
 	{
 		id: 'organizing-meeting',
-		name: 'Organizing Meeting',
+		name: 'Official Organizing Meeting',
 		adminOnly: true,
 		disabled: ['use_shifts']
 	},
