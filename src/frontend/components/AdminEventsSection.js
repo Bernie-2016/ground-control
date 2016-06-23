@@ -182,6 +182,19 @@ class AdminEventsSection extends React.Component {
     </Cell>
   )
 
+  CapacityCell = ({rowIndex, data, col, ...props}) => {
+    const capacity = data[rowIndex]['node'][col]
+    return <Cell {...props}
+      style={{
+        fontFamily: 'Roboto',
+        fontSize: '13px',
+        lineHeight: '18px'
+      }}
+    >
+      {(capacity == 0) ? 'unlimited' : capacity}
+    </Cell>
+  }
+
   BooleanCell = ({rowIndex, data, col, ...props}) => (
     <Cell {...props}
     style={{
@@ -1375,7 +1388,7 @@ ${signature}`
             <Column
               flexGrow={1}
               header={<this.SortControllerCell content="Capacity" attribute="capacity" />}
-              cell={<this.TextCell data={events} col="capacity" />}
+              cell={<this.CapacityCell data={events} col="capacity" />}
               width={100}
               align='center'
             />
