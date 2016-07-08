@@ -23,6 +23,11 @@ export const slacks = {
         description: 'Volunteer development projects discussion',
         showInIndex: true
     },
+    bernieevents: {
+        title: 'Bernie Events',
+        description: 'Connect with the campaign and contribute to volunteer projects',
+        showInIndex: true
+    },
     textforbernie: {
         title: 'Text for Bernie',
         description: 'Text for Bernie uses Slack, a powerful group messaging program, to coordinate our efforts.  Please enter your email address below to receive an email invitation to the Text for Bernie Slack team.',
