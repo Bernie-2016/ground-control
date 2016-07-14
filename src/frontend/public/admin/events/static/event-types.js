@@ -251,6 +251,31 @@ var eventTypes = [
 			duration_unit: 60
 		},
 		adminOnly: false
+	},
+	{
+		id: 'bernie-address',
+		name: 'July 24th Nationwide Bernie Address',
+		defaultValues: {
+			name: 'July 24th Bernie Livestream Party',
+			date: {
+				dateTime: new Date('July 24 2016 05:00:00'),
+				timeZone: 'US/Eastern'
+			},
+			duration_num: 2,
+			duration_unit: 1,
+			event_repeat_type: 'never'
+		},
+		disabled: [
+			'contact_phone',
+			'public_phone',
+			'use_shifts',
+			'attendee_volunteer_show',
+			'host_receive_rsvp_emails',
+			'rsvp_use_reminder_email',
+			'rsvp_email_reminder_hours',
+			'event_repeat_type'
+		],
+		adminOnly: false
 	}
 	// { // Keep this event type in as an example for providing extra default values
 	// 	id: 44,
