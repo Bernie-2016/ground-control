@@ -130,6 +130,9 @@ class EventEdit extends React.Component {
         .min(0)
         .required(),
 
+      creatorName: yup.string()
+        .default(event.creatorName),
+
       hostEmail: yup.string().email()
         .default((event.host) ? event.host.email : null),
 
@@ -151,8 +154,8 @@ class EventEdit extends React.Component {
       attendeeVolunteerMessage: yup.string()
         .default(event.attendeeVolunteerMessage),
 
-      isSearchable: yup.string()
-        .default(String(event.isSearchable)),
+      isSearchable: yup.boolean()
+        .default((event.isSearchable !== 0)),
 
       isOfficial: yup.boolean()
         .default(event.isOfficial)
@@ -166,7 +169,7 @@ class EventEdit extends React.Component {
         defaultValue={eventSchema.default()}
         onSubmit={ (data) => {
           data.duration = data.duration.h * 60 + data.duration.m
-          data.isSearchable = Number(data.isSearchable)
+          data.isSearchable = data.isSearchable ? 1 : 0
           // Encode special characters to HTML entities, but avoid encoding <>"'& + &#...;
           data.description = xmlEntities.decode(entities.encode(data.description))
           if (host)
@@ -292,7 +295,10 @@ class EventEdit extends React.Component {
         />
 
         <InfoHeader content='Event Host' />
-        {(host) ? `${host.firstName} ${host.lastName}` : 'No host name available'}<br />
+        <Form.Field
+          name="creatorName"
+          label="Host Name"
+        /><br/>
 
         <Form.Field
           name="hostEmail"
@@ -302,7 +308,7 @@ class EventEdit extends React.Component {
           onChange={(value) => {
             this.props.relay.setVariables({personFilters: {email: value}})
           }}
-        /><br/>
+        /> {(host && (host.firstName || host.lastName)) ? <span>({host.firstName} {host.lastName})</span> : ''}<br/>
 
         <Form.Field
           name="contactPhone"
@@ -352,9 +358,7 @@ class EventEdit extends React.Component {
 
         <Form.Field
           name='isSearchable'
-          type='select'
           label='Make Event Public?'
-          choices={this.eventSearchableOptions()}
         /><br/><br/>
 
         <Form.Field

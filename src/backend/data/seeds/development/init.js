@@ -4,6 +4,7 @@ import {hash} from '../../../bcrypt-promise';
 import Promise from 'bluebird'
 import loadZips from '../shared/load-zips'
 import generateEventFileTypes from '../shared/event-file-types'
+import generateContactAssignments from '../shared/contact-assignments'
 import importData from '../../import-data'
 import moment from 'moment'
 
@@ -63,10 +64,14 @@ exports.seed = async function(knex, Promise) {
     'bsd_emails': [],
     'bsd_phones': [],
     'bsd_groups': [],
+    'event_files' : [],
     'bsd_event_types' : [],
     'bsd_subscriptions': [],
     'zip_codes' : [],
     'event_file_types' : [],
+    'contact_assignments' : [],
+    'contact_call_actions' : [],
+    'contact_text_actions' : [],
     'sessions' : [],
   }
 
@@ -83,7 +88,7 @@ exports.seed = async function(knex, Promise) {
   }
 
   log.info('Creating admin users...')
-  let password = await hash('admin')
+  let password = await hash('password')
 
   data.users = [
     {
@@ -207,6 +212,27 @@ exports.seed = async function(knex, Promise) {
     })
   }
 
+  log.info('Generating contact assignments...')
+  const contactAssignments = generateContactAssignments()
+  contactAssignments.forEach((assignment, index) => {
+    assignment.id = index + 1
+    if (assignment.call_actions !== undefined) {
+      assignment.call_actions.forEach((action, actionIndex) => {
+        action.contact_assignment_id = assignment.id
+        data.contact_call_actions.push(action)
+      })
+      delete assignment.call_actions
+    }
+    if (assignment.text_actions !== undefined) {
+      assignment.text_actions.forEach((action) => {
+        action.contact_assignment_id = assignment.id
+        data.contact_text_actions.push(action)
+      })
+      delete assignment.text_actions
+    }
+    data.contact_assignments.push(assignment)
+  })
+
   log.info('Generating event types...')
   data.bsd_event_types = [
     {
@@ -228,21 +254,26 @@ exports.seed = async function(knex, Promise) {
   let eventAttendeeCount = 0
 
   log.info('Generating events and attendees...')
+  const eventTypeIdsArray = data.bsd_event_types.map((type) => type.event_type_id)
   for (let index = 1; index <= NUM_EVENTS; index++) {
-    let rsvp_use_reminder_boolean = faker.random.boolean();
-    let rsvp_use_reminder_email = rsvp_use_reminder_boolean;
-    let rsvp_email_reminder_hours = rsvp_use_reminder_boolean ? null : faker.random.number({min:0, max:30});
-    let capacity = faker.random.arrayElement([0, faker.random.number({min:0, max:100})]);
+    let rsvp_use_reminder_boolean = faker.random.boolean()
+    let rsvp_use_reminder_email = rsvp_use_reminder_boolean
+    let rsvp_email_reminder_hours = rsvp_use_reminder_boolean ? null : faker.random.number({min:0, max:30})
+    let capacity = faker.random.arrayElement([0, faker.random.number({min:0, max:100})])
 
-    let zip = faker.random.arrayElement(data.zip_codes);
-    let startDate = formatDate(faker.date.future());
+    let zip = faker.random.arrayElement(data.zip_codes)
+    let startDate = formatDate(faker.date.future())
+    const personID = faker.random.number({min: 0, max: NUM_PERSONS - 1})
+    const host = data.bsd_people[personID]
+
     data.bsd_events.push({
       event_id: index,
       event_id_obfuscated: faker.internet.password(5),
       flag_approval: faker.random.boolean(),
       is_official: faker.random.boolean(),
-      event_type_id: faker.random.arrayElement(data.bsd_event_types.map((type) => type.event_type_id)),
-      creator_cons_id: faker.random.number({min: 1, max: NUM_PERSONS}),
+      event_type_id: faker.random.arrayElement(eventTypeIdsArray),
+      creator_name: `${host.firstname} ${host.lastname}`,
+      creator_cons_id: host.cons_id,
       name: titlify(faker.lorem.sentence(3,5)),
       description: faker.lorem.paragraph(),
       venue_name: titlify(faker.lorem.sentence(1,4)),
@@ -271,14 +302,14 @@ exports.seed = async function(knex, Promise) {
     })
 
     if (faker.random.boolean()){
-    	data.bsd_event_shifts.push({
-    		event_id: index,
-    		event_shift_id: data.bsd_event_shifts.length,
-    		start_dt: moment(startDate).format('YYYY-MM-DD HH:mm:ss'),
-    		start_time: moment(startDate).format('HH:mm:ss'),
-    		end_dt: moment(startDate).format('YYYY-MM-DD HH:mm:ss'),
-    		end_time: moment(startDate).format('HH:mm:ss'),
-    		capacity: faker.random.number({min: 0, max: 300})
+      data.bsd_event_shifts.push({
+        event_id: index,
+        event_shift_id: data.bsd_event_shifts.length,
+        start_dt: moment(startDate).format('YYYY-MM-DD HH:mm:ss'),
+        start_time: moment(startDate).format('HH:mm:ss'),
+        end_dt: moment(startDate).format('YYYY-MM-DD HH:mm:ss'),
+        end_time: moment(startDate).format('HH:mm:ss'),
+        capacity: faker.random.number({min: 0, max: 300})
       })
     }
 
@@ -294,7 +325,7 @@ exports.seed = async function(knex, Promise) {
     }
   }
 
-  let insertOrder = ['users', 'zip_codes', 'event_file_types', 'bsd_groups', 'bsd_event_types', 'bsd_people', 'bsd_events', 'bsd_event_shifts', 'bsd_event_attendees', 'bsd_addresses', 'bsd_person_bsd_groups', 'bsd_emails', 'bsd_phones', 'bsd_subscriptions']
+  let insertOrder = ['users', 'zip_codes', 'event_files', 'event_file_types', 'bsd_groups', 'bsd_event_types', 'bsd_people', 'bsd_events', 'bsd_event_shifts', 'bsd_event_attendees', 'bsd_addresses', 'bsd_person_bsd_groups', 'bsd_emails', 'bsd_phones', 'bsd_subscriptions', 'contact_call_actions', 'contact_text_actions', 'contact_assignments']
 
   for (let index = 0; index < insertOrder.length; index++) {
     let key = insertOrder[index]

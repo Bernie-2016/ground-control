@@ -15,11 +15,12 @@ export default class SlackInviteIndex extends React.Component {
       flexDirection: 'row'
     },
     introTextContainer: {
-      flex: 1,
-      marginRight: 40
+      flex: 1
     },
     container: {
-      padding: '40px'
+      padding: '1em',
+      maxWidth: 850,
+      margin: '0 auto'
     }
   }
 

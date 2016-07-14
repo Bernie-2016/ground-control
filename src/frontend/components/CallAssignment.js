@@ -1,18 +1,18 @@
-import React from 'react';
-import Relay from 'react-relay';
-import {BernieText, BernieColors} from './styles/bernie-css';
-import {Paper, List, ListItem, RaisedButton} from 'material-ui';
-import PlivoDialer from './PlivoDialer';
-import SideBarLayout from './SideBarLayout';
-import moment from 'moment';
+import React from 'react'
+import Relay from 'react-relay'
+import {BernieText, BernieColors} from './styles/bernie-css'
+import {Paper, List, ListItem, RaisedButton} from 'material-ui'
+import PlivoDialer from './PlivoDialer'
+import SideBarLayout from './SideBarLayout'
+import moment from 'moment'
 import yup from 'yup'
-import GCForm from './forms/GCForm';
-import Form from 'react-formal';
+import GCForm from './forms/GCForm'
+import Form from 'react-formal'
 import SubmitCallSurvey from '../mutations/SubmitCallSurvey'
 import CallStatsBar from './CallStatsBar'
-import MutationHandler from './MutationHandler';
-var PNF = require('google-libphonenumber').PhoneNumberFormat;
-var phoneUtil = require('google-libphonenumber').PhoneNumberUtil.getInstance();
+import MutationHandler from './MutationHandler'
+import {PhoneNumberFormat, PhoneNumberUtil} from 'google-libphonenumber'
+const phoneUtil = PhoneNumberUtil.getInstance()
 
 const SurveyRenderers = {
   'BSDSurvey': require('./survey-renderers/BSDSurvey'),
@@ -20,27 +20,25 @@ const SurveyRenderers = {
   'SingleEventRSVPSurvey': require('./survey-renderers/SingleEventRSVPSurvey'),
   'Jan23HostRecruitmentSurvey': require('./survey-renderers/Jan23HostRecruitmentSurvey')
 }
+const maxContainerWidth = 720
 
 class CallAssignment extends React.Component {
   styles = {
     assignmentBar: {
       backgroundColor: BernieColors.lightGray,
-      marginTop: 15,
-      marginLeft: 'auto',
-      marginRight: 'auto',
-      marginBottom: 15,
-      paddingTop: 15,
-      paddingLeft: 15,
-      paddingRight: 15,
-      paddingBottom: 15,
+      margin: '15px auto',
+      padding: 15,
       color: BernieColors.darkGray,
       fontSize: '1em',
       width: 'auto',
-      maxWidth: 720
+      maxWidth: maxContainerWidth
     },
     callAssignmentQuestions: {
       fontSize: '1em',
       marginBottom: 15,
+    },
+    container: {
+      margin: '1em'
     },
     surveyFrame: {
       borderTop: 'solid 1px ' + BernieColors.lightGray,
@@ -48,7 +46,7 @@ class CallAssignment extends React.Component {
     },
     questions: {
       paddingTop: 15,
-      maxWidth: 720,
+      maxWidth: maxContainerWidth,
       marginLeft: 'auto',
       marginRight: 'auto'
     },
@@ -56,10 +54,10 @@ class CallAssignment extends React.Component {
       marginLeft: 'auto',
       marginRight: 'auto',
       border: 'solid 1px ' + BernieColors.blue,
-      maxWidth: 720,
+      maxWidth: maxContainerWidth,
       marginTop: 15,
       marginBottom: 50,
-      padding: '15px 15px 15px 15px'
+      padding: 15
     },
     submitButton: {
       marginTop: 20,
@@ -98,7 +96,7 @@ class CallAssignment extends React.Component {
           'Fill out why you were unable to complete the call',
           function(value) {
             if (this.parent.completed)
-              return true;
+              return true
             else
               return value !== null
           }
@@ -132,24 +130,24 @@ class CallAssignment extends React.Component {
     })
 
   intervieweeName() {
-    let interviewee = this.props.currentUser.intervieweeForCallAssignment;
+    let interviewee = this.props.currentUser.intervieweeForCallAssignment
     let name = ''
     let keys = ['prefix', 'firstName', 'middleName', 'lastName', 'suffix']
     keys.forEach((key) => {
       if (interviewee[key])
         name = name + ' ' + interviewee[key]
     })
-    name = name.trim();
+    name = name.trim()
     return name === '' ? 'Unknown name' : name
   }
 
   generateEventsInfoEmailLink() {
-    const userFirstName = this.props.currentUser.firstName;
-    const interviewee = this.props.currentUser.intervieweeForCallAssignment;
-    const name = (interviewee.firstName) ? interviewee.firstName : this.intervieweeName();
-    const email = interviewee.email;
-    const zip = interviewee.address.zip;
-    const subject = escape('Bernie Phone Call Followup');
+    const userFirstName = this.props.currentUser.firstName
+    const interviewee = this.props.currentUser.intervieweeForCallAssignment
+    const name = (interviewee.firstName) ? interviewee.firstName : this.intervieweeName()
+    const email = interviewee.email
+    const zip = interviewee.address.zip
+    const subject = escape('Bernie Phone Call Followup')
     const message = escape(
 `Hi ${name},
 
@@ -160,30 +158,28 @@ We really appreciate your time! If you're interested in getting involved further
 
 Thanks,
 ${userFirstName}`
-    );
+    )
 
     return `mailto:${email}?subject=${subject}&body=${message}`
   }
 
   phoneTelLink(number, country='US') {
-    return phoneUtil.format(phoneUtil.parse(number, country), PNF.INTERNATIONAL);
+    return phoneUtil.format(phoneUtil.parse(number, country), PhoneNumberFormat.INTERNATIONAL)
   }
 
   renderIntervieweeInfo() {
-    let interviewee = this.props.currentUser.intervieweeForCallAssignment
-    let name = this.intervieweeName()
-    let localTime = moment().utcOffset(interviewee.address.localUTCOffset).format('h:mm a')
+    const interviewee = this.props.currentUser.intervieweeForCallAssignment
+    const name = this.intervieweeName()
+    const localTime = moment().utcOffset(interviewee.address.localUTCOffset).format('h:mm a')
 
-    let lastCalled = () => {
+    const lastCalled = () => {
       if (interviewee.lastCalled) {
         return moment(interviewee.lastCalled).utcOffset(interviewee.address.localUTCOffset).fromNow()
       } else {
         return 'never'
       }
     }
-    let country = interviewee.address.country || 'US'
-    let phone = interviewee.phone
-    let sideBar = (
+    const sideBar = (
       <div>
         <div style={{
           ...BernieText.default,
@@ -201,15 +197,10 @@ ${userFirstName}`
       </div>
     )
 
-    let location = `${interviewee.address.city}, ${interviewee.address.state}`
-    if (country !== 'US')
-      location = location + `, ${country}`
-    location = location + `, ${interviewee.address.zip}`
-
-    let email =  this.props.currentUser.intervieweeForCallAssignment.email ? <a target='_blank' href={this.generateEventsInfoEmailLink()}>{this.props.currentUser.intervieweeForCallAssignment.email}</a> : 'None'
-    let content = (
+    const email =  interviewee.email ? <a target='_blank' href={this.generateEventsInfoEmailLink()}>{interviewee.email}</a> : 'None'
+    const content = (
       <div style={BernieText.default}>
-        Location: {location}<br />
+        Location: {interviewee.address.city}, {interviewee.address.state}<br />
         Local Time: {localTime}<br />
         Last called: {lastCalled()}<br />
         Email: {email}
@@ -221,7 +212,7 @@ ${userFirstName}`
         content={content}
         sideBar={sideBar}
         sideBarStyle={{
-          width: 300,
+          width: '50%',
         }}
         contentViewStyle={{
           marginLeft: 50,
@@ -237,7 +228,6 @@ ${userFirstName}`
       callAssignmentId: this.props.callAssignment.id,
       intervieweeId: this.props.currentUser.intervieweeForCallAssignment.id,
       leftVoicemail: this.state.leftVoicemail,
-      sentText: this.state.sentText,
       reasonNotCompleted: this.state.reasonNotCompleted,
       sentText: this.state.sentText,
       surveyFieldValues: JSON.stringify(surveyFields)
@@ -248,7 +238,7 @@ ${userFirstName}`
     if (this.state.completed)
       this.refs.survey.refs.component.submit()
     else
-      this.submitCallSurvey({});
+      this.submitCallSurvey({})
   }
 
   renderInstructions() {
@@ -302,12 +292,12 @@ ${userFirstName}`
             All done!
           </div>
           <div style={BernieText.default}>
-            We have no one left for you to call right now, but try again tomorrow.
+            We have no one left for you to call right now, but try again in an hour.
           </div>
         </div>
       )
 
-    let Survey = SurveyRenderers[this.props.callAssignment.renderer];
+    let Survey = SurveyRenderers[this.props.callAssignment.renderer]
 
     let survey = (
       <div style={{
@@ -414,7 +404,7 @@ ${userFirstName}`
           </div>
         </div>
       </div>
-    );
+    )
   }
 }
 
@@ -476,4 +466,4 @@ export default Relay.createContainer(CallAssignment, {
       }
     `
   }
-});
+})

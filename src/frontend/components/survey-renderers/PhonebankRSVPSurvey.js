@@ -205,6 +205,7 @@ class PhonebankRSVPSurvey extends React.Component {
             fontSize: '1.0em'
           }}>
             {markerStartDate}
+            {marker.isOfficial ? '\u2014 OFFICIAL EVENT' : ''}
           </div>
           <div style={{
             ...BernieText.default,
@@ -302,6 +303,7 @@ class PhonebankRSVPSurvey extends React.Component {
         eventId: event.eventIdObfuscated,
         capacity: event.capacity,
         attendeesCount: event.attendeesCount,
+        isOfficial: event.isOfficial,
         link: event.link,
         icon: null
       }
@@ -580,6 +582,7 @@ export default Relay.createContainer(PhonebankRSVPSurvey, {
           capacity
           attendeesCount
           link
+          isOfficial
         }
       }
     `

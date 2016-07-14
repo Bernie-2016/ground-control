@@ -1,48 +1,50 @@
-import React from 'react';
-import moment from 'moment-timezone';
-import {BernieText, BernieColors} from './styles/bernie-css';
+import React from 'react'
+import moment from 'moment-timezone'
+import Radium from 'radium'
+import {BernieText, BernieColors, MediaQueries} from './styles/bernie-css'
+import {Paper} from 'material-ui'
 import InfoHeader from './InfoHeader'
+import EventMapPreview from './EventMapPreview'
+import EventOfficialStamp from './EventOfficialStamp'
 import stripScripts from '../helpers/stripScripts'
 
 const momentWithTimezone = (startDate, timeZone) => {
   return moment(startDate).tz(timeZone)
-};
+}
 
+@Radium
 export default class EventPreview extends React.Component {
-  constructor(props) {
-    super(props);
-  }
+	styles = {
+		mapContainer: {
+			display: 'inline-block',
+			float: 'right',
+      width: '45%',
+      height: 290,
+      marginLeft: '2em',
+      [MediaQueries.onMobile]: {
+      	float: 'none',
+      	width: '100%',
+      	marginLeft: 0
+      }
+    }
+	}
 
-    render() {
-    let event = this.props.event
+  render() {
+    const event = this.props.event
     let formattedDateTime = momentWithTimezone(event.startDate, event.localTimezone)
     formattedDateTime = formattedDateTime ? formattedDateTime.format('LLLL') : event.startDate
 
-    let isOfficial = null;
-    if (event.isOfficial){
-      const officialStyle = {
-        display: 'inline-block',
-        border: '2px solid #F55B5B',
-        fontSize: '0.9rem',
-        color: '#F55B5B',
-        fontFamily: 'freight-sans-pro',
-        textTransform: 'uppercase',
-        letterSpacing: '0.1em',
-        fontWeight: '600',
-        borderRadius: '3px',
-        marginTop: '0.75rem',
-        padding: '0.2rem 0.5rem',
-        transform: 'rotate(-2deg)'
-      };
-      isOfficial = <span style={officialStyle}>Official Event</span>
-    }
     return (
       <div style={BernieText.default}>
-        <h1 style={BernieText.title}>{event.name}</h1>
-        {isOfficial}  
+      	<div style={this.styles.mapContainer}>
+      		<Paper zDepth={2} style={{width: '100%', height: '100%'}}>
+	          <EventMapPreview event={event} />
+        	</Paper>
+        </div>
+        <h1 style={{...BernieText.title, fontSize: '2rem'}}>{event.name} {event.isOfficial ? <EventOfficialStamp /> : null}</h1>
 
         <InfoHeader content='Event Host' />
-        <p>{event.host ? `${event.host.firstName} ${event.host.lastName}` : 'No Host Info'}</p> 
+        <p>{event.host ? `${event.host.firstName || ''} ${event.host.lastName || ''}` : 'No Host Info'}</p> 
 
         <InfoHeader content='Event Type' />
         <p>{event.eventType.name}</p> 
@@ -62,8 +64,6 @@ export default class EventPreview extends React.Component {
         <p>{event.venueName}</p>
         <p>{event.venueAddr1} {event.venueAddr2}</p>
         <p>{event.venueCity} {event.venueState}, {event.venueZip} ({event.venueCountry})</p>
-        <br/>
-        <p>Capacity: {(event.capacity == 0) ? 'Unlimited' : event.capacity}</p>
         <br/>
         <p>Directions: {(event.venueDirections) ? event.venueDirections : 'None'}</p>
       </div>

@@ -344,8 +344,8 @@ const GraphQLListContainer = new GraphQLObjectType({
     },
     eventTypes: {
       type: new GraphQLList(GraphQLEventType),
-      resolve: async (eventType, {rootValue}) => {
-        return knex('bsd_event_types')
+      resolve: async(eventType, {rootValue}) => {
+        return knex('bsd_event_types').orderBy('name', 'ASC')
       }
     },
     events: {
@@ -358,6 +358,7 @@ const GraphQLListContainer = new GraphQLObjectType({
           type: new GraphQLEnumType({
             name: 'GraphQLEventStatus',
             values: {
+              PAST_EVENTS: {value: 'pastEvents'},
               PENDING_APPROVAL: {value: 'pendingApproval'},
               PENDING_REVIEW: {value: 'pendingReview'},
               APPROVED: {value: 'approved'},
@@ -373,9 +374,13 @@ const GraphQLListContainer = new GraphQLObjectType({
         let convertedSortField = `bsd_events.${eventFieldFromAPIField(sortField)}`
 
         let events = knex('bsd_events')
-          .where('start_dt', '>=', new Date())
           .where(eventFilters)
           .limit(first)
+
+        if (status === 'pastEvents')
+          events = events.where('start_dt', '<', new Date())
+        else
+          events = events.where('start_dt', '>=', new Date())
 
         if (status === 'pendingReview')
           events = events
@@ -595,6 +600,9 @@ const GraphQLUser = new GraphQLObjectType({
           .where('caller_id', user.id)
           .delete()
         let callAssignment = await rootValue.loaders.bsdCallAssignments.load(localCallAssignmentId)
+
+        // Determine the time zone offsets where it's okay to call.  We only
+        // want to call interviewees whose local time is between 9am and 9pm.
         let allOffsets     = [-10, -9, -8, -7, -6, -5, -4]
         let validOffsets   = []
         // So that I can program late at night
@@ -613,6 +621,7 @@ const GraphQLUser = new GraphQLObjectType({
 
         let group = await rootValue.loaders.gcBsdGroups.load(callAssignment.interviewee_group)
 
+        // Determine whom we *shouldn't* call.
         let previousCallsSubquery = knex('bsd_calls')
           .select('interviewee_id')
           // Don't call people we have successfully canvassed
@@ -620,25 +629,27 @@ const GraphQLUser = new GraphQLObjectType({
             this.where('completed', true)
               .where('call_assignment_id', localCallAssignmentId)
           })
+          // Don't call unusable numbers.
           .orWhereIn('reason_not_completed', ['WRONG_NUMBER', 'DISCONNECTED_NUMBER', 'OTHER_LANGUAGE'])
+          // If the person wasn't available, wait 24h before calling again.
           .orWhere(function () {
             this.whereIn('reason_not_completed', ['NO_PICKUP', 'CALL_BACK'])
               .where('attempted_at', '>', new Date(new Date() - 24 * 60 * 60 * 1000))
           })
+          // Don't call people who rejected this specific assignment.
           .orWhere(function () {
             this.where('call_assignment_id', localCallAssignmentId)
               .where('reason_not_completed', 'NOT_INTERESTED')
           })
 
+        // This is the main query for people we want to call.
         let query = knex.select('bsd_people.cons_id')
-
         if (group.cons_group_id) {
           query = query
             .from('bsd_person_bsd_groups as bsd_people')
             .where('bsd_people.cons_group_id', group.cons_group_id)
         } else if (group.query && group.query !== EVERYONE_GROUP) {
-          let shouldOrder = group.query.indexOf('order by') !== -1
-          query           = query
+          query = query
             .from('bsd_person_gc_bsd_groups as bsd_people')
             .where('gc_bsd_group_id', group.id)
         } else {
@@ -648,24 +659,23 @@ const GraphQLUser = new GraphQLObjectType({
         let assignedCallsSubquery = knex('bsd_assigned_calls')
           .select('interviewee_id')
 
-        let userAddress = await knex('bsd_emails')
-          .select('bsd_emails.cons_id')
-          .where('bsd_emails.email', user.email)
-          .first()
-
         query = query
           .join('bsd_phones', 'bsd_people.cons_id', 'bsd_phones.cons_id')
           .join('bsd_addresses', 'bsd_people.cons_id', 'bsd_addresses.cons_id')
           .join('zip_codes', 'zip_codes.zip', 'bsd_addresses.zip')
           .whereNotIn('bsd_people.cons_id', previousCallsSubquery)
           .whereNotIn('bsd_people.cons_id', assignedCallsSubquery)
-          .whereNotIn('bsd_addresses.state_cd', ['IA', 'NH', 'NV', 'SC'])
           .whereIn('zip_codes.timezone_offset', validOffsets)
           .where('bsd_phones.is_primary', true)
           .where('bsd_addresses.is_primary', true)
           .limit(1)
           .first()
 
+        // Don't ask the user to call themselves.
+        let userAddress = await knex('bsd_emails')
+          .select('bsd_emails.cons_id')
+          .where('bsd_emails.email', user.email)
+          .first()
         if (userAddress)
           query = query.whereNot('bsd_people.cons_id', userAddress.cons_id)
 
@@ -831,12 +841,10 @@ const GraphQLPerson = new GraphQLObjectType({
     },
     hostedEvents: {
       type: new GraphQLList(GraphQLEvent),
-      resolve: async(person, {rootValue}) => {
-
-        let query = knex('bsd_events')
+      resolve: async (person, {rootValue}) => {
+        return knex('bsd_events')
           .where('creator_cons_id', person.cons_id)
-
-        return query
+          .orderBy('start_dt', 'asc')
       }
     }
   }),
@@ -953,9 +961,17 @@ const GraphQLEvent = new GraphQLObjectType({
       type: GraphQLString,
       resolve: (event) => event.event_id_obfuscated
     },
+    eventIdUnObfuscated: {
+      type: GraphQLInt,
+      resolve: (event) => event.event_id
+    },
     isOfficial: {
       type: GraphQLBoolean,
       resolve: (event) => event.is_official
+    },
+    creatorName: {
+      type: GraphQLString,
+      resolve: (event) => event.creator_name
     },
     host: {
       type: GraphQLPerson,
@@ -1098,6 +1114,20 @@ const GraphQLEvent = new GraphQLObjectType({
           files.push(file)
         }
         return files
+      }
+    },
+    relatedCallAssignment: {
+      type: GraphQLCallAssignment,
+      resolve: async (event, _, {rootValue}) => {
+        const assignment = await knex('bsd_call_assignments')
+          .select('bsd_call_assignments.id')
+          .join('gc_bsd_events', 'bsd_call_assignments.id', 'gc_bsd_events.turn_out_assignment')
+          .where('gc_bsd_events.event_id', event.event_id)
+          .first()
+        if (assignment !== undefined)
+          return rootValue.loaders.bsdCallAssignments.load(assignment.id)
+        else
+          return null
       }
     },
     nearbyPeople: {
@@ -1243,6 +1273,7 @@ const GraphQLEventInput = new GraphQLInputObjectType({
     eventIdObfuscated: {type: GraphQLString},
     isOfficial: {type: GraphQLBoolean},
     eventTypeId: {type: GraphQLString},
+    creatorName: {type: GraphQLString},
     hostId: {type: GraphQLString},
     flagApproval: {type: GraphQLBoolean},
     name: {type: GraphQLString},
@@ -1332,7 +1363,20 @@ const GraphQLEditEvents = mutationWithClientMutationId({
         event['attendee_require_phone'] = 1
       }
 
+      // Delete event host address fields (API calls fail if these are incomplete so just remove them all for now)
+      const hostAddressFields = [
+        'host_addr_addressee',
+        'host_addr_addr1',
+        'host_addr_addr2',
+        'host_addr_zip',
+        'host_addr_city',
+        'host_addr_state_cd',
+        'host_addr_country'
+      ]
+      hostAddressFields.forEach((field) => delete event[field])
+
       try {
+        log.info('Merged Event Data:', event)
         await BSDClient.updateEvent(event)
       }
       catch (ex) {
@@ -1981,11 +2025,15 @@ const GraphQLCreateCallAssignment = mutationWithClientMutationId({
         let query = groupText
         query     = query.toLowerCase().trim().replace(/;*$/, '')
 
-        if (query.indexOf('drop') !== -1)
+        if (query.indexOf('drop') !== -1 ||
+            query.indexOf('truncate') !== -1 ||
+            query.indexOf('delete') !== -1 ||
+            query.indexOf('update') !== -1) {
           throw new GraphQLError({
             status: 400,
             message: 'Cannot use DROP in your SQL'
           })
+        }
 
         if (query !== EVERYONE_GROUP) {
           let limitedQuery = query

@@ -12,7 +12,6 @@ import proxy from 'express-http-proxy'
 import AWS from 'aws-sdk'
 import BSD from './bsd'
 import MG from './mail'
-import demoData from './data/demo.json'
 import log from './log'
 import {fromGlobalId} from 'graphql-relay'
 import passport from 'passport'
@@ -31,6 +30,7 @@ import compression from 'compression'
 import rp from 'request-promise'
 import Slack from './slack'
 import moment from 'moment'
+import shiftSchemaMap from './data/default-shift-schema.json'
 
 const WORKERS = process.env.WEB_CONCURRENCY || 1
 
@@ -39,88 +39,39 @@ throng(startApp, {
   lifetime: Infinity
 })
 
-const shiftSchemaMap = {
-  'canvass-3-shifts': [
-    {
-      id: 1,
-      start: '9:00 am',
-      end: '12:00 pm'
-    },
-    {
-      id: 2,
-      start: '12:00 pm',
-      end: '3:00 pm'
-    },
-    {
-      id: 3,
-      start: '3:00 pm',
-      end: '6:00 pm'
-    }
-  ],
-  'canvass-4-shifts': [
-    {
-      id: 1,
-      start: '9:00 am',
-      end: '12:00 pm'
-    },
-    {
-      id: 2,
-      start: '12:00 pm',
-      end: '3:00 pm'
-    },
-    {
-      id: 3,
-      start: '3:00 pm',
-      end: '6:00 pm'
-    },
-    {
-      id: 4,
-      start: '6:00 pm',
-      end: '9:00 pm'
-    }
-  ],
-  'get-out-the-vote': [
-    {
-      id: 1,
-      start: '9:00 am',
-      end: '12:00 pm'
-    },
-    {
-      id: 2,
-      start: '12:00 pm',
-      end: '3:00 pm'
-    },
-    {
-      id: 3,
-      start: '3:00 pm',
-      end: '6:00 pm'
-    },
-    {
-      id: 4,
-      start: '6:00 pm',
-      end: '9:00 pm'
-    }
-  ],
-  'primary-day': [
-    {
-      id: 1,
-      start: '8:00 am',
-      end: '12:00 pm'
-    },
-    {
-      id: 2,
-      start: '12:00 pm',
-      end: '4:00 pm'
-    },
-    {
-      id: 3,
-      start: '4:00 pm',
-      end: '8:00 pm'
-    }
-  ]
+async function generateContactAssignments() {
+  const assignments = await knex('contact_assignments')
+    .distinct('contact_assignments.id')
+    .select(
+      'id',
+      'name',
+      'expires',
+      'description',
+      'instructions',
+      'require_call_first as requireCallFirst'
+    )
+    .where('expires', '>=', new Date())
+    .orderBy('expires', 'asc')
+
+  let results = []
+  for (let i=0; i < assignments.length; i++) {
+    let assignment = assignments[i]
+
+    assignment.callActions = await knex('contact_call_actions')
+      .select('id', 'name', 'call_script as callScript')
+      .where('contact_call_actions.contact_assignment_id', assignment.id)
+
+    assignment.textActions = await knex('contact_text_actions')
+      .select('id', 'name', 'message_content as messageContent')
+      .where('contact_text_actions.contact_assignment_id', assignment.id)
+
+    results.push(assignment)
+  }
+
+  return results
 }
 
-function startApp() {
+async function startApp() {
   log.info('Writing schema...')
   writeSchema()
 
@@ -143,17 +94,18 @@ function startApp() {
   const publicPath = path.resolve(__dirname, '../frontend/public')
   const oneWeekInMillis = 604800000
 
-  const templateDir = path.resolve(publicPath, 'admin/events');
-  const createEventTemplate = fs.readFileSync(templateDir + '/create_event.hbs', {encoding: 'utf-8'});
-  const createEventPage = handlebars.compile(createEventTemplate);
+  const templateDir = path.resolve(publicPath, 'admin/events')
+  const createEventTemplate = fs.readFileSync(templateDir + '/create_event.hbs', {encoding: 'utf-8'})
+  const createEventPage = handlebars.compile(createEventTemplate)
   const publicEventsRootUrl = process.env.PUBLIC_EVENTS_ROOT_URL
+  const contactAssignments = await generateContactAssignments()
 
   const sessionStore = new KnexSessionStore({
     knex: knex,
     tablename: 'sessions'
   })
 
-  const SlackClient = new Slack();
+  const SlackClient = new Slack()
 
   async function createNewBSDUser(email, password) {
     //Create a new BSD User
@@ -191,16 +143,17 @@ function startApp() {
   }
 
   let isStaff = async (userId) => {
-    if (!userId) {
-      return false
-    }
-    const user = await knex('users').where('id', userId).first()
-    if (user && user.email){
-      let domain = user.email.split('@')
-      if (domain.length > 0)
-        return (domain[1] === 'berniesanders.com' || user.is_admin)
-    }
-    return false
+    return await isAdmin(userId) // require admin privileges for staff
+    // if (!userId) {
+    //   return false
+    // }
+    // const user = await knex('users').where('id', userId).first()
+    // if (user && user.email){
+    //   let domain = user.email.split('@')
+    //   if (domain.length > 0)
+    //     return (domain[1] === 'berniesanders.com' || user.is_admin)
+    // }
+    // return false
   }
 
   passport.use('signup', new LocalStrategy(
@@ -318,17 +271,16 @@ function startApp() {
   }))
 
   function eventDataLoader() {
-      return new DataLoader(async (keys) => {
-        let rows = await knex('bsd_events')
-          .whereIn('event_id_obfuscated', keys)
-        return keys.map((key) => {
-          return rows.find((row) =>
-            row['event_id'].toString() === key.toString() || row['event_id_obfuscated'] === key.toString()
-          )
-        })
+    return new DataLoader(async (keys) => {
+      let rows = await knex('bsd_events')
+        .whereIn('event_id_obfuscated', keys)
+      return keys.map((key) => {
+        return rows.find((row) =>
+          row['event_id'].toString() === key.toString() || row['event_id_obfuscated'] === key.toString()
+        )
       })
-    }
-
+    })
+  }
 
   function dataLoaderCreator(tablename, idField) {
     return new DataLoader(async (keys) => {
@@ -461,6 +413,13 @@ function startApp() {
     })
   )
 
+  app.get('/contact-assignments.json', async (req, res) => {
+    res.header("Access-Control-Allow-Origin", "*")
+    res.header("Access-Control-Allow-Headers", "*")
+    res.header('Access-Control-Allow-Methods', "*")
+    res.json(contactAssignments)
+  })
+
   app.get('/events/data/upload', wrap(async (req, res) => {
     res.redirect('https://script.google.com/macros/s/AKfycbwVZHnRZ5CJkzFID91QYcsLNFLkPgstd7XjS9o1QSEAh3tC2vY/exec')
   }))
@@ -468,6 +427,11 @@ function startApp() {
   app.get('/nda', wrap(async (req, res) => {
     res.redirect('https://docs.google.com/forms/d/1cyoAcumEd4Co5Fqj9pOUnQtIUo_rfRzQ7oVqACFe5Rs/viewform')
   }))
+
+  // Redirect old FastForward ednpoint
+  app.get('/event/:id/request_email', (req, res) => {
+    res.redirect(`/events/${req.params.id}/request-email`)
+  })
 
   app.get('/events/:eventId/upload/get-signed-request', isAuthenticated, wrap(async (req, res) => {
     const {name, type, typeSlug} = req.query
@@ -509,7 +473,7 @@ function startApp() {
   }))
 
   app.post('/events/add-rsvp', async (req, res) => {
-    res.header("Access-Control-Allow-Origin", "*")
+    res.header("Access-Control-Allow-Origin", "http://map.berniesanders.com")
     res.header("Access-Control-Allow-Headers", "*")
     res.header('Access-Control-Allow-Methods', "*")
     
@@ -610,6 +574,7 @@ function startApp() {
       'canvass': { id: 32, staffOnly: false, requirePhone: true },
       'canvass-3-shifts': { id: 32, staffOnly: true, requirePhone: true },
       'canvass-4-shifts': { id: 32, staffOnly: true, requirePhone: true },
+      'canvass-4-shifts-early': { id: 32, staffOnly: true, requirePhone: true },
       'barnstorm': { id: 41, staffOnly: false, requirePhone: true },
       'carpool-to-nevada': { id: 39, staffOnly: false, requirePhone: true },
       'carpool': { id: 39, staffOnly: false, requirePhone: true },
@@ -650,6 +615,14 @@ function startApp() {
         }
     }
 
+    // Prevent submitting manifestos and short novels
+    if (form['description'].length > 5000) {
+      res.status(400).send({errors: {
+        'Character Limit' : [`Your event description cannot exceed 5000 characters.`]
+      }})
+      return
+    }
+
     // Flag event as needing approval
     let batchEventMax = 20
     let userIsStaff = false
@@ -670,7 +643,7 @@ function startApp() {
       return
     }
 
-    if (eventIdMap[eventTypeIdString].id === 32){
+    if (eventIdMap[eventTypeIdString].id === 32 && form['venue_state_cd'] !== 'DC'){
       try {
         const result = await rp('https://sheetsu.com/apis/bd810a50')
         const organizerArray = JSON.parse(result).result

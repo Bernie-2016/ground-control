@@ -1,6 +1,7 @@
 import React from 'react'
 import Relay from 'react-relay'
-import {BernieColors, BernieText} from './styles/bernie-css'
+import Radium from 'radium'
+import {BernieColors, BernieText, MediaQueries} from './styles/bernie-css'
 import {Paper, Slider, Toggle} from 'material-ui'
 import GCForm from './forms/GCForm'
 import Form from 'react-formal'
@@ -11,39 +12,54 @@ import CreateAdminEventEmail from '../mutations/CreateAdminEventEmail'
 import yup from 'yup'
 
 const publicEventsRootUrl = 'https://secure.berniesanders.com/page/event/detail/'
+const maxSectionWidth = 380
+const maxDesktopWidth = 1230
 
+@Radium
 class AdminEventEmailCreationForm extends React.Component {
   styles = {
     detailsContainer: {
       float: 'left',
-      marginLeft: '2rem',
       marginTop: '1rem',
-      padding: 10,
-      width: 380
+      width: maxSectionWidth,
+      [MediaQueries.onMobile]: {
+        width: '100%'
+      }
     },
 
     recipientInfoContainer: {
+      padding: 30
+    },
+    recipientInfoWrapper: {
       float: 'left',
       marginLeft: '2rem',
       marginTop: '1rem',
-      padding: 30,
-      width: 380
+      width: maxSectionWidth - 30,
+      [MediaQueries.onMobile]: {
+        width: '100%',
+        marginLeft: 0
+      }
     },
 
     formContainer: {
       float: 'left',
-      width: 380,
-      paddingLeft: 15,
-      paddingRight: 15,
-      paddingTop: 15,
-      paddingBottom: 15,
+      width: maxSectionWidth + 30,
       marginTop: 15,
-      border: 'solid 1px ' + BernieColors.lightGray
+      marginBottom: '2rem',
+      marginLeft: '2rem',
+      [MediaQueries.onMobile]: {
+        width: '100%',
+        marginLeft: 0
+      }
     },
 
     pageContainer: {
-      marginLeft: '7rem',
-      marginTop: '1rem'
+      padding: '1rem 0',
+      [`@media (max-width: ${maxDesktopWidth}px)`]: {
+        padding: '1rem'
+      },
+      margin: '0 auto',
+      maxWidth: maxDesktopWidth
     }
   }
 
@@ -73,17 +89,20 @@ class AdminEventEmailCreationForm extends React.Component {
 
     if (recipientsCount === 0) {
       return (
-        <Paper zDepth={1} style={this.styles.recipientInfoContainer}>
-          <p style={{color: 'red', fontWeight: 'strong'}}>
-            Everyone who would have received this email has previously been contacted using this tool.
-            <br />
-            <br />
-            We don't want to harass people, so this tool is disabled for this event for now.
-          </p>
-      </Paper>
+        <div style={this.styles.recipientInfoWrapper}>
+          <Paper zDepth={1} style={this.styles.recipientInfoContainer}>
+            <p style={{color: 'red', fontWeight: 'strong'}}>
+              Everyone who would have received this email has previously been contacted using this tool.
+              <br />
+              <br />
+              We don't want to harass people, so this tool is disabled for this event for now.
+            </p>
+          </Paper>
+        </div>
       )
     } else {
       return (
+        <div style={this.styles.recipientInfoWrapper}>
         <Paper zDepth={1} style={this.styles.recipientInfoContainer}>
           <p>This email will be sent to <strong>{recipientsCount} people</strong>, including:</p>
           <br />
@@ -95,6 +114,7 @@ class AdminEventEmailCreationForm extends React.Component {
             })}
           </ul>
         </Paper>
+        </div>
       )
     }
   }
@@ -160,98 +180,97 @@ class AdminEventEmailCreationForm extends React.Component {
                               this.props.history.push('/admin/events#query[numEvents]=100&query[sortField]=startDate&query[sortDirection]=ASC&query[status]=FAST_FWD_REQUEST')
                             }
                          }} />
-        <div style={BernieText.title}>
+        <div style={BernieText.secondaryTitle}>
           Send Event Email
         </div>
 
-        <Paper zDepth={2} style={this.styles.formContainer}>
-          <GCForm
-            schema={modelSchema}
-            defaultValue = {modelSchema.default()}
-            value = {this.state.model}
-            onChange={ model => {
-              this.setState({ model })
-            }}
-            onSubmit={(formValues) => {
-              this.refs.mutationHandler.send({
-                listContainer: this.props.listContainer,
-                adminEmail: this.props.currentUser.email,
-                recipients: recipients.slice(0, recipientLimit),
-                eventId: this.props.event.id,
-                ...formValues
-              })
-              this.setState({submitted: !this.state.testMode})
-            }}
-          >
-            <Form.Field
-              name='senderEmail'
-              label="Sender Email Address"
-            />
-            <Form.Field
-              name='senderMessage'
-              multiLine={true}
-              rows={5}
-              label="Message From Sender"
-            />
-            <br />
-            <Form.Field
-              name='hostEmailSubject'
-              multiLine={true}
-              rows={2}
-              label='Host Email Subject'
-            />
-            <br />
-            <Form.Field
-              name='hostEmail'
-              label="Host Email Address"
-            />
-            <br />
-            <Form.Field
-              name='hostMessage'
-              multiLine={true}
-              rows={5}
-              label="Message From Host"
-            />
-            <br />
-            <br />
-            <br />
-            <Form.Field
-              name='toolPassword'
-              label="Password for this tool (ask an admin)"
-            />
-            <br />
-            <br />
-            <h4 style={BernieText.default}>Number of recipients: {recipientLimit} (plus you)</h4>
-            <Slider
-              defaultValue={this.state.recipientLimit}
-              disabled={this.state.testMode}
-              max={recipients.length}
-              min={1}
-              step={1}
-              onChange={(_, newSliderValue) => {
-                this.setState({recipientLimit: newSliderValue})
-              }}
-            />
-            <br />
-            <br />
-            <Toggle
-              label='Test mode (only delivers to you)'
-              toggled={this.state.testMode}
-              onToggle={() => {
-                this.setState({testMode: !this.state.testMode})
-              }}
-            />
-            <br />
-            <br />
-            <Form.Button type='submit' label='Send!' fullWidth={true} disabled={this.state.disableSubmit} />
-          </GCForm>
-        </Paper>
+        <div style={this.styles.detailsContainer}>
+          <EventPreview event={this.props.event} />
+        </div>
 
         {this.renderRecipientInfo()}
 
-        <Paper zDepth={1} style={this.styles.detailsContainer}>
-          <EventPreview event={this.props.event} />
-        </Paper>
+        <div style={this.styles.formContainer}>
+          <Paper style={{padding: 15}}>
+            <GCForm
+              schema={modelSchema}
+              defaultValue = {modelSchema.default()}
+              value = {this.state.model}
+              onChange={ model => {
+                this.setState({ model })
+              }}
+              onSubmit={(formValues) => {
+                this.refs.mutationHandler.send({
+                  listContainer: this.props.listContainer,
+                  adminEmail: this.props.currentUser.email,
+                  recipients: recipients.slice(0, recipientLimit),
+                  eventId: this.props.event.id,
+                  ...formValues
+                })
+                this.setState({submitted: !this.state.testMode})
+              }}
+            >
+              <Form.Field
+                name='senderEmail'
+                label="Sender Email Address"
+                fullWidth={true}
+              />
+              <Form.Field
+                name='senderMessage'
+                multiLine={true}
+                label="Message From Sender"
+                fullWidth={true}
+              />
+              <Form.Field
+                name='hostEmailSubject'
+                multiLine={true}
+                label='Host Email Subject'
+                fullWidth={true}
+              />
+              <Form.Field
+                name='hostEmail'
+                label="Host Email Address"
+                fullWidth={true}
+              />
+              <Form.Field
+                name='hostMessage'
+                multiLine={true}
+                label="Message From Host"
+                fullWidth={true}
+              />
+              <br />
+              <br />
+              <br />
+              Number of recipients: {recipientLimit} (plus you)
+              <Slider
+                defaultValue={this.state.recipientLimit}
+                disabled={this.state.testMode}
+                max={recipients.length}
+                min={1}
+                step={1}
+                onChange={(_, newSliderValue) => {
+                  this.setState({recipientLimit: newSliderValue})
+                }}
+                fullWidth={true}
+              />
+              <Toggle
+                label='Test mode (only delivers to you)'
+                toggled={this.state.testMode}
+                onToggle={() => {
+                  this.setState({testMode: !this.state.testMode})
+                }}
+              />
+              <Form.Field
+                name='toolPassword'
+                label="Password for this tool (ask an admin)"
+                fullWidth={true}
+              />
+              <br />
+              <br />
+              <Form.Button type='submit' label='Send!' fullWidth={true} disabled={this.state.disableSubmit} />
+            </GCForm>
+          </Paper>
+        </div>
       </div>
     )
   }

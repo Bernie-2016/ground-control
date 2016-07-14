@@ -4,6 +4,7 @@
     <title>Ground Control</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#147FD7"/>
     <link rel="shortcut icon" href="//berniesanders.com/wp-content/themes/berniesanders2016/favicon.ico">
     <script>
       var _rollbarConfig = {
@@ -116,23 +117,44 @@
     .geosuggest-item--active:focus {
       background: #ccc;
     }
+    ol, ul {
+      margin-left: 2em;
+    }
     </style>
   </head>
   <body>
     <!-- Google Tag Manager -->
-    <noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-WZL6ZL"
+<!--     <noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-WZL6ZL"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     '//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-WZL6ZL');</script>
+    })(window,document,'script','dataLayer','GTM-WZL6ZL');</script> -->
     <!-- End Google Tag Manager -->
     <div id="root"></div>
     <script type="text/javascript">
       // Force `fetch` polyfill to workaround Chrome not displaying request body
       // in developer tools for the native `fetch`.
       self.fetch = null;
+
+      // Show a blurb for potential volunteer developers
+      var consoleStyle = [
+            'color: rgb(100,100,100)',
+            'text-align: center',
+            'font-weight: bold',
+            'font-size: 18px',
+            'font-family: sans-serif'
+        ];  
+
+        var linkStyle = consoleStyle.slice();
+        linkStyle[0] = 'color: rgb(20, 127, 215)';  
+
+        function css(styleArray){
+          return styleArray.join(';');
+        } 
+
+        console.log("%cInterested in contributing to Ground Control? Check out %chttps://github.com/Bernie-2016/ground-control%c.", css(consoleStyle), css(linkStyle), css(consoleStyle));
     </script>
     {{{ extra_head }}}
     <script src="/assets/js/app.js"></script>

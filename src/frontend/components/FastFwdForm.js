@@ -5,38 +5,35 @@ import {Paper, Slider, Toggle, Styles} from 'material-ui'
 import GCForm from './forms/GCForm'
 import Form from 'react-formal'
 import EventPreview from './EventPreview'
+import EventInvalid from './EventInvalid'
 import MutationHandler from './MutationHandler'
 import CreateFastFwdRequest from '../mutations/CreateFastFwdRequest'
 import yup from 'yup'
 import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider'
-import {BernieTheme} from './styles/bernie-theme';
+import {BernieTheme} from './styles/bernie-theme'
 
 const publicEventsRootUrl = 'https://secure.berniesanders.com/page/event/detail/'
+
+require('./styles/fastFwdForm.css')
 
 class FastFwdForm extends React.Component {
   styles = {
     detailsContainer: {
       float: 'left',
-      marginTop: '1rem',
-      padding: 10,
-      width: 480
+      paddingBottom: '1em',
+      paddingRight: '1em'
     },
 
     formContainer: {
       float: 'left',
-      width: 380,
-      paddingLeft: 15,
-      paddingRight: 15,
-      paddingTop: 15,
-      paddingBottom: 15,
-      marginTop: 15,
-      marginLeft: '2rem',
+      padding: '1em',
+      marginBottom: '2em',
       border: 'solid 1px ' + BernieColors.lightGray
     },
 
     pageContainer: {
-      marginLeft: '7rem',
-      marginTop: '1rem'
+      margin: '0 auto',
+      padding: '2em',
     }
   }
 
@@ -48,59 +45,48 @@ class FastFwdForm extends React.Component {
   render() {
 
     if (!this.props.event)
-      return <div style={{ textAlign: 'center', marginTop: '4em'}}>
-                <h1 style={BernieText.title}>Invalid Event</h1>
-                <p style={BernieText.default}>This event does not exist. If you've just recently created your event.
-                this error may resolve itself in a short period of time. It's also
-                possible your event was deleted. Please email <a href="mailto:help@berniesanders.com">help@berniesanders.com</a> if you need help.</p>
-              </div>
+      return <EventInvalid />
 
+    let eventTypeName = this.props.event.eventType.name.toLowerCase()
+    if (eventTypeName.indexOf('phonebank') > -1)
+      eventTypeName = 'phone bank party'
 
-    let event_type_name = 'volunteer event';
+    const defaultHostMessage = this.props.event.fastFwdRequest ? this.props.event.fastFwdRequest.hostMessage :
+`Hello, neighbors!
 
-    if(this.props.event.eventType.name.toLowerCase().indexOf('phone bank') > -1){
-      event_type_name = 'phone bank party'
-    }
+I'm hosting a ${eventTypeName} and I need a few more Bernie supporters to attend to make this event a big success.  Will you please attend my event?
 
-    if(this.props.event.eventType.name.toLowerCase().indexOf('barnstorm') > -1){
-      event_type_name = 'Barnstorm event'
-    }
+${publicEventsRootUrl + this.props.event.eventIdObfuscated}
 
-    let defaultHostMessage = this.props.event.fastFwdRequest ? this.props.event.fastFwdRequest.hostMessage :
-                            "Hello, neighbors!\n\nI'm hosting a " + event_type_name +
-                            " and I need a few more Bernie supporters " +
-                            "to attend to make this event a big success. " +
-                            "Will you please attend my event?\n\n" +
-                            publicEventsRootUrl + this.props.event.eventIdObfuscated + "\n\n" +
-                            "Thank you,\n\n" +
-                            (this.props.event.host ? this.props.event.host.firstName: "")
+Thank you,
+${this.props.event.host ? this.props.event.host.firstName : ''}`
 
-    let formSchema = yup.object({
+    const formSchema = yup.object({
       hostMessage: yup.string().default(this.props.event.hostMessage || defaultHostMessage).required(),
     })
 
     return (
       <MuiThemeProvider muiTheme={Styles.getMuiTheme(BernieTheme)}>
-        <div style={this.styles.pageContainer}>
+        <div style={this.styles.pageContainer} className="ffwdPageContainer">
           <MutationHandler ref='mutationHandler'
                            successMessage='Your request has been saved. We will review it and send it out to volunteers in your area ASAP!'
                            mutationClass={CreateFastFwdRequest}
                            mutationName='createFastFwdRequest'
                            onSuccess={() => {
                               setTimeout(() => {
-                                location.href = 'https://go.berniesanders.com/page/content/volunteer-hub/';
-                              }, 9000)
+                                this.props.history.push('/events')
+                              }, 5000)
                          }} />
-          <div style={BernieText.title}>
+          <h1 style={BernieText.title}>
             Fast Fwd: Send a message to bring volunteers to your event
+          </h1>
+
+          <div zDepth={1} style={this.styles.detailsContainer} className="ffwdDetailsContainer">
+            <h3 style={{...BernieText.secondaryTitle, fontSize: '1.2rem'}}>Your Event Details:</h3>
+            <EventPreview event={this.props.event} />
           </div>
 
-          <Paper zDepth={1} style={this.styles.detailsContainer}>
-            <p style={BernieText.secondaryTitle}>Your Event Details:</p>
-            <EventPreview event={this.props.event} />
-          </Paper>
-
-          <Paper zDepth={2} style={this.styles.formContainer}>
+          <Paper style={this.styles.formContainer} className="ffwdFormContainer">
             <GCForm
               schema={formSchema}
               defaultValue={formSchema.default()}
@@ -120,7 +106,7 @@ class FastFwdForm extends React.Component {
               <Form.Field
                 name='hostMessage'
                 multiLine={true}
-                rows={12}
+                fullWidth={true}
                 label="Message From Host"
               />
               <br />
@@ -144,47 +130,27 @@ export default Relay.createContainer(FastFwdForm, {
     `,
     event: () => Relay.QL`
       fragment on Event {
-        attendeesCount
-        attendeeVolunteerMessage
-        attendeeVolunteerShow
+        id
         fastFwdRequest{
           hostMessage
         }
+        attendeesCount
+        isOfficial
         capacity
-        contactPhone
-        createDate
         description
         duration
         eventIdObfuscated
         eventType {
-          id
           name
         }
-        flagApproval
         host {
-          id
           firstName
           lastName
           email
         }
-        hostReceiveRsvpEmails
-        id
-        isSearchable
-        latitude
-        localTimezone
-        localUTCOffset
-        longitude
         name
-        nearbyPeople {
-          id
-          firstName
-          lastName
-          email
-        }
-        publicPhone
-        rsvpEmailReminderHours
-        rsvpUseReminderEmail
         startDate
+        localTimezone
         venueAddr1
         venueAddr2
         venueCity

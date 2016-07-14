@@ -16,6 +16,8 @@ The `cron` string is constructed as so:
 * Months: 0-11
 * Day of Week: 0-6
 
+For documentation on constructing the cron string, see [github.com/ncb000gt/node-cron](https://github.com/ncb000gt/node-cron).
+
 The `job` string is relative path to a JSON module that contains the job specification. Checkout [modules](#modules) for more info
 
 Example job object:

@@ -1,8 +1,8 @@
-import React from 'react';
-import Form from 'react-formal';
-import GCSubmitButton from './GCSubmitButton';
-import {RefreshIndicator} from 'material-ui';
-import {BernieColors} from '../styles/bernie-css';
+import React from 'react'
+import Form from 'react-formal'
+import GCSubmitButton from './GCSubmitButton'
+import {RefreshIndicator} from 'material-ui'
+import {BernieColors} from '../styles/bernie-css'
 
 export default class GCForm extends React.Component {
   state = {
@@ -13,12 +13,14 @@ export default class GCForm extends React.Component {
 
   renderChildren(children) {
     return React.Children.map(children, (child) => {
-      if (child.type === Form.Field) {
-        let name = child.props.name;
-        let error = this.state.formErrors ? this.state.formErrors[name] : null;
+      if (child === null)
+        return child
+      else if (child.type === Form.Field) {
+        let name = child.props.name
+        let error = this.state.formErrors ? this.state.formErrors[name] : null
         let clonedElement = child
         if (error) {
-          error = error[0] ? error[0].message.replace(name, child.props.label) : null;
+          error = error[0] ? error[0].message.replace(name, child.props.label) : null
           clonedElement = React.cloneElement(child, {
             errorText: error
           })
@@ -38,7 +40,7 @@ export default class GCForm extends React.Component {
         })
       }
       else
-        return child;
+        return child
     })
   }
 

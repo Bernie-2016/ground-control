@@ -1,0 +1,28 @@
+div {
+    box-sizing: border-box;
+}
+
+@media screen and (min-width: 768px) {
+    .ffwdDetailsContainer {
+        width: 60%;
+    }
+
+    .ffwdFormContainer {
+        width: 40%;
+    }
+
+    .ffwdPageContainer {
+        maxWidth: 1300;
+    }
+}
+@media screen and (max-width: 767px) {
+    .ffwdDetailsContainer {
+        width: 100%;
+    }
+
+    .ffwdFormContainer {
+        width: 100%;
+    }
+
+    .ffwdPageContainer {}
+}

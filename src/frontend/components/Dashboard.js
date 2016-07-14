@@ -1,10 +1,10 @@
-import React from 'react';
-import Relay from 'react-relay';
-import {Styles} from 'material-ui';
+import React from 'react'
+import Relay from 'react-relay'
+import {Styles} from 'material-ui'
 import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider'
-import TopNav from './TopNav';
-import {BernieTheme} from './styles/bernie-theme';
-import {BernieColors} from './styles/bernie-css';
+import TopNav from './TopNav'
+import {BernieTheme} from './styles/bernie-theme'
+import {BernieColors} from './styles/bernie-css'
 import Radium from 'radium'
 
 @Radium
@@ -25,21 +25,21 @@ class Dashboard extends React.Component {
     //   value: 'https://go.berniesanders.com/page/share/share-for-bernie?source=homepage_organize',
     //   label: 'Resources'
     // },
-    // {
-    //   value: 'https://organize.berniesanders.com/slack/berniebuilders',
-    //   label: 'Gather Online'
-    // },
+    {
+      value: '/slack',
+      label: 'Join Slack'
+    },
   ]
 
   renderTopNav() {
     return (
       <TopNav
-        zDepth={0}
-        barColor={BernieColors.lightGray}
-        tabColor={BernieColors.darkGray}
-        selectedTabColor={BernieColors.gray}
+        barColor={BernieColors.blue}
+        tabColor={BernieColors.lightBlue}
+        selectedTabColor={Styles.Colors.white}
+        title="Ground Control"
         logoColors={{
-          primary: BernieColors.blue,
+          primary: Styles.Colors.white,
           swoosh: BernieColors.red
         }}
         tabs={this.tabs}

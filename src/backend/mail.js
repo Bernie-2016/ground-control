@@ -290,9 +290,7 @@ export default class MG {
 
     let data = {
       hostFirstName: name,
-      fastFwdURL: 'https://organize.berniesanders.com/event/' +
-                      event.event_id_obfuscated
-                      + '/request_email',
+      fastFwdURL: `https://organize.berniesanders.com/events/${event.event_id_obfuscated}/request-email`,
       eventDate: moment(event.start_dt).tz(event.start_tz).format('dddd, MMMM Do'),
       eventDay: moment(event.start_dt).tz(event.start_tz).format('dddd'),
       recipientAddress: event.email

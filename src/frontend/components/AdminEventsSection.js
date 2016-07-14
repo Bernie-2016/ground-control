@@ -8,10 +8,11 @@ import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle, SelectField, Drop
 import {Table, Column, ColumnGroup, Cell} from 'fixed-data-table'
 import {BernieText, BernieColors} from './styles/bernie-css'
 import moment from 'moment'
-import json2csv from 'json2csv'
-import qs from 'qs'
 import superagent from 'superagent'
 import Papa from 'papaparse'
+import getDefaultRelayParams from '../helpers/getDefaultRelayParams'
+import setURLRelayParams from '../helpers/setURLRelayParams'
+import convertType from '../helpers/convertType'
 import downloadCSV from '../helpers/downloadCSV'
 import flattenJSON from '../helpers/flattenJSON'
 import {states} from './data/states'
@@ -29,32 +30,7 @@ require('./styles/adminEventsSection.css')
 
 const publicEventsRootUrl = 'https://secure.berniesanders.com/page/event/detail/'
 
-const plurry = (n) => (Math.abs(n) == 1) ? '' : 's';
-
-const convertType = (value) => {
-  if (typeof value === 'object'){
-    let updatedValue = {}
-    Object.keys(value).forEach((key) => {
-      const currentValue = convertType(value[key])
-      if (currentValue != undefined)
-        value[key] = currentValue
-    })
-    return value
-  }
-  else if (value === 'none')
-    return null
-  else if (value === 'true')
-    return true
-  else if (value === 'false')
-    return false
-  else if (value != '' && !isNaN(value) && String(Number(value)) === value)
-    return Number(value)
-  else if (value)
-    return String(value)
-  else {
-    return undefined
-  }
-}
+const plurry = (n) => (Math.abs(n) == 1) ? '' : 's'
 
 const keyboardActionStyles = {
   text: {fontSize: '0.9em', top: '-7px', color: BernieColors.gray, cursor: 'default'},
@@ -74,17 +50,21 @@ const KeyboardActionsInfo = () => (
 )
 
 const approvalFilterOptions = {
+  PAST_EVENTS: {
+    text: 'Past Events',
+    actions: ['email', 'downloadRSVPs']
+  },
   PENDING_APPROVAL: {
     text: 'Pending Approval',
     actions: ['delete', 'approve', 'edit', 'email']
   },
   PENDING_REVIEW: {
     text: 'Pending Review',
-    actions: ['delete', 'demote', 'approve', 'edit', 'email']
+    actions: ['demote', 'approve', 'edit', 'email']
   },
   APPROVED: {
     text: 'Public Events',
-    actions: ['delete', 'demote', 'edit', 'email', 'fastForward', 'downloadRSVPs']
+    actions: ['edit', 'email', 'call', 'fastForward', 'downloadRSVPs']
   },
   FAST_FWD_REQUEST: {
     text: 'FastFwd Requests',
@@ -183,7 +163,7 @@ class AdminEventsSection extends React.Component {
         checked={selectedRows.indexOf(rowIndex) > -1}
         eventIndex={rowIndex}
         onCheck={() => {
-          this._handleEventSelect(rowIndex);
+          this._handleEventSelect(rowIndex)
         }}
         style={{marginLeft: '15px'}}
       />
@@ -202,6 +182,19 @@ class AdminEventsSection extends React.Component {
     </Cell>
   )
 
+  CapacityCell = ({rowIndex, data, col, ...props}) => {
+    const capacity = data[rowIndex]['node'][col]
+    return <Cell {...props}
+      style={{
+        fontFamily: 'Roboto',
+        fontSize: '13px',
+        lineHeight: '18px'
+      }}
+    >
+      {(capacity == 0) ? 'unlimited' : capacity}
+    </Cell>
+  }
+
   BooleanCell = ({rowIndex, data, col, ...props}) => (
     <Cell {...props}
     style={{
@@ -215,7 +208,7 @@ class AdminEventsSection extends React.Component {
   )
 
   NoHTMLCell = ({rowIndex, data, col, ...props}) => {
-    let displayString = data[rowIndex]['node'][col];
+    let displayString = data[rowIndex]['node'][col]
     return (
       <Cell {...props}
       style={{
@@ -302,7 +295,7 @@ class AdminEventsSection extends React.Component {
       fontFamily: 'Roboto',
       fontSize: '13px',
       lineHeight: '18px'
-    };
+    }
     let linkStyle={
       color: BernieColors.darkBlue
     }
@@ -320,6 +313,7 @@ class AdminEventsSection extends React.Component {
   }
 
   ActionCell = ({rowIndex, data, col, ...props}) => {
+    const event = data[rowIndex].node
     let cellStyle = {}
     let iconColor = null
 
@@ -330,7 +324,7 @@ class AdminEventsSection extends React.Component {
 
     const actions = {
       delete: {
-        execute: () => {
+        onTouchTap: () => {
             this._handleEventDeletion([rowIndex])
           },
         icon: 'delete',
@@ -338,14 +332,14 @@ class AdminEventsSection extends React.Component {
       },
       approve: {
         title: (this.props.relay.variables.status === 'PENDING_REVIEW') ? 'mark reviewed' : 'mark approved',
-        execute: () => {
+        onTouchTap: () => {
             this._handleEventConfirmation([rowIndex])
           },
         icon: 'event_available'
       },
       demote: {
         title: 'move to approval queue',
-        execute: () => {
+        onTouchTap: () => {
             this._handleEventConfirmation([rowIndex], true)
           },
         icon: 'event_busy',
@@ -353,33 +347,41 @@ class AdminEventsSection extends React.Component {
       },
       edit: {
         title: 'edit',
-        execute: () => {
-            this._handleEventPreviewOpen(rowIndex, 1);
+        onTouchTap: () => {
+            this._handleEventPreviewOpen(rowIndex, 1)
           },
         icon: 'edit'
       },
       email: {
         title: 'send email',
-        execute: () => {
+        onTouchTap: () => {
             this._handleSendEmail(rowIndex)
           },
         icon: 'email'
       },
+      call: {
+        title: 'call for turnout',
+        href: (event.relatedCallAssignment) ? `/call/${event.relatedCallAssignment.id}` : '/call',
+        target: '_blank',
+        linkButton: true,
+        icon: 'phone',
+        disabled: (event.relatedCallAssignment === null)
+      },
       fastForward: {
         title: 'make fast forward request',
-        execute: () => {
-            this._handleFastForwardRequest([rowIndex])
-          },
+        href: `/admin/events/${event.eventIdObfuscated}/emails/create`,
+        target: '_blank',
+        linkButton: true,
         icon: 'fast_forward',
-        disabled: (data[rowIndex].node.isSearchable === 0)
+        disabled: (event.isSearchable === 0)
       },
       downloadRSVPs: {
         title: 'download RSVPs',
-        execute: () => {
+        onTouchTap: () => {
             this._handleRSVPDownload([rowIndex])
           },
         icon: 'file_download',
-        disabled: (data[rowIndex].node.attendeesCount <= 0)
+        disabled: (event.attendeesCount <= 0)
       }
     }
 
@@ -391,10 +393,9 @@ class AdminEventsSection extends React.Component {
       return options.map((type) => {
           return (
             <IconButton
-              title={actions[type].title}
-              onTouchTap={actions[type].execute}
-              disabled={(actions[type].disabled !== undefined) ? actions[type].disabled : false}
+              {...actions[type]}
               key={type}
+              style={{verticalAlign: 'middle'}}
             >
               <FontIcon className="material-icons" color={iconColor} hoverColor={actions[type].hoverColor || BernieColors.blue}>{actions[type].icon}</FontIcon>
             </IconButton>
@@ -445,7 +446,7 @@ class AdminEventsSection extends React.Component {
           <DropDownMenu
             value={this.props.relay.variables.status}
             onChange={(event, index, value) => {
-                this._handleQueryChange({status: value});
+                this._handleQueryChange({status: value})
               }
             }
             autoWidth={true}
@@ -466,7 +467,7 @@ class AdminEventsSection extends React.Component {
             label="Filter"
             labelPosition="after"
             onTouchTap={() => {
-              this.setState({showFiltersDialog: true});
+              this.setState({showFiltersDialog: true})
             }}
           >
             <FontIcon className="material-icons" style={{position: 'relative', top: '6px', left: '6px'}}>filter_list</FontIcon>
@@ -488,7 +489,7 @@ class AdminEventsSection extends React.Component {
             label="Create"
             labelPosition="after"
             onTouchTap={() => {
-              //this._handleEventCreation(this.state.selectedRows);
+              //this._handleEventCreation(this.state.selectedRows)
               window.location = '/admin/events/create'
             }}
           >
@@ -500,7 +501,7 @@ class AdminEventsSection extends React.Component {
             primary={true}
             disabled={(this.state.selectedRows.length == 0)}
             onTouchTap={() => {
-              this._handleEventDeletion(this.state.selectedRows);
+              this._handleEventDeletion(this.state.selectedRows)
             }}
           />
           <RaisedButton
@@ -509,7 +510,7 @@ class AdminEventsSection extends React.Component {
             secondary={false}
             disabled={(this.state.selectedRows.length == 0 || this.props.relay.variables.status === 'PENDING_APPROVAL')}
             onTouchTap={() => {
-              this._handleEventConfirmation(this.state.selectedRows, true);
+              this._handleEventConfirmation(this.state.selectedRows, true)
             }}
           />
           <RaisedButton
@@ -518,7 +519,7 @@ class AdminEventsSection extends React.Component {
             secondary={true}
             disabled={(this.state.selectedRows.length == 0 || this.props.relay.variables.status === 'APPROVED')}
             onTouchTap={() => {
-              this._handleEventConfirmation(this.state.selectedRows);
+              this._handleEventConfirmation(this.state.selectedRows)
             }}
           />
         </ToolbarGroup>
@@ -545,7 +546,7 @@ class AdminEventsSection extends React.Component {
     let eventsToDelete = this.state.indexesMarkedForDeletion.map(index => {
       return events[index].node.id
     })
-    let deleteMsg = this.state.deletionConfirmationMessage;
+    let deleteMsg = this.state.deletionConfirmationMessage
     if (deleteMsg === 0 || deleteMsg === null)
       deleteMsg = ''
 
@@ -563,7 +564,7 @@ class AdminEventsSection extends React.Component {
   renderDeleteModal() {
 
     const signature = `Events Team
-Bernie 2016`;
+Bernie 2016`
     const deleteReasons = [
       {reason: 'Delete Without Message', message: 0},
       {
@@ -656,23 +657,23 @@ ${signature}`
 
 ${signature}`
       }
-    ];
-    const deleteReasonMenuItems = deleteReasons.map((item, index) => <MenuItem key={index} value={index} primaryText={item.reason}/>);
+    ]
+    const deleteReasonMenuItems = deleteReasons.map((item, index) => <MenuItem key={index} value={index} primaryText={item.reason}/>)
 
     this._handleDeleteModalRequestClose = () => {
       let updatedStateProps = {
           showDeleteEventDialog: false,
           deletionConfirmationMessage: null,
           deletionReasonIndex: null
-        };
+        }
       if (this.state.activeEventIndex) {
-        updatedStateProps['showEventPreview'] = true;
+        updatedStateProps['showEventPreview'] = true
       }
       this.setState(updatedStateProps)
     }
 
-    let numEvents = this.state.indexesMarkedForDeletion.length;
-    let dialogTitle = `You are about to delete ${numEvents} event${plurry(numEvents)}.`;
+    let numEvents = this.state.indexesMarkedForDeletion.length
+    let dialogTitle = `You are about to delete ${numEvents} event${plurry(numEvents)}.`
 
     const standardActions = [
       <FlatButton
@@ -685,7 +686,7 @@ ${signature}`
         disabled={(this.state.deletionConfirmationMessage === null || this.state.deletionConfirmationMessage === deleteReasons[deleteReasons.length-1]['message'] || this.state.deletionConfirmationMessage === '')}
         onTouchTap={this._deleteEvent}
       />
-    ];
+    ]
 
     let deleteMessage = (
       <div>
@@ -708,7 +709,7 @@ ${signature}`
           value={(this.state.deletionConfirmationMessage === 0) ? '' : this.state.deletionConfirmationMessage}
           disabled={(this.state.deletionConfirmationMessage === 0 || this.state.deletionConfirmationMessage === null)}
           onChange={(event) => {
-            this.setState({deletionConfirmationMessage: event.target.value});
+            this.setState({deletionConfirmationMessage: event.target.value})
           }}
           multiLine={true}
           rowsMax={6}
@@ -762,22 +763,22 @@ ${signature}`
         label="Cancel"
         secondary={true}
         onTouchTap={() => {
-          this.setState({showFiltersDialog: false});
+          this.setState({showFiltersDialog: false})
         }}
       />,
       <FlatButton
         label="Clear"
         secondary={true}
         onTouchTap={() => {
-          this._handleRequestFiltersChange({newVars: {}, doNotPreserveOldFilters: true});
-          this._handleRequestFiltersChange({filterKey: 'hostFilters', newVars: {}, doNotPreserveOldFilters: true});
+          this._handleRequestFiltersChange({newVars: {}, doNotPreserveOldFilters: true})
+          this._handleRequestFiltersChange({filterKey: 'hostFilters', newVars: {}, doNotPreserveOldFilters: true})
         }}
       />,
       <FlatButton
         label="Update Filters"
         primary={true}
         onTouchTap={() => {
-          let filtersArray = jQuery(this.refs.eventSearchForm).serializeArray();
+          let filtersArray = jQuery(this.refs.eventSearchForm).serializeArray()
           let eventFiltersObject = {}
           let hostFiltersObject = {}
 
@@ -791,12 +792,12 @@ ${signature}`
             }
           })
 
-          this._handleRequestFiltersChange({newVars: eventFiltersObject, doNotPreserveOldFilters: true});
-          this._handleRequestFiltersChange({filterKey: 'hostFilters', newVars: hostFiltersObject, doNotPreserveOldFilters: true});
-          this.setState({showFiltersDialog: false});
+          this._handleRequestFiltersChange({newVars: eventFiltersObject, doNotPreserveOldFilters: true})
+          this._handleRequestFiltersChange({filterKey: 'hostFilters', newVars: hostFiltersObject, doNotPreserveOldFilters: true})
+          this.setState({showFiltersDialog: false})
         }}
       />,
-    ];
+    ]
 
     const containsInput = (inputArray, inputProp, key='name') => {
       let found = false
@@ -820,8 +821,9 @@ ${signature}`
           type={type}
         />
       </div>
-    );
+    )
 
+    const eventTypeOptions = this.props.listContainer.eventTypes
     const booleanOptions = [
       {
         name: 'Yes',
@@ -831,12 +833,12 @@ ${signature}`
         name: 'No',
         value: false
       }
-    ];
+    ]
 
     const filterInputs = [
       {name: 'eventIdObfuscated', label: 'Event ID'},
       {name: 'name', label: 'Event Name'},
-      {name: 'eventTypeId', label: 'Event Type', type: 'select', options: this.props.listContainer.eventTypes, optionValue: 'id'},
+      {name: 'eventTypeId', label: 'Event Type', type: 'select', options: eventTypeOptions, optionValue: 'id'},
       {name: 'isOfficial', label: 'Official Campaign Event', type: 'select', options: booleanOptions},
       {name: 'isSearchable', label: 'Public Event', type: 'select', options: booleanOptions},
       {name: 'contactPhone', label: 'Host Contact Phone'},
@@ -847,9 +849,7 @@ ${signature}`
       {name: 'venueCity', label: 'City'},
       {name: 'venueState', label: 'State', type: 'select', options: states, optionValue: 'abbreviation'},
       {name: 'venueZip', label: 'Zip Code'},
-      {name: 'latitude', label: 'Latitude', type: 'number'},
-      {name: 'longitude', label: 'Longitude', type: 'number'}
-    ];
+    ]
 
     const hostFilterInputs = [
       {name: 'firstname', label: 'First Name'},
@@ -857,7 +857,7 @@ ${signature}`
       {name: 'lastname', label: 'Last Name'},
       {name: 'email', label: 'Email Address'},
       {name: 'phone', label: 'Phone Number'}
-    ];
+    ]
 
     const FilterSelect = ({filterProperty, name, label, options, optionName='name', optionValue='value'}) => (
       <div>
@@ -872,7 +872,7 @@ ${signature}`
           })}
         </select>
       </div>
-    );
+    )
 
     const FilterGroup = ({filterProperty, name, inputs, containerStyle}) => (
         <div style={containerStyle}>
@@ -895,14 +895,14 @@ ${signature}`
         onRequestClose={() => {
           this.setState({
             showFiltersDialog: false
-          });
+          })
         }}
         bodyStyle={{paddingBottom: '0'}}
       >
       <form
         ref='eventSearchForm'
         onSubmit={(e, data) => {
-          e.preventDefault();
+          e.preventDefault()
         }}
       >
         <FilterGroup name='Event Filters' inputs={filterInputs} filterProperty={this.props.relay.variables.filters} containerStyle={{float: 'left', width: '50%'}} />
@@ -926,7 +926,7 @@ ${signature}`
         key="2"
         primary={true}
         onTouchTap={() => {
-          this._handleEventDeletion([this.state.activeEventIndex]);
+          this._handleEventDeletion([this.state.activeEventIndex])
         }}
       />,
       <FlatButton
@@ -970,19 +970,20 @@ ${signature}`
             }}
         >
           <Tab label="Preview" value={'0'} >
+            <br />
             <EventPreview
               event={activeEvent}
               onChangeEventIndex={(n) => {
-                this._iterateActiveEvent(n);
+                this._iterateActiveEvent(n)
               }}
               onEventConfirm={(indexArray) => {
-                this._handleEventConfirmation(indexArray);
+                this._handleEventConfirmation(indexArray)
               }}
               onTabRequest={(eventIndex, tabIndex) => {
-                this._handleEventPreviewOpen(eventIndex, tabIndex);
+                this._handleEventPreviewOpen(eventIndex, tabIndex)
               }}
               onEventDelete={(indexArray) => {
-                this._handleEventDeletion(indexArray);
+                this._handleEventDeletion(indexArray)
               }}
             />
           </Tab>
@@ -1096,11 +1097,6 @@ ${signature}`
     })
   }
 
-  _handleFastForwardRequest = (eventIndex) => {
-    const eventId = events[eventIndex].node.eventIdObfuscated
-    window.open(`/admin/events/${eventId}/emails/create`)
-  }
-
   _handleRSVPDownload = (eventIndex) => {
     const event = events[eventIndex].node
     superagent.get(`/events/${event.eventIdObfuscated}/get-rsvps.json`)
@@ -1187,10 +1183,7 @@ ${signature}`
       if (readyState.ready) {
         this.setState({loading: false})
         setTimeout(() => {
-          const relayProps = this.props.relay.variables
-          let hash = qs.parse(location.hash.substr(1))
-          hash.query = relayProps;
-          location.hash = qs.stringify(hash, { encode: false, skipNulls: true })
+          setURLRelayParams(this.props.relay)
         }, 500)
       }
     })
@@ -1248,7 +1241,8 @@ ${signature}`
           {...this.props}>
           <ColumnGroup
             fixed={true}
-            header={<this.HeaderCell content="Actions" />}>
+            header={<this.HeaderCell content="Actions" />}
+          >
             <Column
               header={
                 <Cell>
@@ -1280,7 +1274,7 @@ ${signature}`
               flexGrow={1}
               header={<this.HeaderCell content="ID" />}
               cell={<this.EventIdLinkCell data={events} />}
-              width={100}
+              width={85}
               align='center'
             />
             <Column
@@ -1293,22 +1287,30 @@ ${signature}`
             />
           </ColumnGroup>
           <ColumnGroup
-            header={<this.HeaderCell content="Time" />}>
+            header={<this.HeaderCell content="Time" />}
+          >
             <Column
               header={<this.SortControllerCell content="Event Date" attribute="startDate" />}
               cell={<this.DateCell data={events} col="startDate" />}
               flexGrow={1}
-              width={170}
+              width={160}
+            />
+            <Column
+              header={<this.SortControllerCell content="Duration" attribute="duration" />}
+              cell={<this.DurationCell data={events} col="duration" />}
+              flexGrow={1}
+              width={95}
             />
             <Column
               header={<this.SortControllerCell content="Create Date" attribute="createDate" />}
               cell={<this.DateCell data={events} col="createDate" />}
               flexGrow={1}
-              width={170}
+              width={160}
             />
           </ColumnGroup>
           <ColumnGroup
-            header={<this.HeaderCell content="About" />}>
+            header={<this.HeaderCell content="About" />}
+          >
             <Column
               flexGrow={1}
               header={<this.SortControllerCell content="Event Name" attribute="name" />}
@@ -1323,7 +1325,8 @@ ${signature}`
             />
           </ColumnGroup>
           <ColumnGroup
-            header={<this.HeaderCell content="Event Host" />}>
+            header={<this.HeaderCell content="Event Host" />}
+          >
             <Column
               flexGrow={1}
               header={<this.HeaderCell content="Email" />}
@@ -1344,30 +1347,8 @@ ${signature}`
             />
           </ColumnGroup>
           <ColumnGroup
-            header={<this.HeaderCell content="Detailed Info" />}>
-           <Column
-              header={<this.SortControllerCell content="Duration" attribute="duration" />}
-              cell={<this.DurationCell data={events} col="duration" />}
-              flexGrow={1}
-              width={110}
-            />
-            <Column
-              flexGrow={1}
-              header={<this.SortControllerCell content="Capacity" attribute="capacity" />}
-              cell={<this.TextCell data={events} col="capacity" />}
-              width={100}
-              align='center'
-            />
-            <Column
-              flexGrow={1}
-              header={<this.HeaderCell content="RSVPs" />}
-              cell={<this.TextCell data={events} col="attendeesCount" />}
-              width={100}
-              align='center'
-            />
-          </ColumnGroup>
-          <ColumnGroup
-            header={<this.HeaderCell content="Event Location" />}>
+            header={<this.HeaderCell content="Event Location" />}
+          >
             <Column
               header={<this.SortControllerCell content="Venue" attribute="venueName" />}
               cell={<this.TextCell data={events} col="venueName" />}
@@ -1400,18 +1381,22 @@ ${signature}`
               width={120}
               align='center'
             />
+          </ColumnGroup>
+          <ColumnGroup
+            header={<this.HeaderCell content="Attendance" />}
+          >
             <Column
-              header={<this.SortControllerCell content="Latitude" attribute="latitude" />}
-              cell={<this.TextCell data={events} col="latitude" />}
               flexGrow={1}
-              width={150}
+              header={<this.SortControllerCell content="Capacity" attribute="capacity" />}
+              cell={<this.CapacityCell data={events} col="capacity" />}
+              width={100}
               align='center'
             />
             <Column
-              header={<this.SortControllerCell content="Longitude" attribute="longitude" />}
-              cell={<this.TextCell data={events} col="longitude" />}
               flexGrow={1}
-              width={150}
+              header={<this.HeaderCell content="RSVPs" />}
+              cell={<this.TextCell data={events} col="attendeesCount" />}
+              width={100}
               align='center'
             />
           </ColumnGroup>
@@ -1422,32 +1407,15 @@ ${signature}`
   }
 }
 
-const getDefaultQuery = () => {
-  const hashParams = convertType(qs.parse(location.hash.substr(1), { strictNullHandling: true }))
-  let defaultParams = {
-    numEvents: 100,
+export default Relay.createContainer(AdminEventsSection, {
+  initialVariables: getDefaultRelayParams({
+    numEvents: 50,
     sortField: 'startDate',
     sortDirection: 'ASC',
-    status: 'PENDING_REVIEW',
+    status: 'APPROVED',
     filters: {},
     hostFilters: {}
-  }
-  if (hashParams.query){
-    try {
-      let newQueryParams = Object.assign({}, defaultParams, hashParams.query)
-      newQueryParams.filters = Object.assign({}, defaultParams.filters, hashParams.query.filters)
-      return newQueryParams
-    }
-    catch(ex) {
-      console.error('Invalid query parameters', ex)
-    }
-  }
-
-  return defaultParams
-}
-
-export default Relay.createContainer(AdminEventsSection, {
-  initialVariables: getDefaultQuery(),
+  }),
   fragments: {
     currentUser: () => Relay.QL`
       fragment on User {
@@ -1478,6 +1446,7 @@ export default Relay.createContainer(AdminEventsSection, {
             node {
               name
               id
+              creatorName
               host {
                 id
                 firstName
@@ -1493,8 +1462,6 @@ export default Relay.createContainer(AdminEventsSection, {
               isOfficial
               description
               venueName
-              latitude
-              longitude
               venueZip
               venueCity
               venueState
@@ -1502,6 +1469,8 @@ export default Relay.createContainer(AdminEventsSection, {
               venueAddr2
               venueCountry
               venueDirections
+              latitude
+              longitude
               createDate
               startDate
               localTimezone
@@ -1517,16 +1486,8 @@ export default Relay.createContainer(AdminEventsSection, {
               rsvpUseReminderEmail
               rsvpEmailReminderHours
               attendeesCount
-              attendees {
-                firstName
-                lastName
-                phone
-                email
-                address {
-                  city
-                  state
-                  zip
-                }
+              relatedCallAssignment {
+                id
               }
             }
           }

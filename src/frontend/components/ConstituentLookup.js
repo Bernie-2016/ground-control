@@ -1,11 +1,28 @@
 import React from 'react'
 import Relay from 'react-relay'
-import {Styles, Divider, RaisedButton, Card, CardHeader, CardText, FontIcon, RefreshIndicator} from 'material-ui'
+import {
+  Styles,
+  Divider,
+  RaisedButton,
+  Card,
+  CardTitle,
+  CardText,
+  FontIcon,
+  RefreshIndicator,
+  Table,
+  TableHeaderColumn,
+  TableRow,
+  TableHeader,
+  TableRowColumn,
+  TableBody,
+  TableFooter
+} from 'material-ui'
 import GCForm from './forms/GCForm'
 import Form from 'react-formal'
 import yup from 'yup'
+import phoneFormatter from 'phone-formatter'
 import {BernieTheme} from './styles/bernie-theme'
-import {BernieText, BernieColors} from './styles/bernie-css'
+import {BernieText, BernieColors, NAVBAR_HEIGHT} from './styles/bernie-css'
 import {states} from './data/states'
 
 const style = {
@@ -31,6 +48,8 @@ class ConstituentLookup extends React.Component {
       windowHeight: window.innerHeight
     })
   }
+
+  renderPhoneLink = (phone) => (phone) ? <a href={`tel:${phone}`}>{phoneFormatter.format(phone, '(NNN) NNN-NNNN')}</a> : ''
 
   renderSearchResults() {
     const people = this.props.listContainer.people.edges
@@ -62,25 +81,39 @@ class ConstituentLookup extends React.Component {
       )
     return people.map((person) => {
       person = person.node
-      const location = (person.address) ? `${person.address.city} ${person.address.state}` : ''
+      const location = (person.address) ? <span>({person.address.city} {person.address.state})</span> : ''
+      const address = person.address || {}
       return (
         <Card key={person.id}>
-          <CardHeader
-            title={`${person.firstName || ''} ${person.middleName || ''} ${person.lastName || ''}`}
-            subtitle={(location) ? `${location} - ${person.email}` : person.email}
-            avatar={
-              <FontIcon
-                className="material-icons"
-                style={{fontSize: '2em'}}
-              >account_circle</FontIcon>
-            }
+          <CardTitle
             actAsExpander={true}
             showExpandableButton={true}
-          />
-          <CardText expandable={true}>
-            Phone: {person.phone}
+          >
+            <span style={{...BernieText.default, fontSize: '1.1em', fontWeight: 'bold'}}>{person.firstName} {person.middleName} {person.lastName} {location}</span>
             <br />
-            {(person.address) ? `Zip Code: ${person.address.zip}` : ''}
+            <span style={{...BernieText.default, fontSize: '0.9em', letterSpacing: '1px'}}>{person.email}</span>
+          </CardTitle>
+          <CardText expandable={true}>
+            <Table selectable={false} multiSelectable={false} style={{fontFamily: 'Roboto'}}>
+              <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
+                <TableRow>
+                  <TableHeaderColumn>Email</TableHeaderColumn>
+                  <TableHeaderColumn>Phone</TableHeaderColumn>
+                  <TableHeaderColumn>Address</TableHeaderColumn>
+                  <TableHeaderColumn>Zip Code</TableHeaderColumn>
+                </TableRow>
+              </TableHeader>
+              <TableBody displayRowCheckbox={false}>
+                <TableRow>
+                  <TableRowColumn>
+                    <a href={`mailto:${person.email}`}>{person.email}</a>
+                  </TableRowColumn>
+                  <TableRowColumn>{this.renderPhoneLink(person.phone)}</TableRowColumn>
+                  <TableRowColumn>{address.addr1}</TableRowColumn>
+                  <TableRowColumn>{address.zip}</TableRowColumn>
+                </TableRow>
+              </TableBody>
+            </Table>
           </CardText>
         </Card>
       )
@@ -98,10 +131,10 @@ class ConstituentLookup extends React.Component {
     })
 
     return (
-      <div style={{height: this.state.windowHeight - 56, top: 56, position: 'absolute', overflow: 'scroll'}}>
+      <div style={{height: this.state.windowHeight - NAVBAR_HEIGHT, top: NAVBAR_HEIGHT, position: 'absolute', overflow: 'scroll'}}>
         <div
           style={{
-            width: this.state.windowWidth * 0.4 - 40,
+            width: this.state.windowWidth * 0.3 - 40,
             margin: 20,
             position: 'fixed',
             top: 40
@@ -169,7 +202,7 @@ class ConstituentLookup extends React.Component {
             <Form.Button ref="submit" type='submit' label='Search' fullWidth={true} />
           </GCForm>
         </div>
-        <div style={{marginLeft: this.state.windowWidth * 0.4, width: this.state.windowWidth * 0.6}}>
+        <div style={{marginLeft: this.state.windowWidth * 0.3, width: this.state.windowWidth * 0.7}}>
           {this.renderSearchResults()}
         </div>
       </div>
@@ -203,6 +236,7 @@ export default Relay.createContainer(ConstituentLookup, {
               phone
               email
               address {
+                addr1
                 city
                 state
                 zip
