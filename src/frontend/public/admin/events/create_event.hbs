@@ -235,13 +235,9 @@
                       <label class="form_label" for="host_receive_rsvp_emails">Receive email when others sign up?</label>
                       <input name="host_receive_rsvp_emails" type="checkbox" value="1" id="host_receive_rsvp_emails" checked="checked">
                     </div>
-                    <div class="inputgroup checkboxgroup">
-                      <div class="label">
-                        <label class="form_label" for="attendee_volunteer_show">Ask attendees to volunteer?</label>
-                      </div>
-                      <div class="field">
-                        <input name="attendee_volunteer_show" type="checkbox" value="1" id="attendee_volunteer_show">
-                      </div>
+                    <div class="checkboxgroup">
+                      <label class="form_label" for="attendee_volunteer_show">Ask attendees to volunteer?</label>
+                      <input name="attendee_volunteer_show" type="checkbox" value="1" id="attendee_volunteer_show">
                     </div>
                     <div class="form_hide_table hidden" id="avm_block">
                       <div class="onelinelabel">
@@ -253,7 +249,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="inputgroup">
+                  <div class="inputgroup" id="rsvp_email_reminder_hours">
                     <div class="label">
                       <label class="form_label">Send email reminder to attendees?</label>
                     </div>
@@ -1140,13 +1136,13 @@
                   </div>
                   <span class="explain">Pick the date of your event by selecting it on the calendar. Selecting multiple dates will generate multiple duplicate events.</span>
                 </div>
-                <div class="inputgroup">
+                <div class="inputgroup" id="event_repeat_type">
                   <div class="label">
                     <label class="form_label" style="margin-left:0">Repeat this event?</label>
                   </div>
                   <div class="field">
                     <div class="select-wrapper" style="float:none;">
-                      <select name="event_repeat_type" id="event_repeat_type">
+                      <select name="event_repeat_type">
                         <option value="never" selected="selected">Never</option>
                         <option value="weekly">Weekly</option>
                         <option value="month_by_day">Monthly by day of the week</option>
@@ -1162,7 +1158,7 @@
                   <div class="field">
                     <input size="4" name="repeat_duration_num" id="repeat_duration_num" type="number" value="1" step="1" min="1" max="16">&nbsp;
                     <div class="select-wrapper">
-                      <select name="repeat_duration_unit" id="repeat_duration_unit">
+                      <select name="repeat_duration_unit">
                         <option value="7" selected="selected">week(s)</option>
                       </select>
                     </div>
@@ -1189,7 +1185,7 @@
                       </div>
                       <div class="field">
                         <div class="select-wrapper col-3">
-                          <select name="start_time[h]" required>
+                          <select name="start_time[h]" id="start_time_h" required>
                             <option selected="selected"></option>
                             <option value="1">01</option>
                             <option value="2">02</option>
@@ -1206,7 +1202,7 @@
                           </select>
                         </div>
                         <div class="select-wrapper col-3">
-                          <select name="start_time[i]" required>
+                          <select name="start_time[i]" id="start_time_i" required>
                             <option selected="selected"></option>
                             <option value="00">00</option>
                             <option value="15">15</option>
@@ -1216,7 +1212,7 @@
                         </div>
                         &nbsp;
                         <div class="select-wrapper col-3 col-3-3">
-                          <select name="start_time[a]">
+                          <select name="start_time[a]" id="start_time_a">
                             <option value="am">am</option>
                             <option value="pm" selected="selected">pm</option>
                           </select>

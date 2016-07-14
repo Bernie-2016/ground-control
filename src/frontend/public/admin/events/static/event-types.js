@@ -381,7 +381,7 @@ function resetForm(){
 	updateFormValue('cons_email', userEmail);
 	updateFormValue('attendee_volunteer_show', false);
 	$("label, select, input").show();
-	$("#event_repeat_type").change();
+	$("[name=event_repeat_type]").change();
 
 	for (var i = 0; i < disabledInputs.length; i++){
 		var input = form[disabledInputs[i].name];
@@ -464,10 +464,12 @@ function setDefaults(eventTypeId){
 			.find("input, select")
 			.attr("disabled", true);
 	}
+	$("[name=event_repeat_type]").change();
 }
 
 function updateFormValue(property, value) {
 	var form = document.getElementById('secondform');
+	console.log(property, $(form[property]).is('select'));
 	switch (property) {
 		case "description":
 			CKEDITOR.instances.description.setData(value);
@@ -504,10 +506,9 @@ function updateFormValue(property, value) {
 		    form[property].value = value;
 		    form[property].placeholder = value;
 	  	}
-
-		  if (property === 'attendee_volunteer_show' || property === 'duration_allday' || property === 'use_shifts')
-		  	$('[name="' + property + '"]').change()
-		  break
+		if (property === 'attendee_volunteer_show' || property === 'duration_allday' || property === 'use_shifts')
+			$('[name="' + property + '"]').change()
+		break
 	}
 }
 
@@ -558,14 +559,18 @@ function clearEvents(){
 	events_cal.setEvents([]);
 }
 
-function updateEventTime(dateMoment) {
-	var form = document.getElementById('secondform');
+function setSelectedOption(inputId, value) {
+	$("#" + inputId + " option").removeAttr('selected')
+		.filter('[value=' + value + ']')
+		.prop('selected', true);
+}
 
-	var hour = Number(dateMoment.format('hh'));
-	hour = (hour == 12) ? '00' : hour;
-	form['start_time[h]'].value = hour;
-	form['start_time[i]'].value = dateMoment.format('mm');
-	form['start_time[a]'].value = dateMoment.format('a');
+function updateEventTime(dateMoment) {
+	var hour = dateMoment.format('h');
+	hour = (hour == '12') ? '00' : hour;
+	setSelectedOption('start_time_h', hour);
+	setSelectedOption('start_time_i', dateMoment.format('mm'));
+	setSelectedOption('start_time_a', dateMoment.format('a'));
 }
 
 function getHashValue(key) {
