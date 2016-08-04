@@ -476,7 +476,7 @@ async function startApp() {
     res.header("Access-Control-Allow-Origin", "http://map.berniesanders.com")
     res.header("Access-Control-Allow-Headers", "*")
     res.header('Access-Control-Allow-Methods', "*")
-    
+
   	const makeRequest = async (body) => {
   		log.debug(body)
   		let response = null
@@ -586,7 +586,8 @@ async function startApp() {
       'primary-day': { id: 45, staffOnly: true, requirePhone: true },
       'vol2vol': { id: 47, staffOnly: true },
       'rally': { id: 14, staffOnly: true },
-      'voter-registration': { id: 22, staffOnly: false, requirePhone: true }
+      'voter-registration': { id: 22, staffOnly: false, requirePhone: true },
+      'our-revolution-kickoff': { id:52, staffOnly: false, requirePhone: true}
     }
 
     function getDayWithDefaultShifts(shiftSchemaMap, eventType, shiftIDs, capacity, day) {
@@ -605,7 +606,7 @@ async function startApp() {
           }
         })
       }
-      
+
       const shifts = filterShiftsById()
       const bsdShifts = convertToBSDShifts(shifts, capacity)
 
@@ -678,7 +679,7 @@ async function startApp() {
     // Require phone number for RSVPs to phonebanks
     if (eventIdMap[form['event_type_id']].requirePhone)
       form['attendee_require_phone'] = 1
-    
+
     let eventDates = JSON.parse(form[ 'event_dates' ])
     eventDates = eventDates.map((eventDate) => eventDate.date)
     const eventDatesSet = new Set(eventDates)
@@ -742,7 +743,7 @@ async function startApp() {
 
       // Enforce standard event shifts
       if (eventTypeIdString in shiftSchemaMap){
-        const dayWithDefaultShifts = getDayWithDefaultShifts(shiftSchemaMap, eventTypeIdString, form.shift_ids, form.capacity, eventDates[index])        
+        const dayWithDefaultShifts = getDayWithDefaultShifts(shiftSchemaMap, eventTypeIdString, form.shift_ids, form.capacity, eventDates[index])
         form['use_shifts'] = '1'
         form.days = []
         form.days.push(dayWithDefaultShifts)
