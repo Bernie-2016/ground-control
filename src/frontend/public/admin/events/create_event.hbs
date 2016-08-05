@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="x-ua-compatible" content="IE8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bernie Sanders for President  |  Create Event</title>
+    <title>Our Revolution  |  Create Event</title>
     <meta property="og:image" content="https://s.bsd.net/bernie16/main/page/-/website/bsd-fb-share.png">
     <link rel="shortcut icon" href="https://s.bsd.net/bernie16/main/page/-/favicon.ico">
     <meta name="twitter:card" content="summary_large_image">
@@ -89,6 +89,25 @@
 		    text-decoration: underline;
 		}
 
+    #event-success-message {
+      background: #20c261;
+    }
+
+    #event-success-message p {
+      font-size: 1.2rem;
+      line-height: 1.2;
+    }
+
+    #event-success-message h2 {
+      color: white;
+      font-size: 1.7rem;
+      margin-top: 20px;
+    }
+
+    #event-success-message button {
+      margin-bottom: 20px;
+    }
+
 		.event-central.step2 #SKIN .section-wrap#event-error-message {
 		    color: #a94442;
 		    background-color: #f2dede;
@@ -144,7 +163,7 @@
       <div class="container">
         {{#if is_public}}
         <a href="https://berniesanders.com/">
-          <h1>Bernie Sanders for President</h1>
+          <h1>Our Revolution</h1>
         </a>
         <div class="contribute">
           <a href="/signup?next=/events/create" class="contribute">
@@ -154,7 +173,7 @@
         {{else}}
         <div>
           <h2 style="color:#EC3E3E; text-align:center">
-            Bernie 2016 Staff: Create an Event
+            Our Revolution Staff: Create an Event
           </h2>
         </div>
         {{/if}}
@@ -165,12 +184,11 @@
       <div id="SKIN" class="module_event2 bsd-page bsd-event bsd-event-createdetails">
         <div class="basic container">
 		  <div id="event-success-message" class="section-wrap event-message" style="display:none;">
-			  Thanks for submitting an event for the Bernie Sanders campaign!<br>
-			  <p>You should receive a confirmation email with a link to manage your event soon.<br>
+			  <h2>Thanks for submitting an event for Our Revolution!</h2>
+			  <p>You should receive a confirmation email with a link to manage your event soon.</p>
         <!-- In the mean time, you can view the event here:<br>
         <ul id="js-created-event-url-list"></ul>
         <a class="js-created-event-url" href="" target="_blank"></a></p> -->
-        <button class="button" onclick='$("#event-success-message").hide();setHashValue("event_id", null)'>Close</button>
 		  </div>
 
 		  <div id="event-error-message" class="section-wrap event-message" style="display:none;">

@@ -201,6 +201,7 @@ jQuery(document).ready(function() {
                 window.scrollTo(0,0);
                 // window.location.reload();
                 $('#secondform')[0].reset();
+                $('#secondform').hide();
                 $("#event-success-message").show();
             },
             error: function(response){
