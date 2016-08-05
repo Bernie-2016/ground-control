@@ -23,49 +23,49 @@ var eventTypes = [
 		adminOnly: true
 	},
 	*/
-	{
-		id: 'volunteer-meeting',
-		name: 'Volunteer Activity or Meeting',
-		adminOnly: false,
-		nonAdminOnly: false,
-		disabled: ['use_shifts']
-	},
-	{
-		id: 'organizing-meeting',
-		name: 'Official Organizing Meeting',
-		adminOnly: true,
-		disabled: ['use_shifts']
-	},
+	// {
+	// 	id: 'volunteer-meeting',
+	// 	name: 'Volunteer Activity or Meeting',
+	// 	adminOnly: false,
+	// 	nonAdminOnly: false,
+	// 	disabled: ['use_shifts']
+	// },
+	// {
+	// 	id: 'organizing-meeting',
+	// 	name: 'Official Organizing Meeting',
+	// 	adminOnly: true,
+	// 	disabled: ['use_shifts']
+	// },
 	// {
 	// 	id: 'debate-watch',
 	// 	name: 'Debate Watch Party',
 	// 	adminOnly: false,
 	// 	disabled: ['use_shifts']
 	// },
-	{
-		id: 'carpool',
-		name: 'Carpool',
-		adminOnly: false,
-		disabled: ['use_shifts', 'attendee_volunteer_show', 'host_receive_rsvp_emails'],
-		labels: {
-			'host_receive_rsvp_emails': 'Receive an email when people join my carpool',
-			'attendee_volunteer_show': 'Ask riders to help out',
-		},
-		defaultValues: {
-			public_phone: 1,
-			venue_name: 'My car',
-			name: 'Carpool From [HOME CITY] to [DESTINATION CITY]',
-			is_searchable: true,
-			rsvp_use_reminder_email: true,
-			rsvp_email_reminder_hours: 24,
-			duration_num: 2,
-			duration_unit: 60,
-			attendee_volunteer_message: 'If you can chip in for gas and snacks, please sign up as a volunteer. Thanks!',
-			host_receive_rsvp_emails: true,
-			attendee_volunteer_show: true,
-			description: '<a href="http://bernie.to/distance-faq">Click here to view Carpool FAQs</a><p>Join me and other Bernie supporters for a road trip!</p><p>I’ll be leaving on [WRITE YOUR DEPARTURE DATE/TIME HERE] and returning on [WRITE YOUR RETURN DATE/TIME HERE].</p><p>We’re going to hit the road for Bernie to the help out in the crucial final days before the election. Bernie staff on the ground will train us and plug us into the campaign so that we can be as effective as possible.</p><p>Victory will require all of us pitching in, so sign up and let’s go on a Bernie Journey!</p>'
-		}
-	},
+	// {
+	// 	id: 'carpool',
+	// 	name: 'Carpool',
+	// 	adminOnly: false,
+	// 	disabled: ['use_shifts', 'attendee_volunteer_show', 'host_receive_rsvp_emails'],
+	// 	labels: {
+	// 		'host_receive_rsvp_emails': 'Receive an email when people join my carpool',
+	// 		'attendee_volunteer_show': 'Ask riders to help out',
+	// 	},
+	// 	defaultValues: {
+	// 		public_phone: 1,
+	// 		venue_name: 'My car',
+	// 		name: 'Carpool From [HOME CITY] to [DESTINATION CITY]',
+	// 		is_searchable: true,
+	// 		rsvp_use_reminder_email: true,
+	// 		rsvp_email_reminder_hours: 24,
+	// 		duration_num: 2,
+	// 		duration_unit: 60,
+	// 		attendee_volunteer_message: 'If you can chip in for gas and snacks, please sign up as a volunteer. Thanks!',
+	// 		host_receive_rsvp_emails: true,
+	// 		attendee_volunteer_show: true,
+	// 		description: '<a href="http://bernie.to/distance-faq">Click here to view Carpool FAQs</a><p>Join me and other Bernie supporters for a road trip!</p><p>I’ll be leaving on [WRITE YOUR DEPARTURE DATE/TIME HERE] and returning on [WRITE YOUR RETURN DATE/TIME HERE].</p><p>We’re going to hit the road for Bernie to the help out in the crucial final days before the election. Bernie staff on the ground will train us and plug us into the campaign so that we can be as effective as possible.</p><p>Victory will require all of us pitching in, so sign up and let’s go on a Bernie Journey!</p>'
+	// 	}
+	// },
 	// {
 	// 	id: 'ballot-access',
 	// 	name: 'Gather Ballot Access Signatures',
@@ -76,15 +76,15 @@ var eventTypes = [
 	// 	adminOnly: false,
 	// 	disabled: ['use_shifts']
 	// },
-	{
-		id: 'phonebank',
-		name: 'Phonebank',
-		defaultValues: {
-			name: 'Phone banking for Bernie',
-			description: 'Join other volunteers in your area to make phone calls for Bernie. This is a great opportunity to meet other Bernie supporters, make calls to voters, and help make a big impact in our campaign for President. Please bring a laptop, phone, chargers, and any extra batteries you have.',
-		},
-		adminOnly: false
-	},
+	// {
+	// 	id: 'phonebank',
+	// 	name: 'Phonebank',
+	// 	defaultValues: {
+	// 		name: 'Phone banking for Bernie',
+	// 		description: 'Join other volunteers in your area to make phone calls for Bernie. This is a great opportunity to meet other Bernie supporters, make calls to voters, and help make a big impact in our campaign for President. Please bring a laptop, phone, chargers, and any extra batteries you have.',
+	// 	},
+	// 	adminOnly: false
+	// },
 	// {
 	// 	id: 'canvass',
 	// 	name: 'Canvass',
@@ -174,49 +174,49 @@ var eventTypes = [
 	// 	},
 	// 	disabled: ['use_shifts']
 	// },
-	{
-		id: 'barnstorm',
-		name: 'Barnstorm',
-		defaultValues: {
-			name: 'Barnstorm Organizing Rally for Bernie',
-			description: '<p>Join other local volunteers and grassroots organizers for a “barnstorm" organizing rally and learn how to get to work for Bernie. A Bernie volunteer will present an update from the national campaign, talk about our plan to win and plug you into a voter contact program locally.</p><p>This will be a great opportunity to hear what\'s going on nationally and locally with the campaign, as well as a chance to meet other Bernie supporters from your community. Thank you for all that you\'ve contributed and all the hard work that you\'re about to do!</p>',
-
-			is_official: false,
-			attendee_volunteer_show: false,
-			host_receive_rsvp_emails: false,
-			date: {
-				time: '18:30:00',
-			},
-			duration_num: 90,
-			duration_unit: 1,
-			cons_name: '',
-			cons_email: userEmail,
-			rsvp_email_reminder_hours: '24',
-		},
-		disabled: ['use_shifts'],
-		adminOnly: false,
-		nonAdminOnly: true
-	},
-	{
-		id: 'official-barnstorm',
-		name: 'Barnstorm',
-		defaultValues: {
-			name: 'Bernstorm - Organizing Rally with National Bernie Staff',
-			description: '<p>Join other local volunteers and grassroots organizers on [DOW, Month DD] as a representative from the national organizing staff, [STAFF] comes to [STATE] for a series of special organizing events.</p><p>We will discuss how we can rapidly grow our movement in the next several months as we enter the primary season. We will also be discussing local volunteer activities to help the early primary states.</p><p>This will be a great opportunity to hear what\'s going on nationally and locally with the campaign, as well as a chance to meet other Bernie supporters from your community. Thank you for all that you\'ve contributed and all the hard work that you\'re about to do!</p>',
-			is_official: true,
-			attendee_volunteer_show: true,
-			host_receive_rsvp_emails: false,
-			date: {
-				time: '18:00:00',
-			},
-			duration_num: 90,
-			duration_unit: 1,
-			cons_name: 'Bernie 2016',
-			cons_email: userEmail
-		},
-		disabled: ['contact_phone', 'public_phone', 'use_shifts'],
-		adminOnly: true
-	},
+	// {
+	// 	id: 'barnstorm',
+	// 	name: 'Barnstorm',
+	// 	defaultValues: {
+	// 		name: 'Barnstorm Organizing Rally for Bernie',
+	// 		description: '<p>Join other local volunteers and grassroots organizers for a “barnstorm" organizing rally and learn how to get to work for Bernie. A Bernie volunteer will present an update from the national campaign, talk about our plan to win and plug you into a voter contact program locally.</p><p>This will be a great opportunity to hear what\'s going on nationally and locally with the campaign, as well as a chance to meet other Bernie supporters from your community. Thank you for all that you\'ve contributed and all the hard work that you\'re about to do!</p>',
+	//
+	// 		is_official: false,
+	// 		attendee_volunteer_show: false,
+	// 		host_receive_rsvp_emails: false,
+	// 		date: {
+	// 			time: '18:30:00',
+	// 		},
+	// 		duration_num: 90,
+	// 		duration_unit: 1,
+	// 		cons_name: '',
+	// 		cons_email: userEmail,
+	// 		rsvp_email_reminder_hours: '24',
+	// 	},
+	// 	disabled: ['use_shifts'],
+	// 	adminOnly: false,
+	// 	nonAdminOnly: true
+	// },
+	// {
+	// 	id: 'official-barnstorm',
+	// 	name: 'Barnstorm',
+	// 	defaultValues: {
+	// 		name: 'Bernstorm - Organizing Rally with National Bernie Staff',
+	// 		description: '<p>Join other local volunteers and grassroots organizers on [DOW, Month DD] as a representative from the national organizing staff, [STAFF] comes to [STATE] for a series of special organizing events.</p><p>We will discuss how we can rapidly grow our movement in the next several months as we enter the primary season. We will also be discussing local volunteer activities to help the early primary states.</p><p>This will be a great opportunity to hear what\'s going on nationally and locally with the campaign, as well as a chance to meet other Bernie supporters from your community. Thank you for all that you\'ve contributed and all the hard work that you\'re about to do!</p>',
+	// 		is_official: true,
+	// 		attendee_volunteer_show: true,
+	// 		host_receive_rsvp_emails: false,
+	// 		date: {
+	// 			time: '18:00:00',
+	// 		},
+	// 		duration_num: 90,
+	// 		duration_unit: 1,
+	// 		cons_name: 'Bernie 2016',
+	// 		cons_email: userEmail
+	// 	},
+	// 	disabled: ['contact_phone', 'public_phone', 'use_shifts'],
+	// 	adminOnly: true
+	// },
 	// {
 	// 	id: 'vol2vol',
 	// 	name: 'Vol 2 Vol Turnout Shift',
@@ -241,17 +241,17 @@ var eventTypes = [
 	// 	disabled: ['contact_phone', 'public_phone'],
 	// 	adminOnly: true
 	// },
-	{
-		id: 'voter-registration',
-		name: 'Voter Registration',
-		defaultValues: {
-			name: 'Register Voters in [CITY/NEIGHBORHOOD]',
-			description: 'Join us to register (and properly re-register!) our neighbors to vote. If we work together, we can register the necessary voters to bring us closer to a huge voter turnout –– and when voters turn out, we win.',
-			duration_num: 3,
-			duration_unit: 60
-		},
-		adminOnly: false
-	},
+	// {
+	// 	id: 'voter-registration',
+	// 	name: 'Voter Registration',
+	// 	defaultValues: {
+	// 		name: 'Register Voters in [CITY/NEIGHBORHOOD]',
+	// 		description: 'Join us to register (and properly re-register!) our neighbors to vote. If we work together, we can register the necessary voters to bring us closer to a huge voter turnout –– and when voters turn out, we win.',
+	// 		duration_num: 3,
+	// 		duration_unit: 60
+	// 	},
+	// 	adminOnly: false
+	// },
 	{
 		id: 'our-revolution-kickoff',
 		name: 'Our Revolution Organizing Kickoff',

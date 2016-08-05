@@ -353,7 +353,7 @@ export default class BSD {
     return response
   }
 
-  async createConstituent(email, firstname, lastname) {    
+  async createConstituent(email, firstname, lastname) {
     let response = await this.setConstituentData({
       firstname,
       lastname,
@@ -548,10 +548,19 @@ export default class BSD {
     let params = this.apiInputsFromEvent(event)
     log.debug(params)
     let response = await this.request('/event/create_event', {event_api_version: 2, values: JSON.stringify(params)}, 'POST');
+
+    log.debug(response)
     if (response.validation_errors)
       throw new BSDValidationError(JSON.stringify(response.validation_errors))
-    else if (typeof response.event_id_obfuscated === 'undefined')
+
+    // BSD API has changed, this isn't returning now. Faking success on this so we can at least get events into BSD.
+    // else if (typeof response.event_id_obfuscated === 'undefined')
+    //   throw new Error(response)
+
+    // Putting something in to check for a valid response, as this is all BSD is returning atm
+    else if (typeof response.days === 'undefined')
       throw new Error(response)
+
     log.info('response', response)
     return response
   }

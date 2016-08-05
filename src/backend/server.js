@@ -568,25 +568,25 @@ async function startApp() {
     log.info(`Event Create Form Submission to ${src} by ${user}`, JSON.stringify(form))
 
     const eventIdMap = {
-      'volunteer-meeting': { id: 24, staffOnly: false },
-      'ballot-access': { id: 30, staffOnly: false },
-      'phonebank': { id: 31, staffOnly: false, requirePhone: true },
-      'canvass': { id: 32, staffOnly: false, requirePhone: true },
-      'canvass-3-shifts': { id: 32, staffOnly: true, requirePhone: true },
-      'canvass-4-shifts': { id: 32, staffOnly: true, requirePhone: true },
-      'canvass-4-shifts-early': { id: 32, staffOnly: true, requirePhone: true },
-      'barnstorm': { id: 41, staffOnly: false, requirePhone: true },
-      'carpool-to-nevada': { id: 39, staffOnly: false, requirePhone: true },
-      'carpool': { id: 39, staffOnly: false, requirePhone: true },
-      'debate-watch': { id: 36, staffOnly: false },
-      'official-barnstorm': { id: 41, staffOnly: true, requirePhone: true },
-      'organizing-meeting': { id: 34, staffOnly: true },
-      'get-out-the-vote-training': { id: 34, staffOnly: true },
-      'get-out-the-vote': { id: 45, staffOnly: true, requirePhone: true },
-      'primary-day': { id: 45, staffOnly: true, requirePhone: true },
-      'vol2vol': { id: 47, staffOnly: true },
-      'rally': { id: 14, staffOnly: true },
-      'voter-registration': { id: 22, staffOnly: false, requirePhone: true },
+      // 'volunteer-meeting': { id: 24, staffOnly: false },
+      // 'ballot-access': { id: 30, staffOnly: false },
+      // 'phonebank': { id: 31, staffOnly: false, requirePhone: true },
+      // 'canvass': { id: 32, staffOnly: false, requirePhone: true },
+      // 'canvass-3-shifts': { id: 32, staffOnly: true, requirePhone: true },
+      // 'canvass-4-shifts': { id: 32, staffOnly: true, requirePhone: true },
+      // 'canvass-4-shifts-early': { id: 32, staffOnly: true, requirePhone: true },
+      // 'barnstorm': { id: 41, staffOnly: false, requirePhone: true },
+      // 'carpool-to-nevada': { id: 39, staffOnly: false, requirePhone: true },
+      // 'carpool': { id: 39, staffOnly: false, requirePhone: true },
+      // 'debate-watch': { id: 36, staffOnly: false },
+      // 'official-barnstorm': { id: 41, staffOnly: true, requirePhone: true },
+      // 'organizing-meeting': { id: 34, staffOnly: true },
+      // 'get-out-the-vote-training': { id: 34, staffOnly: true },
+      // 'get-out-the-vote': { id: 45, staffOnly: true, requirePhone: true },
+      // 'primary-day': { id: 45, staffOnly: true, requirePhone: true },
+      // 'vol2vol': { id: 47, staffOnly: true },
+      // 'rally': { id: 14, staffOnly: true },
+      // 'voter-registration': { id: 22, staffOnly: false, requirePhone: true },
       'our-revolution-kickoff': { id:52, staffOnly: false, requirePhone: true}
     }
 
@@ -758,8 +758,9 @@ async function startApp() {
 
       try {
         result = await BSDClient.createEvent(form)
-
-        createdEventIds.push(result.event_id_obfuscated)
+        log.debug(JSON.stringify(result, null, 4))
+        // BSD isn't returning event_id_obfuscated as of now
+        // createdEventIds.push(result.event_id_obfuscated)
       } catch(ex) {
         log.error(`Event Creation Error: ${ex.message} [${user}]`)
 
@@ -776,18 +777,20 @@ async function startApp() {
       }
     }
 
-    Mailgun.sendEventConfirmation(
-      {
-        ...form,
-        event_type_name: eventType.name
-      },
-      createdEventIds,
-      constituent
-    )
+    // Disable Mailgun since we're not getting obfuscated id back,a nd since managing events in GC is currently broken bc of stork sync being gone
+    // Mailgun.sendEventConfirmation(
+    //   {
+    //     ...form,
+    //     event_type_name: eventType.name
+    //   },
+    //   createdEventIds,
+    //   constituent
+    // )
 
     log.info(`Event Creation Success: ${createdEventIds.join(' ')} [${user}]`)
 
-    res.send({ids: createdEventIds})
+    // sending success marker since we're not getting id
+    res.send({ids: createdEventIds, success: true})
   }))
 
   app.use(fallback('index.html', {
