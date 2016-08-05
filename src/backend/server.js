@@ -789,8 +789,7 @@ async function startApp() {
 
     log.info(`Event Creation Success: ${createdEventIds.join(' ')} [${user}]`)
 
-    // sending success marker since we're not getting id
-    res.send({ids: createdEventIds, success: true})
+    res.send({ids: createdEventIds})
   }))
 
   app.use(fallback('index.html', {
