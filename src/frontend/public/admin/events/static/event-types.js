@@ -257,7 +257,7 @@ var eventTypes = [
 		name: 'Our Revolution Organizing Kickoff',
 		defaultValues: {
 			name: 'August 24th Our Revolution Organizing Kickoff',
-			description: "On August 24th, 2016, we'll launch Our Revolution with a big Organizing Kickoff to get to work fighting for the political revolution—through November and beyond. Bernie will speak via livestream at 9 ET / 6 PT and lay out the path forward for our movement. We recommend starting your event at least 30 minutes prior to the beginning of the livestream program.",
+			description: "On August 24th, 2016, we'll launch Our Revolution with a big Organizing Kickoff to get to work fighting for the political revolution—through November and beyond. Bernie will speak via livestream at 9 ET / 6 PT and lay out the path forward for our movement. We recommend arriving at least 30 minutes before the livestream starts.",
 			date: {
 				dateTime: new Date('August 24 2016 20:30:00'),
 				timeZone: 'US/Eastern'
