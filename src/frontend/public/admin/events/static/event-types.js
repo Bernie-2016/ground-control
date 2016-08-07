@@ -265,6 +265,7 @@ var eventTypes = [
 			duration_num: 1,
 			duration_unit: 60
 		},
+		disabled: ['attendee_volunteer_show','use_shifts'],
 		adminOnly: false
 	}
 	// { // Keep this event type in as an example for providing extra default values
