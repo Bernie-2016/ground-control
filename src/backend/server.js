@@ -758,9 +758,8 @@ async function startApp() {
 
       try {
         result = await BSDClient.createEvent(form)
-        log.debug(JSON.stringify(result, null, 4))
-        // BSD isn't returning event_id_obfuscated as of now
-        // createdEventIds.push(result.event_id_obfuscated)
+
+        createdEventIds.push(result.event_id_obfuscated)
       } catch(ex) {
         log.error(`Event Creation Error: ${ex.message} [${user}]`)
 
@@ -777,15 +776,14 @@ async function startApp() {
       }
     }
 
-    // Disable Mailgun since we're not getting obfuscated id back,a nd since managing events in GC is currently broken bc of stork sync being gone
-    // Mailgun.sendEventConfirmation(
-    //   {
-    //     ...form,
-    //     event_type_name: eventType.name
-    //   },
-    //   createdEventIds,
-    //   constituent
-    // )
+    Mailgun.sendEventConfirmation(
+      {
+        ...form,
+        event_type_name: eventType.name
+      },
+      createdEventIds,
+      constituent
+    )
 
     log.info(`Event Creation Success: ${createdEventIds.join(' ')} [${user}]`)
 

@@ -199,10 +199,7 @@ jQuery(document).ready(function() {
             success: function(response, textStatus) {
                 setHashValue("event_ids", response.ids.join(','));
                 window.scrollTo(0,0);
-                // window.location.reload();
-                $('#secondform')[0].reset();
-                $('#secondform').hide();
-                $("#event-success-message").show();
+                window.location.reload();
             },
             error: function(response){
                 $('#submit_button').removeClass('in-progress');
@@ -227,20 +224,19 @@ jQuery(document).ready(function() {
     });
 
 
-    // Disable until event ids are returned from BSD
-    // // Show initial modal if we have an event_url in the hash (should have come from previous event creation)
-    // var event_ids = getHashValue("event_ids");
-    // if (event_ids){
-    //     event_ids = event_ids.split(",")
-    //     if (event_ids.length > 0) {
-    //         for (var i=0; i < event_ids.length; i++){
-    //             var event_link = eventsRootUrl + event_ids[i];
-    //             $('#js-created-event-url-list').append(
-    //                 '<li><a class="js-created-event-url" href="' + event_link
-    //                 + '" target="_blank">' + event_link + '</a></li>');
-    //         }
-    //         $("#event-success-message").show();
-    //     }
-    // };
+    // Show initial modal if we have an event_url in the hash (should have come from previous event creation)
+    var event_ids = getHashValue("event_ids");
+    if (event_ids){
+        event_ids = event_ids.split(",")
+        if (event_ids.length > 0) {
+            for (var i=0; i < event_ids.length; i++){
+                var event_link = eventsRootUrl + event_ids[i];
+                $('#js-created-event-url-list').append(
+                    '<li><a class="js-created-event-url" href="' + event_link
+                    + '" target="_blank">' + event_link + '</a></li>');
+            }
+            $("#event-success-message").show();
+        }
+    };
 
 });
