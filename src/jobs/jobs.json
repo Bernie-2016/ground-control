@@ -17,10 +17,6 @@
       "job": "./jobs/expired-call-assignment-cleanup.js"
     },
     {
-      "cron": "00 */7 * * * *",
-      "job": "./jobs/email-event-instructions.js"
-    },
-    {
       "cron": "00 9 * * * *",
       "job": "./jobs/email-fast-fwd-instructions.js"
     },

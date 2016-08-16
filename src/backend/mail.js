@@ -206,7 +206,7 @@ export default class MG {
       'default' : {
         template: 'generic-event-instructions',
         senderAddress,
-        subject: 'Invite nearby Bernie volunteers to your event'
+        subject: 'Invite nearby Our Revolution volunteers to your event'
       },
     }
 
