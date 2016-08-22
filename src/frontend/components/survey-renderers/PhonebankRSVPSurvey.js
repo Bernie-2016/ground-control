@@ -9,6 +9,8 @@ import FontIcon from 'material-ui/lib/font-icon'
 import SideBarLayout from '../SideBarLayout'
 import GCSelectField from '../forms/GCSelectField'
 import GCBooleanField from '../forms/GCBooleanField'
+import qs from 'qs'
+import convertType from '../../helpers/convertType'
 
 const WEEKDAY_DATE_FORMAT = 'dddd, MMMM Do'
 
@@ -546,9 +548,14 @@ class PhonebankRSVPSurvey extends React.Component {
   }
 }
 
+// Convert the query parameter 'official' into a boolean flag.
+const {official} = convertType(qs.parse(location.search.substr(1)))
+const officialOnly = official ? true : false
+
 export default Relay.createContainer(PhonebankRSVPSurvey, {
   initialVariables: {
-    type: 'phonebank'
+    type: 'phonebank',
+    officialOnly: officialOnly
   },
   fragments: {
     currentUser: () => Relay.QL`
@@ -564,7 +571,7 @@ export default Relay.createContainer(PhonebankRSVPSurvey, {
           latitude
           longitude
         }
-        nearbyEvents(within:20, type:$type) {
+        nearbyEvents(within:20, type:$type, officialOnly:$officialOnly) {
           id
           eventIdObfuscated
           name
