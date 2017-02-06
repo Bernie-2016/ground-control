@@ -12,6 +12,7 @@ import SubmitCallSurvey from '../mutations/SubmitCallSurvey'
 import CallStatsBar from './CallStatsBar'
 import MutationHandler from './MutationHandler'
 import {PhoneNumberFormat, PhoneNumberUtil} from 'google-libphonenumber'
+import getDefaultRelayParams from '../helpers/getDefaultRelayParams'
 const phoneUtil = PhoneNumberUtil.getInstance()
 
 const SurveyRenderers = {
@@ -408,8 +409,24 @@ ${userFirstName}`
   }
 }
 
+// Convert the hash parameters 'query[lat]', 'query[lon]', and 'query[miles]'
+// into the API arguments for the center and radius of the filter region.
+const hashParams = getDefaultRelayParams({
+  lat: null,  // latitude in degrees north
+  lon: null,  // longitude in degrees east
+  miles: null  // radius in miles
+})
+const center = (isFinite(hashParams.lat) && isFinite(hashParams.lon)) ?
+  {lat: hashParams.lat, lon: hashParams.lon} : null
+const radiusMeters = isFinite(hashParams.miles) ?
+  hashParams.miles * 1609.34 : null
+
 export default Relay.createContainer(CallAssignment, {
-  initialVariables: { id: '' },
+  initialVariables: {
+    id: '',
+    center: center,
+    radiusMeters: radiusMeters
+  },
   fragments: {
     callAssignment: () => Relay.QL`
       fragment on CallAssignment {
@@ -428,9 +445,11 @@ export default Relay.createContainer(CallAssignment, {
       fragment on User {
         id
         firstName
-        allCallsMade:callsMade(forAssignmentId:$id)
-        completedCallsMade:callsMade(forAssignmentId:$id,completed:true)
-        intervieweeForCallAssignment(callAssignmentId:$id) {
+        allCallsMade: callsMade(forAssignmentId: $id)
+        completedCallsMade: callsMade(forAssignmentId: $id, completed: true)
+        intervieweeForCallAssignment(
+          callAssignmentId: $id, center: $center, radiusMeters: $radiusMeters
+        ) {
           id
           prefix
           firstName
