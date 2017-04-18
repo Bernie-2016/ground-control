@@ -461,6 +461,14 @@ const GraphQLListContainer = new GraphQLObjectType({
   interfaces: [nodeInterface]
 })
 
+const GeoPoint = new GraphQLInputObjectType({
+  name: 'GeoPoint',
+  fields: {
+    lat: {type: GraphQLFloat},
+    lon: {type: GraphQLFloat},
+  }
+})
+
 const GraphQLUser = new GraphQLObjectType({
   name: 'User',
   description: 'User of ground control',
@@ -559,10 +567,13 @@ const GraphQLUser = new GraphQLObjectType({
     intervieweeForCallAssignment: {
       type: GraphQLPerson,
       args: {
-        callAssignmentId: {type: GraphQLString}
+        callAssignmentId: {type: GraphQLString},
+        center: {type: GeoPoint},
+        radiusMeters: {type: GraphQLFloat}
       },
-      resolve: async(user, {callAssignmentId}, {rootValue}) => {
-
+      resolve: async(
+        user, {callAssignmentId, center, radiusMeters}, {rootValue}
+      ) => {
         let localCallAssignmentId = fromGlobalId(callAssignmentId)
         if (localCallAssignmentId.type !== 'CallAssignment')
           localCallAssignmentId = callAssignmentId
@@ -651,6 +662,21 @@ const GraphQLUser = new GraphQLObjectType({
           .first()
         if (userAddress)
           query = query.whereNot('bsd_people.cons_id', userAddress.cons_id)
+
+        // Filter by distance from a geographical point.
+        // Spatial ref 4326 is WGS 84, in degrees
+        // Spatial ref 900913 is Google Web Mercator, in meters
+        if (center && radiusMeters > 0) {
+          query = query.whereRaw(`
+            ST_DWithin(bsd_addresses.geom,
+              ST_Transform(
+                ST_SetSRID(ST_MakePoint(${center.lon}, ${center.lat}), 4326),
+                900913
+              ),
+              ${radiusMeters}
+            )
+          `)
+        }
 
         log.info(`Running query: ${query}`)
 

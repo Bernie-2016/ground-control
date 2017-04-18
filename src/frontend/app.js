@@ -166,6 +166,7 @@ ReactDOM.render(
           queries={{
             ...ListContainerQueries
           }}
+          queryParams={['ll', 'miles']}
           renderLoading={() => <Loading />}
         />
       </Route>
